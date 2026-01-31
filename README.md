@@ -12,50 +12,142 @@ $ ssotme -build -id
 
 > CMCC rulebook generated directly from Airtable base.
 
-**Model ID:** `appfVjSTr5bsyyaBT`
+**Model ID:** `appC8XTj95lubn6hz`
 
 ---
 
 ## Tables
 
-### DemoVersions
+### IsEverythingALanguage
 
-> Table: DemoVersions
+> Table: IsEverythingALanguage
 
 #### Schema
 
 | Field | Type | Data Type | Nullable | Description |
 |-------|------|-----------|----------|-------------|
-| `DemoVersionId` | raw | string | No | - |
-| `Name` | calculated | string | Yes | Human-readable display name combining the version number and a slug of the commit message, used for quick identification in lists and logs. |
-| `Message` | raw | string | Yes | Short summary describing what changed in this version, similar to a git commit message. |
-| `Notes` | raw | string | Yes | Extended details about the version changes, including migration notes, breaking changes, or additional context not captured in the message. |
-| `Published` | raw | boolean | Yes | Indicates whether this version has been officially released. Unpublished versions are drafts or internal checkpoints. |
-| `CommitDate` | raw | datetime | Yes | The timestamp when this version was committed, used to generate the version number and establish chronological order. |
-| `VersionNumber` | calculated | string | Yes | Computed version |
-
-**Formula for `Name`:**
-```
-={{VersionNumber}}
-```
-
-**Formula for `VersionNumber`:**
-```
-=CONCATENATE("v", SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(CommitDate, "T", "-"), "/", "-"), ":", "-"), "Z", ""))
-```
+| `IsEverythingALanguageId` | raw | string | No | - |
+| `Name` | raw | string | Yes | - |
+| `ArgumentName` | raw | string | Yes | - |
+| `ArgumentCategory` | raw | string | Yes | - |
+| `StepType` | raw | string | Yes | - |
+| `Statement` | raw | string | Yes | - |
+| `Formalization` | raw | string | Yes | - |
+| `RelatedCandidateName` | raw | string | Yes | - |
+| `RelatedCandidateId` | raw | string | Yes | - |
+| `EvidenceFromRulebook` | raw | string | Yes | - |
+| `Notes` | raw | string | Yes | - |
 
 
-#### Sample Data (1 records)
+#### Sample Data (16 records)
 
 | Field | Value |
 |-------|-------|
-| `DemoVersionId` | v2026-01-10-19-19-30-000 |
-| `Name` | v2026-01-10-19-19-30.000 |
-| `Message` | Initial commit |
-| `Notes` | This is the initial commit for the project. |
-| `Published` | true |
-| `CommitDate` | 2026-01-10T19:19:30Z |
-| `VersionNumber` | v2026-01-10-19-19-30.000 |
+| `IsEverythingALanguageId` | neial-001 |
+| `Name` | NEIAL-001 |
+| `ArgumentName` | LanguageCanBeFormalized |
+| `ArgumentCategory` | Definition |
+| `StepType` | Motivation |
+| `Statement` | To avoid the slogan 'Everything is a language', treat 'language' as a typed construct defined by testable properties (syntax, parsing, serialized meaning, and descriptor-role). |
+| `Notes` | This keeps 'can be interpreted' separate from 'is a language system'. |
+| `Formalization` |  |
+| `RelatedCandidateName` |  |
+| `RelatedCandidateId` |  |
+| `EvidenceFromRulebook` |  |
+
+---
+
+### LanguageCandidates
+
+> Table: LanguageCandidates
+
+#### Schema
+
+| Field | Type | Data Type | Nullable | Description |
+|-------|------|-----------|----------|-------------|
+| `LanguageCandidateId` | raw | string | No | - |
+| `Name` | raw | string | Yes | - |
+| `Is_A_Family_Feud_Top_Answer` | calculated | boolean | Yes | - |
+| `Category` | raw | string | Yes | - |
+| `CanBeHeld` | raw | boolean | Yes | - |
+| `Meaning_Is_Serialized` | raw | boolean | Yes | - |
+| `RequiresParsing` | raw | boolean | Yes | - |
+| `IsOngologyDescriptor` | raw | boolean | Yes | - |
+| `HasSyntax` | raw | boolean | Yes | - |
+| `ChosenLanguageCandidate` | raw | boolean | Yes | - |
+| `FamilyFeudMismatch` | calculated | string | Yes | - |
+| `SortOrder` | raw | integer | Yes | - |
+| `FamilyFuedQuestion` | calculated | string | Yes | - |
+| `HasIdentity` | raw | boolean | Yes | - |
+| `RelationshipToConcept` | calculated | string | Yes | - |
+| `DistanceFromConcept` | raw | integer | Yes | - |
+| `CategoryContainsLanguage` | calculated | boolean | Yes | - |
+| `HasGrammar` | calculated | string | Yes | - |
+
+**Formula for `Is_A_Family_Feud_Top_Answer`:**
+```
+=AND(
+  {{CategoryContainsLanguage}},
+  {{HasSyntax}},
+  NOT({{CanBeHeld}}),
+  {{Meaning_Is_Serialized}},
+  {{RequiresParsing}},
+  {{IsOngologyDescriptor}},
+  NOT({{HasIdentity}}),
+  {{DistanceFromConcept}}=2
+)
+```
+
+**Formula for `FamilyFeudMismatch`:**
+```
+=IF(NOT({{Is_A_Family_Feud_Top_Answer}} = {{ChosenLanguageCandidate}}),
+  {{Name}} & " " & IF({{Is_A_Family_Feud_Top_Answer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
+  IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'")
+```
+
+**Formula for `FamilyFuedQuestion`:**
+```
+="Is " & {{Name}} & " a language?"
+```
+
+**Formula for `RelationshipToConcept`:**
+```
+=IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")
+```
+
+**Formula for `CategoryContainsLanguage`:**
+```
+=FIND("language", LOWER({{Category}})) > 0
+```
+
+**Formula for `HasGrammar`:**
+```
+={{HasSyntax}}
+```
+
+
+#### Sample Data (24 records)
+
+| Field | Value |
+|-------|-------|
+| `LanguageCandidateId` | running-calculator-app |
+| `Name` | Running Calculator App |
+| `RequiresParsing` | true |
+| `Category` | Running Software |
+| `SortOrder` | 18 |
+| `FamilyFuedQuestion` | Is Running Calculator App a language? |
+| `HasIdentity` | true |
+| `RelationshipToConcept` | IsMirrorOf |
+| `DistanceFromConcept` | 1 |
+| `Is_A_Family_Feud_Top_Answer` | false |
+| `CanBeHeld` | false |
+| `Meaning_Is_Serialized` | false |
+| `IsOngologyDescriptor` | false |
+| `HasSyntax` | false |
+| `ChosenLanguageCandidate` | false |
+| `FamilyFeudMismatch` |  |
+| `CategoryContainsLanguage` | false |
+| `HasGrammar` |  |
 
 ---
 
@@ -68,8 +160,8 @@ $ ssotme -build -id
 
 | Property | Value |
 |----------|-------|
-| Source Base ID | `appfVjSTr5bsyyaBT` |
-| Table Count | 1 |
+| Source Base ID | `appC8XTj95lubn6hz` |
+| Table Count | 2 |
 | Tool Version | 2.0.0 |
 | Export Mode | schema_first_type_mapping |
 | Field Type Mapping | checkbox→boolean, number→number/integer, multipleRecordLinks→relationship, multipleLookupValues→lookup, rollup→aggregation, count→aggregation, formula→calculated |

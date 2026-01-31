@@ -2,20 +2,9 @@
 
 **Schema:** `public`
 **Database:** `demo`
-**Timestamp:** 2026-01-31 19:49:26 UTC
+**Timestamp:** 2026-01-10 16:53:57 UTC
 
 ## Parsing Rulebook
-
-Found **1** tables in rulebook
-
-  - **LanguageCandidates** (17 fields, 24 records)
-
-Generated **1** table definitions with **12** raw fields
-Generated **5** calculation functions
-Generated **1** views
-Enabled RLS on **1** tables
-Generated insert statements for **24** records
-## Script Generation Complete
 
 Generated files:
 - `01-drop-and-create-tables.sql` - Drop and recreate tables with raw fields

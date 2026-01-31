@@ -5,7 +5,7 @@
   "ProjectSettings": [
     {
       "Name": "baseId",
-      "Value": "na-for-now"
+      "Value": "appC8XTj95lubn6hz"
     },
     {
       "Name": "project-name",
@@ -29,7 +29,7 @@
       "Name": "airtabletorulebook",
       "RelativePath": "/effortless-rulebook",
       "CommandLine": "airtable-to-rulebook -o effortless-rulebook.json -account airtable -w 300000",
-      "IsDisabled": true
+      "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
@@ -50,7 +50,7 @@
       "Name": "JsonHbarsTransform",
       "RelativePath": "/docs",
       "CommandLine": "json-hbars-transform -i ../effortless-rulebook/effortless-rulebook.json -i generate-rulebook-md.hbars -o ../README.md",
-      "IsDisabled": true
+      "IsDisabled": false
     }
   ]
 }

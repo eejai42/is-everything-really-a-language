@@ -1,13 +1,13 @@
 {
   "$schema": "https://example.com/cmcc-schema/v1",
-  "model_name": "WikiDataCMCC",
-  "Description": "CMCC Rulebook implementing the Wikidata vs CMCC comparison model. Demonstrates the 5-layer architecture: Schema + Data + Lookups + Aggregations + Lambda Functions. Answers: 'Which state did Obama live in on 2005-01-04?'",
-  "People": {
-    "Description": "Table: People",
+  "model_name": "appC8XTj95lubn6hz",
+  "Description": "CMCC rulebook generated directly from Airtable base.",
+  "IsEverythingALanguage": {
+    "Description": "Table: IsEverythingALanguage",
     "schema": [
       {
-        "name": "PersonId",
-        "datatype": "integer",
+        "name": "IsEverythingALanguageId",
+        "datatype": "string",
         "type": "raw",
         "nullable": false
       },
@@ -15,85 +15,280 @@
         "name": "Name",
         "datatype": "string",
         "type": "raw",
-        "nullable": false
+        "nullable": true
       },
       {
-        "name": "WikidataId",
+        "name": "ArgumentName",
         "datatype": "string",
         "type": "raw",
         "nullable": true
       },
       {
-        "name": "BirthDate",
-        "datatype": "date",
+        "name": "ArgumentCategory",
+        "datatype": "string",
         "type": "raw",
         "nullable": true
       },
       {
-        "name": "IsHistorical",
-        "datatype": "boolean",
+        "name": "StepType",
+        "datatype": "string",
         "type": "raw",
         "nullable": true
       },
       {
-        "name": "OfficesHeldList",
+        "name": "Statement",
         "datatype": "string",
-        "type": "relationship",
-        "nullable": true,
-        "RelatedTo": "OfficesHeld"
+        "type": "raw",
+        "nullable": true
       },
       {
-        "name": "ResidencesList",
+        "name": "Formalization",
         "datatype": "string",
-        "type": "relationship",
-        "nullable": true,
-        "RelatedTo": "PersonResidences"
+        "type": "raw",
+        "nullable": true
       },
       {
-        "name": "HasEverBeenUsSenator",
-        "datatype": "boolean",
-        "type": "aggregation",
-        "nullable": true,
-        "formula": "=COUNTIFS(OfficesHeld!{{Person}}, People!{{PersonId}}, OfficesHeld!{{OfficeName}}, \"US Senator\") > 0"
+        "name": "RelatedCandidateName",
+        "datatype": "string",
+        "type": "raw",
+        "nullable": true
       },
       {
-        "name": "SenatorTermCount",
-        "datatype": "integer",
-        "type": "aggregation",
-        "nullable": true,
-        "formula": "=COUNTIFS(OfficesHeld!{{Person}}, People!{{PersonId}}, OfficesHeld!{{OfficeName}}, \"US Senator\")"
+        "name": "RelatedCandidateId",
+        "datatype": "string",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "EvidenceFromRulebook",
+        "datatype": "string",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "Notes",
+        "datatype": "string",
+        "type": "raw",
+        "nullable": true
       }
     ],
     "data": [
       {
-        "PersonId": 1,
-        "Name": "Barack Obama",
-        "WikidataId": "Q76",
-        "BirthDate": "1961-08-04",
-        "IsHistorical": true
+        "IsEverythingALanguageId": "neial-001",
+        "Name": "NEIAL-001",
+        "ArgumentName": "LanguageCanBeFormalized",
+        "ArgumentCategory": "Definition",
+        "StepType": "Motivation",
+        "Statement": "To avoid the slogan \u0027Everything is a language\u0027, treat \u0027language\u0027 as a typed construct defined by testable properties (syntax, parsing, serialized meaning, and descriptor-role).",
+        "Notes": "This keeps \u0027can be interpreted\u0027 separate from \u0027is a language system\u0027.",
+        "Formalization": "",
+        "RelatedCandidateName": "",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
       },
       {
-        "PersonId": 2,
-        "Name": "Jesus Christ",
-        "WikidataId": "Q302",
-        "BirthDate": null,
-        "IsHistorical": true
+        "IsEverythingALanguageId": "neial-004",
+        "Name": "NEIAL-004",
+        "ArgumentName": "LanguageCanBeFormalized",
+        "ArgumentCategory": "Premise",
+        "StepType": "Witness",
+        "Statement": "There exists at least one clear witness that satisfies the operational definition: English.",
+        "Formalization": "\u2203x (x=English \u2227 Language(x))",
+        "RelatedCandidateName": "English",
+        "RelatedCandidateId": "english",
+        "EvidenceFromRulebook": "HasSyntax=True; RequiresParsing=True; Meaning_Is_Serialized=True; IsOngologyDescriptor=True; CanBeHeld=False; HasIdentity=False; DistanceFromConcept=2; Category=Natural Language",
+        "Notes": "If any predicate is false in your current dataset for this witness, adjust the candidate record or relax the definition."
       },
       {
-        "PersonId": 3,
-        "Name": "Santa Claus",
-        "WikidataId": "Q42927",
-        "BirthDate": null,
-        "IsHistorical": false
+        "IsEverythingALanguageId": "neial-016",
+        "Name": "NEIAL-016",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Conclusion",
+        "StepType": "Conclusion",
+        "Statement": "Given a formalizable definition of language, not everything is a language; some things are better treated as sign vehicles or semiotic processes, with running applications as a key fuzzy region that benefits from explicit modeling.",
+        "Formalization": "Formalizable(Language) \u2227 \u2203x \u00ACLanguage(x) \u21D2 \u00AC(EverythingIsALanguage)",
+        "Notes": "This is the repo\u0027s thesis in one line.",
+        "RelatedCandidateName": "",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-007",
+        "Name": "NEIAL-007",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Premise",
+        "StepType": "Entailment",
+        "Statement": "If Language(x) is defined by necessary conditions, then any x that fails at least one condition is not a language.",
+        "Formalization": "\u2200x (\u00AC(HasSyntax(x) \u2227 RequiresParsing(x) \u2227 Meaning_Is_Serialized(x) \u2227 IsOngologyDescriptor(x)) \u2192 \u00ACLanguage(x))",
+        "Notes": "This is the standard move: a definition implies exclusions.",
+        "RelatedCandidateName": "",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-008",
+        "Name": "NEIAL-008",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Example",
+        "StepType": "Counterexample",
+        "Statement": "Counterexample: a chair can be interpreted as a sign (status, design, function), but it does not constitute a language system under the operational definition.",
+        "Formalization": "\u00ACLanguage(Chair)",
+        "RelatedCandidateName": "A Chair",
+        "Notes": "This separates semiotic availability (can signify) from linguistic structure (has syntax/parsing/serialized meaning).",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-009",
+        "Name": "NEIAL-009",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Example",
+        "StepType": "NonLanguageExample",
+        "Statement": "Non-language example: A Thunderstorm can be meaningful, but meaning here is not generated by an explicit syntax\u002Bparsing\u002Bserialization descriptor system.",
+        "Formalization": "\u00ACLanguage(A Thunderstorm)",
+        "RelatedCandidateName": "A Thunderstorm",
+        "RelatedCandidateId": "a-thunderstorm",
+        "EvidenceFromRulebook": "HasSyntax=False; RequiresParsing=True; Meaning_Is_Serialized=False; IsOngologyDescriptor=False; CanBeHeld=False; HasIdentity=True; DistanceFromConcept=1; Category=Physical event",
+        "Notes": "These are strong candidates for \u0027sign vehicles\u0027 rather than \u0027languages\u0027."
+      },
+      {
+        "IsEverythingALanguageId": "neial-002",
+        "Name": "NEIAL-002",
+        "ArgumentName": "LanguageCanBeFormalized",
+        "ArgumentCategory": "Definition",
+        "StepType": "PredicateSet",
+        "Statement": "Use the repo predicates: HasSyntax, RequiresParsing, Meaning_Is_Serialized, IsOntologyDescriptor (spelled IsOngologyDescriptor in the dataset), plus auxiliary checks like CanBeHeld and HasIdentity.",
+        "Formalization": "Predicates: Syntax(x), Parse(x), SerializeMeaning(x), OntDesc(x), Tangible(x)",
+        "Notes": "We preserve the dataset\u0027s field name even when misspelled to match the generated schema.",
+        "RelatedCandidateName": "",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-006",
+        "Name": "NEIAL-006",
+        "ArgumentName": "LanguageCanBeFormalized",
+        "ArgumentCategory": "Conclusion",
+        "StepType": "Conclusion",
+        "Statement": "Therefore, \u0027language\u0027 can be formalized as a computable classification boundary over explicit predicates.",
+        "Formalization": "(Definition \u2227 Witnesses) \u21D2 Formalizable(Language)",
+        "Notes": "This is the concession: language is formalizable (at least operationally).",
+        "RelatedCandidateName": "",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-012",
+        "Name": "NEIAL-012",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Observation",
+        "StepType": "FuzzyBoundary",
+        "Statement": "Fuzzy case: A Running App often contains embedded languages (code, UI grammars), but as an executing/interactive process it behaves like a dynamic system rather than a static serialized language artifact.",
+        "Formalization": "Borderline(A Running App): may contain \u2203y Language(y) but \u00ACLanguage(A Running App) under static-serialization criteria",
+        "RelatedCandidateName": "A Running App",
+        "Notes": "This is where traditional semiotics\u0027 \u0027anything is a sign\u0027 doesn\u2019t neatly distinguish: (1) language-as-system vs (2) meaning-making interactive processes.",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-013",
+        "Name": "NEIAL-013",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Observation",
+        "StepType": "FuzzyBoundary",
+        "Statement": "Fuzzy case: Running Calculator App often contains embedded languages (code, UI grammars), but as an executing/interactive process it behaves like a dynamic system rather than a static serialized language artifact.",
+        "Formalization": "Borderline(Running Calculator App): may contain \u2203y Language(y) but \u00ACLanguage(Running Calculator App) under static-serialization criteria",
+        "RelatedCandidateName": "Running Calculator App",
+        "RelatedCandidateId": "running-calculator-app",
+        "EvidenceFromRulebook": "HasSyntax=False; RequiresParsing=True; Meaning_Is_Serialized=False; IsOngologyDescriptor=False; CanBeHeld=False; HasIdentity=True; DistanceFromConcept=1; Category=Running Software",
+        "Notes": "This is where traditional semiotics\u0027 \u0027anything is a sign\u0027 doesn\u2019t neatly distinguish: (1) language-as-system vs (2) meaning-making interactive processes."
+      },
+      {
+        "IsEverythingALanguageId": "neial-010",
+        "Name": "NEIAL-010",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Example",
+        "StepType": "NonLanguageExample",
+        "Statement": "Non-language example: A Coffee Mug can be meaningful, but meaning here is not generated by an explicit syntax\u002Bparsing\u002Bserialization descriptor system.",
+        "Formalization": "\u00ACLanguage(A Coffee Mug)",
+        "RelatedCandidateName": "A Coffee Mug",
+        "RelatedCandidateId": "a-coffee-mug",
+        "EvidenceFromRulebook": "HasSyntax=False; RequiresParsing=False; Meaning_Is_Serialized=False; IsOngologyDescriptor=False; CanBeHeld=True; HasIdentity=True; DistanceFromConcept=1; Category=Physical Object",
+        "Notes": "These are strong candidates for \u0027sign vehicles\u0027 rather than \u0027languages\u0027."
+      },
+      {
+        "IsEverythingALanguageId": "neial-014",
+        "Name": "NEIAL-014",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Observation",
+        "StepType": "FuzzyBoundary",
+        "Statement": "Fuzzy case: A Game of Fortnite often contains embedded languages (code, UI grammars), but as an executing/interactive process it behaves like a dynamic system rather than a static serialized language artifact.",
+        "Formalization": "Borderline(A Game of Fortnite): may contain \u2203y Language(y) but \u00ACLanguage(A Game of Fortnite) under static-serialization criteria",
+        "RelatedCandidateName": "A Game of Fortnite",
+        "RelatedCandidateId": "a-game-of-fortnite",
+        "EvidenceFromRulebook": "HasSyntax=False; RequiresParsing=True; Meaning_Is_Serialized=False; IsOngologyDescriptor=False; CanBeHeld=False; HasIdentity=True; DistanceFromConcept=1; Category=Running Software",
+        "Notes": "This is where traditional semiotics\u0027 \u0027anything is a sign\u0027 doesn\u2019t neatly distinguish: (1) language-as-system vs (2) meaning-making interactive processes."
+      },
+      {
+        "IsEverythingALanguageId": "neial-005",
+        "Name": "NEIAL-005",
+        "ArgumentName": "LanguageCanBeFormalized",
+        "ArgumentCategory": "Premise",
+        "StepType": "Witness",
+        "Statement": "There exists at least one clear witness that satisfies the operational definition: Python.",
+        "Formalization": "\u2203x (x=Python \u2227 Language(x))",
+        "RelatedCandidateName": "Python",
+        "RelatedCandidateId": "python",
+        "EvidenceFromRulebook": "HasSyntax=True; RequiresParsing=True; Meaning_Is_Serialized=True; IsOngologyDescriptor=True; CanBeHeld=False; HasIdentity=False; DistanceFromConcept=2; Category=Formal Language",
+        "Notes": "If any predicate is false in your current dataset for this witness, adjust the candidate record or relax the definition."
+      },
+      {
+        "IsEverythingALanguageId": "neial-003",
+        "Name": "NEIAL-003",
+        "ArgumentName": "LanguageCanBeFormalized",
+        "ArgumentCategory": "Definition",
+        "StepType": "Definition",
+        "Statement": "Operational definition: an item x counts as a Language if it has syntax, requires parsing, serializes meaning, and functions as an ontology/descriptor system.",
+        "Formalization": "Language(x) := HasSyntax(x) \u2227 RequiresParsing(x) \u2227 Meaning_Is_Serialized(x) \u2227 IsOngologyDescriptor(x)",
+        "Notes": "This is a deliberately \u0027strong\u0027 definition: it matches formal languages and many natural language representations.",
+        "RelatedCandidateName": "",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-015",
+        "Name": "NEIAL-015",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Definition",
+        "StepType": "Refinement",
+        "Statement": "Refinement: distinguish LanguageSystem (syntax/parsing/serialization descriptor) from SemioticProcess (interactive/dynamic meaning production) and from SignVehicle (object/phenomenon used as a sign).",
+        "Formalization": "Kinds: LanguageSystem(x) | SemioticProcess(x) | SignVehicle(x)",
+        "Notes": "This gives you a place to put running apps and games without forcing \u0027language\u0027 to swallow everything.",
+        "RelatedCandidateName": "",
+        "RelatedCandidateId": "",
+        "EvidenceFromRulebook": ""
+      },
+      {
+        "IsEverythingALanguageId": "neial-011",
+        "Name": "NEIAL-011",
+        "ArgumentName": "NotEverythingIsALanguage",
+        "ArgumentCategory": "Example",
+        "StepType": "NonLanguageExample",
+        "Statement": "Non-language example: The Mona Lisa can be meaningful, but meaning here is not generated by an explicit syntax\u002Bparsing\u002Bserialization descriptor system.",
+        "Formalization": "\u00ACLanguage(The Mona Lisa)",
+        "RelatedCandidateName": "The Mona Lisa",
+        "RelatedCandidateId": "the-mona-lisa",
+        "EvidenceFromRulebook": "HasSyntax=False; RequiresParsing=False; Meaning_Is_Serialized=False; IsOngologyDescriptor=True; CanBeHeld=True; HasIdentity=True; DistanceFromConcept=1; Category=Physical Object",
+        "Notes": "These are strong candidates for \u0027sign vehicles\u0027 rather than \u0027languages\u0027."
       }
     ]
   },
-  "Offices": {
-    "Description": "Table: Offices",
+  "LanguageCandidates": {
+    "Description": "Table: LanguageCandidates",
     "schema": [
       {
-        "name": "OfficeId",
-        "datatype": "integer",
+        "name": "LanguageCandidateId",
+        "datatype": "string",
         "type": "raw",
         "nullable": false
       },
@@ -101,324 +296,609 @@
         "name": "Name",
         "datatype": "string",
         "type": "raw",
-        "nullable": false
-      },
-      {
-        "name": "WikidataId",
-        "datatype": "string",
-        "type": "raw",
         "nullable": true
       },
       {
-        "name": "WikidataPropertyId",
-        "datatype": "string",
-        "type": "raw",
-        "nullable": true
-      },
-      {
-        "name": "RequiresDistrict",
+        "name": "Is_A_Family_Feud_Top_Answer",
         "datatype": "boolean",
-        "type": "raw",
-        "nullable": true
-      },
-      {
-        "name": "HolderCount",
-        "datatype": "integer",
-        "type": "aggregation",
-        "nullable": true,
-        "formula": "=COUNTIFS(OfficesHeld!{{Office}}, Offices!{{OfficeId}})"
-      }
-    ],
-    "data": [
-      {
-        "OfficeId": 1,
-        "Name": "US Senator",
-        "WikidataId": "Q4416090",
-        "WikidataPropertyId": "P39",
-        "RequiresDistrict": true
-      },
-      {
-        "OfficeId": 2,
-        "Name": "President of the United States",
-        "WikidataId": "Q11696",
-        "WikidataPropertyId": "P39",
-        "RequiresDistrict": false
-      },
-      {
-        "OfficeId": 3,
-        "Name": "Governor",
-        "WikidataId": "Q132050",
-        "WikidataPropertyId": "P39",
-        "RequiresDistrict": true
-      }
-    ]
-  },
-  "States": {
-    "Description": "Table: States",
-    "schema": [
-      {
-        "name": "StateId",
-        "datatype": "integer",
-        "type": "raw",
-        "nullable": false
-      },
-      {
-        "name": "Name",
-        "datatype": "string",
-        "type": "raw",
-        "nullable": false
-      },
-      {
-        "name": "Abbreviation",
-        "datatype": "string",
-        "type": "raw",
-        "nullable": false
-      },
-      {
-        "name": "WikidataId",
-        "datatype": "string",
-        "type": "raw",
-        "nullable": true
-      },
-      {
-        "name": "ResidentCount",
-        "datatype": "integer",
-        "type": "aggregation",
-        "nullable": true,
-        "formula": "=COUNTIFS(PersonResidences!{{State}}, States!{{StateId}})"
-      }
-    ],
-    "data": [
-      {
-        "StateId": 1,
-        "Name": "Illinois",
-        "Abbreviation": "IL",
-        "WikidataId": "Q1204"
-      },
-      {
-        "StateId": 2,
-        "Name": "New York",
-        "Abbreviation": "NY",
-        "WikidataId": "Q1384"
-      },
-      {
-        "StateId": 3,
-        "Name": "Arizona",
-        "Abbreviation": "AZ",
-        "WikidataId": "Q816"
-      },
-      {
-        "StateId": 4,
-        "Name": "Hawaii",
-        "Abbreviation": "HI",
-        "WikidataId": "Q782"
-      }
-    ]
-  },
-  "OfficesHeld": {
-    "Description": "Table: OfficesHeld",
-    "schema": [
-      {
-        "name": "OfficeHeldId",
-        "datatype": "integer",
-        "type": "raw",
-        "nullable": false
-      },
-      {
-        "name": "Person",
-        "datatype": "integer",
-        "type": "relationship",
-        "nullable": false,
-        "RelatedTo": "People"
-      },
-      {
-        "name": "Office",
-        "datatype": "integer",
-        "type": "relationship",
-        "nullable": false,
-        "RelatedTo": "Offices"
-      },
-      {
-        "name": "District",
-        "datatype": "integer",
-        "type": "relationship",
-        "nullable": true,
-        "RelatedTo": "States"
-      },
-      {
-        "name": "StartDate",
-        "datatype": "date",
-        "type": "raw",
-        "nullable": false
-      },
-      {
-        "name": "EndDate",
-        "datatype": "date",
-        "type": "raw",
-        "nullable": true
-      },
-      {
-        "name": "Rank",
-        "datatype": "string",
-        "type": "raw",
-        "nullable": true
-      },
-      {
-        "name": "PersonName",
-        "datatype": "string",
-        "type": "lookup",
-        "nullable": true,
-        "formula": "=INDEX(People!{{Name}}, MATCH(OfficesHeld!{{Person}}, People!{{PersonId}}, 0))"
-      },
-      {
-        "name": "OfficeName",
-        "datatype": "string",
-        "type": "lookup",
-        "nullable": true,
-        "formula": "=INDEX(Offices!{{Name}}, MATCH(OfficesHeld!{{Office}}, Offices!{{OfficeId}}, 0))"
-      },
-      {
-        "name": "DistrictName",
-        "datatype": "string",
-        "type": "lookup",
-        "nullable": true,
-        "formula": "=INDEX(States!{{Name}}, MATCH(OfficesHeld!{{District}}, States!{{StateId}}, 0))"
-      },
-      {
-        "name": "DistrictAbbreviation",
-        "datatype": "string",
-        "type": "lookup",
-        "nullable": true,
-        "formula": "=INDEX(States!{{Abbreviation}}, MATCH(OfficesHeld!{{District}}, States!{{StateId}}, 0))"
-      },
-      {
-        "name": "TermDurationDays",
-        "datatype": "integer",
         "type": "calculated",
         "nullable": true,
-        "formula": "=DATEDIFF({{EndDate}}, {{StartDate}})"
+        "formula": "=AND(\n  {{CategoryContainsLanguage}},\n  {{HasSyntax}},\n  NOT({{CanBeHeld}}),\n  {{Meaning_Is_Serialized}},\n  {{RequiresParsing}},\n  {{IsOngologyDescriptor}},\n  NOT({{HasIdentity}}),\n  {{DistanceFromConcept}}=2\n)"
+      },
+      {
+        "name": "Category",
+        "datatype": "string",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "CanBeHeld",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "Meaning_Is_Serialized",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "RequiresParsing",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "IsOngologyDescriptor",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "HasSyntax",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "ChosenLanguageCandidate",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "FamilyFeudMismatch",
+        "datatype": "string",
+        "type": "calculated",
+        "nullable": true,
+        "formula": "=IF(NOT({{Is_A_Family_Feud_Top_Answer}} = {{ChosenLanguageCandidate}}),\n  {{Name}} \u0026 \u0022 \u0022 \u0026 IF({{Is_A_Family_Feud_Top_Answer}}, \u0022Is\u0022, \u0022Isn\u0027t\u0022) \u0026 \u0022 a Family Feud Language, but \u0022 \u0026 \n  IF({{ChosenLanguageCandidate}}, \u0022Is\u0022, \u0022Is Not\u0022) \u0026 \u0022 marked as a \u0027Language Candidate.\u0027\u0022)"
+      },
+      {
+        "name": "SortOrder",
+        "datatype": "integer",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "FamilyFuedQuestion",
+        "datatype": "string",
+        "type": "calculated",
+        "nullable": true,
+        "formula": "=\u0022Is \u0022 \u0026 {{Name}} \u0026 \u0022 a language?\u0022"
+      },
+      {
+        "name": "HasIdentity",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "RelationshipToConcept",
+        "datatype": "string",
+        "type": "calculated",
+        "nullable": true,
+        "formula": "=IF({{DistanceFromConcept}} = 1, \u0022IsMirrorOf\u0022, \u0022IsDescriptionOf\u0022)"
+      },
+      {
+        "name": "DistanceFromConcept",
+        "datatype": "integer",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "CategoryContainsLanguage",
+        "datatype": "boolean",
+        "type": "calculated",
+        "nullable": true,
+        "formula": "=FIND(\u0022language\u0022, LOWER({{Category}})) \u003E 0"
+      },
+      {
+        "name": "HasGrammar",
+        "datatype": "string",
+        "type": "calculated",
+        "nullable": true,
+        "formula": "={{HasSyntax}}"
       }
     ],
     "data": [
       {
-        "OfficeHeldId": 1,
-        "Person": 1,
-        "Office": 1,
-        "District": 1,
-        "StartDate": "2005-01-03",
-        "EndDate": "2008-11-16",
-        "Rank": "normal"
+        "LanguageCandidateId": "running-calculator-app",
+        "Name": "Running Calculator App",
+        "RequiresParsing": true,
+        "Category": "Running Software",
+        "SortOrder": 18,
+        "FamilyFuedQuestion": "Is Running Calculator App a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "CanBeHeld": false,
+        "Meaning_Is_Serialized": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
       },
       {
-        "OfficeHeldId": 2,
-        "Person": 1,
-        "Office": 2,
-        "District": null,
-        "StartDate": "2009-01-20",
-        "EndDate": "2017-01-20",
-        "Rank": "normal"
-      }
-    ]
-  },
-  "PersonResidences": {
-    "Description": "Table: PersonResidences",
-    "schema": [
-      {
-        "name": "ResidenceId",
-        "datatype": "integer",
-        "type": "raw",
-        "nullable": false
+        "LanguageCandidateId": "a-chair",
+        "Name": "A Chair ",
+        "CanBeHeld": true,
+        "Category": "Physical Object",
+        "SortOrder": 3,
+        "FamilyFuedQuestion": "Is A Chair  a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "Meaning_Is_Serialized": false,
+        "RequiresParsing": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
       },
       {
-        "name": "Person",
-        "datatype": "integer",
-        "type": "relationship",
-        "nullable": false,
-        "RelatedTo": "People"
+        "LanguageCandidateId": "a-smartphone",
+        "Name": "A Smartphone",
+        "CanBeHeld": true,
+        "Meaning_Is_Serialized": true,
+        "Category": "Physical Object",
+        "SortOrder": 7,
+        "FamilyFuedQuestion": "Is A Smartphone a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "RequiresParsing": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
       },
       {
-        "name": "State",
-        "datatype": "integer",
-        "type": "relationship",
-        "nullable": true,
-        "RelatedTo": "States"
+        "LanguageCandidateId": "a-coffee-mug",
+        "Name": "A Coffee Mug",
+        "CanBeHeld": true,
+        "Category": "Physical Object",
+        "SortOrder": 12,
+        "FamilyFuedQuestion": "Is A Coffee Mug a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "Meaning_Is_Serialized": false,
+        "RequiresParsing": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
       },
       {
-        "name": "LocationDescription",
-        "datatype": "string",
-        "type": "raw",
-        "nullable": true
+        "LanguageCandidateId": "an-xlsx-doc",
+        "Name": "An XLSX Doc",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Formal Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 22,
+        "FamilyFuedQuestion": "Is An XLSX Doc a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
       },
       {
-        "name": "StartDate",
-        "datatype": "date",
-        "type": "raw",
-        "nullable": true
+        "LanguageCandidateId": "falsifier-a",
+        "Name": "Falsifier A",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "MISSING: Have you seen this Language?",
+        "FamilyFeudMismatch": "Falsifier A Is a Family Feud Language, but Is Not marked as a \u0027Language Candidate.\u0027",
+        "SortOrder": 19,
+        "FamilyFuedQuestion": "Is Falsifier A a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "ChosenLanguageCandidate": false,
+        "HasIdentity": false
       },
       {
-        "name": "EndDate",
-        "datatype": "date",
-        "type": "raw",
-        "nullable": true
+        "LanguageCandidateId": "falsifier-b",
+        "Name": "Falsifier B",
+        "IsOngologyDescriptor": true,
+        "CanBeHeld": true,
+        "RequiresParsing": true,
+        "Category": "MISSING: Have you seen this Language?",
+        "ChosenLanguageCandidate": true,
+        "FamilyFeudMismatch": "Falsifier B Isn\u0027t a Family Feud Language, but Is marked as a \u0027Language Candidate.\u0027",
+        "SortOrder": 20,
+        "FamilyFuedQuestion": "Is Falsifier B a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "CategoryContainsLanguage": true,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "Meaning_Is_Serialized": false,
+        "HasSyntax": false,
+        "HasGrammar": ""
       },
       {
-        "name": "Source",
-        "datatype": "string",
-        "type": "raw",
-        "nullable": true
+        "LanguageCandidateId": "editing-an-docx-doc",
+        "Name": "Editing an DOCX Doc",
+        "IsOngologyDescriptor": true,
+        "Category": "Running Software",
+        "SortOrder": 25,
+        "FamilyFuedQuestion": "Is Editing an DOCX Doc a language?",
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "CanBeHeld": false,
+        "Meaning_Is_Serialized": false,
+        "RequiresParsing": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false,
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
       },
       {
-        "name": "PersonName",
-        "datatype": "string",
-        "type": "lookup",
-        "nullable": true,
-        "formula": "=INDEX(People!{{Name}}, MATCH(PersonResidences!{{Person}}, People!{{PersonId}}, 0))"
+        "LanguageCandidateId": "an-docx-doc",
+        "Name": "An DOCX Doc",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Formal Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 24,
+        "FamilyFuedQuestion": "Is An DOCX Doc a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
       },
       {
-        "name": "StateName",
-        "datatype": "string",
-        "type": "lookup",
-        "nullable": true,
-        "formula": "=INDEX(States!{{Name}}, MATCH(PersonResidences!{{State}}, States!{{StateId}}, 0))"
+        "LanguageCandidateId": "owl-rdf-graphql-generally",
+        "Name": "OWL/RDF/GraphQL/... generally",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Natural Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 10,
+        "FamilyFuedQuestion": "Is OWL/RDF/GraphQL/... generally a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
       },
       {
-        "name": "StateAbbreviation",
-        "datatype": "string",
-        "type": "lookup",
-        "nullable": true,
-        "formula": "=INDEX(States!{{Abbreviation}}, MATCH(PersonResidences!{{State}}, States!{{StateId}}, 0))"
-      }
-    ],
-    "data": [
-      {
-        "ResidenceId": 1,
-        "Person": 3,
-        "State": null,
-        "LocationDescription": "North Pole",
-        "StartDate": null,
-        "EndDate": null,
-        "Source": "folklore"
+        "LanguageCandidateId": "binary-code",
+        "Name": "Binary Code",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Formal Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 14,
+        "FamilyFuedQuestion": "Is Binary Code a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
       },
       {
-        "ResidenceId": 2,
-        "Person": 1,
-        "State": 4,
-        "LocationDescription": "Honolulu, Hawaii",
-        "StartDate": "1961-08-04",
-        "EndDate": "1979-06-01",
-        "Source": "biography"
+        "LanguageCandidateId": "editing-an-xlsx-doc",
+        "Name": "Editing an XLSX Doc",
+        "Category": "Running Software",
+        "SortOrder": 23,
+        "FamilyFuedQuestion": "Is Editing an XLSX Doc a language?",
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "CanBeHeld": false,
+        "Meaning_Is_Serialized": false,
+        "RequiresParsing": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false,
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
+      },
+      {
+        "LanguageCandidateId": "a-thunderstorm",
+        "Name": "A Thunderstorm",
+        "RequiresParsing": true,
+        "Category": "Physical event",
+        "SortOrder": 11,
+        "FamilyFuedQuestion": "Is A Thunderstorm a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "CanBeHeld": false,
+        "Meaning_Is_Serialized": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
+      },
+      {
+        "LanguageCandidateId": "python",
+        "Name": "Python",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Formal Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 6,
+        "FamilyFuedQuestion": "Is Python a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "english",
+        "Name": "English",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Natural Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 1,
+        "FamilyFuedQuestion": "Is English a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "a-csv-file",
+        "Name": "A CSV File",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Formal Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 9,
+        "FamilyFuedQuestion": "Is A CSV File a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "a-uml-file",
+        "Name": "A UML File",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Formal Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 13,
+        "FamilyFuedQuestion": "Is A UML File a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "the-mona-lisa",
+        "Name": "The Mona Lisa",
+        "IsOngologyDescriptor": true,
+        "CanBeHeld": true,
+        "Category": "Physical Object",
+        "SortOrder": 15,
+        "FamilyFuedQuestion": "Is The Mona Lisa a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "Meaning_Is_Serialized": false,
+        "RequiresParsing": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
+      },
+      {
+        "LanguageCandidateId": "french",
+        "Name": "French",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Natural Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 17,
+        "FamilyFuedQuestion": "Is French a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "javascript",
+        "Name": "JavaScript",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Formal Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 16,
+        "FamilyFuedQuestion": "Is JavaScript a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "spoken-words",
+        "Name": "Spoken Words",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Natural Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 2,
+        "FamilyFuedQuestion": "Is Spoken Words a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "sign-language",
+        "Name": "Sign Language",
+        "Is_A_Family_Feud_Top_Answer": true,
+        "IsOngologyDescriptor": true,
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "Natural Language",
+        "ChosenLanguageCandidate": true,
+        "SortOrder": 5,
+        "FamilyFuedQuestion": "Is Sign Language a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "CategoryContainsLanguage": true,
+        "HasGrammar": "true",
+        "CanBeHeld": false,
+        "FamilyFeudMismatch": "",
+        "HasIdentity": false
+      },
+      {
+        "LanguageCandidateId": "a-game-of-fortnite",
+        "Name": "A Game of Fortnite",
+        "RequiresParsing": true,
+        "Category": "Running Software",
+        "SortOrder": 4,
+        "FamilyFuedQuestion": "Is A Game of Fortnite a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "CanBeHeld": false,
+        "Meaning_Is_Serialized": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
+      },
+      {
+        "LanguageCandidateId": "a-running-app",
+        "Name": "A Running App ",
+        "Meaning_Is_Serialized": true,
+        "RequiresParsing": true,
+        "Category": "Running Software",
+        "SortOrder": 8,
+        "FamilyFuedQuestion": "Is A Running App  a language?",
+        "HasIdentity": true,
+        "RelationshipToConcept": "IsMirrorOf",
+        "DistanceFromConcept": 1,
+        "Is_A_Family_Feud_Top_Answer": false,
+        "CanBeHeld": false,
+        "IsOngologyDescriptor": false,
+        "HasSyntax": false,
+        "ChosenLanguageCandidate": false,
+        "FamilyFeudMismatch": "",
+        "CategoryContainsLanguage": false,
+        "HasGrammar": ""
       }
     ]
   },
   "_meta": {
-    "_CMCC_Summary": "CMCC Rulebook for Wikidata comparison demo. Implements Schema + Data + Lookups + Aggregations + Lambda Functions. The stable query interface is: SELECT * FROM vw_residences WHERE person_id = :obama AND start_date <= :date AND :date <= end_date",
+    "_CMCC_Summary": "Airtable export with schema-first type mapping: Schemas, Data, Relationships (FK links), Lookups (INDEX/MATCH), Aggregations (SUMIFS/COUNTIFS/Rollups), and Calculated fields (formulas) in Excel dialect. Field types are determined from Airtable\u0027s schema metadata FIRST (no coercion), with intelligent fallback to formula/data analysis only when schema is unavailable.",
     "_conversion_metadata": {
-      "source": "WIKI_DATA_PLAN.md",
-      "table_count": 5,
-      "demo_question": "Which state did Obama live in on 2005-01-04?",
-      "expected_answers": {
-        "2005-01-02": "NULL (not yet a senator)",
-        "2005-01-04": "Illinois (senator term started 2005-01-03)"
+      "source_base_id": "appC8XTj95lubn6hz",
+      "table_count": 2,
+      "tool_version": "2.0.0",
+      "field_type_mapping": "checkbox\u2192boolean, number\u2192number/integer, multipleRecordLinks\u2192relationship, multipleLookupValues\u2192lookup, rollup\u2192aggregation, count\u2192aggregation, formula\u2192calculated",
+      "export_mode": "schema_first_type_mapping",
+      "type_inference": {
+        "enabled": true,
+        "priority": "airtable_metadata (NO COERCION) \u2192 formula_analysis \u2192 reference_resolution \u2192 data_analysis (fallback only)",
+        "airtable_type_mapping": "checkbox\u2192boolean, singleLineText\u2192string, multilineText\u2192string, number\u2192number/integer, datetime\u2192datetime, singleSelect\u2192string, email\u2192string, url\u2192string, phoneNumber\u2192string",
+        "data_coercion_hierarchy": "Only used as fallback when Airtable schema unavailable: datetime \u2192 number \u2192 integer \u2192 boolean \u2192 base64 \u2192 json \u2192 string",
+        "nullable_support": true,
+        "error_value_handling": "#NUM!, #ERROR!, #N/A, #REF!, #DIV/0!, #VALUE!, #NAME? are treated as NULL"
       }
     }
   }

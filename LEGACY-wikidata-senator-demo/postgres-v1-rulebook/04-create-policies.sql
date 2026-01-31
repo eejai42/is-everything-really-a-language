@@ -6,8 +6,11 @@
 
 -- Enable RLS on all tables
 
-ALTER TABLE is_everything_a_language ENABLE ROW LEVEL SECURITY;
-ALTER TABLE language_candidates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE people ENABLE ROW LEVEL SECURITY;
+ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE states ENABLE ROW LEVEL SECURITY;
+ALTER TABLE offices_held ENABLE ROW LEVEL SECURITY;
+ALTER TABLE person_residences ENABLE ROW LEVEL SECURITY;
 
 -- TODO: Add specific RLS policies based on your security requirements
 -- Example:
