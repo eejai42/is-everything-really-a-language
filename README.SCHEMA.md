@@ -295,30 +295,30 @@ The following entities have been evaluated against the operational definition of
 
 | Name | Category | Is Language? | HasSyntax | RequiresParsing | MeaningIsSerialized | IsOntologyDescriptor | README |
 |------|----------|--------------|-----------|-----------------|---------------------|----------------------|--------|
-| Falsifier A | MISSING: Have you seen this Language? | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/falsifier-a/README.md) |
+| Falsifier A | MISSING: Have you seen this Language? | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/falsifier-a/README.md) |
 | Falsifier B | MISSING: Have you seen this Language? | No | ✗ | ✓ | ✗ | ✓ | - |
-| English | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/english/README.md) |
-| Spoken Words | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/spoken-words/README.md) |
+| English | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/english/README.md) |
+| Spoken Words | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/spoken-words/README.md) |
 | A Chair  | Physical Object | No | ✗ | ✗ | ✗ | ✗ | - |
 | A Game of Fortnite | Running Software | No | ✗ | ✓ | ✗ | ✗ | - |
-| Sign Language | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/sign-language/README.md) |
-| Python | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/python/README.md) |
+| Sign Language | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/sign-language/README.md) |
+| Python | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/python/README.md) |
 | A Smartphone | Physical Object | No | ✗ | ✗ | ✓ | ✗ | - |
 | A Running App  | Running Software | No | ✗ | ✓ | ✓ | ✗ | - |
-| An XLSX Doc | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/an-xlsx-doc/README.md) |
+| An XLSX Doc | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/an-xlsx-doc/README.md) |
 | Editing an XLSX Doc | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
-| An DOCX Doc | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/an-docx-doc/README.md) |
+| An DOCX Doc | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/an-docx-doc/README.md) |
 | Editing an DOCX Doc | Running Software | No | ✗ | ✗ | ✗ | ✓ | - |
-| A CSV File | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/a-csv-file/README.md) |
-| OWL/RDF/GraphQL/... generally | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/owl-rdf-graphql-generally/README.md) |
+| A CSV File | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/a-csv-file/README.md) |
+| OWL/RDF/GraphQL/... generally | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/owl-rdf-graphql-generally/README.md) |
 | A Coffee Mug | Physical Object | No | ✗ | ✗ | ✗ | ✗ | - |
 | A Thunderstorm | Physical event | No | ✗ | ✓ | ✗ | ✗ | - |
-| A UML File | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/a-uml-file/README.md) |
-| Binary Code | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/binary-code/README.md) |
+| A UML File | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/a-uml-file/README.md) |
+| Binary Code | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/binary-code/README.md) |
 | The Mona Lisa | Physical Object | No | ✗ | ✗ | ✗ | ✓ | - |
 | Running Calculator App | Running Software | No | ✗ | ✓ | ✗ | ✗ | - |
-| JavaScript | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/javascript/README.md) |
-| French | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./language-candidates/french/README.md) |
+| JavaScript | Formal Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/javascript/README.md) |
+| French | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/french/README.md) |
 
 ### Predicate Legend
 
@@ -382,11 +382,11 @@ The following entities have been evaluated against the operational definition of
 |-------|------|-----------|----------|-------------|
 | `LanguageCandidateId` | raw | string | No | - |
 | `Name` | raw | string | Yes | - |
-| `FamilyFeudMismatch` | calculated | string | Yes | - |
-| `FamilyFuedQuestion` | calculated | string | Yes | - |
 | `Category` | raw | string | Yes | - |
+| `FamilyFuedQuestion` | calculated | string | Yes | - |
 | `TopFamilyFeudAnswer` | calculated | boolean | Yes | - |
 | `ChosenLanguageCandidate` | raw | boolean | Yes | - |
+| `FamilyFeudMismatch` | calculated | string | Yes | - |
 | `HasSyntax` | raw | boolean | Yes | - |
 | `HasIdentity` | raw | boolean | Yes | - |
 | `CanBeHeld` | raw | boolean | Yes | - |
@@ -397,13 +397,6 @@ The following entities have been evaluated against the operational definition of
 | `DistanceFromConcept` | raw | integer | Yes | - |
 | `RelationshipToConcept` | calculated | string | Yes | - |
 | `SortOrder` | raw | integer | Yes | - |
-
-**Formula for `FamilyFeudMismatch`:**
-```
-=IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),
-  {{Name}} & " " & IF({{TopFamilyFeudAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
-  IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'")
-```
 
 **Formula for `FamilyFuedQuestion`:**
 ```
@@ -421,6 +414,13 @@ The following entities have been evaluated against the operational definition of
   NOT({{HasIdentity}}),
   {{DistanceFromConcept}}=2
 )
+```
+
+**Formula for `FamilyFeudMismatch`:**
+```
+=IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),
+  {{Name}} & " " & IF({{TopFamilyFeudAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
+  IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'")
 ```
 
 **Formula for `HasGrammar`:**
@@ -447,7 +447,7 @@ The following entities have been evaluated against the operational definition of
 | `HasSyntax` | true |
 | `Category` | MISSING: Have you seen this Language? |
 | `FamilyFeudMismatch` | Falsifier A Is a Family Feud Language, but Is Not marked as a 'Language Candidate.' |
-| `SortOrder` | 19 |
+| `SortOrder` | 0 |
 | `FamilyFuedQuestion` | Is Falsifier A a language? |
 | `RelationshipToConcept` | IsDescriptionOf |
 | `DistanceFromConcept` | 2 |

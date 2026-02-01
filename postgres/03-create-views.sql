@@ -24,11 +24,11 @@ CREATE OR REPLACE VIEW vw_language_candidates WITH (security_invoker = ON) AS
 SELECT
   t.language_candidate_id,
   t.name,
-  calc_language_candidates_family_feud_mismatch(t.language_candidate_id) AS family_feud_mismatch,
-  calc_language_candidates_family_fued_question(t.language_candidate_id) AS family_fued_question,
   t.category,
+  calc_language_candidates_family_fued_question(t.language_candidate_id) AS family_fued_question,
   calc_language_candidates_top_family_feud_answer(t.language_candidate_id) AS top_family_feud_answer,
   t.chosen_language_candidate,
+  calc_language_candidates_family_feud_mismatch(t.language_candidate_id) AS family_feud_mismatch,
   t.has_syntax,
   t.has_identity,
   t.can_be_held,

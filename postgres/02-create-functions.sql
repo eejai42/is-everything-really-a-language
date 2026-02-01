@@ -10,14 +10,6 @@
 -- ============================================================================
 
 
-CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_mismatch(p_language_candidate_id TEXT)
-RETURNS TEXT AS $$
-BEGIN
-  RETURN NULL; -- Formula translation failed
-END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
-
-
 CREATE OR REPLACE FUNCTION calc_language_candidates_family_fued_question(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
@@ -30,6 +22,14 @@ CREATE OR REPLACE FUNCTION calc_language_candidates_top_family_feud_answer(p_lan
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN ((COALESCE((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND NOT (COALESCE((SELECT can_be_held FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)) AND COALESCE((SELECT meaning_is_serialized FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT requires_parsing FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT is_ongology_descriptor FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND NOT (COALESCE((SELECT has_identity FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)) AND COALESCE((SELECT distance_from_concept FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = 2, FALSE)))::boolean;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_mismatch(p_language_candidate_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN NULL; -- Formula translation failed
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 

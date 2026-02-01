@@ -53,34 +53,34 @@ INSERT INTO is_everything_a_language (is_everything_a_language_id, name, argumen
 VALUES ('neial-016', 'NEIAL-016', 'NotEverythingIsALanguage', 'Conclusion', 'Conclusion', 'Given a formalizable definition of language, not everything is a language; some things are better treated as sign vehicles or semiotic processes, with running applications as a key fuzzy region that benefits from explicit modeling.', 'Formalizable(Language) ∧ ∃x ¬Language(x) ⇒ ¬(EverythingIsALanguage)', '', '', '', 'This is the repo''s thesis in one line.');
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('falsifier-a', 'Falsifier A', 'MISSING: Have you seen this Language?', FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 19);
+VALUES ('falsifier-a', 'Falsifier A', 'MISSING: Have you seen this Language?', FALSE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 0);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('falsifier-b', 'Falsifier B', 'MISSING: Have you seen this Language?', TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, 1, 20);
+VALUES ('falsifier-b', 'Falsifier B', 'MISSING: Have you seen this Language?', TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, 1, 1);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('english', 'English', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 1);
+VALUES ('english', 'English', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 2);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('spoken-words', 'Spoken Words', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 2);
+VALUES ('spoken-words', 'Spoken Words', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 3);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('a-chair', 'A Chair ', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, 1, 3);
+VALUES ('a-chair', 'A Chair ', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, 1, 4);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('a-game-of-fortnite', 'A Game of Fortnite', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, 1, 4);
+VALUES ('a-game-of-fortnite', 'A Game of Fortnite', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, 1, 5);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('sign-language', 'Sign Language', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 5);
+VALUES ('sign-language', 'Sign Language', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 6);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('python', 'Python', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 6);
+VALUES ('python', 'Python', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 7);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('a-smartphone', 'A Smartphone', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, 1, 7);
+VALUES ('a-smartphone', 'A Smartphone', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, 1, 8);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('a-running-app', 'A Running App ', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, 1, 8);
+VALUES ('a-running-app', 'A Running App ', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, 1, 9);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
 VALUES ('an-xlsx-doc', 'An XLSX Doc', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 22);
@@ -95,32 +95,32 @@ INSERT INTO language_candidates (language_candidate_id, name, category, chosen_l
 VALUES ('editing-an-docx-doc', 'Editing an DOCX Doc', 'Running Software', FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, 1, 25);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('a-csv-file', 'A CSV File', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 9);
+VALUES ('a-csv-file', 'A CSV File', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 10);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('owl-rdf-graphql-generally', 'OWL/RDF/GraphQL/... generally', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 10);
+VALUES ('owl-rdf-graphql-generally', 'OWL/RDF/GraphQL/... generally', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 11);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
 VALUES ('a-coffee-mug', 'A Coffee Mug', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, 1, 12);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('a-thunderstorm', 'A Thunderstorm', 'Physical event', FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, 1, 11);
+VALUES ('a-thunderstorm', 'A Thunderstorm', 'Physical event', FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, 1, 13);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('a-uml-file', 'A UML File', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 13);
+VALUES ('a-uml-file', 'A UML File', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 14);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('binary-code', 'Binary Code', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 14);
+VALUES ('binary-code', 'Binary Code', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 15);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('the-mona-lisa', 'The Mona Lisa', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, 1, 15);
+VALUES ('the-mona-lisa', 'The Mona Lisa', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, 1, 16);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('running-calculator-app', 'Running Calculator App', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, 1, 18);
+VALUES ('running-calculator-app', 'Running Calculator App', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, 1, 17);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('javascript', 'JavaScript', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 16);
+VALUES ('javascript', 'JavaScript', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 18);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, meaning_is_serialized, is_ongology_descriptor, distance_from_concept, sort_order)
-VALUES ('french', 'French', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 17);
+VALUES ('french', 'French', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, 2, 19);
 

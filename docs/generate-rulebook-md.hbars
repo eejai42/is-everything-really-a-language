@@ -58,7 +58,7 @@ The following entities have been evaluated against the operational definition of
 | Name | Category | Is Language? | HasSyntax | RequiresParsing | MeaningIsSerialized | IsOntologyDescriptor | README |
 |------|----------|--------------|-----------|-----------------|---------------------|----------------------|--------|
 {{#each LanguageCandidates.data}}
-| {{Name}} | {{Category}} | {{#if TopFamilyFeudAnswer}}Yes{{else}}No{{/if}} | {{#if HasSyntax}}✓{{else}}✗{{/if}} | {{#if RequiresParsing}}✓{{else}}✗{{/if}} | {{#if MeaningIsSerialized}}✓{{else}}✗{{/if}} | {{#if IsOngologyDescriptor}}✓{{else}}✗{{/if}} | {{#if TopFamilyFeudAnswer}}[View](./language-candidates/{{LanguageCandidateId}}/README.md){{else}}-{{/if}} |
+| {{Name}} | {{Category}} | {{#if TopFamilyFeudAnswer}}Yes{{else}}No{{/if}} | {{#if HasSyntax}}✓{{else}}✗{{/if}} | {{#if RequiresParsing}}✓{{else}}✗{{/if}} | {{#if MeaningIsSerialized}}✓{{else}}✗{{/if}} | {{#if IsOngologyDescriptor}}✓{{else}}✗{{/if}} | {{#if TopFamilyFeudAnswer}}[View](./execution-substratrates/{{LanguageCandidateId}}/README.md){{else}}-{{/if}} |
 {{/each}}
 
 ### Predicate Legend

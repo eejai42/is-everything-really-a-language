@@ -41,78 +41,85 @@
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktopython",
-      "RelativePath": "/language-candidates/python",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/python",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktoenglish",
-      "RelativePath": "/language-candidates/english",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/english",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktogolang",
-      "RelativePath": "/language-candidates/golang",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/golang",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktobinary",
-      "RelativePath": "/language-candidates/binary",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/binary",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktocsv",
-      "RelativePath": "/language-candidates/csv",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/csv",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktouml",
-      "RelativePath": "/language-candidates/uml",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/uml",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktoowl",
-      "RelativePath": "/language-candidates/owl",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/owl",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktordf",
-      "RelativePath": "/language-candidates/rdf",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/rdf",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktographql",
-      "RelativePath": "/language-candidates/graphql",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/graphql",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktodocx",
-      "RelativePath": "/language-candidates/docx",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/docx",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {
       "IsSSoTTranspiler": false,
       "Name": "rulebooktoyaml",
-      "RelativePath": "/language-candidates/yaml",
-      "CommandLine": "-exec ./run.sh",
+      "RelativePath": "/execution-substratrates/yaml",
+      "CommandLine": "-exec ./inject-substrate.sh",
+      "IsDisabled": false
+    },
+    {
+      "IsSSoTTranspiler": false,
+      "Name": "rulebooktoxlsx",
+      "RelativePath": "/execution-substratrates/xlsx",
+      "CommandLine": "-exec ./inject-substrate.sh",
       "IsDisabled": false
     },
     {

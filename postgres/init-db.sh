@@ -15,6 +15,7 @@ SQL_FILES=(
     "${SCRIPT_DIR}/000-drop-all.sql"
     "${SCRIPT_DIR}/01-drop-and-create-tables.sql"
     "${SCRIPT_DIR}/02-create-functions.sql"
+    "${SCRIPT_DIR}/02b-custom-functions.sql"
     "${SCRIPT_DIR}/03-create-views.sql"
     "${SCRIPT_DIR}/04-create-policies.sql"
     "${SCRIPT_DIR}/05-insert-data.sql"

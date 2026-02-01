@@ -13,7 +13,7 @@ from datetime import datetime
 def get_rulebook_path():
     """Get the path to the effortless-rulebook.json file.
 
-    Scripts run from /language-candidates/{candidate}/ so the rulebook
+    Scripts run from /execution-substratrates/{candidate}/ so the rulebook
     is at ../../effortless-rulebook/effortless-rulebook.json
     """
     return Path("../../effortless-rulebook/effortless-rulebook.json")
@@ -83,6 +83,6 @@ Generated from: `effortless-rulebook/effortless-rulebook.json`
 def get_candidate_name_from_cwd():
     """Extract the candidate name from the current working directory.
 
-    Assumes we're running from /language-candidates/{candidate}/
+    Assumes we're running from /execution-substratrates/{candidate}/
     """
     return Path.cwd().name

@@ -273,7 +273,7 @@ RETURNS BOOLEAN AS $$
 $$ LANGUAGE SQL STABLE;
 ```
 
-**Python** ([language-candidates/python/erb_sdk.py](language-candidates/python/erb_sdk.py)):
+**Python** ([execution-substratrates/python/erb_sdk.py](execution-substratrates/python/erb_sdk.py)):
 ```python
 def calc_is_a_family_feud_top_answer(self) -> bool:
     category_contains_language = self.calc_category_contains_language()
@@ -289,7 +289,7 @@ def calc_is_a_family_feud_top_answer(self) -> bool:
     )
 ```
 
-**RDF/Turtle** ([language-candidates/rdf/schema.ttl](language-candidates/rdf/schema.ttl)):
+**RDF/Turtle** ([execution-substratrates/rdf/schema.ttl](execution-substratrates/rdf/schema.ttl)):
 ```turtle
 erb:isAFamilyFeudTopAnswer a rdf:Property ;
     rdfs:domain erb:LanguageCandidate ;
@@ -307,17 +307,17 @@ erb:isAFamilyFeudTopAnswer a rdf:Property ;
 | Layer | Description | Run | README |
 |-------|-------------|-----|--------|
 | **PostgreSQL** | Source of truth — tables, calc functions, views | [init-db.sh](postgres/init-db.sh) | [README](postgres/README.md) |
-| **Python** | SDK with dataclasses and calc methods | [run.sh](language-candidates/python/run.sh) | [README](language-candidates/python/README.md) |
-| **Go** | Structs with calculation methods | [run.sh](language-candidates/golang/run.sh) | [README](language-candidates/golang/README.md) |
-| **English** | Human-readable specification | — | [specification.md](language-candidates/english/specification.md) |
-| **GraphQL** | Schema with resolvers | [run.sh](language-candidates/graphql/run.sh) | [README](language-candidates/graphql/README.md) |
-| **RDF/Turtle** | Linked data ontology | [run.sh](language-candidates/rdf/run.sh) | [README](language-candidates/rdf/README.md) |
-| **OWL** | Semantic web ontology | [run.sh](language-candidates/owl/run.sh) | [README](language-candidates/owl/README.md) |
-| **YAML** | LLM-friendly schema | [run.sh](language-candidates/yaml/run.sh) | [README](language-candidates/yaml/README.md) |
-| **CSV** | Tabular field definitions | [run.sh](language-candidates/csv/run.sh) | [README](language-candidates/csv/README.md) |
-| **UML** | Entity relationship diagrams | [run.sh](language-candidates/uml/run.sh) | [README](language-candidates/uml/README.md) |
-| **DOCX** | Word document export | [run.sh](language-candidates/docx/run.sh) | [README](language-candidates/docx/README.md) |
-| **Binary** | Encoded schema representation | [run.sh](language-candidates/binary/run.sh) | [README](language-candidates/binary/README.md) |
+| **Python** | SDK with dataclasses and calc methods | [run.sh](execution-substratrates/python/run.sh) | [README](execution-substratrates/python/README.md) |
+| **Go** | Structs with calculation methods | [run.sh](execution-substratrates/golang/run.sh) | [README](execution-substratrates/golang/README.md) |
+| **English** | Human-readable specification | — | [specification.md](execution-substratrates/english/specification.md) |
+| **GraphQL** | Schema with resolvers | [run.sh](execution-substratrates/graphql/run.sh) | [README](execution-substratrates/graphql/README.md) |
+| **RDF/Turtle** | Linked data ontology | [run.sh](execution-substratrates/rdf/run.sh) | [README](execution-substratrates/rdf/README.md) |
+| **OWL** | Semantic web ontology | [run.sh](execution-substratrates/owl/run.sh) | [README](execution-substratrates/owl/README.md) |
+| **YAML** | LLM-friendly schema | [run.sh](execution-substratrates/yaml/run.sh) | [README](execution-substratrates/yaml/README.md) |
+| **CSV** | Tabular field definitions | [run.sh](execution-substratrates/csv/run.sh) | [README](execution-substratrates/csv/README.md) |
+| **UML** | Entity relationship diagrams | [run.sh](execution-substratrates/uml/run.sh) | [README](execution-substratrates/uml/README.md) |
+| **DOCX** | Word document export | [run.sh](execution-substratrates/docx/run.sh) | [README](execution-substratrates/docx/README.md) |
+| **Binary** | Encoded schema representation | [run.sh](execution-substratrates/binary/run.sh) | [README](execution-substratrates/binary/README.md) |
 
 ---
 
@@ -326,7 +326,7 @@ erb:isAFamilyFeudTopAnswer a rdf:Property ;
 ### Run the Python SDK
 
 ```bash
-cd language-candidates/python
+cd execution-substratrates/python
 ./run.sh
 ```
 
@@ -398,17 +398,17 @@ The build pipeline uses `ssotme` transpilers to generate all execution layers fr
 | Transpiler | Output | README |
 |------------|--------|--------|
 | `rulebooktopostgres` | PostgreSQL DDL (tables, functions, views, policies, data) | [postgres/README.md](postgres/README.md) |
-| `rulebooktopython` | Python SDK with dataclasses | [language-candidates/python/README.md](language-candidates/python/README.md) |
-| `rulebooktogolang` | Go structs with calc methods | [language-candidates/golang/README.md](language-candidates/golang/README.md) |
-| `rulebooktoenglish` | Human-readable specification | [language-candidates/english/README.md](language-candidates/english/README.md) |
-| `rulebooktographql` | GraphQL schema + resolvers | [language-candidates/graphql/README.md](language-candidates/graphql/README.md) |
-| `rulebooktordf` | RDF/Turtle linked data | [language-candidates/rdf/README.md](language-candidates/rdf/README.md) |
-| `rulebooktoowl` | OWL semantic web ontology | [language-candidates/owl/README.md](language-candidates/owl/README.md) |
-| `rulebooktoyaml` | YAML schema (LLM-friendly) | [language-candidates/yaml/README.md](language-candidates/yaml/README.md) |
-| `rulebooktocsv` | CSV field definitions | [language-candidates/csv/README.md](language-candidates/csv/README.md) |
-| `rulebooktouml` | UML entity diagrams | [language-candidates/uml/README.md](language-candidates/uml/README.md) |
-| `rulebooktodocx` | Word document export | [language-candidates/docx/README.md](language-candidates/docx/README.md) |
-| `rulebooktobinary` | Binary schema encoding | [language-candidates/binary/README.md](language-candidates/binary/README.md) |
+| `rulebooktopython` | Python SDK with dataclasses | [execution-substratrates/python/README.md](execution-substratrates/python/README.md) |
+| `rulebooktogolang` | Go structs with calc methods | [execution-substratrates/golang/README.md](execution-substratrates/golang/README.md) |
+| `rulebooktoenglish` | Human-readable specification | [execution-substratrates/english/README.md](execution-substratrates/english/README.md) |
+| `rulebooktographql` | GraphQL schema + resolvers | [execution-substratrates/graphql/README.md](execution-substratrates/graphql/README.md) |
+| `rulebooktordf` | RDF/Turtle linked data | [execution-substratrates/rdf/README.md](execution-substratrates/rdf/README.md) |
+| `rulebooktoowl` | OWL semantic web ontology | [execution-substratrates/owl/README.md](execution-substratrates/owl/README.md) |
+| `rulebooktoyaml` | YAML schema (LLM-friendly) | [execution-substratrates/yaml/README.md](execution-substratrates/yaml/README.md) |
+| `rulebooktocsv` | CSV field definitions | [execution-substratrates/csv/README.md](execution-substratrates/csv/README.md) |
+| `rulebooktouml` | UML entity diagrams | [execution-substratrates/uml/README.md](execution-substratrates/uml/README.md) |
+| `rulebooktodocx` | Word document export | [execution-substratrates/docx/README.md](execution-substratrates/docx/README.md) |
+| `rulebooktobinary` | Binary schema encoding | [execution-substratrates/binary/README.md](execution-substratrates/binary/README.md) |
 
 ### Utility
 

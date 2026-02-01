@@ -14,7 +14,7 @@ if [ -z "$TARGET" ]; then
     exit 1
 fi
 
-SCRIPT="${SCRIPT_DIR}/inject-into-${TARGET}.py"
+SCRIPT="${SCRIPT_DIR}/injection-scripts/inject-into-${TARGET}.py"
 
 if [ ! -f "$SCRIPT" ]; then
     echo "Error: Script not found: $SCRIPT"
