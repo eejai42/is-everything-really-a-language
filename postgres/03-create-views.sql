@@ -36,6 +36,10 @@ SELECT
   t.requires_parsing,
   t.meaning_is_serialized,
   t.is_ongology_descriptor,
+  t.dimensionality_while_editing,
+  calc_language_candidates_is_open_closed_world_conflicted(t.language_candidate_id) AS is_open_closed_world_conflicted,
+  t.is_open_world,
+  t.is_closed_world,
   t.distance_from_concept,
   calc_language_candidates_relationship_to_concept(t.language_candidate_id) AS relationship_to_concept,
   t.sort_order

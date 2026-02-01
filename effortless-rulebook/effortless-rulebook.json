@@ -329,7 +329,7 @@
         "datatype": "string",
         "type": "calculated",
         "nullable": true,
-        "formula": "=IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),\n  {{Name}} \u0026 \u0022 \u0022 \u0026 IF({{TopFamilyFeudAnswer}}, \u0022Is\u0022, \u0022Isn\u0027t\u0022) \u0026 \u0022 a Family Feud Language, but \u0022 \u0026 \n  IF({{ChosenLanguageCandidate}}, \u0022Is\u0022, \u0022Is Not\u0022) \u0026 \u0022 marked as a \u0027Language Candidate.\u0027\u0022)"
+        "formula": "=IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),\n  {{Name}} \u0026 \u0022 \u0022 \u0026 IF({{TopFamilyFeudAnswer}}, \u0022Is\u0022, \u0022Isn\u0027t\u0022) \u0026 \u0022 a Family Feud Language, but \u0022 \u0026 \n  IF({{ChosenLanguageCandidate}}, \u0022Is\u0022, \u0022Is Not\u0022) \u0026 \u0022 marked as a \u0027Language Candidate.\u0027\u0022) \u0026 IF({{IsOpenClosedWorldConflicted}}, \u0022 - Open World vs. Closed World Conflict.\u0022)"
       },
       {
         "name": "HasSyntax",
@@ -375,6 +375,31 @@
         "nullable": true
       },
       {
+        "name": "DimensionalityWhileEditing",
+        "datatype": "string",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "IsOpenClosedWorldConflicted",
+        "datatype": "boolean",
+        "type": "calculated",
+        "nullable": true,
+        "formula": "=AND({{IsOpenWorld}} = TRUE(), \n    {{IsClosedWorld}} = TRUE())"
+      },
+      {
+        "name": "IsOpenWorld",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "IsClosedWorld",
+        "datatype": "boolean",
+        "type": "raw",
+        "nullable": true
+      },
+      {
         "name": "DistanceFromConcept",
         "datatype": "integer",
         "type": "raw",
@@ -412,7 +437,11 @@
         "HasGrammar": true,
         "ChosenLanguageCandidate": false,
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "falsifier-b",
@@ -431,7 +460,34 @@
         "TopFamilyFeudAnswer": false,
         "HasSyntax": false,
         "HasGrammar": false,
-        "MeaningIsSerialized": false
+        "MeaningIsSerialized": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
+      },
+      {
+        "LanguageCandidateId": "falsifier-c",
+        "Name": "Falsifier C",
+        "TopFamilyFeudAnswer": true,
+        "IsOngologyDescriptor": true,
+        "MeaningIsSerialized": true,
+        "RequiresParsing": true,
+        "HasSyntax": true,
+        "Category": "MISSING: Have you seen this Language?",
+        "ChosenLanguageCandidate": true,
+        "FamilyFeudMismatch": " - Open World vs. Closed World Conflict.",
+        "SortOrder": 2,
+        "FamilyFuedQuestion": "Is Falsifier C a language?",
+        "RelationshipToConcept": "IsDescriptionOf",
+        "DistanceFromConcept": 2,
+        "HasGrammar": true,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
+        "IsClosedWorld": true,
+        "IsOpenWorld": true,
+        "IsOpenClosedWorldConflicted": true,
+        "HasIdentity": false,
+        "CanBeHeld": false
       },
       {
         "LanguageCandidateId": "english",
@@ -443,14 +499,18 @@
         "HasSyntax": true,
         "Category": "Natural Language",
         "ChosenLanguageCandidate": true,
-        "SortOrder": 2,
+        "SortOrder": 3,
         "FamilyFuedQuestion": "Is English a language?",
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
+        "IsOpenWorld": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "spoken-words",
@@ -462,25 +522,31 @@
         "HasSyntax": true,
         "Category": "Natural Language",
         "ChosenLanguageCandidate": true,
-        "SortOrder": 3,
+        "SortOrder": 4,
         "FamilyFuedQuestion": "Is Spoken Words a language?",
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
+        "IsOpenWorld": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "a-chair",
         "Name": "A Chair ",
         "CanBeHeld": true,
         "Category": "Physical Object",
-        "SortOrder": 4,
+        "SortOrder": 5,
         "FamilyFuedQuestion": "Is A Chair  a language?",
         "HasIdentity": true,
         "RelationshipToConcept": "IsMirrorOf",
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
+        "IsClosedWorld": true,
         "TopFamilyFeudAnswer": false,
         "ChosenLanguageCandidate": false,
         "FamilyFeudMismatch": "",
@@ -488,18 +554,22 @@
         "HasGrammar": false,
         "RequiresParsing": false,
         "MeaningIsSerialized": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false
       },
       {
         "LanguageCandidateId": "a-game-of-fortnite",
         "Name": "A Game of Fortnite",
         "RequiresParsing": true,
         "Category": "Running Software",
-        "SortOrder": 5,
+        "SortOrder": 6,
         "FamilyFuedQuestion": "Is A Game of Fortnite a language?",
         "HasIdentity": true,
         "RelationshipToConcept": "IsMirrorOf",
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
+        "IsClosedWorld": true,
         "TopFamilyFeudAnswer": false,
         "ChosenLanguageCandidate": false,
         "FamilyFeudMismatch": "",
@@ -507,7 +577,9 @@
         "CanBeHeld": false,
         "HasGrammar": false,
         "MeaningIsSerialized": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false
       },
       {
         "LanguageCandidateId": "sign-language",
@@ -519,14 +591,18 @@
         "HasSyntax": true,
         "Category": "Natural Language",
         "ChosenLanguageCandidate": true,
-        "SortOrder": 6,
+        "SortOrder": 7,
         "FamilyFuedQuestion": "Is Sign Language a language?",
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
+        "IsOpenWorld": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "python",
@@ -538,14 +614,18 @@
         "HasSyntax": true,
         "Category": "Formal Language",
         "ChosenLanguageCandidate": true,
-        "SortOrder": 7,
+        "SortOrder": 8,
         "FamilyFuedQuestion": "Is Python a language?",
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
+        "IsOpenWorld": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "a-smartphone",
@@ -553,18 +633,22 @@
         "CanBeHeld": true,
         "MeaningIsSerialized": true,
         "Category": "Physical Object",
-        "SortOrder": 8,
+        "SortOrder": 9,
         "FamilyFuedQuestion": "Is A Smartphone a language?",
         "HasIdentity": true,
         "RelationshipToConcept": "IsMirrorOf",
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
+        "IsClosedWorld": true,
         "TopFamilyFeudAnswer": false,
         "ChosenLanguageCandidate": false,
         "FamilyFeudMismatch": "",
         "HasSyntax": false,
         "HasGrammar": false,
         "RequiresParsing": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false
       },
       {
         "LanguageCandidateId": "a-running-app",
@@ -572,18 +656,22 @@
         "MeaningIsSerialized": true,
         "RequiresParsing": true,
         "Category": "Running Software",
-        "SortOrder": 9,
+        "SortOrder": 22,
         "FamilyFuedQuestion": "Is A Running App  a language?",
         "HasIdentity": true,
         "RelationshipToConcept": "IsMirrorOf",
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
+        "IsClosedWorld": true,
         "TopFamilyFeudAnswer": false,
         "ChosenLanguageCandidate": false,
         "FamilyFeudMismatch": "",
         "HasSyntax": false,
         "CanBeHeld": false,
         "HasGrammar": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false
       },
       {
         "LanguageCandidateId": "an-xlsx-doc",
@@ -595,20 +683,24 @@
         "HasSyntax": true,
         "Category": "Formal Language",
         "ChosenLanguageCandidate": true,
-        "SortOrder": 22,
+        "SortOrder": 23,
         "FamilyFuedQuestion": "Is An XLSX Doc a language?",
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "editing-an-xlsx-doc",
         "Name": "Editing an XLSX Doc",
         "Category": "Running Software",
-        "SortOrder": 23,
+        "SortOrder": 24,
         "FamilyFuedQuestion": "Is Editing an XLSX Doc a language?",
         "RelationshipToConcept": "IsMirrorOf",
         "DistanceFromConcept": 1,
@@ -621,7 +713,11 @@
         "HasGrammar": false,
         "RequiresParsing": false,
         "MeaningIsSerialized": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "an-docx-doc",
@@ -633,14 +729,18 @@
         "HasSyntax": true,
         "Category": "Formal Language",
         "ChosenLanguageCandidate": true,
-        "SortOrder": 24,
+        "SortOrder": 25,
         "FamilyFuedQuestion": "Is An DOCX Doc a language?",
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "editing-an-docx-doc",
@@ -659,7 +759,11 @@
         "CanBeHeld": false,
         "HasGrammar": false,
         "RequiresParsing": false,
-        "MeaningIsSerialized": false
+        "MeaningIsSerialized": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "a-csv-file",
@@ -676,9 +780,13 @@
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
+        "IsOpenWorld": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "owl-rdf-graphql-generally",
@@ -695,9 +803,13 @@
         "RelationshipToConcept": "IsDescriptionOf",
         "DistanceFromConcept": 2,
         "HasGrammar": true,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
+        "IsClosedWorld": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false
       },
       {
         "LanguageCandidateId": "a-coffee-mug",
@@ -716,7 +828,11 @@
         "HasGrammar": false,
         "RequiresParsing": false,
         "MeaningIsSerialized": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "a-thunderstorm",
@@ -735,7 +851,11 @@
         "HasSyntax": false,
         "HasGrammar": false,
         "MeaningIsSerialized": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "a-uml-file",
@@ -754,7 +874,11 @@
         "HasGrammar": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "binary-code",
@@ -773,7 +897,11 @@
         "HasGrammar": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "the-mona-lisa",
@@ -792,7 +920,11 @@
         "HasSyntax": false,
         "HasGrammar": false,
         "RequiresParsing": false,
-        "MeaningIsSerialized": false
+        "MeaningIsSerialized": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "running-calculator-app",
@@ -811,7 +943,11 @@
         "CanBeHeld": false,
         "HasGrammar": false,
         "MeaningIsSerialized": false,
-        "IsOngologyDescriptor": false
+        "IsOngologyDescriptor": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "javascript",
@@ -830,7 +966,11 @@
         "HasGrammar": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       },
       {
         "LanguageCandidateId": "french",
@@ -849,7 +989,11 @@
         "HasGrammar": true,
         "FamilyFeudMismatch": "",
         "HasIdentity": false,
-        "CanBeHeld": false
+        "CanBeHeld": false,
+        "DimensionalityWhileEditing": "",
+        "IsOpenClosedWorldConflicted": false,
+        "IsOpenWorld": false,
+        "IsClosedWorld": false
       }
     ]
   },

@@ -1,6 +1,46 @@
 # Go SDK - Language Candidates Rulebook
 
-Go implementation of the ERB calculation functions.
+Go implementation of the ERB calculation functions as a compiled, typed SDK.
+
+## Role in Three-Phase Contract
+
+Go serves as a **compiled typed runtime** — struct types with `Calc*()` methods that compute derived fields in-memory with compile-time type safety.
+
+### Phase 1: Inject
+
+Generate Go structs + `Calc*()` methods mirroring the formula DAG:
+
+| Component | Purpose |
+|-----------|---------|
+| Entity structs | Go structs with JSON tags for each entity type |
+| `Calc*()` methods | Methods implementing each derived field formula |
+| Pointer receivers | Methods that can access/modify struct state |
+
+The injection script reads `effortless-rulebook.json` and generates Go code that mirrors the PostgreSQL calc functions.
+
+### Phase 2: Execute
+
+1. Read `blank-test.json` into structs
+2. For each record:
+   - Unmarshal JSON into struct with raw fields
+   - Compute derived fields (call Calc methods)
+3. Marshal structs back to JSON
+
+```bash
+./take-test.sh  # Compiles, loads blank-test.json, computes, writes results
+```
+
+### Phase 3: Emit
+
+Write computed values to `test-answers.json`:
+
+| Output | Content |
+|--------|---------|
+| `test-answers.json` | All raw fields + Go-computed values |
+
+### Grade
+
+Compare `test-answers.json` against `answer-key.json` field-by-field to verify SDK correctness.
 
 ## Technology
 
@@ -16,8 +56,13 @@ The Go SDK mirrors the PostgreSQL calc functions as methods on entity structs, e
 
 ## Files
 
-- `erb_sdk.go` - Entity structs with calc methods mirroring PostgreSQL
-- `main.go` - Demo application
+| File | Description |
+|------|-------------|
+| `erb_sdk.go` | Entity structs with calc methods mirroring PostgreSQL |
+| `main.go` | Demo application |
+| `inject-substrate.sh` | Generates the SDK from rulebook |
+| `take-test.sh` | Runs the test (compile, load data, compute, extract) |
+| `test-answers.json` | Computed results for grading |
 
 ## Usage
 
@@ -47,6 +92,29 @@ Level 0: Raw fields (from rulebook)
 Level 1: CategoryContainsLanguage, HasGrammar, RelationshipToConcept, FamilyFuedQuestion
 Level 2: IsAFamilyFeudTopAnswer (depends on CategoryContainsLanguage)
 Level 3: FamilyFeudMismatch (depends on IsAFamilyFeudTopAnswer)
+```
+
+## Calc Method Examples
+
+```go
+func (c *LanguageCandidate) CalcCategoryContainsLanguage() bool {
+    if c.Category == nil {
+        return false
+    }
+    return strings.Contains(strings.ToLower(*c.Category), "language")
+}
+
+func (c *LanguageCandidate) CalcIsAFamilyFeudTopAnswer() bool {
+    categoryContainsLanguage := c.CalcCategoryContainsLanguage()
+    return categoryContainsLanguage &&
+        boolOrFalse(c.HasSyntax) &&
+        !boolOrFalse(c.CanBeHeld) &&
+        boolOrFalse(c.MeaningIsSerialized) &&
+        boolOrFalse(c.RequiresParsing) &&
+        boolOrFalse(c.IsOngologyDescriptor) &&
+        !boolOrFalse(c.HasIdentity) &&
+        intOrZero(c.DistanceFromConcept) == 2
+}
 ```
 
 ## Source

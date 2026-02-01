@@ -1,14 +1,10 @@
 #!/bin/bash
 
 # take-test.sh for golang execution substrate
-# This script will eventually run the golang substrate to produce test answers
+# Runs the Go SDK to compute test answers from blank-test.json
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
-# Step 1: Copy blank test template to this folder as test-answers.json
-cp "$SCRIPT_DIR/../../testing/blank-test.json" "$SCRIPT_DIR/test-answers.json"
-
-# TODO: Step 2: Run the golang substrate solution to populate answers
-# (Future implementation will go here)
-
-echo "golang: test-answers.json created from blank template"
+# Run the Go test runner to compute answers
+go run erb_sdk.go main.go take-test

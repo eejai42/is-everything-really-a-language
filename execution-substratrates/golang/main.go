@@ -1,19 +1,29 @@
-// ERB SDK - Go Demo
+// ERB SDK - Go Demo and Test Runner
 package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"sort"
-
-	erb "erb_sdk"
 )
 
 func main() {
+	// Check if running as test runner
+	if len(os.Args) > 1 && os.Args[1] == "take-test" {
+		runTest()
+		return
+	}
+
+	// Demo mode: load from rulebook
+	runDemo()
+}
+
+func runDemo() {
 	// Load from rulebook
 	rulebookPath := filepath.Join("..", "..", "effortless-rulebook", "effortless-rulebook.json")
 
-	rulebook, err := erb.LoadFromRulebook(rulebookPath)
+	rulebook, err := LoadFromRulebook(rulebookPath)
 	if err != nil {
 		fmt.Printf("Failed to load rulebook: %v\n", err)
 		return
@@ -65,4 +75,37 @@ func main() {
 			fmt.Printf("  family_feud_mismatch: null\n")
 		}
 	}
+}
+
+func runTest() {
+	scriptDir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Failed to get working directory: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Paths
+	blankTestPath := filepath.Join(scriptDir, "..", "..", "testing", "blank-test.json")
+	answersPath := filepath.Join(scriptDir, "test-answers.json")
+
+	// Step 1: Load blank test data
+	candidates, err := LoadTestCandidates(blankTestPath)
+	if err != nil {
+		fmt.Printf("Failed to load blank test: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Step 2: Compute all calculated fields
+	var computed []TestCandidate
+	for _, c := range candidates {
+		computed = append(computed, *c.ComputeAnswers())
+	}
+
+	// Step 3: Save test answers
+	if err := SaveTestCandidates(answersPath, computed); err != nil {
+		fmt.Printf("Failed to save test answers: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("golang: Computed %d test answers -> test-answers.json\n", len(computed))
 }

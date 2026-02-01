@@ -1,0 +1,44 @@
+table_name,field_name,field_type,dag_level,formula
+IsEverythingALanguage,is_everything_a_language_id,raw,0,
+IsEverythingALanguage,name,raw,0,
+IsEverythingALanguage,argument_name,raw,0,
+IsEverythingALanguage,argument_category,raw,0,
+IsEverythingALanguage,step_type,raw,0,
+IsEverythingALanguage,statement,raw,0,
+IsEverythingALanguage,formalization,raw,0,
+IsEverythingALanguage,related_candidate_name,raw,0,
+IsEverythingALanguage,related_candidate_id,raw,0,
+IsEverythingALanguage,evidence_from_rulebook,raw,0,
+IsEverythingALanguage,notes,raw,0,
+LanguageCandidates,language_candidate_id,raw,0,
+LanguageCandidates,name,raw,0,
+LanguageCandidates,category,raw,0,
+LanguageCandidates,family_fued_question,calculated,,"=""Is "" & {{Name}} & "" a language?"""
+LanguageCandidates,top_family_feud_answer,calculated,,"=AND(
+  {{HasSyntax}},
+  NOT({{CanBeHeld}}),
+  {{MeaningIsSerialized}},
+  {{RequiresParsing}},
+  {{IsOngologyDescriptor}},
+  NOT({{HasIdentity}}),
+  {{DistanceFromConcept}}=2
+)"
+LanguageCandidates,chosen_language_candidate,raw,0,
+LanguageCandidates,family_feud_mismatch,calculated,,"=IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),
+  {{Name}} & "" "" & IF({{TopFamilyFeudAnswer}}, ""Is"", ""Isn't"") & "" a Family Feud Language, but "" & 
+  IF({{ChosenLanguageCandidate}}, ""Is"", ""Is Not"") & "" marked as a 'Language Candidate.'"") & IF({{IsOpenClosedWorldConflicted}}, "" - Open World vs. Closed World Conflict."")"
+LanguageCandidates,has_syntax,raw,0,
+LanguageCandidates,has_identity,raw,0,
+LanguageCandidates,can_be_held,raw,0,
+LanguageCandidates,has_grammar,calculated,,={{HasSyntax}} = TRUE()
+LanguageCandidates,requires_parsing,raw,0,
+LanguageCandidates,meaning_is_serialized,raw,0,
+LanguageCandidates,is_ongology_descriptor,raw,0,
+LanguageCandidates,dimensionality_while_editing,raw,0,
+LanguageCandidates,is_open_closed_world_conflicted,calculated,,"=AND({{IsOpenWorld}} = TRUE(), 
+    {{IsClosedWorld}} = TRUE())"
+LanguageCandidates,is_open_world,raw,0,
+LanguageCandidates,is_closed_world,raw,0,
+LanguageCandidates,distance_from_concept,raw,0,
+LanguageCandidates,relationship_to_concept,calculated,,"=IF({{DistanceFromConcept}} = 1, ""IsMirrorOf"", ""IsDescriptionOf"")"
+LanguageCandidates,sort_order,raw,0,

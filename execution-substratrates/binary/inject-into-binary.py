@@ -1,52 +1,136 @@
 #!/usr/bin/env python3
 """
-Generate Binary representation from the Effortless Rulebook.
+Inject ERB Rulebook into Binary Execution Substrate.
 
-This script runs from /execution-substratrates/binary/ and reads
-the rulebook from ../../effortless-rulebook/effortless-rulebook.json
+This script compiles the C implementation of calc functions to a shared library
+that can be called from Python via ctypes.
+
+The C code (erb_calc.c) contains ALL calculation logic. This script only:
+1. Compiles the C code to native binary (.dylib on macOS, .so on Linux)
+2. Verifies the build was successful
+
+Build process:
+- macOS: clang -shared -fPIC erb_calc.c -o erb_calc.dylib
+- Linux: gcc -shared -fPIC erb_calc.c -o erb_calc.so
 """
 
+import os
 import sys
+import subprocess
+import platform
 from pathlib import Path
 
 # Add project root to path for shared imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from orchestration.shared import load_rulebook, write_readme, get_candidate_name_from_cwd
+from orchestration.shared import load_rulebook
+
+
+def detect_platform():
+    """Detect the current platform and return appropriate compiler settings."""
+    system = platform.system()
+    if system == "Darwin":
+        return {
+            "compiler": "clang",
+            "output": "erb_calc.dylib",
+            "flags": ["-shared", "-fPIC", "-O2"],
+        }
+    elif system == "Linux":
+        return {
+            "compiler": "gcc",
+            "output": "erb_calc.so",
+            "flags": ["-shared", "-fPIC", "-O2"],
+        }
+    else:
+        raise RuntimeError(f"Unsupported platform: {system}")
+
+
+def compile_shared_library(script_dir):
+    """Compile erb_calc.c to a shared library."""
+    platform_info = detect_platform()
+
+    c_source = script_dir / "erb_calc.c"
+    output_file = script_dir / platform_info["output"]
+
+    if not c_source.exists():
+        raise FileNotFoundError(f"C source not found: {c_source}")
+
+    # Build command
+    cmd = [
+        platform_info["compiler"],
+        *platform_info["flags"],
+        str(c_source),
+        "-o", str(output_file),
+    ]
+
+    print(f"Compiling: {' '.join(cmd)}")
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+
+    if result.returncode != 0:
+        print(f"Compilation FAILED:")
+        print(result.stderr)
+        sys.exit(1)
+
+    print(f"Successfully compiled: {output_file}")
+    return output_file
+
+
+def verify_library(lib_path):
+    """Verify the library exports expected functions."""
+    import ctypes
+
+    try:
+        lib = ctypes.CDLL(str(lib_path))
+
+        # Check that expected functions exist
+        expected_functions = [
+            "calc_category_contains_language",
+            "calc_has_grammar",
+            "calc_relationship_to_concept",
+            "calc_family_fued_question",
+            "calc_is_a_family_feud_top_answer",
+            "calc_family_feud_mismatch",
+        ]
+
+        for func_name in expected_functions:
+            if not hasattr(lib, func_name):
+                print(f"WARNING: Function {func_name} not found in library")
+            else:
+                print(f"  - {func_name}")
+
+        print("Library verification passed!")
+        return True
+
+    except Exception as e:
+        print(f"Library verification FAILED: {e}")
+        return False
 
 
 def main():
-    candidate_name = get_candidate_name_from_cwd()
-    print(f"Generating {candidate_name} language candidate...")
+    script_dir = Path(__file__).resolve().parent
+    print("=" * 60)
+    print("Binary Execution Substrate - Injection Phase")
+    print("=" * 60)
 
-    # Load the rulebook (for future use)
+    # Load rulebook (for verification/logging)
     try:
         rulebook = load_rulebook()
-        print(f"Loaded rulebook with {len(rulebook)} top-level keys")
+        candidates = rulebook.get("LanguageCandidates", {}).get("data", [])
+        print(f"Loaded rulebook with {len(candidates)} language candidates")
     except FileNotFoundError as e:
         print(f"Warning: {e}")
-        rulebook = None
 
-    # Write placeholder README
-    write_readme(
-        candidate_name,
-        "Binary format generation from the Effortless Rulebook.\n\n"
-        "Future implementation will generate compact binary "
-        "serialization formats (e.g., Protocol Buffers, MessagePack).",
-        technology="""**Binary serialization** represents data as compact byte sequences rather than human-readable text. Unlike JSON or XML, binary formats encode type information and values directly as bytes, eliminating parsing overhead and reducing payload size by 2-10x.
+    # Compile the shared library
+    print("\nCompiling C code to native binary...")
+    lib_path = compile_shared_library(script_dir)
 
-Key characteristics:
-- **Schema-driven**: Formats like Protocol Buffers and Thrift require schema definitions (`.proto`, `.thrift` files) that compile to code
-- **Self-describing vs. Schema-required**: MessagePack and CBOR include type markers inline; Protobuf requires the schema to decode
-- **Backward compatibility**: Well-designed schemas support field addition/removal without breaking existing readers
+    # Verify the library
+    print("\nVerifying library exports...")
+    verify_library(lib_path)
 
-Common formats for ERB export:
-- **Protocol Buffers** - Google's format, excellent tooling, strict schemas
-- **MessagePack** - "JSON in binary", schema-optional, widely supported
-- **CBOR** - IETF standard (RFC 8949), optimized for constrained environments"""
-    )
-
-    print(f"Done generating {candidate_name} candidate.")
+    print("\nInjection complete!")
+    print(f"Library ready at: {lib_path}")
 
 
 if __name__ == "__main__":

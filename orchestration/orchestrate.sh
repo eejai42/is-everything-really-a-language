@@ -97,6 +97,9 @@ for substrate in $SUBSTRATES; do
     COLOR_INDEX=$(( (COLOR_INDEX + 1) % ${#SUBSTRATE_COLORS[@]} ))
 
     if [ -f "$inject_script" ]; then
+        # Add significant vertical spacing for visual isolation (like starting a new page)
+        printf '\n%.0s' {1..20}
+        
         substrate_upper=$(echo "$substrate" | tr '[:lower:]' '[:upper:]')
         echo -e "${COLOR}╔══════════════════════════════════════════════════════════════╗${NC}"
         echo -e "${COLOR}║${NC} ${BOLD}[$CURRENT/$TOTAL_SUBSTRATES]${NC} ${COLOR}▶ ${BOLD}${substrate_upper}${NC}"
@@ -109,7 +112,40 @@ for substrate in $SUBSTRATES; do
             INJECT_RESULTS="$INJECT_RESULTS$substrate:FAILED\n"
             echo -e "  ${RED}✗${NC} ${substrate}: ${RED}${BOLD}FAILED${NC}"
         fi
-        echo ""
+
+        # Grade this substrate immediately
+        python3 -c "
+import sys
+import json
+import os
+sys.path.insert(0, '$SCRIPT_DIR')
+from importlib.util import spec_from_loader, module_from_spec
+from importlib.machinery import SourceFileLoader
+
+spec = spec_from_loader('test_orchestrator', SourceFileLoader('test_orchestrator', '$SCRIPT_DIR/test-orchestrator.py'))
+test_orch = module_from_spec(spec)
+spec.loader.exec_module(test_orch)
+
+with open(test_orch.ANSWER_KEY_PATH, 'r') as f:
+    answer_key = json.load(f)
+
+substrate = '$substrate'
+answers_path = os.path.join(test_orch.SUBSTRATES_DIR, substrate, 'test-answers.json')
+if os.path.exists(answers_path):
+    grades = test_orch.grade_substrate(substrate, answer_key, answers_path)
+else:
+    grades = test_orch.grade_substrate(substrate, answer_key, None)
+    grades['error'] = 'No test-answers.json'
+
+test_orch.generate_substrate_report(substrate, grades)
+test_orch.print_substrate_test_summary(substrate, grades)
+
+# Save grades to temp file for final summary
+import pickle
+grades_file = os.path.join(test_orch.SUBSTRATES_DIR, substrate, '.grades.pkl')
+with open(grades_file, 'wb') as f:
+    pickle.dump(grades, f)
+"
     else
         echo -e "  ${YELLOW}○${NC} ${substrate}: ${DIM}SKIPPED (no inject-substrate.sh)${NC}"
         INJECT_RESULTS="$INJECT_RESULTS$substrate:SKIPPED\n"
@@ -117,43 +153,37 @@ for substrate in $SUBSTRATES; do
 done
 
 # -----------------------------------------------------------------------------
-# Step 3: Grade results and generate reports
+# Step 3: Generate summary report
 # -----------------------------------------------------------------------------
 echo -e "${BOLD}${BLUE}┌──────────────────────────────────────────────────────────────┐${NC}"
-echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 3:${NC} ${YELLOW}Grading results and generating reports...${NC}           ${BOLD}${BLUE}│${NC}"
+echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 3:${NC} ${YELLOW}Generating summary report...${NC}                         ${BOLD}${BLUE}│${NC}"
 echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────┘${NC}"
 python3 -c "
 import sys
 import json
+import os
+import pickle
 sys.path.insert(0, '$SCRIPT_DIR')
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader
 
-# Load test-orchestrator module
 spec = spec_from_loader('test_orchestrator', SourceFileLoader('test_orchestrator', '$SCRIPT_DIR/test-orchestrator.py'))
 test_orch = module_from_spec(spec)
 spec.loader.exec_module(test_orch)
 
-# Load answer key
-with open(test_orch.ANSWER_KEY_PATH, 'r') as f:
-    answer_key = json.load(f)
-
-# Get substrates that have test-answers.json
-import os
+# Collect grades from temp files
 substrates = test_orch.get_substrates()
-substrate_results = {}
+all_grades = {}
 for substrate in substrates:
-    answers_path = os.path.join(test_orch.SUBSTRATES_DIR, substrate, 'test-answers.json')
-    if os.path.exists(answers_path):
-        substrate_results[substrate] = {'answers_path': answers_path, 'error': None}
-    else:
-        substrate_results[substrate] = {'answers_path': None, 'error': 'No test-answers.json'}
+    grades_file = os.path.join(test_orch.SUBSTRATES_DIR, substrate, '.grades.pkl')
+    if os.path.exists(grades_file):
+        with open(grades_file, 'rb') as f:
+            all_grades[substrate] = pickle.load(f)
+        os.remove(grades_file)  # Clean up
 
-# Grade all substrates
-all_grades = test_orch.grade_all_substrates(answer_key, substrate_results)
-
-# Generate summary report
+# Generate summary report and print final table
 test_orch.generate_summary_report(all_grades)
+test_orch.print_final_summary_table(all_grades)
 "
 echo ""
 

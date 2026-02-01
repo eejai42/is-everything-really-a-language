@@ -297,6 +297,7 @@ The following entities have been evaluated against the operational definition of
 |------|----------|--------------|-----------|-----------------|---------------------|----------------------|--------|
 | Falsifier A | MISSING: Have you seen this Language? | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/falsifier-a/README.md) |
 | Falsifier B | MISSING: Have you seen this Language? | No | ✗ | ✓ | ✗ | ✓ | - |
+| Falsifier C | MISSING: Have you seen this Language? | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/falsifier-c/README.md) |
 | English | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/english/README.md) |
 | Spoken Words | Natural Language | Yes | ✓ | ✓ | ✓ | ✓ | [View](./execution-substratrates/spoken-words/README.md) |
 | A Chair  | Physical Object | No | ✗ | ✗ | ✗ | ✗ | - |
@@ -394,6 +395,10 @@ The following entities have been evaluated against the operational definition of
 | `RequiresParsing` | raw | boolean | Yes | - |
 | `MeaningIsSerialized` | raw | boolean | Yes | - |
 | `IsOngologyDescriptor` | raw | boolean | Yes | - |
+| `DimensionalityWhileEditing` | raw | string | Yes | - |
+| `IsOpenClosedWorldConflicted` | calculated | boolean | Yes | - |
+| `IsOpenWorld` | raw | boolean | Yes | - |
+| `IsClosedWorld` | raw | boolean | Yes | - |
 | `DistanceFromConcept` | raw | integer | Yes | - |
 | `RelationshipToConcept` | calculated | string | Yes | - |
 | `SortOrder` | raw | integer | Yes | - |
@@ -420,12 +425,18 @@ The following entities have been evaluated against the operational definition of
 ```
 =IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),
   {{Name}} & " " & IF({{TopFamilyFeudAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
-  IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'")
+  IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
 ```
 
 **Formula for `HasGrammar`:**
 ```
 ={{HasSyntax}} = TRUE()
+```
+
+**Formula for `IsOpenClosedWorldConflicted`:**
+```
+=AND({{IsOpenWorld}} = TRUE(), 
+    {{IsClosedWorld}} = TRUE())
 ```
 
 **Formula for `RelationshipToConcept`:**
@@ -434,7 +445,7 @@ The following entities have been evaluated against the operational definition of
 ```
 
 
-#### Sample Data (24 records)
+#### Sample Data (25 records)
 
 | Field | Value |
 |-------|-------|
@@ -455,6 +466,10 @@ The following entities have been evaluated against the operational definition of
 | `ChosenLanguageCandidate` | false |
 | `HasIdentity` | false |
 | `CanBeHeld` | false |
+| `DimensionalityWhileEditing` |  |
+| `IsOpenClosedWorldConflicted` | false |
+| `IsOpenWorld` | false |
+| `IsClosedWorld` | false |
 
 ---
 

@@ -4,10 +4,10 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Fields Tested | 120 |
-| Passed | 22 |
-| Failed | 98 |
-| Score | 18.3% |
+| Total Fields Tested | 125 |
+| Passed | 23 |
+| Failed | 102 |
+| Score | 18.4% |
 
 ## Failures
 
@@ -63,4 +63,4 @@
 | editing-an-docx-doc | relationship_to_concept | IsMirrorOf | None |
 | editing-an-xlsx-doc | family_fued_question | Is Editing an XLSX Doc a language? | None |
 | editing-an-xlsx-doc | top_family_feud_answer | False | None |
-| ... | ... | (48 more failures) | ... |
+| ... | ... | (52 more failures) | ... |

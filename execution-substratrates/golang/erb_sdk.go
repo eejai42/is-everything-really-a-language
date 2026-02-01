@@ -9,7 +9,7 @@
 //   Level 2: IsAFamilyFeudTopAnswer (depends on CategoryContainsLanguage)
 //   Level 3: FamilyFeudMismatch (depends on IsAFamilyFeudTopAnswer)
 
-package erb
+package main
 
 import (
 	"encoding/json"
@@ -27,7 +27,7 @@ type LanguageCandidate struct {
 	Name                    *string `json:"Name"`
 	Category                *string `json:"Category"`
 	CanBeHeld               *bool   `json:"CanBeHeld"`
-	MeaningIsSerialized     *bool   `json:"Meaning_Is_Serialized"`
+	MeaningIsSerialized     *bool   `json:"MeaningIsSerialized"`
 	RequiresParsing         *bool   `json:"RequiresParsing"`
 	IsOngologyDescriptor    *bool   `json:"IsOngologyDescriptor"`
 	HasSyntax               *bool   `json:"HasSyntax"`
@@ -279,4 +279,108 @@ func LoadFromRulebook(path string) (*Rulebook, error) {
 	}
 
 	return &rulebook, nil
+}
+
+// =============================================================================
+// TEST DATA STRUCTURES - For reading/writing test JSON (snake_case format)
+// =============================================================================
+
+// TestCandidate represents a language candidate in the test JSON format (snake_case)
+type TestCandidate struct {
+	LanguageCandidateID     string  `json:"language_candidate_id"`
+	Name                    *string `json:"name"`
+	Category                *string `json:"category"`
+	FamilyFuedQuestion      *string `json:"family_fued_question"`
+	TopFamilyFeudAnswer     *bool   `json:"top_family_feud_answer"`
+	ChosenLanguageCandidate *bool   `json:"chosen_language_candidate"`
+	FamilyFeudMismatch      *string `json:"family_feud_mismatch"`
+	HasSyntax               *bool   `json:"has_syntax"`
+	HasIdentity             *bool   `json:"has_identity"`
+	CanBeHeld               *bool   `json:"can_be_held"`
+	HasGrammar              *bool   `json:"has_grammar"`
+	RequiresParsing         *bool   `json:"requires_parsing"`
+	MeaningIsSerialized     *bool   `json:"meaning_is_serialized"`
+	IsOngologyDescriptor    *bool   `json:"is_ongology_descriptor"`
+	DistanceFromConcept     *int    `json:"distance_from_concept"`
+	RelationshipToConcept   *string `json:"relationship_to_concept"`
+	SortOrder               *int    `json:"sort_order"`
+}
+
+// ToLanguageCandidate converts TestCandidate to LanguageCandidate for calculation
+func (tc *TestCandidate) ToLanguageCandidate() *LanguageCandidate {
+	return &LanguageCandidate{
+		LanguageCandidateID:     tc.LanguageCandidateID,
+		Name:                    tc.Name,
+		Category:                tc.Category,
+		CanBeHeld:               tc.CanBeHeld,
+		MeaningIsSerialized:     tc.MeaningIsSerialized,
+		RequiresParsing:         tc.RequiresParsing,
+		IsOngologyDescriptor:    tc.IsOngologyDescriptor,
+		HasSyntax:               tc.HasSyntax,
+		ChosenLanguageCandidate: tc.ChosenLanguageCandidate,
+		SortOrder:               tc.SortOrder,
+		HasIdentity:             tc.HasIdentity,
+		DistanceFromConcept:     tc.DistanceFromConcept,
+	}
+}
+
+// ComputeAnswers computes all calculated fields and returns an updated TestCandidate
+func (tc *TestCandidate) ComputeAnswers() *TestCandidate {
+	lc := tc.ToLanguageCandidate()
+
+	// Compute calculated fields
+	familyFuedQuestion := lc.CalcFamilyFuedQuestion()
+	topAnswer := lc.CalcIsAFamilyFeudTopAnswer()
+	hasGrammar := lc.HasSyntax != nil && *lc.HasSyntax
+	relationshipToConcept := lc.CalcRelationshipToConcept()
+	familyFeudMismatch := lc.CalcFamilyFeudMismatch()
+
+	return &TestCandidate{
+		LanguageCandidateID:     tc.LanguageCandidateID,
+		Name:                    tc.Name,
+		Category:                tc.Category,
+		FamilyFuedQuestion:      &familyFuedQuestion,
+		TopFamilyFeudAnswer:     &topAnswer,
+		ChosenLanguageCandidate: tc.ChosenLanguageCandidate,
+		FamilyFeudMismatch:      familyFeudMismatch,
+		HasSyntax:               tc.HasSyntax,
+		HasIdentity:             tc.HasIdentity,
+		CanBeHeld:               tc.CanBeHeld,
+		HasGrammar:              &hasGrammar,
+		RequiresParsing:         tc.RequiresParsing,
+		MeaningIsSerialized:     tc.MeaningIsSerialized,
+		IsOngologyDescriptor:    tc.IsOngologyDescriptor,
+		DistanceFromConcept:     tc.DistanceFromConcept,
+		RelationshipToConcept:   &relationshipToConcept,
+		SortOrder:               tc.SortOrder,
+	}
+}
+
+// LoadTestCandidates loads candidates from a test JSON file (blank-test.json format)
+func LoadTestCandidates(path string) ([]TestCandidate, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read test file: %w", err)
+	}
+
+	var candidates []TestCandidate
+	if err := json.Unmarshal(data, &candidates); err != nil {
+		return nil, fmt.Errorf("failed to parse test file: %w", err)
+	}
+
+	return candidates, nil
+}
+
+// SaveTestCandidates saves computed candidates to a test JSON file
+func SaveTestCandidates(path string, candidates []TestCandidate) error {
+	data, err := json.MarshalIndent(candidates, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal test answers: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("failed to write test answers: %w", err)
+	}
+
+	return nil
 }

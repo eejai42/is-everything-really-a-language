@@ -51,6 +51,50 @@ ANSWER_KEY_PATH = os.path.join(TESTING_DIR, "answer-key.json")
 BLANK_TEST_PATH = os.path.join(TESTING_DIR, "blank-test.json")
 SUMMARY_PATH = os.path.join(SCRIPT_DIR, "all-tests-results.md")
 
+# ANSI color codes for terminal output
+GREEN = "\033[92m"
+RED = "\033[91m"
+YELLOW = "\033[93m"
+RESET = "\033[0m"
+BOLD = "\033[1m"
+
+# Extended 256-color palette for gradients and backgrounds
+SKY_BLUE_BG = "\033[48;5;117m"  # Sky blue background
+DARK_TEXT = "\033[38;5;232m"    # Near-black text for contrast
+GREEN_BG = "\033[48;5;22m"      # Dark green background for pass rows
+RED_BG = "\033[48;5;52m"        # Dark red background for fail rows
+WHITE_TEXT = "\033[97m"         # White text
+
+
+def get_score_color(score: float) -> str:
+    """
+    Returns ANSI color code for a score using a red->yellow->green gradient.
+    0% = pure red, 50% = yellow, 100% = pure green
+    Uses 256-color palette for smooth gradient.
+    """
+    if score >= 100:
+        return "\033[38;5;46m"   # Bright green
+    elif score >= 90:
+        return "\033[38;5;82m"   # Light green
+    elif score >= 80:
+        return "\033[38;5;118m"  # Yellow-green
+    elif score >= 70:
+        return "\033[38;5;154m"  # More yellow-green
+    elif score >= 60:
+        return "\033[38;5;190m"  # Yellow-ish green
+    elif score >= 50:
+        return "\033[38;5;226m"  # Yellow
+    elif score >= 40:
+        return "\033[38;5;220m"  # Orange-yellow
+    elif score >= 30:
+        return "\033[38;5;214m"  # Orange
+    elif score >= 20:
+        return "\033[38;5;208m"  # Dark orange
+    elif score >= 10:
+        return "\033[38;5;202m"  # Red-orange
+    else:
+        return "\033[38;5;196m"  # Pure red
+
 
 # =============================================================================
 # STEP 1: Generate Answer Key from Postgres
@@ -58,7 +102,7 @@ SUMMARY_PATH = os.path.join(SCRIPT_DIR, "all-tests-results.md")
 
 def generate_answer_key():
     """Query the view and export all data (including computed columns) to answer-key.json"""
-    print(f"Step 1: Generating answer key from {VIEW_NAME}...")
+    print(f"Step 1: Generating answer key from {VIEW_NAME}...", flush=True)
 
     try:
         conn = psycopg2.connect(DB_CONNECTION)
@@ -74,7 +118,7 @@ def generate_answer_key():
         with open(ANSWER_KEY_PATH, 'w') as f:
             json.dump(answer_key, f, indent=2, default=str)
 
-        print(f"  -> Exported {len(answer_key)} records to {ANSWER_KEY_PATH}")
+        print(f"  -> Exported {len(answer_key)} records to {ANSWER_KEY_PATH}", flush=True)
 
         cur.close()
         conn.close()
@@ -82,7 +126,7 @@ def generate_answer_key():
         return answer_key
 
     except Exception as e:
-        print(f"  ERROR: Failed to connect to database: {e}")
+        print(f"  ERROR: Failed to connect to database: {e}", flush=True)
         sys.exit(1)
 
 
@@ -92,7 +136,7 @@ def generate_answer_key():
 
 def generate_blank_test(answer_key):
     """Set computed columns to null in blank test (keeps structure, clears values)"""
-    print(f"Step 2: Generating blank test (nulling {len(COMPUTED_COLUMNS)} computed columns)...")
+    print(f"Step 2: Generating blank test (nulling {len(COMPUTED_COLUMNS)} computed columns)...", flush=True)
 
     blank_test = []
     for record in answer_key:
@@ -105,8 +149,8 @@ def generate_blank_test(answer_key):
     with open(BLANK_TEST_PATH, 'w') as f:
         json.dump(blank_test, f, indent=2, default=str)
 
-    print(f"  -> Exported {len(blank_test)} records to {BLANK_TEST_PATH}")
-    print(f"  -> Nulled columns: {', '.join(COMPUTED_COLUMNS)}")
+    print(f"  -> Exported {len(blank_test)} records to {BLANK_TEST_PATH}", flush=True)
+    print(f"  -> Nulled columns: {', '.join(COMPUTED_COLUMNS)}", flush=True)
 
     return blank_test
 
@@ -158,24 +202,67 @@ def run_substrate_test(substrate_name):
         return None, str(e)
 
 
-def run_all_substrate_tests():
-    """Run take-test.sh for each substrate"""
-    print(f"Step 3: Running tests for each substrate...")
+def run_and_grade_all_substrates(answer_key):
+    """Run and grade each substrate, showing results immediately after each test"""
+    print(f"Step 3: Running and grading tests for each substrate...", flush=True)
+    print(flush=True)
 
     substrates = get_substrates()
-    print(f"  -> Found {len(substrates)} substrates: {', '.join(substrates)}")
+    print(f"  Found {len(substrates)} substrates: {', '.join(substrates)}", flush=True)
+    print(flush=True)
 
-    results = {}
-    for substrate in substrates:
+    all_grades = {}
+
+    for i, substrate in enumerate(substrates, 1):
+        # Add significant vertical spacing before each substrate for visual isolation
+        # (like starting at the top of a new page - using top 3/4 of terminal height)
+        print("\n" * 20, flush=True)
+        
+        # Print substrate header (flush immediately so it appears before the test runs)
+        print(f"  [{i}/{len(substrates)}] Testing {substrate}...", flush=True)
+
+        # Run the test
         answers_path, error = run_substrate_test(substrate)
-        results[substrate] = {
-            "answers_path": answers_path,
-            "error": error
-        }
-        status = "OK" if answers_path else f"ERROR: {error}"
-        print(f"  -> {substrate}: {status}")
 
-    return results
+        # Grade the results
+        grades = grade_substrate(substrate, answer_key, answers_path)
+        if error:
+            grades["error"] = error
+
+        all_grades[substrate] = grades
+
+        # Generate the report file
+        generate_substrate_report(substrate, grades)
+
+        # Print the summary box immediately
+        print_substrate_test_summary(substrate, grades)
+
+    return all_grades
+
+
+def grade_all_substrates(answer_key, substrate_results):
+    """
+    Grade all substrates and generate reports.
+    Used by orchestrate.sh which handles running tests separately.
+    """
+    all_grades = {}
+
+    for substrate_name, run_result in substrate_results.items():
+        answers_path = run_result.get("answers_path")
+
+        grades = grade_substrate(substrate_name, answer_key, answers_path)
+
+        if run_result.get("error"):
+            grades["error"] = run_result["error"]
+
+        all_grades[substrate_name] = grades
+
+        generate_substrate_report(substrate_name, grades)
+
+        # Print detailed test summary for this substrate
+        print_substrate_test_summary(substrate_name, grades)
+
+    return all_grades
 
 
 # =============================================================================
@@ -319,40 +406,76 @@ def generate_substrate_report(substrate_name, results):
     return report_path
 
 
-def grade_all_substrates(answer_key, substrate_results):
-    """Grade all substrates and generate reports"""
-    print(f"Step 4: Grading substrate answers...")
+def print_substrate_test_summary(substrate_name, grades):
+    """Print a per-test breakdown for a substrate to console"""
+    total = grades["total_fields_tested"]
+    passed = grades["fields_passed"]
+    failed = grades["fields_failed"]
+    score = (passed / total * 100) if total > 0 else 0
 
-    all_grades = {}
+    # Determine status with color
+    if grades.get("error"):
+        status_plain = "ERROR"
+    elif failed == 0:
+        status_plain = "PASS"
+    else:
+        status_plain = "FAIL"
 
-    for substrate_name, run_result in substrate_results.items():
-        answers_path = run_result.get("answers_path")
+    # Get gradient color for score
+    score_color = get_score_color(score)
 
-        grades = grade_substrate(substrate_name, answer_key, answers_path)
+    # Print header with sky-blue background
+    box_width = 52
+    print(f"  {SKY_BLUE_BG}{DARK_TEXT}┌{'─' * box_width}┐{RESET}", flush=True)
+    print(f"  {SKY_BLUE_BG}{DARK_TEXT}│{BOLD} {substrate_name.upper():^{box_width - 2}} {RESET}{SKY_BLUE_BG}{DARK_TEXT}│{RESET}", flush=True)
+    # Score line with gradient color
+    score_text = f"Score: {passed}/{total} ({score:.1f}%) - {status_plain}"
+    print(f"  {SKY_BLUE_BG}{DARK_TEXT}│ {score_color}{BOLD}{score_text:^{box_width - 2}}{RESET}{SKY_BLUE_BG}{DARK_TEXT} │{RESET}", flush=True)
+    print(f"  {SKY_BLUE_BG}{DARK_TEXT}├{'─' * box_width}┤{RESET}", flush=True)
 
-        if run_result.get("error"):
-            grades["error"] = run_result["error"]
+    # Group failures by field
+    failures_by_field = {}
+    for failure in grades.get("failures", []):
+        field = failure.get("field")
+        if field not in failures_by_field:
+            failures_by_field[field] = 0
+        failures_by_field[field] += 1
 
-        all_grades[substrate_name] = grades
+    # Print per-test results with colored row backgrounds
+    for col in COMPUTED_COLUMNS:
+        col_failures = failures_by_field.get(col, 0)
+        col_total = grades["total_records"]
 
-        report_path = generate_substrate_report(substrate_name, grades)
+        if col_failures == 0 and not grades.get("error"):
+            # Passing test - green background
+            row_bg = GREEN_BG
+            icon = "✓"
+            result_padded = "PASS"
+            text_color = GREEN
+        else:
+            # Failing test - red background
+            row_bg = RED_BG
+            icon = "✗"
+            result_padded = f"FAIL ({col_failures}/{col_total})"
+            text_color = RED
 
-        total = grades["total_fields_tested"]
-        passed = grades["fields_passed"]
-        score = (passed / total * 100) if total > 0 else 0
+        # Truncate column name if too long
+        col_display = col[:30] if len(col) > 30 else col
+        # Render the entire row with colored background
+        row_content = f"  {icon} {col_display:<32} {result_padded:>12} "
+        print(f"  {row_bg}{WHITE_TEXT}│{row_content}│{RESET}", flush=True)
 
-        print(f"  -> {substrate_name}: {passed}/{total} ({score:.1f}%) -> {report_path}")
-
-    return all_grades
+    print(f"  {SKY_BLUE_BG}{DARK_TEXT}└{'─' * box_width}┘{RESET}", flush=True)
+    print(flush=True)
 
 
 # =============================================================================
-# STEP 5: Generate Summary Report
+# STEP 4: Generate Summary Report
 # =============================================================================
 
 def generate_summary_report(all_grades):
     """Generate all-tests-results.md with summary of all substrates"""
-    print(f"Step 5: Generating summary report...")
+    print(f"Step 4: Generating summary report...", flush=True)
 
     lines = [
         "# Test Orchestrator Results",
@@ -408,6 +531,64 @@ def generate_summary_report(all_grades):
         f"| Total Failed | {total_failed} |",
         f"| Overall Score | {overall_score:.1f}% |",
         "",
+    ])
+
+    # Summary by Test (computed column)
+    lines.extend([
+        "## Summary by Test",
+        "",
+        "| Test (Computed Column) | Substrates Passing | Substrates Failing | Pass Rate |",
+        "|------------------------|--------------------|--------------------|-----------|",
+    ])
+
+    # Calculate per-test statistics
+    for col in COMPUTED_COLUMNS:
+        passing_substrates = []
+        failing_substrates = []
+
+        for substrate_name in sorted(all_grades.keys()):
+            grades = all_grades[substrate_name]
+            # Count failures for this specific column
+            col_failures = [f for f in grades.get("failures", []) if f.get("field") == col]
+
+            if len(col_failures) == 0 and not grades.get("error"):
+                passing_substrates.append(substrate_name)
+            else:
+                failing_substrates.append(substrate_name)
+
+        total_substrates = len(all_grades)
+        pass_rate = (len(passing_substrates) / total_substrates * 100) if total_substrates > 0 else 0
+
+        lines.append(f"| `{col}` | {len(passing_substrates)} | {len(failing_substrates)} | {pass_rate:.1f}% |")
+
+    lines.extend([
+        "",
+        "### Test Details",
+        "",
+    ])
+
+    # Detailed breakdown for each test
+    for col in COMPUTED_COLUMNS:
+        passing_substrates = []
+        failing_substrates = []
+
+        for substrate_name in sorted(all_grades.keys()):
+            grades = all_grades[substrate_name]
+            col_failures = [f for f in grades.get("failures", []) if f.get("field") == col]
+
+            if len(col_failures) == 0 and not grades.get("error"):
+                passing_substrates.append(substrate_name)
+            else:
+                failing_substrates.append(substrate_name)
+
+        lines.append(f"**`{col}`**")
+        if passing_substrates:
+            lines.append(f"- Passing: {', '.join(passing_substrates)}")
+        if failing_substrates:
+            lines.append(f"- Failing: {', '.join(failing_substrates)}")
+        lines.append("")
+
+    lines.extend([
         "## Computed Columns Being Tested",
         "",
     ])
@@ -425,8 +606,93 @@ def generate_summary_report(all_grades):
     with open(SUMMARY_PATH, 'w') as f:
         f.write('\n'.join(lines))
 
-    print(f"  -> Summary written to {SUMMARY_PATH}")
-    print(f"  -> Overall: {total_passed}/{total_tests} ({overall_score:.1f}%)")
+    print(f"  -> Summary written to {SUMMARY_PATH}", flush=True)
+    print(f"  -> Overall: {total_passed}/{total_tests} ({overall_score:.1f}%)", flush=True)
+
+    return total_passed, total_failed, total_tests, overall_score
+
+
+def print_final_summary_table(all_grades):
+    """Print a final summary table to console showing all substrates"""
+    print(flush=True)
+    print("=" * 70, flush=True)
+    print(f"{BOLD}FINAL RESULTS SUMMARY{RESET}", flush=True)
+    print("=" * 70, flush=True)
+    print(flush=True)
+
+    # Calculate column widths
+    substrate_width = 15
+    test_width = 8
+
+    # Header row
+    header = f"{'Substrate':<{substrate_width}}"
+    for col in COMPUTED_COLUMNS:
+        col_short = col[:test_width] if len(col) > test_width else col
+        header += f" │ {col_short:^{test_width}}"
+    header += f" │ {'Total':^8} │ {'Score':^7}"
+    print(header, flush=True)
+    print("─" * len(header), flush=True)
+
+    # Data rows
+    total_passed = 0
+    total_failed = 0
+
+    for substrate_name in sorted(all_grades.keys()):
+        grades = all_grades[substrate_name]
+
+        # Group failures by field
+        failures_by_field = {}
+        for failure in grades.get("failures", []):
+            field = failure.get("field")
+            if field not in failures_by_field:
+                failures_by_field[field] = 0
+            failures_by_field[field] += 1
+
+        # Print substrate name
+        print(f"{substrate_name:<{substrate_width}}", end="", flush=True)
+
+        substrate_passed = 0
+        substrate_total = 0
+
+        for col in COMPUTED_COLUMNS:
+            col_failures = failures_by_field.get(col, 0)
+            col_total = grades["total_records"]
+
+            substrate_passed += (col_total - col_failures)
+            substrate_total += col_total
+
+            if col_failures == 0 and not grades.get("error"):
+                # Center the checkmark with padding
+                padding = (test_width - 1) // 2
+                print(f" │ {' ' * padding}{GREEN}✓{RESET}{' ' * (test_width - padding - 1)}", end="", flush=True)
+            else:
+                # Center the failure count with padding
+                cell_str = str(col_failures)
+                padding = (test_width - len(cell_str)) // 2
+                print(f" │ {' ' * padding}{RED}{cell_str}{RESET}{' ' * (test_width - padding - len(cell_str))}", end="", flush=True)
+
+        total_passed += substrate_passed
+        total_failed += (substrate_total - substrate_passed)
+
+        passed = grades["fields_passed"]
+        total = grades["total_fields_tested"]
+        score = (passed / total * 100) if total > 0 else 0
+
+        # Use gradient color for score
+        score_color = get_score_color(score)
+
+        print(f" │ {passed:>3}/{total:<3} │ {score_color}{score:>5.1f}%{RESET}", flush=True)
+
+    print("─" * len(header), flush=True)
+
+    # Overall totals
+    overall_total = total_passed + total_failed
+    overall_score = (total_passed / overall_total * 100) if overall_total > 0 else 0
+    print(f"{BOLD}{'OVERALL':<{substrate_width}}{RESET}", end="", flush=True)
+    for _ in COMPUTED_COLUMNS:
+        print(f" │ {'':^{test_width}}", end="", flush=True)
+    print(f" │ {total_passed:>3}/{overall_total:<3} │ {BOLD}{overall_score:>5.1f}%{RESET}", flush=True)
+    print(flush=True)
 
 
 # =============================================================================
@@ -434,34 +700,33 @@ def generate_summary_report(all_grades):
 # =============================================================================
 
 def main():
-    print("=" * 60)
-    print("TEST ORCHESTRATOR")
-    print("=" * 60)
-    print()
+    print("=" * 60, flush=True)
+    print("TEST ORCHESTRATOR", flush=True)
+    print("=" * 60, flush=True)
+    print(flush=True)
 
     # Step 1: Generate answer key from Postgres
     answer_key = generate_answer_key()
-    print()
+    print(flush=True)
 
     # Step 2: Generate blank test
-    blank_test = generate_blank_test(answer_key)
-    print()
+    generate_blank_test(answer_key)
+    print(flush=True)
 
-    # Step 3: Run each substrate's test
-    substrate_results = run_all_substrate_tests()
-    print()
+    # Step 3: Run and grade each substrate (shows summary after each test)
+    all_grades = run_and_grade_all_substrates(answer_key)
+    print(flush=True)
 
-    # Step 4: Grade each substrate
-    all_grades = grade_all_substrates(answer_key, substrate_results)
-    print()
-
-    # Step 5: Generate summary report
+    # Step 4: Generate summary report
     generate_summary_report(all_grades)
-    print()
+    print(flush=True)
 
-    print("=" * 60)
-    print("DONE")
-    print("=" * 60)
+    # Step 5: Print final summary table to console
+    print_final_summary_table(all_grades)
+
+    print("=" * 60, flush=True)
+    print("DONE", flush=True)
+    print("=" * 60, flush=True)
 
 
 if __name__ == "__main__":

@@ -42,6 +42,14 @@ END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
+CREATE OR REPLACE FUNCTION calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN ((COALESCE((SELECT is_open_world FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = TRUE, FALSE) AND COALESCE((SELECT is_closed_world FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = TRUE, FALSE)))::boolean;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
 CREATE OR REPLACE FUNCTION calc_language_candidates_relationship_to_concept(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
