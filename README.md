@@ -46,6 +46,42 @@ All code, files, and formats are projections.
 
 ---
 
+## Two Empirical Invariants
+
+This repository is not primarily a linguistic or philosophical argument.
+It is an operational claim about how different kinds of systems behave.
+
+There exist systems that *appear* equivalent at the level of representation (schemas, ontologies, languages), but which behave **fundamentally differently when evolved**.
+This repository is defined by two such differences, both of which are **empirically observable**.
+
+### Invariant 1: Ontology Mutation (The Rename Test)
+
+A system has a **single source of ontological truth** *if and only if* an entity can be renamed **once** and that rename propagates deterministically across **all substrates** without search, heuristics, or manual coordination.
+
+In this repository:
+- Renaming is a **mutation of identity metadata**
+- All serializations, schemas, views, and interfaces are projections
+- Denormalization is safe because it is non-authoritative
+
+Rename a column in Airtable, and the change propagates to PostgreSQL functions, Python dataclasses, Go structs, Excel formulas, GraphQL resolvers, OWL ontologies, x86 assembly functions—**all of them**—deterministically.
+
+> **If renaming an entity does not propagate across all representations, the system does not have a single ontology—it has multiple texts.**
+
+### Invariant 2: Interpreter-Free Semantic Completeness
+
+In traditional ontology and model-driven workflows, formal artifacts (e.g., OWL) are accompanied by **natural-language annotations** that must be read and re-interpreted by a human or custom code to produce constraints, executable rules, or application behavior.
+
+In those systems, semantics are **reconstructed downstream**.
+
+In this repository, the rulebook is **semantically complete prior to projection**.
+
+OWL, RDF, SHACL, and GraphQL are generated as **lossless projections** of a single canonical model.
+No human or algorithmic interpreter is required to "reconnect" the graph to its reasoning.
+
+This distinguishes the rulebook from traditional ontologies, even when they are formally equivalent.
+
+---
+
 ## The Rulebook Is the Hub
 
 `/effortless-rulebook/effortless-rulebook.json` is the canonical model.
@@ -78,9 +114,11 @@ If you disagree with a result, you can point to the exact predicate.
 
 **The most radical claim of this architecture: change the source of truth, and everything else follows along automatically.**
 
+This is [Invariant 1](#invariant-1-ontology-mutation-the-rename-test) in action.
+
 Add a new column in Airtable? Twelve execution substrates each regenerate with the new field—from Python dataclasses to PostgreSQL views to *literally x86 assembly code*.
 
-Change a formula in Excel? The same formula propagates to Go structs, GraphQL resolvers, OWL ontologies, and compiled binaries.
+Change a formula? Rename a field? The same change propagates to Go structs, GraphQL resolvers, OWL ontologies, and compiled binaries—**deterministically, without search or manual coordination**.
 
 This isn't abstraction. This is **one truth, many projections**.
 
@@ -133,32 +171,36 @@ The entire repository—12+ execution substrates, tests, and documentation—is 
 ## Table of Contents
 
 1. [The Core Claim (TL;DR)](#the-core-claim-tldr)
-2. [The Rulebook Is the Hub](#the-rulebook-is-the-hub)
-3. [What This Repository Settles](#what-this-repository-settles)
-4. [Everything Follows Along](#everything-follows-along)
+2. [Two Empirical Invariants](#two-empirical-invariants)
+   - [Invariant 1: Ontology Mutation (The Rename Test)](#invariant-1-ontology-mutation-the-rename-test)
+   - [Invariant 2: Interpreter-Free Semantic Completeness](#invariant-2-interpreter-free-semantic-completeness)
+3. [The Rulebook Is the Hub](#the-rulebook-is-the-hub)
+4. [What This Repository Settles](#what-this-repository-settles)
+5. [Everything Follows Along](#everything-follows-along)
    - [From Airtable to Assembler](#from-airtable-to-assembler)
 6. [The Argument](#the-argument)
    - [Part I: Language Can Be Formalized](#part-i-language-can-be-formalized)
    - [Part II: Not Everything Is a Language](#part-ii-not-everything-is-a-language)
    - [Conclusion](#conclusion)
-7. [The Predicates](#the-predicates)
-8. [The Evaluation Matrix](#the-evaluation-matrix)
-9. [The DAG (Inference Levels)](#the-dag-inference-levels)
-10. [Independent Execution Substrates](#independent-execution-substrates)
+7. [Why OWL, RDF, SHACL, and GraphQL Are Projections Here](#why-owl-rdf-shacl-and-graphql-are-projections-here)
+8. [The Predicates](#the-predicates)
+9. [The Evaluation Matrix](#the-evaluation-matrix)
+10. [The DAG (Inference Levels)](#the-dag-inference-levels)
+11. [Independent Execution Substrates](#independent-execution-substrates)
     - [Substrate Roles in the Three-Phase Contract](#substrate-roles-in-the-three-phase-contract)
     - [All Execution Substrates](#all-execution-substrates)
-11. [Testing Architecture](#testing-architecture)
+12. [Testing Architecture](#testing-architecture)
     - [The Three-Phase Testing Model](#the-three-phase-testing-model)
     - [Phase 1: Substrate Injection](#phase-1-substrate-injection-domain-agnostic)
     - [Phase 2: Test Execution](#phase-2-test-execution-main)
     - [Phase 3: Grading](#phase-3-grading)
-12. [Fuzzy Evaluation Layer](#fuzzy-evaluation-layer)
+13. [Fuzzy Evaluation Layer](#fuzzy-evaluation-layer)
     - [Concept](#concept)
     - [Substrates Using Fuzzy Evaluation](#substrates-using-fuzzy-evaluation)
     - [Running Fuzzy Evaluation](#running-fuzzy-evaluation)
-13. [Quick Start](#quick-start)
-14. [Architecture](#architecture)
-15. [Transpilers](#transpilers)
+14. [Quick Start](#quick-start)
+15. [Architecture](#architecture)
+16. [Transpilers](#transpilers)
 
 ---
 
@@ -249,6 +291,38 @@ Formally:
 ```
 Formalizable(Language) ∧ ∃x ¬Language(x) ⇒ ¬(EverythingIsALanguage)
 ```
+
+---
+
+## Why OWL, RDF, SHACL, and GraphQL Are Projections Here
+
+This repository can emit OWL, RDF, SHACL, and GraphQL representations.
+However, none of these artifacts are treated as authoritative.
+
+In typical workflows:
+- OWL defines structure
+- Comments and annotations define intent
+- Constraints and reasoning are added later by human interpreters
+
+Here:
+- Intent, constraints, and inference semantics exist **first** (in the rulebook)
+- Formal representations are **derived**
+- Annotations are explanatory, not semantic
+
+As a result, the rulebook can implement a **semantically complete traditional ontology** *without requiring an interpreter*.
+
+This difference is not stylistic. It determines whether meaning survives refactoring, renaming, and cross-substrate projection.
+
+When you rename `has_syntax` to `has_grammar` in Airtable:
+- The OWL class property changes
+- The RDF predicate changes
+- The SHACL constraint changes
+- The GraphQL field changes
+- The Python method changes
+- The Go function changes
+- The x86 assembly label changes
+
+All deterministically. All from one edit. No search-and-replace. No interpreter reconstruction.
 
 ---
 
