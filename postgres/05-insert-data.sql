@@ -26,7 +26,7 @@ INSERT INTO language_candidates (language_candidate_id, name, category, chosen_l
 VALUES ('a-coffee-mug', 'A Coffee Mug', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 'N/A', FALSE, TRUE, 1, 'NA', 5);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, dimensionality_while_editing, is_open_world, is_closed_world, distance_from_concept, model_object_facility_layer, sort_order)
-VALUES ('a-game-of-fortnite', 'A Game of Fortnite', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, 'MultiDimensionalNonSymbolic', FALSE, TRUE, 1, 'M4', 6);
+VALUES ('a-game-of-fortnite', 'A Game of Fortnite', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, 'MultiDimensionalNonSymbolic', FALSE, TRUE, 1, 'M4', 6);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, dimensionality_while_editing, is_open_world, is_closed_world, distance_from_concept, model_object_facility_layer, sort_order)
 VALUES ('sign-language', 'Sign Language', 'Natural Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, 'OneDimensionalSymbolic', TRUE, FALSE, 2, 'M1', 7);
@@ -38,7 +38,7 @@ INSERT INTO language_candidates (language_candidate_id, name, category, chosen_l
 VALUES ('a-smartphone', 'A Smartphone', 'Physical Object', FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, 'N/A', FALSE, TRUE, 1, 'NA', 9);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, dimensionality_while_editing, is_open_world, is_closed_world, distance_from_concept, model_object_facility_layer, sort_order)
-VALUES ('a-running-app', 'A Running App ', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, TRUE, 'MultiDimensionalNonSymbolic', FALSE, TRUE, 1, 'M4', 22);
+VALUES ('a-running-app', 'A Running App ', 'Running Software', FALSE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, 'MultiDimensionalNonSymbolic', FALSE, TRUE, 1, 'M4', 22);
 
 INSERT INTO language_candidates (language_candidate_id, name, category, chosen_language_candidate, has_syntax, has_identity, can_be_held, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, dimensionality_while_editing, is_open_world, is_closed_world, distance_from_concept, model_object_facility_layer, sort_order)
 VALUES ('an-xlsx-doc', 'An XLSX Doc', 'Formal Language', TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, 'OneDimensionalSymbolic', FALSE, FALSE, 2, 'M2', 23);

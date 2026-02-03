@@ -6,11 +6,11 @@ english,English,Natural Language,Is English a language?,true,true,,true,false,fa
 airtable-editing,Airtable - Editing,Running Software,Is Airtable - Editing a language?,false,false,,false,true,false,false,false,true,false,true,true,MultiDimensionalNonSymbolic,false,true,false,2,,IsDescriptionOf,M4,3
 spoken-words,Spoken Words,Natural Language,Is Spoken Words a language?,true,true,,true,false,false,true,true,true,true,true,false,OneDimensionalSymbolic,true,false,false,2,,IsDescriptionOf,M1,4
 a-coffee-mug,A Coffee Mug,Physical Object,Is A Coffee Mug a language?,false,false,,false,true,true,false,false,false,false,false,false,N/A,false,true,false,1,,IsMirrorOf,NA,5
-a-game-of-fortnite,A Game of Fortnite,Running Software,Is A Game of Fortnite a language?,false,false,,false,true,false,false,true,true,false,false,false,MultiDimensionalNonSymbolic,false,true,false,1,,IsMirrorOf,M4,6
+a-game-of-fortnite,A Game of Fortnite,Running Software,Is A Game of Fortnite a language?,false,false,,false,true,false,false,true,false,false,false,false,MultiDimensionalNonSymbolic,false,true,false,1,,IsMirrorOf,M4,6
 sign-language,Sign Language,Natural Language,Is Sign Language a language?,true,true,,true,false,false,true,true,true,true,true,false,OneDimensionalSymbolic,true,false,false,2,,IsDescriptionOf,M1,7
 python,Python,Formal Language,Is Python a language?,true,true,,true,false,false,true,true,true,true,true,false,OneDimensionalSymbolic,true,false,false,2,,IsDescriptionOf,M1,8
 a-smartphone,A Smartphone,Physical Object,Is A Smartphone a language?,false,false,,false,true,true,false,false,false,true,false,false,N/A,false,true,false,1,,IsMirrorOf,NA,9
-a-running-app,A Running App ,Running Software,Is A Running App  a language?,false,false,,false,true,false,false,true,true,true,false,true,MultiDimensionalNonSymbolic,false,true,false,1,,IsMirrorOf,M4,22
+a-running-app,A Running App ,Running Software,Is A Running App  a language?,false,false,,false,true,false,false,true,false,true,false,true,MultiDimensionalNonSymbolic,false,true,false,1,,IsMirrorOf,M4,22
 an-xlsx-doc,An XLSX Doc,Formal Language,Is An XLSX Doc a language?,true,true,,true,false,false,true,true,true,true,true,false,OneDimensionalSymbolic,false,false,false,2,,IsDescriptionOf,M2,23
 xlsx-editing,XLSX - Editing,Running Software,Is XLSX - Editing a language?,false,false,,false,false,false,false,false,true,false,false,true,MultiDimensionalNonSymbolic,false,false,false,1,,IsMirrorOf,M4,24
 an-docx-doc,An DOCX Doc,Formal Language,Is An DOCX Doc a language?,true,true,,true,false,false,true,true,true,true,true,false,OneDimensionalSymbolic,false,false,false,2,,IsDescriptionOf,M2,25

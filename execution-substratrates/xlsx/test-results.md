@@ -8,4 +8,4 @@
 | Passed | 125 |
 | Failed | 0 |
 | Score | 100.0% |
-| Duration | 329ms |
+| Duration | 336ms |

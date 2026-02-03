@@ -10,17 +10,17 @@
 
 | Substrate | Passed | Failed | Total | Score | Duration | Status |
 |-----------|--------|--------|-------|-------|----------|--------|
-| binary | 87 | 38 | 125 | 69.6% | 292ms | FAIL |
-| csv | 125 | 0 | 125 | 100.0% | 220ms | PASS |
-| english | 113 | 12 | 125 | 90.4% | 16.33s | FAIL |
-| golang | 125 | 0 | 125 | 100.0% | 121ms | PASS |
-| graphql | 125 | 0 | 125 | 100.0% | 112ms | PASS |
-| owl | 125 | 0 | 125 | 100.0% | 2.19s | PASS |
-| python | 125 | 0 | 125 | 100.0% | 113ms | PASS |
-| rdf | 125 | 0 | 125 | 100.0% | 264ms | PASS |
+| binary | 87 | 38 | 125 | 69.6% | 434ms | FAIL |
+| csv | 125 | 0 | 125 | 100.0% | 317ms | PASS |
+| english | 113 | 12 | 125 | 90.4% | 2.15s | FAIL |
+| golang | 125 | 0 | 125 | 100.0% | 201ms | PASS |
+| graphql | 125 | 0 | 125 | 100.0% | 139ms | PASS |
+| owl | 125 | 0 | 125 | 100.0% | 2.41s | PASS |
+| python | 125 | 0 | 125 | 100.0% | 115ms | PASS |
+| rdf | 125 | 0 | 125 | 100.0% | 270ms | PASS |
 | uml | 125 | 0 | 125 | 100.0% | 100ms | PASS |
-| xlsx | 125 | 0 | 125 | 100.0% | 329ms | PASS |
-| yaml | 125 | 0 | 125 | 100.0% | 95ms | PASS |
+| xlsx | 125 | 0 | 125 | 100.0% | 336ms | PASS |
+| yaml | 125 | 0 | 125 | 100.0% | 99ms | PASS |
 
 ## Overall Statistics
 
@@ -31,7 +31,7 @@
 | Total Passed | 1325 |
 | Total Failed | 50 |
 | Overall Score | 96.4% |
-| Total Duration | 20.16s |
+| Total Duration | 6.57s |
 
 ## Summary by Test
 

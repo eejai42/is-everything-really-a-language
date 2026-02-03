@@ -380,7 +380,7 @@ object "A Game of Fortnite" as LanguageCandidates_7 {
   HasIdentity = true
   CanBeHeld = false
   RequiresParsing = true
-  ResolvesToAnAST = true
+  ResolvesToAnAST = false
   HasLinearDecodingPressure = false
   IsStableOntologyReference = false
   IsLiveOntologyEditor = false
@@ -464,7 +464,7 @@ object "A Running App " as LanguageCandidates_11 {
   HasIdentity = true
   CanBeHeld = false
   RequiresParsing = true
-  ResolvesToAnAST = true
+  ResolvesToAnAST = false
   HasLinearDecodingPressure = true
   IsStableOntologyReference = false
   IsLiveOntologyEditor = true

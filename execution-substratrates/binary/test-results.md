@@ -8,7 +8,7 @@
 | Passed | 87 |
 | Failed | 38 |
 | Score | 69.6% |
-| Duration | 292ms |
+| Duration | 434ms |
 
 ## Failures
 
