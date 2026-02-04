@@ -818,7 +818,7 @@ def print_final_summary_table(all_grades):
     # Overall totals
     overall_total = total_passed + total_failed
     overall_score = (total_passed / overall_total * 100) if overall_total > 0 else 0
-    total_duration_str = format_duration(total_time)
+    total_duration_str = f"{total_time:.1f}s"
     print(f"{BOLD}{'OVERALL':<{substrate_width}}{RESET}", end="", flush=True)
     for _ in COMPUTED_COLUMNS:
         print(f" │ {'':^{test_width}}", end="", flush=True)
