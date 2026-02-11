@@ -29,10 +29,10 @@ class LanguageCandidates {
   +HasLinearDecodingPressure: Boolean
   +IsStableOntologyReference: Boolean
   +IsLiveOntologyEditor: Boolean
-  +DimensionalityWhileEditing: String
   +IsOpenWorld: Boolean
   +IsClosedWorld: Boolean
   +DistanceFromConcept: Integer
+  +DimensionalityWhileEditing: String
   +ModelObjectFacilityLayer: String
   +SortOrder: Integer
   --
@@ -40,8 +40,8 @@ class LanguageCandidates {
   /TopFamilyFeudAnswer: Boolean  {derived}
   /FamilyFeudMismatch: String  {derived}
   /HasGrammar: Boolean  {derived}
-  /IsOpenClosedWorldConflicted: Boolean  {derived}
   /IsDescriptionOf: Boolean  {derived}
+  /IsOpenClosedWorldConflicted: Boolean  {derived}
   /RelationshipToConcept: String  {derived}
 }
 

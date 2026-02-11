@@ -295,31 +295,29 @@ The following entities have been evaluated against the operational definition of
 
 | Name | Category | Is Language? | HasSyntax | RequiresParsing | HasLinearDecodingPressure | StableOntologyReference | README |
 |------|----------|--------------|-----------|-----------------|---------------------------|-------------------------|--------|
-| Falsifier A | MISSING: Have you seen this Language? | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/falsifier-a/README.md) |
-| Falsifier B | MISSING: Have you seen this Language? | No | ✗ | ✓ | ✗ | ✗ | - |
-| Falsifier C | MISSING: Have you seen this Language? | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/falsifier-c/README.md) |
-| English | Natural Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/english/README.md) |
-| Airtable - Editing | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
-| Spoken Words | Natural Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/spoken-words/README.md) |
+| English | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Coffee Mug | Physical Object | No | ✗ | ✗ | ✗ | ✗ | - |
+| Spoken Words | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
+| Editing Airtable Base | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
+| Sign Language | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Game of Fortnite | Running Software | No | ✗ | ✓ | ✗ | ✗ | - |
-| Sign Language | Natural Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/sign-language/README.md) |
-| Python | Formal Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/python/README.md) |
+| Falsifier A | MISSING: Have you seen this Language? | No | ✓ | ✓ | ✓ | ✗ | - |
+| Falsifier B | MISSING: Have you seen this Language? | No | ✗ | ✓ | ✗ | ✗ | - |
+| Falsifier C | MISSING: Have you seen this Language? | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Smartphone | Physical Object | No | ✗ | ✗ | ✓ | ✗ | - |
+| Python | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Running App  | Running Software | No | ✗ | ✓ | ✓ | ✗ | - |
-| An XLSX Doc | Formal Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/an-xlsx-doc/README.md) |
+| An XLSX Doc | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | XLSX - Editing | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
-| An DOCX Doc | Formal Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/an-docx-doc/README.md) |
+| An DOCX Doc | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | DOCX - Editing | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
-| A CSV File | Formal Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/a-csv-file/README.md) |
-| OWL/RDF/GraphQL/... generally | Natural Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/owl-rdf-graphql-generally/README.md) |
+| OWL/RDF/GraphQL/... generally | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Thunderstorm | Physical event | No | ✗ | ✓ | ✗ | ✗ | - |
-| A UML File | Formal Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/a-uml-file/README.md) |
-| Binary Code | Formal Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/binary-code/README.md) |
+| A CSV File | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | The Mona Lisa | Physical Object | No | ✗ | ✗ | ✗ | ✗ | - |
+| Binary Code | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | Running Calculator App | Running Software | No | ✗ | ✓ | ✗ | ✗ | - |
-| JavaScript | Formal Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/javascript/README.md) |
-| French | Natural Language | Yes | ✓ | ✓ | ✓ | ✗ | [View](./execution-substratrates/french/README.md) |
+| A UML File | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 
 ### Predicate Legend
 
@@ -344,36 +342,41 @@ The following entities have been evaluated against the operational definition of
 |-------|------|-----------|----------|-------------|
 | `LanguageCandidateId` | raw | string | No | - |
 | `Name` | raw | string | Yes | Name of the language candidate being classified. |
-| `Category` | raw | string | Yes | The general high level category of the candidate. |
-| `FamilyFuedQuestion` | calculated | string | Yes | Question that 100 random people could be asked, family feud style. |
-| `TopFamilyFeudAnswer` | calculated | boolean | Yes | The predicted answer as the top most popular answer among those in the family feud polling pool. |
-| `ChosenLanguageCandidate` | raw | boolean | Yes | The test answer that is intended to match the Family Feud answer to be "correct". |
-| `FamilyFeudMismatch` | calculated | string | Yes | If the family feud answer does not match the chosen language candidates status then this explains what did not match. t also flags (in english) mismatch where a candidate is marked as BOTH open AND closed world which does not make sense. |
-| `HasSyntax` | raw | boolean | Yes | Does this language candidate have syntax and/or grammar? |
-| `HasIdentity` | raw | boolean | Yes | Could this thing be assigned a guid, unique in the universe that would identify it globally?  Like a drivers license or social security number for a person. |
-| `CanBeHeld` | raw | boolean | Yes | Is this candidate physical/material.  I.e. could it at least theoretically "be held"? |
+| `IsLanguage` | raw | boolean | Yes | The test answer that is intended to match the Family Feud answer to be "correct". |
 | `HasGrammar` | calculated | boolean | Yes | Does this candidate have a Grammar?  Generally follows candidates that have syntax also have grammar. |
+| `HasSyntax` | raw | boolean | Yes | Does this language candidate have syntax and/or grammar? |
+| `CanBeHeld` | raw | boolean | Yes | Is this candidate physical/material.  I.e. could it at least theoretically "be held"? |
+| `FamilyFuedQuestion` | calculated | string | Yes | Question that 100 random people could be asked, family feud style. |
+| `IsFamilyFeudLanguage` | calculated | boolean | Yes | The predicted answer as the top most popular answer among those in the family feud polling pool. |
+| `FamilyFeudMismatch` | calculated | string | Yes | If the family feud answer does not match the chosen language candidates status then this explains what did not match. t also flags (in english) mismatch where a candidate is marked as BOTH open AND closed world which does not make sense. |
+| `Category` | raw | string | Yes | The general high level category of the candidate. |
+| `HasIdentity` | raw | boolean | Yes | Could this thing be assigned a guid, unique in the universe that would identify it globally?  Like a drivers license or social security number for a person. |
 | `RequiresParsing` | raw | boolean | Yes | Is the knowledge/information encoded in a form that requires parsing before meaning can be extracted? |
 | `ResolvesToAnAST` | raw | boolean | Yes | Is the knowledge/information encoded in a form that requires parsing before meaning can be extracted? |
 | `HasLinearDecodingPressure` | raw | boolean | Yes | - |
 | `IsStableOntologyReference` | raw | boolean | Yes | - |
 | `IsLiveOntologyEditor` | raw | boolean | Yes | - |
-| `DimensionalityWhileEditing` | raw | string | Yes | - |
 | `IsOpenWorld` | raw | boolean | Yes | - |
 | `IsClosedWorld` | raw | boolean | Yes | - |
-| `IsOpenClosedWorldConflicted` | calculated | boolean | Yes | - |
-| `DistanceFromConcept` | raw | integer | Yes | - |
 | `IsDescriptionOf` | calculated | boolean | Yes | - |
+| `DistanceFromConcept` | raw | integer | Yes | - |
+| `IsOpenClosedWorldConflicted` | calculated | boolean | Yes | - |
+| `DimensionalityWhileEditing` | raw | string | Yes | - |
 | `RelationshipToConcept` | calculated | string | Yes | - |
 | `ModelObjectFacilityLayer` | raw | string | Yes | - |
 | `SortOrder` | raw | integer | Yes | - |
+
+**Formula for `HasGrammar`:**
+```
+={{HasSyntax}} = TRUE()
+```
 
 **Formula for `FamilyFuedQuestion`:**
 ```
 ="Is " & {{Name}} & " a language?"
 ```
 
-**Formula for `TopFamilyFeudAnswer`:**
+**Formula for `IsFamilyFeudLanguage`:**
 ```
 =AND(
   {{HasSyntax}},
@@ -389,24 +392,19 @@ The following entities have been evaluated against the operational definition of
 
 **Formula for `FamilyFeudMismatch`:**
 ```
-=IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),
-  {{Name}} & " " & IF({{TopFamilyFeudAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
-  IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
-```
-
-**Formula for `HasGrammar`:**
-```
-={{HasSyntax}} = TRUE()
-```
-
-**Formula for `IsOpenClosedWorldConflicted`:**
-```
-=AND({{IsOpenWorld}}, {{IsClosedWorld}})
+=IF(NOT({{IsFamilyFeudLanguage}} = {{IsLanguage}}),
+  {{Name}} & " " & IF({{IsFamilyFeudLanguage}}, "Is", "Isn't") & " a Family Feud Language, but " & 
+  IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
 ```
 
 **Formula for `IsDescriptionOf`:**
 ```
 ={{DistanceFromConcept}} > 1
+```
+
+**Formula for `IsOpenClosedWorldConflicted`:**
+```
+=AND({{IsOpenWorld}}, {{IsClosedWorld}})
 ```
 
 **Formula for `RelationshipToConcept`:**
@@ -415,33 +413,33 @@ The following entities have been evaluated against the operational definition of
 ```
 
 
-#### Sample Data (25 records)
+#### Sample Data (23 records)
 
 | Field | Value |
 |-------|-------|
-| `LanguageCandidateId` | falsifier-a |
-| `Name` | Falsifier A |
-| `TopFamilyFeudAnswer` | true |
+| `LanguageCandidateId` | english |
+| `Name` | English |
+| `IsFamilyFeudLanguage` | true |
 | `IsStableOntologyReference` | true |
 | `HasLinearDecodingPressure` | true |
 | `RequiresParsing` | true |
 | `HasSyntax` | true |
-| `Category` | MISSING: Have you seen this Language? |
-| `FamilyFeudMismatch` | Falsifier A Is a Family Feud Language, but Is Not marked as a 'Language Candidate.' |
-| `SortOrder` | 0 |
-| `FamilyFuedQuestion` | Is Falsifier A a language? |
+| `Category` | Natural Language |
+| `IsLanguage` | true |
+| `SortOrder` | 1 |
+| `FamilyFuedQuestion` | Is English a language? |
 | `RelationshipToConcept` | IsDescriptionOf |
 | `DistanceFromConcept` | 2 |
 | `HasGrammar` | true |
-| `DimensionalityWhileEditing` | N/A |
+| `DimensionalityWhileEditing` | OneDimensionalSymbolic |
+| `IsOpenWorld` | true |
 | `IsDescriptionOf` | true |
 | `ResolvesToAnAST` | true |
 | `ModelObjectFacilityLayer` | M1 |
-| `ChosenLanguageCandidate` | false |
-| `HasIdentity` | false |
 | `CanBeHeld` | false |
+| `FamilyFeudMismatch` |  |
+| `HasIdentity` | false |
 | `IsLiveOntologyEditor` | false |
-| `IsOpenWorld` | false |
 | `IsClosedWorld` | false |
 | `IsOpenClosedWorldConflicted` | false |
 

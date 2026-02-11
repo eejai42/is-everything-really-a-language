@@ -28,17 +28,17 @@ function calcHasGrammar(candidate) {
 }
 
 /**
- * Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
- */
-function calcIsOpenClosedWorldConflicted(candidate) {
-  return ((candidate.isOpenWorld === true) && (candidate.isClosedWorld === true));
-}
-
-/**
  * Formula: ={{DistanceFromConcept}} > 1
  */
 function calcIsDescriptionOf(candidate) {
   return (candidate.distanceFromConcept > 1);
+}
+
+/**
+ * Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
+ */
+function calcIsOpenClosedWorldConflicted(candidate) {
+  return ((candidate.isOpenWorld === true) && (candidate.isClosedWorld === true));
 }
 
 /**
@@ -75,8 +75,8 @@ function calcFamilyFeudMismatch(candidate) {
 module.exports = {
   calcFamilyFuedQuestion,
   calcHasGrammar,
-  calcIsOpenClosedWorldConflicted,
   calcIsDescriptionOf,
+  calcIsOpenClosedWorldConflicted,
   calcRelationshipToConcept,
   calcTopFamilyFeudAnswer,
   calcFamilyFeudMismatch,

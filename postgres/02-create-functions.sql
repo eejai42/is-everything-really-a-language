@@ -10,6 +10,14 @@
 -- ============================================================================
 
 
+CREATE OR REPLACE FUNCTION calc_language_candidates_has_grammar(p_language_candidate_id TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN ((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = TRUE)::boolean;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
 CREATE OR REPLACE FUNCTION calc_language_candidates_family_fued_question(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
@@ -18,7 +26,7 @@ END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_language_candidates_top_family_feud_answer(p_language_candidate_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_is_family_feud_language(p_language_candidate_id TEXT)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN ((COALESCE((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT requires_parsing FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND (calc_language_candidates_is_description_of(p_language_candidate_id) = 'true') AND COALESCE((SELECT has_linear_decoding_pressure FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT resolves_to_an_ast FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT is_stable_ontology_reference FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND NOT (COALESCE((SELECT can_be_held FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)) AND NOT (COALESCE((SELECT has_identity FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE))))::boolean;
@@ -34,10 +42,10 @@ END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_language_candidates_has_grammar(p_language_candidate_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_is_description_of(p_language_candidate_id TEXT)
 RETURNS BOOLEAN AS $$
 BEGIN
-  RETURN ((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = TRUE)::boolean;
+  RETURN ((SELECT distance_from_concept FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) > 1)::boolean;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
@@ -46,14 +54,6 @@ CREATE OR REPLACE FUNCTION calc_language_candidates_is_open_closed_world_conflic
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN ((COALESCE((SELECT is_open_world FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT is_closed_world FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)))::boolean;
-END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
-
-
-CREATE OR REPLACE FUNCTION calc_language_candidates_is_description_of(p_language_candidate_id TEXT)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN ((SELECT distance_from_concept FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) > 1)::boolean;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 

@@ -15,11 +15,11 @@ derive FamilyFeudMismatch: if not ((self.topFamilyFeudAnswer = self.chosenLangua
 -- Formula: ={{HasSyntax}} = TRUE()
 derive HasGrammar: (self.hasSyntax = true)
 
--- Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
-derive IsOpenClosedWorldConflicted: (self.isOpenWorld and self.isClosedWorld)
-
 -- Formula: ={{DistanceFromConcept}} > 1
 derive IsDescriptionOf: (self.distanceFromConcept > 1)
+
+-- Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
+derive IsOpenClosedWorldConflicted: (self.isOpenWorld and self.isClosedWorld)
 
 -- Formula: =IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")
 derive RelationshipToConcept: if (self.distanceFromConcept = 1) then 'IsMirrorOf' else 'IsDescriptionOf' endif

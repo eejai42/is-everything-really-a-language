@@ -72,6 +72,20 @@ WHERE {
     BIND((?has_syntax = true) AS ?_result)
 }
 
+# Computed field: IsDescriptionOf
+# Formula: ={{DistanceFromConcept}} > 1
+PREFIX erb: <http://example.org/erb#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?entity erb:isDescriptionOf ?_result .
+}
+WHERE {
+    ?entity a erb:LanguageCandidates .
+    OPTIONAL { ?entity erb:distanceFromConcept ?distance_from_concept . }
+    BIND((?distance_from_concept > 1) AS ?_result)
+}
+
 # Computed field: IsOpenClosedWorldConflicted
 # Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
 PREFIX erb: <http://example.org/erb#>
@@ -85,20 +99,6 @@ WHERE {
     OPTIONAL { ?entity erb:isClosedWorld ?is_closed_world . }
     OPTIONAL { ?entity erb:isOpenWorld ?is_open_world . }
     BIND((?is_open_world && ?is_closed_world) AS ?_result)
-}
-
-# Computed field: IsDescriptionOf
-# Formula: ={{DistanceFromConcept}} > 1
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:isDescriptionOf ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:distanceFromConcept ?distance_from_concept . }
-    BIND((?distance_from_concept > 1) AS ?_result)
 }
 
 # Computed field: RelationshipToConcept

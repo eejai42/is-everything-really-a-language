@@ -77,8 +77,8 @@ CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_mismatch(p_langu
 RETURNS TEXT AS $$
   SELECT
     CASE
-      WHEN COALESCE(calc_language_candidates_top_family_feud_answer(p_language_candidate_id), FALSE)
-           = COALESCE(chosen_language_candidate, FALSE)
+      WHEN COALESCE(calc_language_candidates_is_family_feud_language(p_language_candidate_id), FALSE)
+           = COALESCE(is_language, FALSE)
       THEN
         CASE
           WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)
@@ -86,9 +86,9 @@ RETURNS TEXT AS $$
           ELSE NULL
         END
       ELSE name || ' ' ||
-           CASE WHEN calc_language_candidates_top_family_feud_answer(p_language_candidate_id) THEN 'Is' ELSE 'Isn''t' END ||
+           CASE WHEN calc_language_candidates_is_family_feud_language(p_language_candidate_id) THEN 'Is' ELSE 'Isn''t' END ||
            ' a Family Feud Language, but ' ||
-           CASE WHEN chosen_language_candidate THEN 'Is' ELSE 'Is Not' END ||
+           CASE WHEN is_language THEN 'Is' ELSE 'Is Not' END ||
            ' marked as a ''Language Candidate.''' ||
            CASE
              WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)

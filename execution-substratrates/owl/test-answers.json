@@ -50,8 +50,8 @@
     "is_live_ontology_editor": false,
     "is_open_world": false,
     "is_closed_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "falsifier-c",
@@ -185,8 +185,8 @@
     "is_stable_ontology_reference": false,
     "is_live_ontology_editor": false,
     "is_open_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "a-game-of-fortnite",
@@ -212,8 +212,8 @@
     "is_stable_ontology_reference": false,
     "is_live_ontology_editor": false,
     "is_open_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "sign-language",
@@ -293,8 +293,8 @@
     "is_stable_ontology_reference": false,
     "is_live_ontology_editor": false,
     "is_open_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "a-running-app",
@@ -320,8 +320,8 @@
     "resolves_to_an_ast": false,
     "is_stable_ontology_reference": false,
     "is_open_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "an-xlsx-doc",
@@ -374,8 +374,8 @@
     "is_stable_ontology_reference": false,
     "is_open_world": false,
     "is_closed_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "an-docx-doc",
@@ -428,8 +428,8 @@
     "has_linear_decoding_pressure": false,
     "is_open_world": false,
     "is_closed_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "a-csv-file",
@@ -509,8 +509,8 @@
     "is_live_ontology_editor": false,
     "is_open_world": false,
     "is_closed_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "a-uml-file",
@@ -590,8 +590,8 @@
     "is_live_ontology_editor": false,
     "is_open_world": false,
     "is_closed_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "running-calculator-app",
@@ -617,8 +617,8 @@
     "is_live_ontology_editor": false,
     "is_open_world": false,
     "is_closed_world": false,
-    "is_open_closed_world_conflicted": false,
-    "is_description_of": false
+    "is_description_of": false,
+    "is_open_closed_world_conflicted": false
   },
   {
     "language_candidate_id": "javascript",

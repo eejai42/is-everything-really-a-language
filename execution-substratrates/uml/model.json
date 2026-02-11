@@ -100,10 +100,6 @@
           "type": "boolean"
         },
         {
-          "name": "DimensionalityWhileEditing",
-          "type": "string"
-        },
-        {
           "name": "IsOpenWorld",
           "type": "boolean"
         },
@@ -114,6 +110,10 @@
         {
           "name": "DistanceFromConcept",
           "type": "integer"
+        },
+        {
+          "name": "DimensionalityWhileEditing",
+          "type": "string"
         },
         {
           "name": "ModelObjectFacilityLayer",
@@ -146,14 +146,14 @@
           "formula": "={{HasSyntax}} = TRUE()"
         },
         {
-          "name": "IsOpenClosedWorldConflicted",
-          "type": "boolean",
-          "formula": "=AND({{IsOpenWorld}}, {{IsClosedWorld}})"
-        },
-        {
           "name": "IsDescriptionOf",
           "type": "boolean",
           "formula": "={{DistanceFromConcept}} > 1"
+        },
+        {
+          "name": "IsOpenClosedWorldConflicted",
+          "type": "boolean",
+          "formula": "=AND({{IsOpenWorld}}, {{IsClosedWorld}})"
         },
         {
           "name": "RelationshipToConcept",
@@ -452,10 +452,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "N/A",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "N/A",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 0
       }
@@ -476,10 +476,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "N/A",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "N/A",
         "ModelObjectFacilityLayer": "NA",
         "SortOrder": 1
       }
@@ -500,10 +500,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": true,
         "IsClosedWorld": true,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 2
       }
@@ -524,10 +524,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": true,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 3
       }
@@ -548,10 +548,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": true,
-        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": true,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "ModelObjectFacilityLayer": "M4",
         "SortOrder": 3
       }
@@ -572,10 +572,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": true,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 4
       }
@@ -596,10 +596,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": false,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "N/A",
         "IsOpenWorld": false,
         "IsClosedWorld": true,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "N/A",
         "ModelObjectFacilityLayer": "NA",
         "SortOrder": 5
       }
@@ -620,10 +620,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": false,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": true,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "ModelObjectFacilityLayer": "M4",
         "SortOrder": 6
       }
@@ -644,10 +644,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": true,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 7
       }
@@ -668,10 +668,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": true,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 8
       }
@@ -692,10 +692,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": false,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "N/A",
         "IsOpenWorld": false,
         "IsClosedWorld": true,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "N/A",
         "ModelObjectFacilityLayer": "NA",
         "SortOrder": 9
       }
@@ -716,10 +716,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": false,
         "IsLiveOntologyEditor": true,
-        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": true,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "ModelObjectFacilityLayer": "M4",
         "SortOrder": 22
       }
@@ -740,10 +740,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M2",
         "SortOrder": 23
       }
@@ -764,10 +764,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": false,
         "IsLiveOntologyEditor": true,
-        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "ModelObjectFacilityLayer": "M4",
         "SortOrder": 24
       }
@@ -788,10 +788,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M2",
         "SortOrder": 25
       }
@@ -812,10 +812,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": true,
-        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "ModelObjectFacilityLayer": "M4",
         "SortOrder": 25
       }
@@ -836,10 +836,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": true,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M2",
         "SortOrder": 10
       }
@@ -860,10 +860,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": true,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M2",
         "SortOrder": 11
       }
@@ -884,10 +884,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": false,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "N/A",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "N/A",
         "ModelObjectFacilityLayer": "NA",
         "SortOrder": 13
       }
@@ -908,10 +908,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M2",
         "SortOrder": 14
       }
@@ -932,10 +932,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M2",
         "SortOrder": 15
       }
@@ -956,10 +956,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "N/A",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "N/A",
         "ModelObjectFacilityLayer": "NA",
         "SortOrder": 16
       }
@@ -980,10 +980,10 @@
         "HasLinearDecodingPressure": false,
         "IsStableOntologyReference": false,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 1,
+        "DimensionalityWhileEditing": "MultiDimensionalNonSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 17
       }
@@ -1004,10 +1004,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 18
       }
@@ -1028,10 +1028,10 @@
         "HasLinearDecodingPressure": true,
         "IsStableOntologyReference": true,
         "IsLiveOntologyEditor": false,
-        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "IsOpenWorld": false,
         "IsClosedWorld": false,
         "DistanceFromConcept": 2,
+        "DimensionalityWhileEditing": "OneDimensionalSymbolic",
         "ModelObjectFacilityLayer": "M1",
         "SortOrder": 19
       }

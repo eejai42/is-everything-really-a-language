@@ -301,7 +301,7 @@ _eval_top_family_feud_answer:
     cbz w0, and_false_1
     ldrb w0, [x19, #92]
     cbz w0, and_false_1
-    ldrb w0, [x19, #136]
+    ldrb w0, [x19, #99]
     cbz w0, and_false_1
     ldrb w0, [x19, #94]
     cbz w0, and_false_1
@@ -449,7 +449,7 @@ if_end_4:
     mov x1, x21
     str x0, [sp, #16]
     str x1, [sp, #24]
-    ldrb w0, [x19, #122]
+    ldrb w0, [x19, #112]
     cbz w0, if_else_9
     adrp x0, str_9@PAGE
     add x0, x0, str_9@PAGEOFF
@@ -507,32 +507,6 @@ _eval_has_grammar:
     ldp x29, x30, [sp], #16
     ret
 
-    .globl _eval_is_open_closed_world_conflicted
-    .p2align 2
-_eval_is_open_closed_world_conflicted:
-    stp x29, x30, [sp, #-16]!
-    mov x29, sp
-    stp x19, x20, [sp, #-16]!
-    stp x21, x22, [sp, #-16]!
-    stp x23, x24, [sp, #-16]!
-    sub sp, sp, #256
-    mov x19, x0
-    ldrb w0, [x19, #120]
-    cbz w0, and_false_11
-    ldrb w0, [x19, #121]
-    cbz w0, and_false_11
-    mov w0, #1
-    b and_end_12
-and_false_11:
-    mov w0, #0
-and_end_12:
-    add sp, sp, #256
-    ldp x23, x24, [sp], #16
-    ldp x21, x22, [sp], #16
-    ldp x19, x20, [sp], #16
-    ldp x29, x30, [sp], #16
-    ret
-
     .globl _eval_is_description_of
     .p2align 2
 _eval_is_description_of:
@@ -543,11 +517,37 @@ _eval_is_description_of:
     stp x23, x24, [sp, #-16]!
     sub sp, sp, #256
     mov x19, x0
-    ldr x0, [x19, #128]
+    ldr x0, [x19, #104]
     mov x20, x0
     mov x0, #1
     cmp x20, x0
     cset w0, gt
+    add sp, sp, #256
+    ldp x23, x24, [sp], #16
+    ldp x21, x22, [sp], #16
+    ldp x19, x20, [sp], #16
+    ldp x29, x30, [sp], #16
+    ret
+
+    .globl _eval_is_open_closed_world_conflicted
+    .p2align 2
+_eval_is_open_closed_world_conflicted:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    stp x19, x20, [sp, #-16]!
+    stp x21, x22, [sp, #-16]!
+    stp x23, x24, [sp, #-16]!
+    sub sp, sp, #256
+    mov x19, x0
+    ldrb w0, [x19, #97]
+    cbz w0, and_false_11
+    ldrb w0, [x19, #98]
+    cbz w0, and_false_11
+    mov w0, #1
+    b and_end_12
+and_false_11:
+    mov w0, #0
+and_end_12:
     add sp, sp, #256
     ldp x23, x24, [sp], #16
     ldp x21, x22, [sp], #16
@@ -565,7 +565,7 @@ _eval_relationship_to_concept:
     stp x23, x24, [sp, #-16]!
     sub sp, sp, #256
     mov x19, x0
-    ldr x0, [x19, #128]
+    ldr x0, [x19, #104]
     mov x20, x0
     mov x0, #1
     cmp x20, x0

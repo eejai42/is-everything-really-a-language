@@ -22,13 +22,13 @@ def calc_has_grammar(has_syntax):
     """Formula: ={{HasSyntax}} = TRUE()"""
     return (has_syntax == True)
 
-def calc_is_open_closed_world_conflicted(is_open_world, is_closed_world):
-    """Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})"""
-    return ((is_open_world is True) and (is_closed_world is True))
-
 def calc_is_description_of(distance_from_concept):
     """Formula: ={{DistanceFromConcept}} > 1"""
     return (distance_from_concept > 1)
+
+def calc_is_open_closed_world_conflicted(is_open_world, is_closed_world):
+    """Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})"""
+    return ((is_open_world is True) and (is_closed_world is True))
 
 def calc_relationship_to_concept(distance_from_concept):
     """Formula: =IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")"""
@@ -78,8 +78,8 @@ def compute_all_calculated_fields(record: dict) -> dict:
     # Level 1 calculations
     result['family_fued_question'] = calc_family_fued_question(result.get('name'))
     result['has_grammar'] = calc_has_grammar(result.get('has_syntax'))
-    result['is_open_closed_world_conflicted'] = calc_is_open_closed_world_conflicted(result.get('is_open_world'), result.get('is_closed_world'))
     result['is_description_of'] = calc_is_description_of(result.get('distance_from_concept'))
+    result['is_open_closed_world_conflicted'] = calc_is_open_closed_world_conflicted(result.get('is_open_world'), result.get('is_closed_world'))
     result['relationship_to_concept'] = calc_relationship_to_concept(result.get('distance_from_concept'))
 
     # Level 2 calculations

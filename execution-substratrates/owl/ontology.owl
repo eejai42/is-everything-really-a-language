@@ -155,11 +155,6 @@ erb:isLiveOntologyEditor a owl:DatatypeProperty ;
     rdfs:range xsd:boolean ;
     rdfs:label "IsLiveOntologyEditor" .
 
-erb:dimensionalityWhileEditing a owl:DatatypeProperty ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "DimensionalityWhileEditing" .
-
 erb:isOpenWorld a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
@@ -170,10 +165,10 @@ erb:isClosedWorld a owl:DatatypeProperty ;
     rdfs:range xsd:boolean ;
     rdfs:label "IsClosedWorld" .
 
-erb:isOpenClosedWorldConflicted a owl:DatatypeProperty ;
+erb:isDescriptionOf a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "IsOpenClosedWorldConflicted" .
+    rdfs:label "IsDescriptionOf" .
     # calculated: calculated
 
 erb:distanceFromConcept a owl:DatatypeProperty ;
@@ -181,11 +176,16 @@ erb:distanceFromConcept a owl:DatatypeProperty ;
     rdfs:range xsd:integer ;
     rdfs:label "DistanceFromConcept" .
 
-erb:isDescriptionOf a owl:DatatypeProperty ;
+erb:isOpenClosedWorldConflicted a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "IsDescriptionOf" .
+    rdfs:label "IsOpenClosedWorldConflicted" .
     # calculated: calculated
+
+erb:dimensionalityWhileEditing a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "DimensionalityWhileEditing" .
 
 erb:relationshipToConcept a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;

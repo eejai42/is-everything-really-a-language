@@ -59,18 +59,18 @@ type LanguageCandidate struct {
 	HasLinearDecodingPressure *bool `json:"has_linear_decoding_pressure"`
 	IsStableOntologyReference *bool `json:"is_stable_ontology_reference"`
 	IsLiveOntologyEditor *bool `json:"is_live_ontology_editor"`
-	DimensionalityWhileEditing *string `json:"dimensionality_while_editing"`
 	IsOpenWorld *bool `json:"is_open_world"`
 	IsClosedWorld *bool `json:"is_closed_world"`
 	DistanceFromConcept *int `json:"distance_from_concept"`
+	DimensionalityWhileEditing *string `json:"dimensionality_while_editing"`
 	ModelObjectFacilityLayer *string `json:"model_object_facility_layer"`
 	SortOrder *int `json:"sort_order"`
 	FamilyFuedQuestion *string `json:"family_fued_question"`
 	TopFamilyFeudAnswer *bool `json:"top_family_feud_answer"`
 	FamilyFeudMismatch *string `json:"family_feud_mismatch"`
 	HasGrammar *bool `json:"has_grammar"`
-	IsOpenClosedWorldConflicted *bool `json:"is_open_closed_world_conflicted"`
 	IsDescriptionOf *bool `json:"is_description_of"`
+	IsOpenClosedWorldConflicted *bool `json:"is_open_closed_world_conflicted"`
 	RelationshipToConcept *string `json:"relationship_to_concept"`
 }
 
@@ -100,16 +100,16 @@ func (tc *LanguageCandidate) CalcHasGrammar() bool {
 	return (boolVal(tc.HasSyntax) == true)
 }
 
-// CalcIsOpenClosedWorldConflicted computes the IsOpenClosedWorldConflicted calculated field
-// Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
-func (tc *LanguageCandidate) CalcIsOpenClosedWorldConflicted() bool {
-	return (boolVal(tc.IsOpenWorld) && boolVal(tc.IsClosedWorld))
-}
-
 // CalcIsDescriptionOf computes the IsDescriptionOf calculated field
 // Formula: ={{DistanceFromConcept}} > 1
 func (tc *LanguageCandidate) CalcIsDescriptionOf() bool {
 	return (tc.DistanceFromConcept != nil && *tc.DistanceFromConcept > 1)
+}
+
+// CalcIsOpenClosedWorldConflicted computes the IsOpenClosedWorldConflicted calculated field
+// Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
+func (tc *LanguageCandidate) CalcIsOpenClosedWorldConflicted() bool {
+	return (boolVal(tc.IsOpenWorld) && boolVal(tc.IsClosedWorld))
 }
 
 // CalcRelationshipToConcept computes the RelationshipToConcept calculated field
@@ -125,8 +125,8 @@ func (tc *LanguageCandidate) ComputeAll() *LanguageCandidate {
 	// Level 1 calculations
 	familyFuedQuestion := "Is " + stringVal(tc.Name) + " a language?"
 	hasGrammar := (boolVal(tc.HasSyntax) == true)
-	isOpenClosedWorldConflicted := (boolVal(tc.IsOpenWorld) && boolVal(tc.IsClosedWorld))
 	isDescriptionOf := (tc.DistanceFromConcept != nil && *tc.DistanceFromConcept > 1)
+	isOpenClosedWorldConflicted := (boolVal(tc.IsOpenWorld) && boolVal(tc.IsClosedWorld))
 	relationshipToConcept := func() string { if (tc.DistanceFromConcept != nil && *tc.DistanceFromConcept == 1) { return "IsMirrorOf" }; return "IsDescriptionOf" }()
 
 	// Level 2 calculations
@@ -148,18 +148,18 @@ func (tc *LanguageCandidate) ComputeAll() *LanguageCandidate {
 		HasLinearDecodingPressure: tc.HasLinearDecodingPressure,
 		IsStableOntologyReference: tc.IsStableOntologyReference,
 		IsLiveOntologyEditor: tc.IsLiveOntologyEditor,
-		DimensionalityWhileEditing: tc.DimensionalityWhileEditing,
 		IsOpenWorld: tc.IsOpenWorld,
 		IsClosedWorld: tc.IsClosedWorld,
 		DistanceFromConcept: tc.DistanceFromConcept,
+		DimensionalityWhileEditing: tc.DimensionalityWhileEditing,
 		ModelObjectFacilityLayer: tc.ModelObjectFacilityLayer,
 		SortOrder: tc.SortOrder,
 		FamilyFuedQuestion: nilIfEmpty(familyFuedQuestion),
 		TopFamilyFeudAnswer: &topFamilyFeudAnswer,
 		FamilyFeudMismatch: nilIfEmpty(familyFeudMismatch),
 		HasGrammar: &hasGrammar,
-		IsOpenClosedWorldConflicted: &isOpenClosedWorldConflicted,
 		IsDescriptionOf: &isDescriptionOf,
+		IsOpenClosedWorldConflicted: &isOpenClosedWorldConflicted,
 		RelationshipToConcept: nilIfEmpty(relationshipToConcept),
 	}
 }

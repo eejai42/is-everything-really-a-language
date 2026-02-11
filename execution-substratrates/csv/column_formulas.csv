@@ -26,12 +26,12 @@ LanguageCandidates,resolves_to_an_ast,raw,0,
 LanguageCandidates,has_linear_decoding_pressure,raw,0,
 LanguageCandidates,is_stable_ontology_reference,raw,0,
 LanguageCandidates,is_live_ontology_editor,raw,0,
-LanguageCandidates,dimensionality_while_editing,raw,0,
 LanguageCandidates,is_open_world,raw,0,
 LanguageCandidates,is_closed_world,raw,0,
-LanguageCandidates,is_open_closed_world_conflicted,calculated,,"=AND({{IsOpenWorld}}, {{IsClosedWorld}})"
-LanguageCandidates,distance_from_concept,raw,0,
 LanguageCandidates,is_description_of,calculated,,={{DistanceFromConcept}} > 1
+LanguageCandidates,distance_from_concept,raw,0,
+LanguageCandidates,is_open_closed_world_conflicted,calculated,,"=AND({{IsOpenWorld}}, {{IsClosedWorld}})"
+LanguageCandidates,dimensionality_while_editing,raw,0,
 LanguageCandidates,relationship_to_concept,calculated,,"=IF({{DistanceFromConcept}} = 1, ""IsMirrorOf"", ""IsDescriptionOf"")"
 LanguageCandidates,model_object_facility_layer,raw,0,
 LanguageCandidates,sort_order,raw,0,

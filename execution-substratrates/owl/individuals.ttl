@@ -228,10 +228,10 @@ erb:LanguageCandidates_0 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "N/A" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 0 .
 
@@ -248,10 +248,10 @@ erb:LanguageCandidates_1 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "N/A" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
     erb:sortOrder 1 .
 
@@ -268,10 +268,10 @@ erb:LanguageCandidates_2 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld true ;
     erb:isClosedWorld true ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 2 .
 
@@ -288,10 +288,10 @@ erb:LanguageCandidates_3 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld true ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 3 .
 
@@ -308,10 +308,10 @@ erb:LanguageCandidates_4 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor true ;
-    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld true ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
     erb:sortOrder 3 .
 
@@ -328,10 +328,10 @@ erb:LanguageCandidates_5 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld true ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 4 .
 
@@ -348,10 +348,10 @@ erb:LanguageCandidates_6 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference false ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "N/A" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld true ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
     erb:sortOrder 5 .
 
@@ -368,10 +368,10 @@ erb:LanguageCandidates_7 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference false ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld true ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
     erb:sortOrder 6 .
 
@@ -388,10 +388,10 @@ erb:LanguageCandidates_8 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld true ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 7 .
 
@@ -408,10 +408,10 @@ erb:LanguageCandidates_9 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld true ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 8 .
 
@@ -428,10 +428,10 @@ erb:LanguageCandidates_10 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference false ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "N/A" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld true ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
     erb:sortOrder 9 .
 
@@ -448,10 +448,10 @@ erb:LanguageCandidates_11 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference false ;
     erb:isLiveOntologyEditor true ;
-    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld true ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
     erb:sortOrder 22 .
 
@@ -468,10 +468,10 @@ erb:LanguageCandidates_12 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
     erb:sortOrder 23 .
 
@@ -488,10 +488,10 @@ erb:LanguageCandidates_13 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference false ;
     erb:isLiveOntologyEditor true ;
-    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
     erb:sortOrder 24 .
 
@@ -508,10 +508,10 @@ erb:LanguageCandidates_14 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
     erb:sortOrder 25 .
 
@@ -528,10 +528,10 @@ erb:LanguageCandidates_15 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor true ;
-    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
     erb:sortOrder 25 .
 
@@ -548,10 +548,10 @@ erb:LanguageCandidates_16 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld true ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
     erb:sortOrder 10 .
 
@@ -568,10 +568,10 @@ erb:LanguageCandidates_17 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld true ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
     erb:sortOrder 11 .
 
@@ -588,10 +588,10 @@ erb:LanguageCandidates_18 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference false ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "N/A" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
     erb:sortOrder 13 .
 
@@ -608,10 +608,10 @@ erb:LanguageCandidates_19 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
     erb:sortOrder 14 .
 
@@ -628,10 +628,10 @@ erb:LanguageCandidates_20 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
     erb:sortOrder 15 .
 
@@ -648,10 +648,10 @@ erb:LanguageCandidates_21 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "N/A" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
     erb:sortOrder 16 .
 
@@ -668,10 +668,10 @@ erb:LanguageCandidates_22 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure false ;
     erb:isStableOntologyReference false ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 1 ;
+    erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 17 .
 
@@ -688,10 +688,10 @@ erb:LanguageCandidates_23 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 18 .
 
@@ -708,9 +708,9 @@ erb:LanguageCandidates_24 a erb:LanguageCandidates ;
     erb:hasLinearDecodingPressure true ;
     erb:isStableOntologyReference true ;
     erb:isLiveOntologyEditor false ;
-    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:isOpenWorld false ;
     erb:isClosedWorld false ;
     erb:distanceFromConcept 2 ;
+    erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
     erb:sortOrder 19 .

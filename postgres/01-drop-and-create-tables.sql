@@ -15,9 +15,9 @@ DROP FUNCTION IF EXISTS calc_language_candidates_family_feud_mismatch(TEXT) CASC
 DROP FUNCTION IF EXISTS calc_language_candidates_family_fued_question(TEXT) CASCADE;
 DROP FUNCTION IF EXISTS calc_language_candidates_has_grammar(TEXT) CASCADE;
 DROP FUNCTION IF EXISTS calc_language_candidates_is_description_of(TEXT) CASCADE;
+DROP FUNCTION IF EXISTS calc_language_candidates_is_family_feud_language(TEXT) CASCADE;
 DROP FUNCTION IF EXISTS calc_language_candidates_is_open_closed_world_conflicted(TEXT) CASCADE;
 DROP FUNCTION IF EXISTS calc_language_candidates_relationship_to_concept(TEXT) CASCADE;
-DROP FUNCTION IF EXISTS calc_language_candidates_top_family_feud_answer(TEXT) CASCADE;
 
 -- Drop views (order: second, because they depend on tables)
 DROP VIEW IF EXISTS vw_is_everything_a_language CASCADE;
@@ -34,20 +34,20 @@ DROP TABLE IF EXISTS language_candidates CASCADE;
 CREATE TABLE language_candidates (
   language_candidate_id               TEXT                 PRIMARY KEY,
   name                                TEXT                ,
-  category                            TEXT                ,
-  chosen_language_candidate           BOOLEAN             ,
+  is_language                         BOOLEAN             ,
   has_syntax                          BOOLEAN             ,
-  has_identity                        BOOLEAN             ,
   can_be_held                         BOOLEAN             ,
+  category                            TEXT                ,
+  has_identity                        BOOLEAN             ,
   requires_parsing                    BOOLEAN             ,
   resolves_to_an_ast                  BOOLEAN             ,
   has_linear_decoding_pressure        BOOLEAN             ,
   is_stable_ontology_reference        BOOLEAN             ,
   is_live_ontology_editor             BOOLEAN             ,
-  dimensionality_while_editing        TEXT                ,
   is_open_world                       BOOLEAN             ,
   is_closed_world                     BOOLEAN             ,
   distance_from_concept               INTEGER             ,
+  dimensionality_while_editing        TEXT                ,
   model_object_facility_layer         TEXT                ,
   sort_order                          INTEGER             
 );

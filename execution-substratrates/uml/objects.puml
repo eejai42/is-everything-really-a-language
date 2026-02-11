@@ -237,10 +237,10 @@ object "Falsifier A" as LanguageCandidates_0 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "N/A"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "N/A"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 0
 }
@@ -258,10 +258,10 @@ object "Falsifier B" as LanguageCandidates_1 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "N/A"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
   ModelObjectFacilityLayer = "NA"
   SortOrder = 1
 }
@@ -279,10 +279,10 @@ object "Falsifier C" as LanguageCandidates_2 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = true
   IsClosedWorld = true
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 2
 }
@@ -300,10 +300,10 @@ object "English" as LanguageCandidates_3 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = true
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 3
 }
@@ -321,10 +321,10 @@ object "Airtable - Editing" as LanguageCandidates_4 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = true
   IsLiveOntologyEditor = true
-  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   IsOpenWorld = false
   IsClosedWorld = true
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   ModelObjectFacilityLayer = "M4"
   SortOrder = 3
 }
@@ -342,10 +342,10 @@ object "Spoken Words" as LanguageCandidates_5 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = true
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 4
 }
@@ -363,10 +363,10 @@ object "A Coffee Mug" as LanguageCandidates_6 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = false
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "N/A"
   IsOpenWorld = false
   IsClosedWorld = true
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
   ModelObjectFacilityLayer = "NA"
   SortOrder = 5
 }
@@ -384,10 +384,10 @@ object "A Game of Fortnite" as LanguageCandidates_7 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = false
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   IsOpenWorld = false
   IsClosedWorld = true
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   ModelObjectFacilityLayer = "M4"
   SortOrder = 6
 }
@@ -405,10 +405,10 @@ object "Sign Language" as LanguageCandidates_8 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = true
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 7
 }
@@ -426,10 +426,10 @@ object "Python" as LanguageCandidates_9 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = true
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 8
 }
@@ -447,10 +447,10 @@ object "A Smartphone" as LanguageCandidates_10 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = false
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "N/A"
   IsOpenWorld = false
   IsClosedWorld = true
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
   ModelObjectFacilityLayer = "NA"
   SortOrder = 9
 }
@@ -468,10 +468,10 @@ object "A Running App " as LanguageCandidates_11 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = false
   IsLiveOntologyEditor = true
-  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   IsOpenWorld = false
   IsClosedWorld = true
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   ModelObjectFacilityLayer = "M4"
   SortOrder = 22
 }
@@ -489,10 +489,10 @@ object "An XLSX Doc" as LanguageCandidates_12 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M2"
   SortOrder = 23
 }
@@ -510,10 +510,10 @@ object "XLSX - Editing" as LanguageCandidates_13 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = false
   IsLiveOntologyEditor = true
-  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   ModelObjectFacilityLayer = "M4"
   SortOrder = 24
 }
@@ -531,10 +531,10 @@ object "An DOCX Doc" as LanguageCandidates_14 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M2"
   SortOrder = 25
 }
@@ -552,10 +552,10 @@ object "DOCX - Editing" as LanguageCandidates_15 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = true
   IsLiveOntologyEditor = true
-  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   ModelObjectFacilityLayer = "M4"
   SortOrder = 25
 }
@@ -573,10 +573,10 @@ object "A CSV File" as LanguageCandidates_16 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = true
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M2"
   SortOrder = 10
 }
@@ -594,10 +594,10 @@ object "OWL/RDF/GraphQL/... generally" as LanguageCandidates_17 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = false
   IsClosedWorld = true
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M2"
   SortOrder = 11
 }
@@ -615,10 +615,10 @@ object "A Thunderstorm" as LanguageCandidates_18 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = false
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "N/A"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
   ModelObjectFacilityLayer = "NA"
   SortOrder = 13
 }
@@ -636,10 +636,10 @@ object "A UML File" as LanguageCandidates_19 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M2"
   SortOrder = 14
 }
@@ -657,10 +657,10 @@ object "Binary Code" as LanguageCandidates_20 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M2"
   SortOrder = 15
 }
@@ -678,10 +678,10 @@ object "The Mona Lisa" as LanguageCandidates_21 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "N/A"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
   ModelObjectFacilityLayer = "NA"
   SortOrder = 16
 }
@@ -699,10 +699,10 @@ object "Running Calculator App" as LanguageCandidates_22 {
   HasLinearDecodingPressure = false
   IsStableOntologyReference = false
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 17
 }
@@ -720,10 +720,10 @@ object "JavaScript" as LanguageCandidates_23 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 18
 }
@@ -741,10 +741,10 @@ object "French" as LanguageCandidates_24 {
   HasLinearDecodingPressure = true
   IsStableOntologyReference = true
   IsLiveOntologyEditor = false
-  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   IsOpenWorld = false
   IsClosedWorld = false
   DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
   ModelObjectFacilityLayer = "M1"
   SortOrder = 19
 }

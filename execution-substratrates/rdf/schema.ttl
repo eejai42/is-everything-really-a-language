@@ -149,11 +149,6 @@ erb:isLiveOntologyEditor a rdf:Property ;
     rdfs:range xsd:boolean ;
     rdfs:label "IsLiveOntologyEditor" .
 
-erb:dimensionalityWhileEditing a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "DimensionalityWhileEditing" .
-
 erb:isOpenWorld a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
@@ -164,20 +159,25 @@ erb:isClosedWorld a rdf:Property ;
     rdfs:range xsd:boolean ;
     rdfs:label "IsClosedWorld" .
 
-erb:isOpenClosedWorldConflicted a rdf:Property ;
+erb:isDescriptionOf a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "IsOpenClosedWorldConflicted" .
+    rdfs:label "IsDescriptionOf" .
 
 erb:distanceFromConcept a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:integer ;
     rdfs:label "DistanceFromConcept" .
 
-erb:isDescriptionOf a rdf:Property ;
+erb:isOpenClosedWorldConflicted a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "IsDescriptionOf" .
+    rdfs:label "IsOpenClosedWorldConflicted" .
+
+erb:dimensionalityWhileEditing a rdf:Property ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "DimensionalityWhileEditing" .
 
 erb:relationshipToConcept a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;

@@ -30,10 +30,10 @@ type LanguageCandidates {
   hasLinearDecodingPressure: Boolean
   isStableOntologyReference: Boolean
   isLiveOntologyEditor: Boolean
-  dimensionalityWhileEditing: String
   isOpenWorld: Boolean
   isClosedWorld: Boolean
   distanceFromConcept: Int
+  dimensionalityWhileEditing: String
   modelObjectFacilityLayer: String
   sortOrder: Int
 
@@ -46,10 +46,10 @@ type LanguageCandidates {
   familyFeudMismatch: String
   """Formula: ={{HasSyntax}} = TRUE()"""
   hasGrammar: Boolean
-  """Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})"""
-  isOpenClosedWorldConflicted: Boolean
   """Formula: ={{DistanceFromConcept}} > 1"""
   isDescriptionOf: Boolean
+  """Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})"""
+  isOpenClosedWorldConflicted: Boolean
   """Formula: =IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptio..."""
   relationshipToConcept: String
 }
