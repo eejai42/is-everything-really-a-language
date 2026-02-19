@@ -8,6 +8,7 @@
 
 ALTER TABLE language_candidates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE is_everything_a_language ENABLE ROW LEVEL SECURITY;
+ALTER TABLE erb_customizations ENABLE ROW LEVEL SECURITY;
 
 -- TODO: Add specific RLS policies based on your security requirements
 -- Example:

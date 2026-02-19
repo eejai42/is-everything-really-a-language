@@ -14,22 +14,22 @@ INSERT INTO language_candidates (language_candidate_id, name, is_language, has_s
 VALUES ('spoken-words', 'Spoken Words', TRUE, TRUE, FALSE, 'Natural Language', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, 2, 'OneDimensionalSymbolic', 'M1', 3);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
-VALUES ('editing-airtable-base', 'Editing Airtable Base', FALSE, FALSE, FALSE, 'Running Software', TRUE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, 2, 'MultiDimensionalNonSymbolic', 'M4', 4);
+VALUES ('a-game-of-fortnite', 'A Game of Fortnite', FALSE, FALSE, FALSE, 'Running Software', TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, 1, 'MultiDimensionalNonSymbolic', 'M4', 4);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
 VALUES ('sign-language', 'Sign Language', TRUE, TRUE, FALSE, 'Natural Language', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, 2, 'OneDimensionalSymbolic', 'M1', 5);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
-VALUES ('a-game-of-fortnite', 'A Game of Fortnite', FALSE, FALSE, FALSE, 'Running Software', TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, 1, 'MultiDimensionalNonSymbolic', 'M4', 6);
+VALUES ('editing-airtable-base', 'Editing Airtable Base', FALSE, FALSE, FALSE, 'Running Software', TRUE, FALSE, TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, 2, 'MultiDimensionalNonSymbolic', 'M4', 6);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
-VALUES ('falsifier-a', 'Falsifier A', FALSE, TRUE, FALSE, 'MISSING: Have you seen this Language?', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, 2, 'N/A', 'M1', 7);
+VALUES ('math', 'Math', TRUE, TRUE, FALSE, 'Formal Language', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, 2, 'OneDimensionalSymbolic', 'M1', 7);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
-VALUES ('falsifier-b', 'Falsifier B', TRUE, FALSE, TRUE, 'MISSING: Have you seen this Language?', TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, 1, 'N/A', 'NA', 8);
+VALUES ('falsifier-a', 'Falsifier A', TRUE, FALSE, TRUE, 'MISSING: Have you seen this Language?', TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, 1, 'N/A', 'NA', 8);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
-VALUES ('falsifier-c', 'Falsifier C', TRUE, TRUE, FALSE, 'MISSING: Have you seen this Language?', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, 2, 'OneDimensionalSymbolic', 'M1', 9);
+VALUES ('falsifier-b', 'Falsifier B', FALSE, TRUE, FALSE, 'MISSING: Have you seen this Language?', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, 2, 'N/A', 'M1', 9);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
 VALUES ('a-smartphone', 'A Smartphone', FALSE, FALSE, TRUE, 'Physical Object', TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE, 1, 'N/A', 'NA', 10);
@@ -59,7 +59,7 @@ INSERT INTO language_candidates (language_candidate_id, name, is_language, has_s
 VALUES ('a-thunderstorm', 'A Thunderstorm', FALSE, FALSE, TRUE, 'Physical event', TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 1, 'N/A', 'NA', 18);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
-VALUES ('a-csv-file', 'A CSV File', TRUE, TRUE, FALSE, 'Formal Language', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, 2, 'OneDimensionalSymbolic', 'M2', 19);
+VALUES ('a-uml-file', 'A UML File', TRUE, TRUE, FALSE, 'Formal Language', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, 2, 'OneDimensionalSymbolic', 'M2', 23);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
 VALUES ('the-mona-lisa', 'The Mona Lisa', FALSE, FALSE, TRUE, 'Physical Object', TRUE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE, FALSE, 1, 'N/A', 'NA', 20);
@@ -71,7 +71,7 @@ INSERT INTO language_candidates (language_candidate_id, name, is_language, has_s
 VALUES ('running-calculator-app', 'Running Calculator App', FALSE, FALSE, FALSE, 'Running Software', TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, 1, 'MultiDimensionalNonSymbolic', 'M1', 22);
 
 INSERT INTO language_candidates (language_candidate_id, name, is_language, has_syntax, can_be_held, category, has_identity, requires_parsing, resolves_to_an_ast, has_linear_decoding_pressure, is_stable_ontology_reference, is_live_ontology_editor, is_open_world, is_closed_world, distance_from_concept, dimensionality_while_editing, model_object_facility_layer, sort_order)
-VALUES ('a-uml-file', 'A UML File', TRUE, TRUE, FALSE, 'Formal Language', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, 2, 'OneDimensionalSymbolic', 'M2', 23);
+VALUES ('owa-cwa-falsifier', 'OWA & CWA Falsifier', TRUE, TRUE, FALSE, 'MISSING: Have you seen this Language?', FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, 2, 'OneDimensionalSymbolic', 'M1', 23);
 
 INSERT INTO is_everything_a_language (is_everything_a_language_id, name, argument_name, argument_category, step_type, statement, formalization, related_candidate_name, related_candidate_id, evidence_from_rulebook, notes)
 VALUES ('neial-001', 'NEIAL-001', 'LanguageCanBeFormalized', 'Definition', 'Motivation', 'To avoid the slogan ''Everything is a language'', treat ''language'' as a typed construct defined by testable properties (syntax, parsing, linear decoding pressure, and descriptor-role).', '', '', '', '', 'This keeps ''can be interpreted'' separate from ''is a language system''.');
@@ -120,4 +120,129 @@ VALUES ('neial-015', 'NEIAL-015', 'NotEverythingIsALanguage', 'Definition', 'Ref
 
 INSERT INTO is_everything_a_language (is_everything_a_language_id, name, argument_name, argument_category, step_type, statement, formalization, related_candidate_name, related_candidate_id, evidence_from_rulebook, notes)
 VALUES ('neial-016', 'NEIAL-016', 'NotEverythingIsALanguage', 'Conclusion', 'Conclusion', 'Given a formalizable definition of language, not everything is a language; some things are better treated as sign vehicles or semiotic processes, with running applications as a key fuzzy region that benefits from explicit modeling.', 'Formalizable(Language) ∧ ∃x ¬Language(x) ⇒ ¬(EverythingIsALanguage)', '', '', '', 'This is the repo''s thesis in one line.');
+
+INSERT INTO erb_customizations (erb_customization_id, name, title, sql_code, sql_target, customization_type)
+VALUES ('03a-customize-schema-sql', '03a-customize-schema.sql', 'Customize Schema', '-- ============================================================================
+-- CUSTOMIZE SCHEMA - User-defined tables and schema modifications
+-- ============================================================================
+-- This file is for YOUR custom schema changes that should persist across
+-- regeneration of the base ERB files.
+--
+-- USE THIS FILE FOR:
+--   - Additional tables not defined in the rulebook
+--   - Extra columns on existing tables (ALTER TABLE)
+--   - Custom indexes for performance tuning
+--   - Custom constraints or triggers
+--
+-- IMPORTANT:
+--   - This file runs AFTER 01-drop-and-create-tables.sql
+--   - The base tables already exist when this runs
+--   - This file will NOT be overwritten by ERB regeneration
+--
+-- ============================================================================
+
+-- Your custom schema changes go here:
+', 'Postgres', 'Schema');
+
+INSERT INTO erb_customizations (erb_customization_id, name, title, sql_code, sql_target, customization_type)
+VALUES ('03b-customize-functions-sql', '03b-customize-functions.sql', 'Customize Functions', '-- Formula: ="Is " & {{Name}} & " a language?"
+CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_question(p_language_candidate_id TEXT)
+RETURNS TEXT AS $$
+  SELECT ''Is '' || COALESCE(name, '''') || '' a language?''
+  FROM language_candidates
+  WHERE language_candidate_id = p_language_candidate_id;
+$$ LANGUAGE SQL STABLE SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.calc_language_candidates_question(p_language_candidate_id text)
+ RETURNS text
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+AS $function$
+BEGIN
+  RETURN (''Is '' || (SELECT NULLIF(name, '''''''') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) || '' a language?'')::text;
+END;
+$function$;
+
+
+-- Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),
+--   {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn''t") & " a Family Feud Language, but " &
+--   IF({{IsLanguage}}, "Is", "Is Not") & " marked as a ''Language Candidate.''") &
+--   IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
+CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_mismatch(p_language_candidate_id TEXT)
+RETURNS TEXT AS $$
+  SELECT
+    CASE
+      WHEN COALESCE(calc_language_candidates_predicted_answer(p_language_candidate_id), FALSE)
+           = COALESCE(is_language, FALSE)
+      THEN
+        CASE
+          WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)
+          THEN '' - Open World vs. Closed World Conflict.''
+          ELSE NULL
+        END
+      ELSE name || '' '' ||
+           CASE WHEN calc_language_candidates_predicted_answer(p_language_candidate_id) THEN ''Is'' ELSE ''Isn''''t'' END ||
+           '' a Family Feud Language, but '' ||
+           CASE WHEN is_language THEN ''Is'' ELSE ''Is Not'' END ||
+           '' marked as a ''''Language Candidate.'''''' ||
+           CASE
+             WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)
+             THEN '' - Open World vs. Closed World Conflict.''
+             ELSE ''''
+           END
+    END
+  FROM language_candidates
+  WHERE language_candidate_id = p_language_candidate_id;
+$$ LANGUAGE SQL STABLE SECURITY DEFINER;', 'Postgres', 'Functions');
+
+INSERT INTO erb_customizations (erb_customization_id, name, title, sql_code, sql_target, customization_type)
+VALUES ('03c-customize-views-sql', '03c-customize-views.sql', 'Customize Views', '-- ============================================================================
+-- CUSTOMIZE VIEWS - User-defined views and view extensions
+-- ============================================================================
+-- This file is for YOUR custom views that should persist across
+-- regeneration of the base ERB files.
+--
+-- IMPORTANT:
+--   - This file runs AFTER 03-create-views.sql
+--   - All base vw_* views already exist when this runs
+--   - This file will NOT be overwritten by ERB regeneration
+--
+-- ============================================================================
+
+-- Your custom views go here:
+', 'Postgres', 'Views');
+
+INSERT INTO erb_customizations (erb_customization_id, name, title, sql_code, sql_target, customization_type)
+VALUES ('03d-customize-rls-sql', '03d-customize-rls.sql', 'Customize Policies (RLS)', '-- ============================================================================
+-- CUSTOMIZE POLICIES - User-defined Row Level Security policies
+-- ============================================================================
+-- This file is for YOUR custom RLS policies that should persist across
+-- regeneration of the base ERB files.
+--
+-- IMPORTANT:
+--   - This file runs AFTER 04-create-policies.sql
+--   - Base RLS policies already exist when this runs
+--   - This file will NOT be overwritten by ERB regeneration
+--
+-- ============================================================================
+
+-- Your custom policies go here:
+', 'Postgres', 'RLS');
+
+INSERT INTO erb_customizations (erb_customization_id, name, title, sql_code, sql_target, customization_type)
+VALUES ('03e-customize-data-sql', '03e-customize-data.sql', 'Customize Data (Seeds / Migrations)', '-- ============================================================================
+-- CUSTOMIZE DATA - User-defined seed data and data migrations
+-- ============================================================================
+-- This file is for YOUR custom seed data that should persist across
+-- regeneration of the base ERB files.
+--
+-- IMPORTANT:
+--   - This file runs AFTER 05-insert-data.sql
+--   - Base seed data already exists when this runs
+--   - This file will NOT be overwritten by ERB regeneration
+--
+-- ============================================================================
+
+-- Your custom data inserts go here:
+', 'Postgres', 'Data');
 

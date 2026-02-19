@@ -298,12 +298,12 @@ The following entities have been evaluated against the operational definition of
 | English | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Coffee Mug | Physical Object | No | ✗ | ✗ | ✗ | ✗ | - |
 | Spoken Words | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
-| Editing Airtable Base | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
-| Sign Language | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Game of Fortnite | Running Software | No | ✗ | ✓ | ✗ | ✗ | - |
-| Falsifier A | MISSING: Have you seen this Language? | No | ✓ | ✓ | ✓ | ✗ | - |
-| Falsifier B | MISSING: Have you seen this Language? | No | ✗ | ✓ | ✗ | ✗ | - |
-| Falsifier C | MISSING: Have you seen this Language? | No | ✓ | ✓ | ✓ | ✗ | - |
+| Sign Language | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
+| Editing Airtable Base | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
+| Math | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
+| Falsifier A | MISSING: Have you seen this Language? | No | ✗ | ✓ | ✗ | ✗ | - |
+| Falsifier B | MISSING: Have you seen this Language? | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Smartphone | Physical Object | No | ✗ | ✗ | ✓ | ✗ | - |
 | Python | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Running App  | Running Software | No | ✗ | ✓ | ✓ | ✗ | - |
@@ -313,11 +313,11 @@ The following entities have been evaluated against the operational definition of
 | DOCX - Editing | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
 | OWL/RDF/GraphQL/... generally | Natural Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | A Thunderstorm | Physical event | No | ✗ | ✓ | ✗ | ✗ | - |
-| A CSV File | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
+| A UML File | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | The Mona Lisa | Physical Object | No | ✗ | ✗ | ✗ | ✗ | - |
 | Binary Code | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
 | Running Calculator App | Running Software | No | ✗ | ✓ | ✗ | ✗ | - |
-| A UML File | Formal Language | No | ✓ | ✓ | ✓ | ✗ | - |
+| OWA & CWA Falsifier | MISSING: Have you seen this Language? | No | ✓ | ✓ | ✓ | ✗ | - |
 
 ### Predicate Legend
 
@@ -346,9 +346,10 @@ The following entities have been evaluated against the operational definition of
 | `HasGrammar` | calculated | boolean | Yes | Does this candidate have a Grammar?  Generally follows candidates that have syntax also have grammar. |
 | `HasSyntax` | raw | boolean | Yes | Does this language candidate have syntax and/or grammar? |
 | `CanBeHeld` | raw | boolean | Yes | Is this candidate physical/material.  I.e. could it at least theoretically "be held"? |
-| `FamilyFuedQuestion` | calculated | string | Yes | Question that 100 random people could be asked, family feud style. |
-| `IsFamilyFeudLanguage` | calculated | boolean | Yes | The predicted answer as the top most popular answer among those in the family feud polling pool. |
-| `FamilyFeudMismatch` | calculated | string | Yes | If the family feud answer does not match the chosen language candidates status then this explains what did not match. t also flags (in english) mismatch where a candidate is marked as BOTH open AND closed world which does not make sense. |
+| `Question` | calculated | string | Yes | Question that 100 random people could be asked, family feud style. |
+| `PredictedAnswer` | calculated | boolean | Yes | The predicted answer as the top most popular answer among those in the family feud polling pool. |
+| `PredictionPredicates` | calculated | string | Yes | - |
+| `PredictionFail` | calculated | string | Yes | If the family feud answer does not match the chosen language candidates status then this explains what did not match. t also flags (in english) mismatch where a candidate is marked as BOTH open AND closed world which does not make sense. |
 | `Category` | raw | string | Yes | The general high level category of the candidate. |
 | `HasIdentity` | raw | boolean | Yes | Could this thing be assigned a guid, unique in the universe that would identify it globally?  Like a drivers license or social security number for a person. |
 | `RequiresParsing` | raw | boolean | Yes | Is the knowledge/information encoded in a form that requires parsing before meaning can be extracted? |
@@ -371,12 +372,12 @@ The following entities have been evaluated against the operational definition of
 ={{HasSyntax}} = TRUE()
 ```
 
-**Formula for `FamilyFuedQuestion`:**
+**Formula for `Question`:**
 ```
 ="Is " & {{Name}} & " a language?"
 ```
 
-**Formula for `IsFamilyFeudLanguage`:**
+**Formula for `PredictedAnswer`:**
 ```
 =AND(
   {{HasSyntax}},
@@ -390,10 +391,18 @@ The following entities have been evaluated against the operational definition of
 )
 ```
 
-**Formula for `FamilyFeudMismatch`:**
+**Formula for `PredictionPredicates`:**
 ```
-=IF(NOT({{IsFamilyFeudLanguage}} = {{IsLanguage}}),
-  {{Name}} & " " & IF({{IsFamilyFeudLanguage}}, "Is", "Isn't") & " a Family Feud Language, but " & 
+=IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Neede") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " &
+"  " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & "\n AND " &
+"  " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " &
+"  " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")
+```
+
+**Formula for `PredictionFail`:**
+```
+=IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),
+  {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
   IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
 ```
 
@@ -419,7 +428,7 @@ The following entities have been evaluated against the operational definition of
 |-------|-------|
 | `LanguageCandidateId` | english |
 | `Name` | English |
-| `IsFamilyFeudLanguage` | true |
+| `PredictedAnswer` | true |
 | `IsStableOntologyReference` | true |
 | `HasLinearDecodingPressure` | true |
 | `RequiresParsing` | true |
@@ -427,7 +436,7 @@ The following entities have been evaluated against the operational definition of
 | `Category` | Natural Language |
 | `IsLanguage` | true |
 | `SortOrder` | 1 |
-| `FamilyFuedQuestion` | Is English a language? |
+| `Question` | Is English a language? |
 | `RelationshipToConcept` | IsDescriptionOf |
 | `DistanceFromConcept` | 2 |
 | `HasGrammar` | true |
@@ -436,8 +445,10 @@ The following entities have been evaluated against the operational definition of
 | `IsDescriptionOf` | true |
 | `ResolvesToAnAST` | true |
 | `ModelObjectFacilityLayer` | M1 |
+| `PredictionPredicates` | Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST,   Is Stable Ontology
+ AND   Can't Be Held,   Has no Identity |
 | `CanBeHeld` | false |
-| `FamilyFeudMismatch` |  |
+| `PredictionFail` |  |
 | `HasIdentity` | false |
 | `IsLiveOntologyEditor` | false |
 | `IsClosedWorld` | false |
@@ -484,6 +495,55 @@ The following entities have been evaluated against the operational definition of
 
 ---
 
+### Table: ERBCustomizations
+
+> Table: ERBCustomizations
+
+#### Schema
+
+| Field | Type | Data Type | Nullable | Description |
+|-------|------|-----------|----------|-------------|
+| `ERBCustomizationId` | raw | string | No | - |
+| `Name` | raw | string | Yes | - |
+| `Title` | raw | string | Yes | - |
+| `SQLCode` | raw | string | Yes | - |
+| `SQLTarget` | raw | string | Yes | - |
+| `CustomizationType` | raw | string | Yes | - |
+
+
+#### Sample Data (5 records)
+
+| Field | Value |
+|-------|-------|
+| `ERBCustomizationId` | 03a-customize-schema-sql |
+| `Name` | 03a-customize-schema.sql |
+| `Title` | Customize Schema |
+| `SQLCode` | -- ============================================================================
+-- CUSTOMIZE SCHEMA - User-defined tables and schema modifications
+-- ============================================================================
+-- This file is for YOUR custom schema changes that should persist across
+-- regeneration of the base ERB files.
+--
+-- USE THIS FILE FOR:
+--   - Additional tables not defined in the rulebook
+--   - Extra columns on existing tables (ALTER TABLE)
+--   - Custom indexes for performance tuning
+--   - Custom constraints or triggers
+--
+-- IMPORTANT:
+--   - This file runs AFTER 01-drop-and-create-tables.sql
+--   - The base tables already exist when this runs
+--   - This file will NOT be overwritten by ERB regeneration
+--
+-- ============================================================================
+
+-- Your custom schema changes go here:
+ |
+| `SQLTarget` | Postgres |
+| `CustomizationType` | Schema |
+
+---
+
 
 ## Metadata
 
@@ -494,7 +554,7 @@ The following entities have been evaluated against the operational definition of
 | Property | Value |
 |----------|-------|
 | Source Base ID | `appC8XTj95lubn6hz` |
-| Table Count | 2 |
+| Table Count | 3 |
 | Tool Version | 2.0.0 |
 | Export Mode | schema_first_type_mapping |
 | Field Type Mapping | checkbox→boolean, number→number/integer, multipleRecordLinks→relationship, multipleLookupValues→lookup, rollup→aggregation, count→aggregation, formula→calculated |

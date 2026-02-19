@@ -4,8 +4,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Fields Tested | 125 |
-| Passed | 125 |
+| Total Fields Tested | 0 |
+| Passed | 0 |
 | Failed | 0 |
-| Score | 100.0% |
-| Duration | 2.54s |
+| Score | 0.0% |
+| Duration | 146ms |
+
+## Error
+
+```
+No test-answers found
+```

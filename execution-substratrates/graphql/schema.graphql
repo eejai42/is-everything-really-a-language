@@ -20,11 +20,11 @@ type LanguageCandidates {
   # Raw Fields
   languageCandidateId: String!
   name: String
-  category: String
-  chosenLanguageCandidate: Boolean
+  isLanguage: Boolean
   hasSyntax: Boolean
-  hasIdentity: Boolean
   canBeHeld: Boolean
+  category: String
+  hasIdentity: Boolean
   requiresParsing: Boolean
   resolvesToAnAST: Boolean
   hasLinearDecodingPressure: Boolean
@@ -38,14 +38,16 @@ type LanguageCandidates {
   sortOrder: Int
 
   # Calculated Fields
-  """Formula: ="Is " & {{Name}} & " a language?""""
-  familyFuedQuestion: String
-  """Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescript..."""
-  topFamilyFeudAnswer: Boolean
-  """Formula: =IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}..."""
-  familyFeudMismatch: String
   """Formula: ={{HasSyntax}} = TRUE()"""
   hasGrammar: Boolean
+  """Formula: ="Is " & {{Name}} & " a language?""""
+  question: String
+  """Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescript..."""
+  predictedAnswer: Boolean
+  """Formula: =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({..."""
+  predictionPredicates: String
+  """Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} & ..."""
+  predictionFail: String
   """Formula: ={{DistanceFromConcept}} > 1"""
   isDescriptionOf: Boolean
   """Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})"""
@@ -68,4 +70,15 @@ type IsEverythingALanguage {
   relatedCandidateId: String
   evidenceFromRulebook: String
   notes: String
+}
+
+"""Entity: ERBCustomizations"""
+type ERBCustomizations {
+  # Raw Fields
+  eRBCustomizationId: String!
+  name: String
+  title: String
+  sQLCode: String
+  sQLTarget: String
+  customizationType: String
 }

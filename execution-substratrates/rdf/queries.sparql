@@ -6,13 +6,27 @@
 
 
 
-# Computed field: FamilyFuedQuestion
+# Computed field: HasGrammar
+# Formula: ={{HasSyntax}} = TRUE()
+PREFIX erb: <http://example.org/erb#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?entity erb:hasGrammar ?_result .
+}
+WHERE {
+    ?entity a erb:LanguageCandidates .
+    OPTIONAL { ?entity erb:hasSyntax ?has_syntax . }
+    BIND((?has_syntax = true) AS ?_result)
+}
+
+# Computed field: Question
 # Formula: ="Is " & {{Name}} & " a language?"
 PREFIX erb: <http://example.org/erb#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 CONSTRUCT {
-    ?entity erb:familyFuedQuestion ?_result .
+    ?entity erb:question ?_result .
 }
 WHERE {
     ?entity a erb:LanguageCandidates .
@@ -20,13 +34,13 @@ WHERE {
     BIND(CONCAT("Is ", ?name, " a language?") AS ?_result)
 }
 
-# Computed field: TopFamilyFeudAnswer
+# Computed field: PredictedAnswer
 # Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescriptionOf}},   {{HasLinearDecodingPressure}},   {{ResolvesToAnAST}},   {{IsStableOntologyReference}},   NOT({{CanBeHeld}}),   NOT({{HasIdentity}}) )
 PREFIX erb: <http://example.org/erb#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 CONSTRUCT {
-    ?entity erb:topFamilyFeudAnswer ?_result .
+    ?entity erb:predictedAnswer ?_result .
 }
 WHERE {
     ?entity a erb:LanguageCandidates .
@@ -41,35 +55,42 @@ WHERE {
     BIND((?has_syntax && ?requires_parsing && ?is_description_of && ?has_linear_decoding_pressure && ?resolves_to_an_ast && ?is_stable_ontology_reference && (!(?can_be_held)) && (!(?has_identity))) AS ?_result)
 }
 
-# Computed field: FamilyFeudMismatch
-# Formula: =IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),   {{Name}} & " " & IF({{TopFamilyFeudAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " &    IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
+# Computed field: PredictionPredicates
+# Formula: =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Neede") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & "  " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & "\n AND " & "  " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & "  " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")
 PREFIX erb: <http://example.org/erb#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 CONSTRUCT {
-    ?entity erb:familyFeudMismatch ?_result .
+    ?entity erb:predictionPredicates ?_result .
 }
 WHERE {
     ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:chosenLanguageCandidate ?chosen_language_candidate . }
+    OPTIONAL { ?entity erb:canBeHeld ?can_be_held . }
+    OPTIONAL { ?entity erb:hasIdentity ?has_identity . }
+    OPTIONAL { ?entity erb:hasLinearDecodingPressure ?has_linear_decoding_pressure . }
+    OPTIONAL { ?entity erb:hasSyntax ?has_syntax . }
+    OPTIONAL { ?entity erb:isDescriptionOf ?is_description_of . }
+    OPTIONAL { ?entity erb:isStableOntologyReference ?is_stable_ontology_reference . }
+    OPTIONAL { ?entity erb:requiresParsing ?requires_parsing . }
+    OPTIONAL { ?entity erb:resolvesToAnAST ?resolves_to_an_ast . }
+    BIND(CONCAT(IF(?has_syntax, "Has Syntax", "No Syntax"), " & ", IF(?requires_parsing, "Requires Parsing", "No Parsing Neede"), " & ", IF(?is_description_of, "Describes the thing", "Is the Thing"), " & ", IF(?has_linear_decoding_pressure, "Has Linear Decoding Pressure", "No Decoding Pressure"), " & ", IF(?resolves_to_an_ast, "Resolves to AST", "No AST"), ", ", "  ", IF(?is_stable_ontology_reference, "Is Stable Ontology", "Not 'Ontology'"), "\\n AND ", "  ", IF(?can_be_held, "Can Be Held", "Can't Be Held"), ", ", "  ", IF(?has_identity, "Has Identity", "Has no Identity")) AS ?_result)
+}
+
+# Computed field: PredictionFail
+# Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " &    IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
+PREFIX erb: <http://example.org/erb#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?entity erb:predictionFail ?_result .
+}
+WHERE {
+    ?entity a erb:LanguageCandidates .
+    OPTIONAL { ?entity erb:isLanguage ?is_language . }
     OPTIONAL { ?entity erb:isOpenClosedWorldConflicted ?is_open_closed_world_conflicted . }
     OPTIONAL { ?entity erb:name ?name . }
-    OPTIONAL { ?entity erb:topFamilyFeudAnswer ?top_family_feud_answer . }
-    BIND(CONCAT(IF((!((?top_family_feud_answer = ?chosen_language_candidate))), CONCAT(?name, " ", IF(?top_family_feud_answer, "Is", "Isn't"), " a Family Feud Language, but ", IF(?chosen_language_candidate, "Is", "Is Not"), " marked as a 'Language Candidate.'"), ""), IF(?is_open_closed_world_conflicted, " - Open World vs. Closed World Conflict.", "")) AS ?_result)
-}
-
-# Computed field: HasGrammar
-# Formula: ={{HasSyntax}} = TRUE()
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:hasGrammar ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:hasSyntax ?has_syntax . }
-    BIND((?has_syntax = true) AS ?_result)
+    OPTIONAL { ?entity erb:predictedAnswer ?predicted_answer . }
+    BIND(CONCAT(IF((!((?predicted_answer = ?is_language))), CONCAT(?name, " ", IF(?predicted_answer, "Is", "Isn't"), " a Family Feud Language, but ", IF(?is_language, "Is", "Is Not"), " marked as a 'Language Candidate.'"), ""), IF(?is_open_closed_world_conflicted, " - Open World vs. Closed World Conflict.", "")) AS ?_result)
 }
 
 # Computed field: IsDescriptionOf

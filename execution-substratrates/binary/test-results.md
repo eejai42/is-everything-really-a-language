@@ -4,51 +4,39 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Fields Tested | 125 |
-| Passed | 87 |
-| Failed | 38 |
-| Score | 69.6% |
-| Duration | 312ms |
+| Total Fields Tested | 184 |
+| Passed | 92 |
+| Failed | 92 |
+| Score | 50.0% |
+| Duration | 273ms |
 
-## Failures
+## Results by Entity
 
-| language_candidate_id | Field | Expected | Actual |
-|---------------|-------|----------|--------|
-| a-coffee-mug | family_feud_mismatch | None |  |
-| a-csv-file | family_feud_mismatch | None | A CSV File Isn't a Family Feud Language, |
-| a-csv-file | top_family_feud_answer | True | False |
-| a-game-of-fortnite | family_feud_mismatch | None |  |
-| a-running-app | family_feud_mismatch | None |  |
-| a-smartphone | family_feud_mismatch | None |  |
-| a-thunderstorm | family_feud_mismatch | None |  |
-| a-uml-file | family_feud_mismatch | None | A UML File Isn't a Family Feud Language, |
-| a-uml-file | top_family_feud_answer | True | False |
-| airtable-editing | family_feud_mismatch | None |  |
-| an-docx-doc | family_feud_mismatch | None | An DOCX Doc Isn't a Family Feud Language |
-| an-docx-doc | top_family_feud_answer | True | False |
-| an-xlsx-doc | family_feud_mismatch | None | An XLSX Doc Isn't a Family Feud Language |
-| an-xlsx-doc | top_family_feud_answer | True | False |
-| binary-code | family_feud_mismatch | None | Binary Code Isn't a Family Feud Language |
-| binary-code | top_family_feud_answer | True | False |
-| docx-editing | family_feud_mismatch | None |  |
-| english | family_feud_mismatch | None | English Isn't a Family Feud Language, bu |
-| english | top_family_feud_answer | True | False |
-| falsifier-a | family_feud_mismatch | Falsifier A Is a Family Feud Language, b |  |
-| falsifier-a | top_family_feud_answer | True | False |
-| falsifier-c | family_feud_mismatch |  - Open World vs. Closed World Conflict. | Falsifier C Isn't a Family Feud Language |
-| falsifier-c | top_family_feud_answer | True | False |
-| french | family_feud_mismatch | None | French Isn't a Family Feud Language, but |
-| french | top_family_feud_answer | True | False |
-| javascript | family_feud_mismatch | None | JavaScript Isn't a Family Feud Language, |
-| javascript | top_family_feud_answer | True | False |
-| owl-rdf-graphql-generally | family_feud_mismatch | None | OWL/RDF/GraphQL/... generally Isn't a Fa |
-| owl-rdf-graphql-generally | top_family_feud_answer | True | False |
-| python | family_feud_mismatch | None | Python Isn't a Family Feud Language, but |
-| python | top_family_feud_answer | True | False |
-| running-calculator-app | family_feud_mismatch | None |  |
-| sign-language | family_feud_mismatch | None | Sign Language Isn't a Family Feud Langua |
-| sign-language | top_family_feud_answer | True | False |
-| spoken-words | family_feud_mismatch | None | Spoken Words Isn't a Family Feud Languag |
-| spoken-words | top_family_feud_answer | True | False |
-| the-mona-lisa | family_feud_mismatch | None |  |
-| xlsx-editing | family_feud_mismatch | None |  |
+### language_candidates
+
+- Fields: 92/184 (50.0%)
+- Computed columns: has_grammar, question, predicted_answer, prediction_predicates, prediction_fail, is_description_of, is_open_closed_world_conflicted, relationship_to_concept
+
+| PK | Field | Expected | Actual |
+|-----|-------|----------|--------|
+| a-coffee-mug | question | Is A Coffee Mug a language? | None |
+| a-coffee-mug | predicted_answer | False | None |
+| a-coffee-mug | prediction_predicates | No Syntax & No Parsing Neede & | None |
+| a-coffee-mug | is_description_of | False | None |
+| a-game-of-fortnite | question | Is A Game of Fortnite a langua | None |
+| a-game-of-fortnite | predicted_answer | False | None |
+| a-game-of-fortnite | prediction_predicates | No Syntax & Requires Parsing & | None |
+| a-game-of-fortnite | is_description_of | False | None |
+| a-running-app | question | Is A Running App  a language? | None |
+| a-running-app | predicted_answer | False | None |
+| a-running-app | prediction_predicates | No Syntax & Requires Parsing & | None |
+| a-running-app | is_description_of | False | None |
+| a-smartphone | question | Is A Smartphone a language? | None |
+| a-smartphone | predicted_answer | False | None |
+| a-smartphone | prediction_predicates | No Syntax & No Parsing Neede & | None |
+| a-smartphone | is_description_of | False | None |
+| a-thunderstorm | question | Is A Thunderstorm a language? | None |
+| a-thunderstorm | predicted_answer | False | None |
+| a-thunderstorm | prediction_predicates | No Syntax & Requires Parsing & | None |
+| a-thunderstorm | is_description_of | False | None |
+| ... | ... | (72 more) | ... |

@@ -8,6 +8,40 @@ erb: a owl:Ontology ;
     rdfs:label "ERB Ontology" ;
     rdfs:comment "Generated from effortless-rulebook.json" .
 
+# === Class: ERBCustomizations ===
+erb:ERBCustomizations a owl:Class ;
+    rdfs:label "ERBCustomizations" .
+
+erb:eRBCustomizationId a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "ERBCustomizationId" .
+
+erb:name a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "Name" .
+
+erb:title a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "Title" .
+
+erb:sQLCode a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "SQLCode" .
+
+erb:sQLTarget a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "SQLTarget" .
+
+erb:customizationType a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "CustomizationType" .
+
 # === Class: IsEverythingALanguage ===
 erb:IsEverythingALanguage a owl:Class ;
     rdfs:label "IsEverythingALanguage" .
@@ -81,32 +115,15 @@ erb:name a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "Name" .
 
-erb:category a owl:DatatypeProperty ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "Category" .
-
-erb:familyFuedQuestion a owl:DatatypeProperty ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "FamilyFuedQuestion" .
-    # calculated: calculated
-
-erb:topFamilyFeudAnswer a owl:DatatypeProperty ;
+erb:isLanguage a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "TopFamilyFeudAnswer" .
-    # calculated: calculated
+    rdfs:label "IsLanguage" .
 
-erb:chosenLanguageCandidate a owl:DatatypeProperty ;
+erb:hasGrammar a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "ChosenLanguageCandidate" .
-
-erb:familyFeudMismatch a owl:DatatypeProperty ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "FamilyFeudMismatch" .
+    rdfs:label "HasGrammar" .
     # calculated: calculated
 
 erb:hasSyntax a owl:DatatypeProperty ;
@@ -114,21 +131,44 @@ erb:hasSyntax a owl:DatatypeProperty ;
     rdfs:range xsd:boolean ;
     rdfs:label "HasSyntax" .
 
-erb:hasIdentity a owl:DatatypeProperty ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "HasIdentity" .
-
 erb:canBeHeld a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
     rdfs:label "CanBeHeld" .
 
-erb:hasGrammar a owl:DatatypeProperty ;
+erb:question a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "Question" .
+    # calculated: calculated
+
+erb:predictedAnswer a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "HasGrammar" .
+    rdfs:label "PredictedAnswer" .
     # calculated: calculated
+
+erb:predictionPredicates a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "PredictionPredicates" .
+    # calculated: calculated
+
+erb:predictionFail a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "PredictionFail" .
+    # calculated: calculated
+
+erb:category a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "Category" .
+
+erb:hasIdentity a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "HasIdentity" .
 
 erb:requiresParsing a owl:DatatypeProperty ;
     rdfs:domain erb:LanguageCandidates ;

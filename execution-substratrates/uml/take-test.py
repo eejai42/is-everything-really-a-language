@@ -2,6 +2,10 @@
 """
 Take Test - UML Execution Substrate
 
+Supports two modes:
+1. Multi-entity (--multi-entity): Uses shared erb_calc.py for all entities
+2. Legacy: Uses OCL interpreter for single test-answers.json
+
 Scaffolding that:
 1. Loads generated model (schema + instances)
 2. Evaluates OCL expressions to compute derived values
@@ -11,7 +15,10 @@ The computation happens in the OCL interpreter, not hardcoded here.
 This script is 100% domain-agnostic - all field names come from the rulebook.
 """
 
+import argparse
+import glob as glob_module
 import json
+import os
 import re
 from pathlib import Path
 import sys
@@ -23,6 +30,11 @@ from enum import Enum, auto
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from orchestration.shared import load_rulebook
+
+# Add Python substrate directory to path for shared library
+script_dir = Path(__file__).parent.resolve()
+python_substrate_dir = script_dir / ".." / "python"
+sys.path.insert(0, str(python_substrate_dir))
 
 
 # =============================================================================
@@ -290,8 +302,6 @@ class OCLParser:
         return self.tokens[-1]
 
     def parse(self) -> OCLNode:
-        # Start with or to handle all boolean operators and comparisons
-        # The + operator for string concatenation is handled at additive level
         return self.parse_or()
 
     def parse_or(self) -> OCLNode:
@@ -355,13 +365,11 @@ class OCLParser:
     def parse_postfix(self) -> OCLNode:
         node = self.parse_primary()
 
-        # Handle dot notation (method calls and attribute access)
         while self.current().type == OCLTokenType.DOT:
             self.consume()
             name_tok = self.consume(OCLTokenType.IDENTIFIER)
             method_name = name_tok.value
 
-            # Check for method call with parentheses
             if self.current().type == OCLTokenType.LPAREN:
                 self.consume()
                 args = []
@@ -373,7 +381,6 @@ class OCLParser:
                 self.consume(OCLTokenType.RPAREN)
                 node = OCLMethodCall(obj=node, method=method_name, args=args)
             else:
-                # Attribute access - treat as method with no args
                 node = OCLMethodCall(obj=node, method=method_name, args=[])
 
         return node
@@ -401,29 +408,26 @@ class OCLParser:
             name = tok.value
             self.consume()
 
-            # Handle self.attribute
             if name.lower() == 'self' and self.current().type == OCLTokenType.DOT:
-                self.consume()  # consume dot
+                self.consume()
                 attr_tok = self.consume(OCLTokenType.IDENTIFIER)
                 return OCLSelfAttr(attr=attr_tok.value)
 
-            # Just an identifier
             return OCLSelfAttr(attr=name)
 
         if tok.type == OCLTokenType.LPAREN:
             self.consume()
-            node = self.parse_or()  # Full expression in parens
+            node = self.parse_or()
             self.consume(OCLTokenType.RPAREN)
             return node
 
-        # Handle IF expressions at primary level (for nested if in binary ops)
         if tok.type == OCLTokenType.IF:
             self.consume()
             cond = self.parse_or()
             self.consume(OCLTokenType.THEN)
-            then_branch = self.parse_or()  # Full expression in branches
+            then_branch = self.parse_or()
             self.consume(OCLTokenType.ELSE)
-            else_branch = self.parse_or()  # Full expression in branches
+            else_branch = self.parse_or()
             self.consume(OCLTokenType.ENDIF)
             return OCLIfExpr(cond=cond, then_branch=then_branch, else_branch=else_branch)
 
@@ -442,28 +446,15 @@ def parse_ocl(expr: str) -> OCLNode:
 # =============================================================================
 
 class OCLInterpreter:
-    """
-    Minimal OCL interpreter for ERB formula subset.
-
-    Supported operations:
-    - Attribute access: self.name
-    - Arithmetic: +, -, *, /
-    - String concatenation: +
-    - Comparison: =, <>, <, <=, >, >=
-    - Boolean: and, or, not
-    - String methods: toLower(), indexOf()
-    - Conditional: if-then-else-endif
-    """
+    """Minimal OCL interpreter for ERB formula subset."""
 
     def __init__(self, instance: Dict[str, Any]):
         self.instance = instance
-        # Build case-insensitive lookup (OCL uses camelCase but model has PascalCase)
         self.attr_lookup = {}
         for key, value in instance.items():
             self.attr_lookup[key.lower()] = value
 
     def evaluate(self, expr: str) -> Any:
-        """Evaluate an OCL expression against the instance."""
         ast = parse_ocl(expr)
         return self.eval_node(ast)
 
@@ -478,7 +469,6 @@ class OCLInterpreter:
             return node.value
 
         if isinstance(node, OCLSelfAttr):
-            # Use case-insensitive lookup
             return self.attr_lookup.get(node.attr.lower())
 
         if isinstance(node, OCLUnaryExpr):
@@ -506,7 +496,6 @@ class OCLInterpreter:
         raise ValueError(f"Unknown node type: {type(node)}")
 
     def apply_binary_op(self, op: str, left: Any, right: Any) -> Any:
-        # String concatenation with +
         if op == '+':
             if isinstance(left, str) or isinstance(right, str):
                 left_str = '' if left is None else str(left)
@@ -617,22 +606,18 @@ def parse_ocl_file(ocl_text: str) -> Dict[str, Dict[str, str]]:
     for line in ocl_text.split('\n'):
         line = line.strip()
 
-        # Skip empty lines and comments
         if not line or line.startswith('--'):
             continue
 
-        # Context declaration
         if line.startswith('context '):
             current_class = line[8:].strip()
             if current_class not in constraints:
                 constraints[current_class] = {}
             continue
 
-        # Derive expression
         if line.startswith('derive '):
             if current_class is None:
                 continue
-            # Parse: derive AttrName: expression
             rest = line[7:].strip()
             colon_idx = rest.find(':')
             if colon_idx == -1:
@@ -645,65 +630,112 @@ def parse_ocl_file(ocl_text: str) -> Dict[str, Dict[str, str]]:
 
 
 def topological_sort_constraints(class_constraints: Dict[str, str]) -> List[tuple]:
-    """
-    Topologically sort derived attributes by their dependencies.
-    Returns list of (attr_name, ocl_expr) tuples in evaluation order.
-    """
-    # Build dependency graph
-    # For each attribute, find which other derived attributes it references
+    """Topologically sort derived attributes by their dependencies."""
     attr_names = set(class_constraints.keys())
-    dependencies = {}  # attr -> set of attrs it depends on
+    dependencies = {}
 
     for attr_name, ocl_expr in class_constraints.items():
         deps = set()
-        # Look for self.attrName patterns in the expression
         expr_lower = ocl_expr.lower()
         for other_attr in attr_names:
             if other_attr == attr_name:
                 continue
-            # Check if this attribute references the other (case-insensitive)
             if f'self.{other_attr.lower()}' in expr_lower:
                 deps.add(other_attr)
         dependencies[attr_name] = deps
 
-    # Kahn's algorithm for topological sort
     in_degree = {attr: 0 for attr in attr_names}
     for attr, deps in dependencies.items():
         for dep in deps:
             if dep in in_degree:
                 in_degree[attr] += 1
 
-    # Start with nodes that have no dependencies on other derived attrs
     queue = [attr for attr, degree in in_degree.items() if degree == 0]
     result = []
 
     while queue:
-        # Sort to ensure deterministic order
         queue.sort()
         attr = queue.pop(0)
         result.append((attr, class_constraints[attr]))
 
-        # Remove this node and update in-degrees
         for other_attr, deps in dependencies.items():
             if attr in deps:
                 in_degree[other_attr] -= 1
                 if in_degree[other_attr] == 0:
                     queue.append(other_attr)
 
-    # If not all attributes are in result, there's a cycle (shouldn't happen)
     if len(result) != len(attr_names):
-        # Fall back to original order
         return list(class_constraints.items())
 
     return result
 
 
 # =============================================================================
-# MAIN
+# MULTI-ENTITY MODE (uses shared erb_calc.py)
 # =============================================================================
 
-def main():
-    script_dir = Path(__file__).resolve().parent
+def process_entity(input_path: str, output_path: str) -> int:
+    """Process a single entity file using shared erb_calc library."""
+    from erb_calc import compute_all_calculated_fields
+
+    with open(input_path, 'r', encoding='utf-8') as f:
+        records = json.load(f)
+
+    computed_records = []
+    for record in records:
+        computed = compute_all_calculated_fields(record)
+        computed_records.append(computed)
+
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(computed_records, f, indent=2)
+
+    return len(computed_records)
+
+
+def run_multi_entity():
+    """Process all entity files in blank-tests/ directory using shared library."""
+    blank_tests_dir = script_dir / "blank-tests"
+    test_answers_dir = script_dir / "test-answers"
+
+    if not blank_tests_dir.is_dir():
+        print(f"Error: {blank_tests_dir} not found")
+        sys.exit(1)
+
+    test_answers_dir.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 70)
+    print("UML Execution Substrate - Multi-Entity Test Execution")
+    print("=" * 70)
+    print()
+
+    total_records = 0
+    entity_count = 0
+
+    for input_path in sorted(glob_module.glob(str(blank_tests_dir / "*.json"))):
+        filename = os.path.basename(input_path)
+
+        if filename.startswith('_'):
+            continue
+
+        entity = filename.replace('.json', '')
+        output_path = test_answers_dir / filename
+
+        count = process_entity(input_path, str(output_path))
+        total_records += count
+        entity_count += 1
+
+        print(f"  -> {entity}: {count} records")
+
+    print(f"\nUML substrate: Processed {entity_count} entities, {total_records} total records")
+    print("=" * 70)
+
+
+# =============================================================================
+# LEGACY MODE (uses OCL interpreter)
+# =============================================================================
+
+def run_legacy():
+    """Process using OCL interpreter (legacy mode)."""
     test_file = script_dir / "test-answers.json"
 
     print("=" * 70)
@@ -711,7 +743,6 @@ def main():
     print("=" * 70)
     print()
 
-    # Check required files exist
     model_path = script_dir / "model.json"
     ocl_path = script_dir / "constraints.ocl"
 
@@ -721,14 +752,12 @@ def main():
             print("Run: python inject-into-uml.py first")
             sys.exit(1)
 
-    # Load model
     print("Loading model...")
     with open(model_path) as f:
         model = json.load(f)
 
     print(f"   Loaded {len(model['instances'])} instances")
 
-    # Load OCL constraints
     print("\nLoading OCL constraints...")
     ocl_text = ocl_path.read_text()
     constraints = parse_ocl_file(ocl_text)
@@ -736,7 +765,6 @@ def main():
     total_constraints = sum(len(v) for v in constraints.values())
     print(f"   Loaded {total_constraints} derived attribute definitions")
 
-    # Evaluate derived values for each instance
     print("\nEvaluating OCL expressions...")
     print("   (This is where computation happens - in the OCL interpreter)")
 
@@ -747,38 +775,28 @@ def main():
         if instance["class"] != target_class:
             continue
 
-        # Start with raw values, converting keys to snake_case
         record = {}
         for key, value in instance["values"].items():
             snake_key = camel_to_snake(key)
             record[snake_key] = value
 
-        # Get class constraints
         class_name = instance["class"]
         class_constraints = constraints.get(class_name, {})
 
-        # Create interpreter for this instance
-        # Note: OCL uses original field names, so we pass original values
         interpreter = OCLInterpreter(instance["values"])
 
-        # Topologically sort constraints so dependencies are evaluated first
         sorted_constraints = topological_sort_constraints(class_constraints)
 
-        # Evaluate each derived attribute in dependency order
-        # Note: Derived attributes may depend on each other, so update the lookup
-        # after each successful evaluation
         for attr_name, ocl_expr in sorted_constraints:
             snake_key = camel_to_snake(attr_name)
             try:
                 value = interpreter.evaluate(ocl_expr)
                 record[snake_key] = value
-                # Update interpreter's lookup so subsequent attributes can reference this
                 interpreter.attr_lookup[attr_name.lower()] = value
             except Exception as e:
                 print(f"   Warning: Error evaluating {attr_name}: {e}")
                 record[snake_key] = None
 
-        # Post-process: convert empty strings to None for family_feud_mismatch
         if record.get("family_feud_mismatch") == "":
             record["family_feud_mismatch"] = None
 
@@ -786,7 +804,6 @@ def main():
 
     print(f"   Evaluated {len(results)} records")
 
-    # Save results
     print(f"\nSaving results to: {test_file}")
     with open(test_file, "w", encoding='utf-8') as f:
         json.dump(results, f, indent=2)
@@ -794,6 +811,25 @@ def main():
     print("\n" + "=" * 70)
     print("Test execution complete!")
     print("=" * 70)
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+def main():
+    parser = argparse.ArgumentParser(description="UML Substrate Test Runner")
+    parser.add_argument(
+        "--multi-entity",
+        action="store_true",
+        help="Process all entities in blank-tests/ directory"
+    )
+    args = parser.parse_args()
+
+    if args.multi_entity:
+        run_multi_entity()
+    else:
+        run_legacy()
 
 
 if __name__ == "__main__":

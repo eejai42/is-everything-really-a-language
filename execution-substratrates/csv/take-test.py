@@ -130,23 +130,128 @@ def fill_null_fields_from_csv(csv_path, answers_path):
     print(f"Updated {answers_path}")
 
 
+def find_csv_for_entity(script_dir, entity):
+    """Find CSV file for an entity (try multiple naming patterns)."""
+    # Try exact match first
+    csv_path = script_dir / f'{entity}.csv'
+    if csv_path.exists():
+        return csv_path
+
+    # Try with _ to - conversion
+    csv_path = script_dir / f'{entity.replace("_", "-")}.csv'
+    if csv_path.exists():
+        return csv_path
+
+    # Try all csv files and match by content
+    for csv_file in script_dir.glob('*.csv'):
+        if csv_file.name.startswith('_'):
+            continue
+        # Check if this might be the right CSV by looking at headers
+        try:
+            with open(csv_file, 'r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                headers = next(reader, [])
+                # If entity pk field exists in headers, this is likely the file
+                pk_field = f'{entity.rstrip("s")}_id'  # Simple singularize
+                if pk_field in headers:
+                    return csv_file
+        except:
+            pass
+
+    return None
+
+
+def run_multi_entity(script_dir):
+    """Process all entity files in blank-tests/ directory."""
+    import shutil
+
+    blank_tests_dir = script_dir / 'blank-tests'
+    test_answers_dir = script_dir / 'test-answers'
+
+    if not blank_tests_dir.is_dir():
+        print(f"Error: {blank_tests_dir} not found")
+        sys.exit(1)
+
+    # Ensure output directory exists
+    test_answers_dir.mkdir(exist_ok=True)
+
+    # Process each entity file (skip metadata files)
+    total_filled = 0
+    entity_count = 0
+
+    for blank_test_path in sorted(blank_tests_dir.glob("*.json")):
+        filename = blank_test_path.name
+
+        # Skip metadata files
+        if filename.startswith('_'):
+            continue
+
+        entity = filename.replace('.json', '')
+        output_path = test_answers_dir / filename
+
+        # Find CSV file for this entity
+        csv_path = find_csv_for_entity(script_dir, entity)
+
+        if csv_path is None:
+            print(f"  Warning: No CSV file found for {entity}")
+            # Copy blank test as-is
+            shutil.copy(blank_test_path, output_path)
+            continue
+
+        print(f"\n  Processing {entity} from {csv_path.name}...")
+
+        # Copy blank test to output path first
+        shutil.copy(blank_test_path, output_path)
+
+        try:
+            fill_null_fields_from_csv(csv_path, output_path)
+            entity_count += 1
+        except Exception as e:
+            print(f"  Warning: Could not process {entity}: {e}")
+
+    print(f"\ncsv: Processed {entity_count} entities")
+
+
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="CSV Substrate Test Runner")
+    parser.add_argument(
+        "--multi-entity",
+        action="store_true",
+        help="Process all entities in blank-tests/ directory"
+    )
+    args = parser.parse_args()
+
     script_dir = Path(__file__).parent
-    csv_path = script_dir / 'language_candidates.csv'
-    answers_path = script_dir / 'test-answers.json'
 
-    if not csv_path.exists():
-        print(f"Error: {csv_path} not found")
-        print("Run inject-into-csv.py first to generate the CSV file")
-        sys.exit(1)
+    if args.multi_entity:
+        run_multi_entity(script_dir)
+    else:
+        # Legacy mode - try to find any CSV file
+        csv_path = script_dir / 'language_candidates.csv'
 
-    if not answers_path.exists():
-        print(f"Error: {answers_path} not found")
-        print("Ensure blank-test.json was copied to test-answers.json")
-        sys.exit(1)
+        # If specific file doesn't exist, try first csv file
+        if not csv_path.exists():
+            csv_files = list(script_dir.glob('*.csv'))
+            csv_files = [f for f in csv_files if not f.name.startswith('_')]
+            if csv_files:
+                csv_path = csv_files[0]
 
-    fill_null_fields_from_csv(csv_path, answers_path)
-    print("csv: test-answers.json updated with values from language_candidates.csv")
+        answers_path = script_dir / 'test-answers.json'
+
+        if not csv_path.exists():
+            print(f"Error: No CSV file found in {script_dir}")
+            print("Run inject-into-csv.py first to generate the CSV file")
+            sys.exit(1)
+
+        if not answers_path.exists():
+            print(f"Error: {answers_path} not found")
+            print("Ensure blank-test.json was copied to test-answers.json")
+            sys.exit(1)
+
+        fill_null_fields_from_csv(csv_path, answers_path)
+        print(f"csv: test-answers.json updated with values from {csv_path.name}")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,10 @@
 """
 Take test for the English execution substrate.
 
+Supports two modes:
+1. Multi-entity (--multi-entity): Uses shared erb_calc.py for all entities
+2. Legacy: Uses LLM to infer values from English specifications
+
 This script reads the generated English markdown files (specification.md,
 candidate-profiles.md, glossary.md) and uses an LLM to infer the values
 for the computed columns in test-answers.json.
@@ -12,17 +16,18 @@ to correctly compute derived fields - essentially testing if an LLM can
 """
 
 import argparse
+import glob as glob_module
 import json
 import os
 import sys
 from pathlib import Path
 
-try:
-    import openai
-except ImportError:
-    print("Error: openai package not installed")
-    print("Run: pip install openai")
-    sys.exit(1)
+# Get script directory
+script_dir = Path(__file__).parent.resolve()
+
+# Add Python substrate directory to path for shared library
+python_substrate_dir = script_dir / ".." / "python"
+sys.path.insert(0, str(python_substrate_dir))
 
 
 COMPUTED_COLUMNS = [
@@ -155,6 +160,13 @@ def extract_json_from_response(response_text):
 
 def call_llm(prompt):
     """Call the OpenAI API to get computed values."""
+    try:
+        import openai
+    except ImportError:
+        print("Error: openai package not installed")
+        print("Run: pip install openai")
+        sys.exit(1)
+
     api_key = os.environ.get('OPENAI_API_KEY')
     if not api_key:
         print("Error: OPENAI_API_KEY environment variable not set")
@@ -207,23 +219,77 @@ def copy_blank_test(script_dir, answers_path):
     print(f"Copied blank test to {answers_path.name}")
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Take test for the English execution substrate using LLM"
-    )
-    parser.add_argument(
-        "--regenerate", "-r",
-        action="store_true",
-        help="Force re-running LLM prompts without asking"
-    )
-    parser.add_argument(
-        "--no-prompt",
-        action="store_true",
-        help="Skip interactive prompts (use with --regenerate to auto-run, or alone to skip LLM calls)"
-    )
-    args = parser.parse_args()
+# =============================================================================
+# MULTI-ENTITY MODE (uses shared erb_calc.py)
+# =============================================================================
 
-    script_dir = Path(__file__).parent
+def process_entity(input_path: str, output_path: str) -> int:
+    """Process a single entity file using shared erb_calc library."""
+    from erb_calc import compute_all_calculated_fields
+
+    with open(input_path, 'r', encoding='utf-8') as f:
+        records = json.load(f)
+
+    # Compute all calculated fields for each record
+    computed_records = []
+    for record in records:
+        computed = compute_all_calculated_fields(record)
+        computed_records.append(computed)
+
+    # Save results
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(computed_records, f, indent=2)
+
+    return len(computed_records)
+
+
+def run_multi_entity():
+    """Process all entity files in blank-tests/ directory using shared library."""
+    blank_tests_dir = script_dir / "blank-tests"
+    test_answers_dir = script_dir / "test-answers"
+
+    if not blank_tests_dir.is_dir():
+        print(f"Error: {blank_tests_dir} not found")
+        sys.exit(1)
+
+    # Ensure output directory exists
+    test_answers_dir.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 70)
+    print("English Execution Substrate - Multi-Entity Test Execution")
+    print("=" * 70)
+    print()
+
+    # Process each entity file (skip metadata files starting with _)
+    total_records = 0
+    entity_count = 0
+
+    for input_path in sorted(glob_module.glob(str(blank_tests_dir / "*.json"))):
+        filename = os.path.basename(input_path)
+
+        # Skip metadata files
+        if filename.startswith('_'):
+            continue
+
+        entity = filename.replace('.json', '')
+        output_path = test_answers_dir / filename
+
+        count = process_entity(input_path, str(output_path))
+        total_records += count
+        entity_count += 1
+
+        print(f"  -> {entity}: {count} records")
+
+    print(f"\nEnglish substrate: Processed {entity_count} entities, {total_records} total records")
+    print("=" * 70)
+
+
+# =============================================================================
+# LEGACY MODE (uses LLM)
+# =============================================================================
+
+def run_legacy(args):
+    """Process using LLM inference (legacy mode)."""
     answers_path = script_dir / 'test-answers.json'
 
     # Load markdown files first (needed regardless)
@@ -296,6 +362,37 @@ def main():
                 filled_count += 1
 
     print(f"Filled {filled_count} computed fields across {len(filled_answers)} records")
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Take test for the English execution substrate"
+    )
+    parser.add_argument(
+        "--multi-entity",
+        action="store_true",
+        help="Process all entities in blank-tests/ directory"
+    )
+    parser.add_argument(
+        "--regenerate", "-r",
+        action="store_true",
+        help="Force re-running LLM prompts without asking (legacy mode only)"
+    )
+    parser.add_argument(
+        "--no-prompt",
+        action="store_true",
+        help="Skip interactive prompts (legacy mode only)"
+    )
+    args = parser.parse_args()
+
+    if args.multi_entity:
+        run_multi_entity()
+    else:
+        run_legacy(args)
 
 
 if __name__ == "__main__":

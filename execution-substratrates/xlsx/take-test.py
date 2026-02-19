@@ -505,21 +505,77 @@ def fill_null_fields_from_xlsx(xlsx_path, answers_path):
     print(f"Updated {answers_path}")
 
 
+def run_multi_entity(script_dir, xlsx_path):
+    """Process all entity files in blank-tests/ directory."""
+    import shutil
+
+    blank_tests_dir = script_dir / 'blank-tests'
+    test_answers_dir = script_dir / 'test-answers'
+
+    if not blank_tests_dir.is_dir():
+        print(f"Error: {blank_tests_dir} not found")
+        sys.exit(1)
+
+    # Ensure output directory exists
+    test_answers_dir.mkdir(exist_ok=True)
+
+    # Process each entity file (skip metadata files)
+    total_filled = 0
+    entity_count = 0
+
+    for blank_test_path in sorted(blank_tests_dir.glob("*.json")):
+        filename = blank_test_path.name
+
+        # Skip metadata files
+        if filename.startswith('_'):
+            continue
+
+        entity = filename.replace('.json', '')
+        output_path = test_answers_dir / filename
+
+        # Copy blank test to output path first
+        shutil.copy(blank_test_path, output_path)
+
+        print(f"\n  Processing {entity}...")
+        try:
+            fill_null_fields_from_xlsx(xlsx_path, output_path)
+            entity_count += 1
+        except Exception as e:
+            print(f"  Warning: Could not process {entity}: {e}")
+
+    print(f"\nxlsx: Processed {entity_count} entities from rulebook.xlsx")
+
+
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="XLSX Substrate Test Runner")
+    parser.add_argument(
+        "--multi-entity",
+        action="store_true",
+        help="Process all entities in blank-tests/ directory"
+    )
+    args = parser.parse_args()
+
     script_dir = Path(__file__).parent
     xlsx_path = script_dir / 'rulebook.xlsx'
-    answers_path = script_dir / 'test-answers.json'
 
     if not xlsx_path.exists():
         print(f"Error: {xlsx_path} not found")
         sys.exit(1)
 
-    if not answers_path.exists():
-        print(f"Error: {answers_path} not found")
-        sys.exit(1)
+    if args.multi_entity:
+        run_multi_entity(script_dir, xlsx_path)
+    else:
+        # Legacy mode
+        answers_path = script_dir / 'test-answers.json'
 
-    fill_null_fields_from_xlsx(xlsx_path, answers_path)
-    print("xlsx: test-answers.json updated with values from rulebook.xlsx")
+        if not answers_path.exists():
+            print(f"Error: {answers_path} not found")
+            sys.exit(1)
+
+        fill_null_fields_from_xlsx(xlsx_path, answers_path)
+        print("xlsx: test-answers.json updated with values from rulebook.xlsx")
 
 
 if __name__ == "__main__":

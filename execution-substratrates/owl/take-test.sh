@@ -1,21 +1,35 @@
 #!/bin/bash
 
 # take-test.sh for owl execution substrate
-# This script runs the SHACL reasoner to compute derived values
+# Executes the SHACL reasoner to compute derived values
+#
+# Supports two modes:
+# 1. Multi-entity: Processes all files in blank-tests/ -> test-answers/
+# 2. Legacy: Uses single blank-test.json -> test-answers.json
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Step 1: Delete previous test-answers.json to prevent stale results
-echo "Deleting previous test-answers.json..."
-rm -f "$SCRIPT_DIR/test-answers.json"
+# Check for new multi-entity structure
+if [ -d "$SCRIPT_DIR/blank-tests" ] && [ -n "$(ls -A "$SCRIPT_DIR/blank-tests" 2>/dev/null)" ]; then
+    # Multi-entity mode: blank-tests/ exists and has files
+    echo "owl: Using multi-entity mode (blank-tests/ -> test-answers/)"
 
-# Step 2: Install dependencies if needed (auto-handled by take-test.py)
-# pip install rdflib pyshacl --quiet
+    # Ensure test-answers directory exists
+    mkdir -p "$SCRIPT_DIR/test-answers"
 
-# Step 3: Run the OWL/SHACL substrate solution to populate answers
-echo "Running OWL substrate test (SHACL reasoner)..."
-python3 "$SCRIPT_DIR/take-test.py"
+    # Run OWL substrate in multi-entity mode
+    python3 "$SCRIPT_DIR/take-test.py" --multi-entity
+else
+    # Legacy mode: Use single blank-test.json
+    echo "owl: Using legacy mode (blank-test.json -> test-answers.json)"
 
-echo "owl: test-answers.json populated with computed values"
+    # Delete previous test-answers.json to prevent stale results
+    rm -f "$SCRIPT_DIR/test-answers.json"
+
+    # Run OWL substrate
+    python3 "$SCRIPT_DIR/take-test.py"
+fi
+
+echo "owl: test completed"

@@ -9,13 +9,30 @@ erb:LanguageCandidatesShape a sh:NodeShape ;
     sh:targetClass erb:LanguageCandidates ;
     sh:rule [
         a sh:SPARQLRule ;
-        rdfs:label "rule_LanguageCandidates_FamilyFuedQuestion" ;
+        rdfs:label "rule_LanguageCandidates_HasGrammar" ;
         sh:prefixes erb: ;
         sh:construct """
             PREFIX erb: <http://example.org/erb#>
             PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
             CONSTRUCT {
-                $this erb:familyFuedQuestion ?_result .
+                $this erb:hasGrammar ?_result .
+            }
+            WHERE {
+    $this a erb:LanguageCandidates .
+    OPTIONAL { $this erb:hasSyntax ?has_syntax . }
+                BIND((?has_syntax = true) AS ?_result)
+            }
+        """ ;
+    ] ;
+    sh:rule [
+        a sh:SPARQLRule ;
+        rdfs:label "rule_LanguageCandidates_Question" ;
+        sh:prefixes erb: ;
+        sh:construct """
+            PREFIX erb: <http://example.org/erb#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            CONSTRUCT {
+                $this erb:question ?_result .
             }
             WHERE {
     $this a erb:LanguageCandidates .
@@ -26,13 +43,13 @@ erb:LanguageCandidatesShape a sh:NodeShape ;
     ] ;
     sh:rule [
         a sh:SPARQLRule ;
-        rdfs:label "rule_LanguageCandidates_TopFamilyFeudAnswer" ;
+        rdfs:label "rule_LanguageCandidates_PredictedAnswer" ;
         sh:prefixes erb: ;
         sh:construct """
             PREFIX erb: <http://example.org/erb#>
             PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
             CONSTRUCT {
-                $this erb:topFamilyFeudAnswer ?_result .
+                $this erb:predictedAnswer ?_result .
             }
             WHERE {
     $this a erb:LanguageCandidates .
@@ -50,38 +67,45 @@ erb:LanguageCandidatesShape a sh:NodeShape ;
     ] ;
     sh:rule [
         a sh:SPARQLRule ;
-        rdfs:label "rule_LanguageCandidates_FamilyFeudMismatch" ;
+        rdfs:label "rule_LanguageCandidates_PredictionPredicates" ;
         sh:prefixes erb: ;
         sh:construct """
             PREFIX erb: <http://example.org/erb#>
             PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
             CONSTRUCT {
-                $this erb:familyFeudMismatch ?_result .
+                $this erb:predictionPredicates ?_result .
             }
             WHERE {
     $this a erb:LanguageCandidates .
-    OPTIONAL { $this erb:chosenLanguageCandidate ?chosen_language_candidate . }
-    OPTIONAL { $this erb:isOpenClosedWorldConflicted ?is_open_closed_world_conflicted . }
-    OPTIONAL { $this erb:name ?name . }
-    OPTIONAL { $this erb:topFamilyFeudAnswer ?top_family_feud_answer . }
-                BIND(CONCAT(IF((!((?top_family_feud_answer = ?chosen_language_candidate))), CONCAT(?name, " ", IF(?top_family_feud_answer, "Is", "Isn\'t"), " a Family Feud Language, but ", IF(?chosen_language_candidate, "Is", "Is Not"), " marked as a \'Language Candidate.\'"), ""), IF(?is_open_closed_world_conflicted, " - Open World vs. Closed World Conflict.", "")) AS ?_result)
+    OPTIONAL { $this erb:canBeHeld ?can_be_held . }
+    OPTIONAL { $this erb:hasIdentity ?has_identity . }
+    OPTIONAL { $this erb:hasLinearDecodingPressure ?has_linear_decoding_pressure . }
+    OPTIONAL { $this erb:hasSyntax ?has_syntax . }
+    OPTIONAL { $this erb:isDescriptionOf ?is_description_of . }
+    OPTIONAL { $this erb:isStableOntologyReference ?is_stable_ontology_reference . }
+    OPTIONAL { $this erb:requiresParsing ?requires_parsing . }
+    OPTIONAL { $this erb:resolvesToAnAST ?resolves_to_an_ast . }
+                BIND(CONCAT(IF(?has_syntax, "Has Syntax", "No Syntax"), " & ", IF(?requires_parsing, "Requires Parsing", "No Parsing Neede"), " & ", IF(?is_description_of, "Describes the thing", "Is the Thing"), " & ", IF(?has_linear_decoding_pressure, "Has Linear Decoding Pressure", "No Decoding Pressure"), " & ", IF(?resolves_to_an_ast, "Resolves to AST", "No AST"), ", ", "  ", IF(?is_stable_ontology_reference, "Is Stable Ontology", "Not \'Ontology\'"), "\\n AND ", "  ", IF(?can_be_held, "Can Be Held", "Can\'t Be Held"), ", ", "  ", IF(?has_identity, "Has Identity", "Has no Identity")) AS ?_result)
             }
         """ ;
     ] ;
     sh:rule [
         a sh:SPARQLRule ;
-        rdfs:label "rule_LanguageCandidates_HasGrammar" ;
+        rdfs:label "rule_LanguageCandidates_PredictionFail" ;
         sh:prefixes erb: ;
         sh:construct """
             PREFIX erb: <http://example.org/erb#>
             PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
             CONSTRUCT {
-                $this erb:hasGrammar ?_result .
+                $this erb:predictionFail ?_result .
             }
             WHERE {
     $this a erb:LanguageCandidates .
-    OPTIONAL { $this erb:hasSyntax ?has_syntax . }
-                BIND((?has_syntax = true) AS ?_result)
+    OPTIONAL { $this erb:isLanguage ?is_language . }
+    OPTIONAL { $this erb:isOpenClosedWorldConflicted ?is_open_closed_world_conflicted . }
+    OPTIONAL { $this erb:name ?name . }
+    OPTIONAL { $this erb:predictedAnswer ?predicted_answer . }
+                BIND(CONCAT(IF((!((?predicted_answer = ?is_language))), CONCAT(?name, " ", IF(?predicted_answer, "Is", "Isn\'t"), " a Family Feud Language, but ", IF(?is_language, "Is", "Is Not"), " marked as a \'Language Candidate.\'"), ""), IF(?is_open_closed_world_conflicted, " - Open World vs. Closed World Conflict.", "")) AS ?_result)
             }
         """ ;
     ] ;
@@ -138,4 +162,4 @@ erb:LanguageCandidatesShape a sh:NodeShape ;
         """ ;
     ] .
 
-# Generated 7 SHACL rules
+# Generated 8 SHACL rules

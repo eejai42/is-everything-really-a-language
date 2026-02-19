@@ -18,7 +18,7 @@ END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_language_candidates_family_fued_question(p_language_candidate_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_question(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
   RETURN ('Is " & (SELECT NULLIF(name, '''') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) & " a language?')::text;
@@ -26,7 +26,7 @@ END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_language_candidates_is_family_feud_language(p_language_candidate_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_predicted_answer(p_language_candidate_id TEXT)
 RETURNS BOOLEAN AS $$
 BEGIN
   RETURN ((COALESCE((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT requires_parsing FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND (calc_language_candidates_is_description_of(p_language_candidate_id) = 'true') AND COALESCE((SELECT has_linear_decoding_pressure FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT resolves_to_an_ast FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT is_stable_ontology_reference FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND NOT (COALESCE((SELECT can_be_held FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)) AND NOT (COALESCE((SELECT has_identity FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE))))::boolean;
@@ -34,7 +34,15 @@ END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_mismatch(p_language_candidate_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_prediction_predicates(p_language_candidate_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (CONCAT(CASE WHEN COALESCE((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Has Syntax' ELSE 'No Syntax' END, ' & ', CASE WHEN COALESCE((SELECT requires_parsing FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Requires Parsing' ELSE 'No Parsing Neede' END, ' & ', CASE WHEN (calc_language_candidates_is_description_of(p_language_candidate_id) = 'true') THEN 'Describes the thing' ELSE 'Is the Thing' END, ' & ', CASE WHEN COALESCE((SELECT has_linear_decoding_pressure FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Has Linear Decoding Pressure' ELSE 'No Decoding Pressure' END, ' & ', CASE WHEN COALESCE((SELECT resolves_to_an_ast FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Resolves to AST' ELSE 'No AST' END, ', ', '  ', CASE WHEN COALESCE((SELECT is_stable_ontology_reference FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Is Stable Ontology' ELSE 'Not ''Ontology''' END, '\n AND ', '  ', CASE WHEN COALESCE((SELECT can_be_held FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Can Be Held' ELSE 'Can''t Be Held' END, ', ', '  ', CASE WHEN COALESCE((SELECT has_identity FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Has Identity' ELSE 'Has no Identity' END))::text;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION calc_language_candidates_prediction_fail(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
   RETURN NULL; -- Formula translation failed

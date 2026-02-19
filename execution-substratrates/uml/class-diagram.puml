@@ -1,6 +1,16 @@
 @startuml
 skinparam classAttributeIconSize 0
 
+class ERBCustomizations {
+  +ERBCustomizationId: String
+  +Name: String
+  +Title: String
+  +SQLCode: String
+  +SQLTarget: String
+  +CustomizationType: String
+  --
+}
+
 class IsEverythingALanguage {
   +IsEverythingALanguageId: String
   +Name: String
@@ -19,11 +29,11 @@ class IsEverythingALanguage {
 class LanguageCandidates {
   +LanguageCandidateId: String
   +Name: String
-  +Category: String
-  +ChosenLanguageCandidate: Boolean
+  +IsLanguage: Boolean
   +HasSyntax: Boolean
-  +HasIdentity: Boolean
   +CanBeHeld: Boolean
+  +Category: String
+  +HasIdentity: Boolean
   +RequiresParsing: Boolean
   +ResolvesToAnAST: Boolean
   +HasLinearDecodingPressure: Boolean
@@ -36,10 +46,11 @@ class LanguageCandidates {
   +ModelObjectFacilityLayer: String
   +SortOrder: Integer
   --
-  /FamilyFuedQuestion: String  {derived}
-  /TopFamilyFeudAnswer: Boolean  {derived}
-  /FamilyFeudMismatch: String  {derived}
   /HasGrammar: Boolean  {derived}
+  /Question: String  {derived}
+  /PredictedAnswer: Boolean  {derived}
+  /PredictionPredicates: String  {derived}
+  /PredictionFail: String  {derived}
   /IsDescriptionOf: Boolean  {derived}
   /IsOpenClosedWorldConflicted: Boolean  {derived}
   /RelationshipToConcept: String  {derived}

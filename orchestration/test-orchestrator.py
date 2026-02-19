@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 # =============================================================================
-# TEST ORCHESTRATOR
+# TEST ORCHESTRATOR (Generic / Domain-Agnostic)
 # =============================================================================
 # Generic test framework for evaluating execution substrates.
-# Compares field-by-field - no domain-specific logic in the evaluation.
+#
+# This orchestrator knows NOTHING about specific domains. It only knows:
+# - Views (anything named vw_* in postgres)
+# - Raw fields (schema type: "raw")
+# - Computed fields (schema type: "calculated")
+# - JSON comparison (expected vs actual)
+#
+# All configuration is auto-discovered from the rulebook and database.
 # =============================================================================
 
+import glob
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -17,153 +26,330 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # =============================================================================
-# CONFIGURATION
+# PATHS (Generic - No Domain-Specific Names)
 # =============================================================================
 
-# Database connection
-DB_CONNECTION = os.environ.get(
-    "DATABASE_URL",
-    "postgresql://postgres@localhost:5432/wikidata-language-candidates"
-)
-
-# View to query for answer key
-VIEW_NAME = "vw_language_candidates"
-
-# Primary key field (used for matching records between answer key and test answers)
-PRIMARY_KEY = "language_candidate_id"
-
-# Computed columns to strip for blank test
-# (These are the fields that substrates must compute)
-# Note: has_grammar was removed - it's now a raw field in the rulebook
-COMPUTED_COLUMNS = [
-    "family_feud_mismatch",
-    "family_fued_question",
-    "top_family_feud_answer",
-    "relationship_to_concept",
-    "is_open_closed_world_conflicted",
-]
-
-# Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 TESTING_DIR = os.path.join(PROJECT_ROOT, "testing")
+ANSWER_KEYS_DIR = os.path.join(TESTING_DIR, "answer-keys")
+BLANK_TESTS_DIR = os.path.join(TESTING_DIR, "blank-tests")
 SUBSTRATES_DIR = os.path.join(PROJECT_ROOT, "execution-substratrates")
-
-ANSWER_KEY_PATH = os.path.join(TESTING_DIR, "answer-key.json")
-BLANK_TEST_PATH = os.path.join(TESTING_DIR, "blank-test.json")
+RULEBOOK_DIR = os.path.join(PROJECT_ROOT, "effortless-rulebook")
+RULEBOOK_PATH = os.path.join(RULEBOOK_DIR, "effortless-rulebook.json")
 SUMMARY_PATH = os.path.join(SCRIPT_DIR, "all-tests-results.md")
 
-# ANSI color codes for terminal output
+# Database connection (generic - uses environment variable or inferred from init-db.sh)
+DB_CONNECTION = os.environ.get("DATABASE_URL")
+if not DB_CONNECTION:
+    # Try to infer from init-db.sh DEFAULT_CONN line
+    init_db_path = os.path.join(PROJECT_ROOT, "postgres", "init-db.sh")
+    if os.path.exists(init_db_path):
+        with open(init_db_path, 'r') as f:
+            for line in f:
+                if 'DEFAULT_CONN=' in line:
+                    # Extract connection string from: DEFAULT_CONN="postgresql://..."
+                    match = re.search(r'DEFAULT_CONN="([^"]+)"', line)
+                    if match:
+                        DB_CONNECTION = match.group(1)
+                        break
+    if not DB_CONNECTION:
+        DB_CONNECTION = "postgresql://postgres@localhost:5432/postgres"
+
+# =============================================================================
+# ANSI Color Codes (Unchanged)
+# =============================================================================
+
 GREEN = "\033[92m"
 RED = "\033[91m"
 YELLOW = "\033[93m"
 RESET = "\033[0m"
 BOLD = "\033[1m"
-
-# Extended 256-color palette for gradients and backgrounds
-SKY_BLUE_BG = "\033[48;5;117m"  # Sky blue background
-DARK_TEXT = "\033[38;5;232m"    # Near-black text for contrast
-GREEN_BG = "\033[48;5;22m"      # Dark green background for pass rows
-RED_BG = "\033[48;5;52m"        # Dark red background for fail rows
-WHITE_TEXT = "\033[97m"         # White text
-STRIKETHROUGH = "\033[9m"       # Strikethrough text
-DIM = "\033[2m"                 # Dim text
+SKY_BLUE_BG = "\033[48;5;117m"
+DARK_TEXT = "\033[38;5;232m"
+GREEN_BG = "\033[48;5;22m"
+RED_BG = "\033[48;5;52m"
+WHITE_TEXT = "\033[97m"
+STRIKETHROUGH = "\033[9m"
+DIM = "\033[2m"
 
 
 def get_score_color(score: float) -> str:
-    """
-    Returns ANSI color code for a score using a red->yellow->green gradient.
-    0% = pure red, 50% = yellow, 100% = pure green
-    Uses 256-color palette for smooth gradient.
-    """
+    """Returns ANSI color code for a score using a red->yellow->green gradient."""
     if score >= 100:
-        return "\033[38;5;46m"   # Bright green
+        return "\033[38;5;46m"
     elif score >= 90:
-        return "\033[38;5;82m"   # Light green
+        return "\033[38;5;82m"
     elif score >= 80:
-        return "\033[38;5;118m"  # Yellow-green
+        return "\033[38;5;118m"
     elif score >= 70:
-        return "\033[38;5;154m"  # More yellow-green
+        return "\033[38;5;154m"
     elif score >= 60:
-        return "\033[38;5;190m"  # Yellow-ish green
+        return "\033[38;5;190m"
     elif score >= 50:
-        return "\033[38;5;226m"  # Yellow
+        return "\033[38;5;226m"
     elif score >= 40:
-        return "\033[38;5;220m"  # Orange-yellow
+        return "\033[38;5;220m"
     elif score >= 30:
-        return "\033[38;5;214m"  # Orange
+        return "\033[38;5;214m"
     elif score >= 20:
-        return "\033[38;5;208m"  # Dark orange
+        return "\033[38;5;208m"
     elif score >= 10:
-        return "\033[38;5;202m"  # Red-orange
+        return "\033[38;5;202m"
     else:
-        return "\033[38;5;196m"  # Pure red
+        return "\033[38;5;196m"
 
 
 # =============================================================================
-# STEP 1: Generate Answer Key from Postgres
+# AUTO-DISCOVERY: Views, Computed Columns, Primary Keys
 # =============================================================================
 
-def generate_answer_key():
-    """Query the view and export all data (including computed columns) to answer-key.json"""
-    print(f"Step 1: Generating answer key from {VIEW_NAME}...", flush=True)
+def to_snake_case(name: str) -> str:
+    """Convert PascalCase to snake_case: FamilyFuedQuestion -> family_fued_question"""
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
-    try:
-        conn = psycopg2.connect(DB_CONNECTION)
+
+def to_pascal_case(name: str) -> str:
+    """Convert snake_case to PascalCase: language_candidates -> LanguageCandidates"""
+    return ''.join(word.capitalize() for word in name.split('_'))
+
+
+def load_rulebook() -> dict:
+    """Load the effortless-rulebook.json file"""
+    if not os.path.exists(RULEBOOK_PATH):
+        print(f"  WARNING: Rulebook not found at {RULEBOOK_PATH}", flush=True)
+        return {}
+    with open(RULEBOOK_PATH, 'r') as f:
+        return json.load(f)
+
+
+def discover_entities(rulebook: dict) -> list:
+    """
+    Discover all entities from the rulebook.
+    Entities are top-level keys that have a 'schema' array.
+    """
+    entities = []
+    skip_keys = {'$schema', 'model_name', 'Description', '_meta'}
+
+    for key, value in rulebook.items():
+        if key in skip_keys:
+            continue
+        if isinstance(value, dict) and 'schema' in value:
+            entities.append(key)
+
+    return entities
+
+
+def get_entity_schema(rulebook: dict, entity_name: str) -> list:
+    """Get the schema array for an entity (handles both PascalCase and snake_case)"""
+    # Try PascalCase first
+    if entity_name in rulebook:
+        return rulebook[entity_name].get('schema', [])
+
+    # Try converting from snake_case
+    pascal_name = to_pascal_case(entity_name)
+    if pascal_name in rulebook:
+        return rulebook[pascal_name].get('schema', [])
+
+    return []
+
+
+def discover_primary_key(rulebook: dict, entity_name: str) -> str:
+    """
+    Discover the primary key for an entity.
+    First non-nullable field, or first field ending in 'Id'.
+    """
+    schema = get_entity_schema(rulebook, entity_name)
+
+    # First try: find first non-nullable field
+    for field in schema:
+        if field.get('nullable') == False:
+            return to_snake_case(field['name'])
+
+    # Second try: find first field ending in 'Id'
+    for field in schema:
+        if field['name'].endswith('Id'):
+            return to_snake_case(field['name'])
+
+    # Fallback: first field
+    if schema:
+        return to_snake_case(schema[0]['name'])
+
+    return None
+
+
+def discover_computed_columns(rulebook: dict, entity_name: str) -> list:
+    """
+    Discover computed columns for an entity.
+    Returns list of snake_case column names where type == "calculated".
+    """
+    schema = get_entity_schema(rulebook, entity_name)
+
+    computed = []
+    for field in schema:
+        if field.get('type') == 'calculated':
+            computed.append(to_snake_case(field['name']))
+
+    return computed
+
+
+def discover_views(conn) -> list:
+    """Query postgres for all vw_* views"""
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT table_name
+        FROM information_schema.views
+        WHERE table_name LIKE 'vw_%'
+        ORDER BY table_name
+    """)
+    views = [row[0] for row in cur.fetchall()]
+    cur.close()
+    return views
+
+
+def view_to_entity_name(view_name: str) -> str:
+    """Convert view name to entity name: vw_language_candidates -> language_candidates"""
+    return view_name.replace('vw_', '')
+
+
+# =============================================================================
+# STEP 1: Generate Answer Keys from Postgres
+# =============================================================================
+
+def generate_all_answer_keys(conn, rulebook: dict) -> dict:
+    """
+    Query all vw_* views and export to answer-keys/{entity}.json.
+    Also generates legacy answer-key.json for backward compatibility.
+    Returns dict of entity_name -> list of records.
+    """
+    print("Step 1: Generating answer keys from all views...", flush=True)
+
+    # Ensure directory exists
+    os.makedirs(ANSWER_KEYS_DIR, exist_ok=True)
+
+    views = discover_views(conn)
+    print(f"  Found {len(views)} views: {', '.join(views)}", flush=True)
+
+    all_answer_keys = {}
+    first_entity_with_computed = None
+
+    for view in views:
+        entity = view_to_entity_name(view)
+        pk = discover_primary_key(rulebook, entity)
+        computed_cols = discover_computed_columns(rulebook, entity)
+
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
-        cur.execute(f"SELECT * FROM {VIEW_NAME} ORDER BY {PRIMARY_KEY}")
+        # Order by primary key if available
+        if pk:
+            cur.execute(f"SELECT * FROM {view} ORDER BY {pk}")
+        else:
+            cur.execute(f"SELECT * FROM {view}")
+
         rows = cur.fetchall()
-
-        # Convert to list of dicts (RealDictCursor returns dict-like rows)
-        answer_key = [dict(row) for row in rows]
-
-        # Write to file
-        with open(ANSWER_KEY_PATH, 'w') as f:
-            json.dump(answer_key, f, indent=2, default=str)
-
-        print(f"  -> Exported {len(answer_key)} records to {ANSWER_KEY_PATH}", flush=True)
-
+        records = [dict(row) for row in rows]
         cur.close()
-        conn.close()
 
-        return answer_key
+        # Save to file
+        output_path = os.path.join(ANSWER_KEYS_DIR, f"{entity}.json")
+        with open(output_path, 'w') as f:
+            json.dump(records, f, indent=2, default=str)
 
-    except Exception as e:
-        print(f"  ERROR: Failed to connect to database: {e}", flush=True)
-        sys.exit(1)
+        all_answer_keys[entity] = records
 
+        # Track first entity with computed columns for legacy file
+        if computed_cols and first_entity_with_computed is None:
+            first_entity_with_computed = entity
 
-# =============================================================================
-# STEP 2: Generate Blank Test (null placeholders for computed columns)
-# =============================================================================
+        print(f"  -> {entity}: {len(records)} records", flush=True)
 
-def generate_blank_test(answer_key):
-    """Set computed columns to null in blank test (keeps structure, clears values)"""
-    print(f"Step 2: Generating blank test (nulling {len(COMPUTED_COLUMNS)} computed columns)...", flush=True)
+    # Generate legacy answer-key.json for backward compatibility
+    if first_entity_with_computed and first_entity_with_computed in all_answer_keys:
+        legacy_path = os.path.join(TESTING_DIR, "answer-key.json")
+        with open(legacy_path, 'w') as f:
+            json.dump(all_answer_keys[first_entity_with_computed], f, indent=2, default=str)
+        print(f"  -> Legacy answer-key.json: {first_entity_with_computed}", flush=True)
 
-    blank_test = []
-    for record in answer_key:
-        blank_record = dict(record)
-        # Set computed columns to null (placeholder for substrate to fill in)
-        for col in COMPUTED_COLUMNS:
-            blank_record[col] = None
-        blank_test.append(blank_record)
-
-    with open(BLANK_TEST_PATH, 'w') as f:
-        json.dump(blank_test, f, indent=2, default=str)
-
-    print(f"  -> Exported {len(blank_test)} records to {BLANK_TEST_PATH}", flush=True)
-    print(f"  -> Nulled columns: {', '.join(COMPUTED_COLUMNS)}", flush=True)
-
-    return blank_test
+    return all_answer_keys
 
 
 # =============================================================================
-# STEP 3: Run Each Substrate's Test
+# STEP 2: Generate Blank Tests (null computed columns)
 # =============================================================================
 
-def get_substrates():
+def generate_all_blank_tests(all_answer_keys: dict, rulebook: dict) -> dict:
+    """
+    Create blank tests by nulling computed columns for each entity.
+    Also generates legacy blank-test.json for backward compatibility.
+    """
+    print("Step 2: Generating blank tests...", flush=True)
+
+    # Ensure directory exists
+    os.makedirs(BLANK_TESTS_DIR, exist_ok=True)
+
+    all_blank_tests = {}
+    entity_metadata = {}
+    first_entity_with_computed = None
+
+    for entity, records in all_answer_keys.items():
+        computed_cols = discover_computed_columns(rulebook, entity)
+        pk = discover_primary_key(rulebook, entity)
+
+        if not computed_cols:
+            print(f"  -> {entity}: No computed columns (skipping blank test)", flush=True)
+            continue
+
+        # Create blank test by nulling computed columns
+        blank_records = []
+        for record in records:
+            blank_record = dict(record)
+            for col in computed_cols:
+                if col in blank_record:
+                    blank_record[col] = None
+            blank_records.append(blank_record)
+
+        # Save to file
+        output_path = os.path.join(BLANK_TESTS_DIR, f"{entity}.json")
+        with open(output_path, 'w') as f:
+            json.dump(blank_records, f, indent=2, default=str)
+
+        all_blank_tests[entity] = blank_records
+
+        # Track metadata for grading context
+        entity_metadata[entity] = {
+            "primary_key": pk,
+            "computed_columns": computed_cols,
+            "record_count": len(blank_records)
+        }
+
+        # Track first entity for legacy file
+        if first_entity_with_computed is None:
+            first_entity_with_computed = entity
+
+        print(f"  -> {entity}: Nulled {len(computed_cols)} columns: {', '.join(computed_cols)}", flush=True)
+
+    # Generate legacy blank-test.json for backward compatibility
+    if first_entity_with_computed and first_entity_with_computed in all_blank_tests:
+        legacy_path = os.path.join(TESTING_DIR, "blank-test.json")
+        with open(legacy_path, 'w') as f:
+            json.dump(all_blank_tests[first_entity_with_computed], f, indent=2, default=str)
+        print(f"  -> Legacy blank-test.json: {first_entity_with_computed}", flush=True)
+
+    # Generate entity metadata for grading context
+    metadata_path = os.path.join(BLANK_TESTS_DIR, "_metadata.json")
+    with open(metadata_path, 'w') as f:
+        json.dump(entity_metadata, f, indent=2)
+    print(f"  -> Entity metadata: {len(entity_metadata)} entities", flush=True)
+
+    return all_blank_tests
+
+
+# =============================================================================
+# STEP 3: Run Substrate Tests
+# =============================================================================
+
+def get_substrates() -> list:
     """Get list of substrate directories"""
     substrates = []
     if os.path.isdir(SUBSTRATES_DIR):
@@ -174,14 +360,52 @@ def get_substrates():
     return substrates
 
 
-def run_substrate_test(substrate_name):
-    """Run a substrate's take-test.sh and return path to test-answers.json with timing"""
+def distribute_blank_tests_to_substrate(substrate_name: str) -> int:
+    """
+    Copy blank tests from testing/blank-tests/ to substrate's blank-tests/ directory.
+    Also clears the substrate's test-answers/ directory.
+    Returns number of test files distributed.
+    """
+    import shutil
+
+    substrate_dir = os.path.join(SUBSTRATES_DIR, substrate_name)
+    substrate_blank_tests = os.path.join(substrate_dir, "blank-tests")
+    substrate_test_answers = os.path.join(substrate_dir, "test-answers")
+
+    # Clear and recreate blank-tests directory
+    if os.path.exists(substrate_blank_tests):
+        shutil.rmtree(substrate_blank_tests)
+    os.makedirs(substrate_blank_tests, exist_ok=True)
+
+    # Clear and recreate test-answers directory
+    if os.path.exists(substrate_test_answers):
+        shutil.rmtree(substrate_test_answers)
+    os.makedirs(substrate_test_answers, exist_ok=True)
+
+    # Copy all blank test files (excluding metadata)
+    count = 0
+    for filename in os.listdir(BLANK_TESTS_DIR):
+        if filename.endswith('.json') and not filename.startswith('_'):
+            src = os.path.join(BLANK_TESTS_DIR, filename)
+            dst = os.path.join(substrate_blank_tests, filename)
+            shutil.copy(src, dst)
+            count += 1
+
+    # Also copy metadata file
+    metadata_src = os.path.join(BLANK_TESTS_DIR, "_metadata.json")
+    if os.path.exists(metadata_src):
+        shutil.copy(metadata_src, os.path.join(substrate_blank_tests, "_metadata.json"))
+
+    return count
+
+
+def run_substrate_test(substrate_name: str) -> tuple:
+    """Run a substrate's take-test.sh and return (success, error, elapsed)"""
     substrate_dir = os.path.join(SUBSTRATES_DIR, substrate_name)
     script_path = os.path.join(substrate_dir, "take-test.sh")
-    answers_path = os.path.join(substrate_dir, "test-answers.json")
 
     if not os.path.exists(script_path):
-        return None, f"No take-test.sh found", 0.0
+        return False, "No take-test.sh found", 0.0
 
     start_time = time.time()
     try:
@@ -190,29 +414,178 @@ def run_substrate_test(substrate_name):
             cwd=substrate_dir,
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=120
         )
         elapsed = time.time() - start_time
 
         if result.returncode != 0:
-            return None, f"Script failed: {result.stderr}", elapsed
+            return False, f"Script failed: {result.stderr[:200]}", elapsed
 
-        if not os.path.exists(answers_path):
-            return None, f"No test-answers.json generated", elapsed
-
-        return answers_path, None, elapsed
+        return True, None, elapsed
 
     except subprocess.TimeoutExpired:
         elapsed = time.time() - start_time
-        return None, "Script timed out", elapsed
+        return False, "Script timed out", elapsed
     except Exception as e:
         elapsed = time.time() - start_time
-        return None, str(e), elapsed
+        return False, str(e), elapsed
 
 
-def run_and_grade_all_substrates(answer_key):
-    """Run and grade each substrate, showing results immediately after each test"""
-    print(f"Step 3: Running and grading tests for each substrate...", flush=True)
+def get_substrate_answers(substrate_name: str, rulebook: dict) -> dict:
+    """
+    Get all test-answers from a substrate.
+    Returns dict of entity_name -> list of records.
+    """
+    substrate_dir = os.path.join(SUBSTRATES_DIR, substrate_name)
+    answers_dir = os.path.join(substrate_dir, "test-answers")
+
+    # Check for new multi-entity structure
+    if os.path.isdir(answers_dir):
+        answers = {}
+        for file in glob.glob(os.path.join(answers_dir, "*.json")):
+            entity = os.path.basename(file).replace('.json', '')
+            try:
+                with open(file, 'r') as f:
+                    answers[entity] = json.load(f)
+            except:
+                pass
+        if answers:
+            return answers
+
+    # Fall back to old single-file structure (test-answers.json)
+    old_path = os.path.join(substrate_dir, "test-answers.json")
+    if os.path.exists(old_path):
+        try:
+            with open(old_path, 'r') as f:
+                records = json.load(f)
+
+            if records:
+                # Try to identify entity from record keys
+                sample = records[0] if records else {}
+
+                # Find first entity with computed columns that matches record keys
+                for entity_file in glob.glob(os.path.join(BLANK_TESTS_DIR, "*.json")):
+                    entity = os.path.basename(entity_file).replace('.json', '')
+                    pk = discover_primary_key(rulebook, entity)
+                    if pk and pk in sample:
+                        return {entity: records}
+
+                # Fallback: use first entity with computed columns
+                for entity_file in glob.glob(os.path.join(BLANK_TESTS_DIR, "*.json")):
+                    entity = os.path.basename(entity_file).replace('.json', '')
+                    return {entity: records}
+        except:
+            pass
+
+    return {}
+
+
+# =============================================================================
+# STEP 4: Grade Substrates (Generic Field-by-Field Comparison)
+# =============================================================================
+
+def compare_values(expected, actual) -> bool:
+    """Compare two values, handling type differences"""
+    return str(expected) == str(actual)
+
+
+def grade_substrate(substrate_name: str, all_answer_keys: dict, rulebook: dict) -> dict:
+    """
+    Grade a substrate's answers against all answer keys.
+    Returns detailed results per entity.
+    """
+    results = {
+        "substrate": substrate_name,
+        "entities": {},
+        "total_fields_tested": 0,
+        "fields_passed": 0,
+        "fields_failed": 0,
+        "error": None,
+        "elapsed_seconds": 0.0
+    }
+
+    # Get substrate's answers
+    substrate_answers = get_substrate_answers(substrate_name, rulebook)
+
+    if not substrate_answers:
+        results["error"] = "No test-answers found"
+        return results
+
+    # Grade each entity the substrate attempted
+    for entity, test_records in substrate_answers.items():
+        if entity not in all_answer_keys:
+            continue
+
+        answer_key = all_answer_keys[entity]
+        computed_cols = discover_computed_columns(rulebook, entity)
+        pk = discover_primary_key(rulebook, entity)
+
+        if not computed_cols:
+            continue  # Nothing to test
+
+        # Index test answers by primary key
+        answers_by_pk = {}
+        for record in test_records:
+            pk_val = record.get(pk)
+            if pk_val is not None:
+                answers_by_pk[str(pk_val)] = record
+
+        entity_result = {
+            "total_records": len(answer_key),
+            "computed_columns": computed_cols,
+            "primary_key": pk,
+            "fields_tested": 0,
+            "fields_passed": 0,
+            "fields_failed": 0,
+            "failures": []
+        }
+
+        # Compare each record
+        for expected_record in answer_key:
+            pk_val = str(expected_record.get(pk))
+            actual_record = answers_by_pk.get(pk_val, {})
+
+            for col in computed_cols:
+                entity_result["fields_tested"] += 1
+                results["total_fields_tested"] += 1
+
+                expected_val = expected_record.get(col)
+                actual_val = actual_record.get(col)
+
+                if compare_values(expected_val, actual_val):
+                    entity_result["fields_passed"] += 1
+                    results["fields_passed"] += 1
+                else:
+                    entity_result["fields_failed"] += 1
+                    results["fields_failed"] += 1
+                    entity_result["failures"].append({
+                        "pk": pk_val,
+                        "field": col,
+                        "expected": expected_val,
+                        "actual": actual_val
+                    })
+
+        # Skip entities with 0% (not attempted - all nulls still)
+        if entity_result["fields_passed"] == 0 and entity_result["fields_failed"] > 0:
+            # Check if all actuals are None (substrate didn't fill them in)
+            all_none = all(
+                f["actual"] is None or f["actual"] == "None"
+                for f in entity_result["failures"]
+            )
+            if all_none:
+                # Substrate didn't attempt this entity, remove from totals
+                results["total_fields_tested"] -= entity_result["fields_tested"]
+                results["fields_failed"] -= entity_result["fields_failed"]
+                continue
+
+        results["entities"][entity] = entity_result
+
+    return results
+
+
+def run_and_grade_all_substrates(all_answer_keys: dict, rulebook: dict) -> dict:
+    """Run and grade each substrate"""
+    print("Step 3: Running and grading tests for each substrate...", flush=True)
     print(flush=True)
 
     substrates = get_substrates()
@@ -222,142 +595,36 @@ def run_and_grade_all_substrates(answer_key):
     all_grades = {}
 
     for i, substrate in enumerate(substrates, 1):
-        # Print substrate header (flush immediately so it appears before the test runs)
         print(f"  [{i}/{len(substrates)}] Testing {substrate}...", flush=True)
 
-        # Run the test (now returns timing)
-        answers_path, error, elapsed = run_substrate_test(substrate)
+        # Distribute blank tests to substrate directory
+        test_count = distribute_blank_tests_to_substrate(substrate)
+        print(f"      Distributed {test_count} blank tests to {substrate}/blank-tests/", flush=True)
+
+        # Run the test
+        success, error, elapsed = run_substrate_test(substrate)
 
         # Grade the results
-        grades = grade_substrate(substrate, answer_key, answers_path)
+        grades = grade_substrate(substrate, all_answer_keys, rulebook)
         if error:
             grades["error"] = error
         grades["elapsed_seconds"] = elapsed
 
         all_grades[substrate] = grades
 
-        # Generate the report file
-        generate_substrate_report(substrate, grades)
-
-        # Print the summary box immediately
-        print_substrate_test_summary(substrate, grades)
-
-        # Add vertical spacing after each substrate for visual isolation
-        print("\n" * 10, flush=True)
-
-    return all_grades
-
-
-def grade_all_substrates(answer_key, substrate_results):
-    """
-    Grade all substrates and generate reports.
-    Used by orchestrate.sh which handles running tests separately.
-    """
-    all_grades = {}
-
-    for substrate_name, run_result in substrate_results.items():
-        answers_path = run_result.get("answers_path")
-
-        grades = grade_substrate(substrate_name, answer_key, answers_path)
-
-        if run_result.get("error"):
-            grades["error"] = run_result["error"]
-
-        # Include timing if provided
-        grades["elapsed_seconds"] = run_result.get("elapsed_seconds", 0.0)
-
-        all_grades[substrate_name] = grades
-
-        generate_substrate_report(substrate_name, grades)
-
-        # Print detailed test summary for this substrate
-        print_substrate_test_summary(substrate_name, grades)
+        # Generate report and print summary
+        generate_substrate_report(substrate, grades, rulebook)
+        print_substrate_test_summary(substrate, grades, rulebook)
+        print("\n" * 5, flush=True)
 
     return all_grades
 
 
 # =============================================================================
-# STEP 4: Grade Each Substrate (Generic Field-by-Field Comparison)
+# Reporting Functions
 # =============================================================================
 
-def load_json(path):
-    """Load JSON file, return empty list if error"""
-    try:
-        with open(path, 'r') as f:
-            return json.load(f)
-    except:
-        return []
-
-
-def compare_values(expected, actual):
-    """Compare two values, handling type differences"""
-    # Convert both to strings for comparison (handles int vs str, etc.)
-    return str(expected) == str(actual)
-
-
-def grade_substrate(substrate_name, answer_key, answers_path):
-    """
-    Compare substrate's answers against answer key.
-    Returns dict with detailed results.
-
-    THIS IS GENERIC - no domain-specific logic.
-    Just compares field-by-field whatever is in the JSON.
-    """
-    results = {
-        "substrate": substrate_name,
-        "total_records": len(answer_key),
-        "total_fields_tested": 0,
-        "fields_passed": 0,
-        "fields_failed": 0,
-        "failures": [],
-        "error": None,
-        "elapsed_seconds": 0.0  # Will be set by caller
-    }
-
-    if not answers_path:
-        results["error"] = "No answers file"
-        return results
-
-    test_answers = load_json(answers_path)
-
-    if not test_answers:
-        results["error"] = "Could not load answers or empty file"
-        return results
-
-    # Index test answers by primary key for lookup
-    answers_by_pk = {}
-    for record in test_answers:
-        pk = record.get(PRIMARY_KEY)
-        if pk is not None:
-            answers_by_pk[str(pk)] = record
-
-    # Compare each record, field by field
-    for expected_record in answer_key:
-        pk = str(expected_record.get(PRIMARY_KEY))
-        actual_record = answers_by_pk.get(pk, {})
-
-        # Only check computed columns (those are what substrates must produce)
-        for field in COMPUTED_COLUMNS:
-            results["total_fields_tested"] += 1
-
-            expected_val = expected_record.get(field)
-            actual_val = actual_record.get(field)
-
-            if compare_values(expected_val, actual_val):
-                results["fields_passed"] += 1
-            else:
-                results["fields_failed"] += 1
-                results["failures"].append({
-                    PRIMARY_KEY: pk,
-                    "field": field,
-                    "expected": expected_val,
-                    "actual": actual_val
-                })
-
-    return results
-
-
-def format_duration(seconds):
+def format_duration(seconds: float) -> str:
     """Format duration in human-readable form"""
     if seconds < 1:
         return f"{seconds * 1000:.0f}ms"
@@ -369,7 +636,7 @@ def format_duration(seconds):
         return f"{mins}m {secs:.1f}s"
 
 
-def generate_substrate_report(substrate_name, results):
+def generate_substrate_report(substrate_name: str, results: dict, rulebook: dict):
     """Generate test-results.md for a substrate"""
     substrate_dir = os.path.join(SUBSTRATES_DIR, substrate_name)
     report_path = os.path.join(substrate_dir, "test-results.md")
@@ -385,8 +652,8 @@ def generate_substrate_report(substrate_name, results):
         "",
         "## Summary",
         "",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Total Fields Tested | {total} |",
         f"| Passed | {passed} |",
         f"| Failed | {failed} |",
@@ -399,49 +666,62 @@ def generate_substrate_report(substrate_name, results):
         lines.extend([
             "## Error",
             "",
-            f"```",
+            "```",
             results["error"],
-            f"```",
+            "```",
             "",
         ])
 
-    if results["failures"]:
+    # Per-entity breakdown
+    if results.get("entities"):
         lines.extend([
-            "## Failures",
+            "## Results by Entity",
             "",
-            f"| {PRIMARY_KEY} | Field | Expected | Actual |",
-            f"|---------------|-------|----------|--------|",
         ])
 
-        # Show first 50 failures to keep report manageable
-        for failure in results["failures"][:50]:
-            pk = failure[PRIMARY_KEY]
-            field = failure["field"]
-            expected = str(failure["expected"])[:40]
-            actual = str(failure["actual"])[:40]
-            lines.append(f"| {pk} | {field} | {expected} | {actual} |")
+        for entity, entity_result in results["entities"].items():
+            e_total = entity_result["fields_tested"]
+            e_passed = entity_result["fields_passed"]
+            e_score = (e_passed / e_total * 100) if e_total > 0 else 0
 
-        if len(results["failures"]) > 50:
-            lines.append(f"| ... | ... | ({len(results['failures']) - 50} more failures) | ... |")
+            lines.extend([
+                f"### {entity}",
+                "",
+                f"- Fields: {e_passed}/{e_total} ({e_score:.1f}%)",
+                f"- Computed columns: {', '.join(entity_result['computed_columns'])}",
+                "",
+            ])
 
-        lines.append("")
+            if entity_result["failures"]:
+                lines.extend([
+                    "| PK | Field | Expected | Actual |",
+                    "|-----|-------|----------|--------|",
+                ])
+                for failure in entity_result["failures"][:20]:
+                    pk = failure["pk"]
+                    field = failure["field"]
+                    expected = str(failure["expected"])[:30]
+                    actual = str(failure["actual"])[:30]
+                    lines.append(f"| {pk} | {field} | {expected} | {actual} |")
+
+                if len(entity_result["failures"]) > 20:
+                    lines.append(f"| ... | ... | ({len(entity_result['failures']) - 20} more) | ... |")
+                lines.append("")
 
     with open(report_path, 'w') as f:
         f.write('\n'.join(lines))
 
-    return report_path
 
-
-def print_substrate_test_summary(substrate_name, grades):
+def print_substrate_test_summary(substrate_name: str, grades: dict, rulebook: dict):
     """Print a per-test breakdown for a substrate to console"""
     total = grades["total_fields_tested"]
     passed = grades["fields_passed"]
     failed = grades["fields_failed"]
-    execution_failed = grades.get("execution_failed", False) or (grades.get("error") and total == 0)
+    execution_failed = grades.get("error") and total == 0
     score = (passed / total * 100) if total > 0 else 0
     elapsed = grades.get("elapsed_seconds", 0.0)
 
-    # Determine status with color
+    # Determine status
     if execution_failed:
         status_plain = "FAILED TO COMPUTE"
     elif grades.get("error"):
@@ -451,11 +731,9 @@ def print_substrate_test_summary(substrate_name, grades):
     else:
         status_plain = "FAIL"
 
-    # Get gradient color for score
     score_color = get_score_color(score)
 
-    # Print header with sky-blue background (or red for execution failures)
-    box_width = 52
+    box_width = 60
     if execution_failed:
         header_bg = RED_BG
         header_text = WHITE_TEXT
@@ -466,7 +744,6 @@ def print_substrate_test_summary(substrate_name, grades):
     print(f"  {header_bg}{header_text}┌{'─' * box_width}┐{RESET}", flush=True)
     print(f"  {header_bg}{header_text}│{BOLD} {substrate_name.upper():^{box_width - 2}} {RESET}{header_bg}{header_text}│{RESET}", flush=True)
 
-    # Score line with timing
     duration_str = format_duration(elapsed)
     if execution_failed:
         score_text = f"Score: --/-- (--%) - {status_plain}"
@@ -474,69 +751,74 @@ def print_substrate_test_summary(substrate_name, grades):
     else:
         score_text = f"Score: {passed}/{total} ({score:.1f}%) - {status_plain}"
         print(f"  {header_bg}{header_text}│ {score_color}{BOLD}{score_text:^{box_width - 2}}{RESET}{header_bg}{header_text} │{RESET}", flush=True)
-    # Duration line
+
     duration_text = f"Duration: {duration_str}"
     print(f"  {header_bg}{header_text}│ {duration_text:^{box_width - 2}} │{RESET}", flush=True)
     print(f"  {header_bg}{header_text}├{'─' * box_width}┤{RESET}", flush=True)
 
-    # Group failures by field
-    failures_by_field = {}
-    for failure in grades.get("failures", []):
-        field = failure.get("field")
-        if field not in failures_by_field:
-            failures_by_field[field] = 0
-        failures_by_field[field] += 1
+    # Print per-entity results
+    for entity, entity_result in grades.get("entities", {}).items():
+        e_total = entity_result["fields_tested"]
+        e_passed = entity_result["fields_passed"]
+        e_failed = entity_result["fields_failed"]
+        e_score = (e_passed / e_total * 100) if e_total > 0 else 0
 
-    # Print per-test results with colored row backgrounds
-    for col in COMPUTED_COLUMNS:
-        col_failures = failures_by_field.get(col, 0)
-        col_total = grades["total_records"]
-
-        if execution_failed:
-            # Execution failed - show -- for all
-            row_bg = RED_BG
-            icon = "✗"
-            result_padded = "-- (NO DATA)"
-            text_color = RED
-        elif col_failures == 0 and not grades.get("error"):
-            # Passing test - green background
+        if e_failed == 0:
             row_bg = GREEN_BG
             icon = "✓"
-            result_padded = "PASS"
+            result_str = "PASS"
             text_color = GREEN
         else:
-            # Failing test - red background
             row_bg = RED_BG
             icon = "✗"
-            result_padded = f"FAIL ({col_failures}/{col_total})"
+            result_str = f"FAIL ({e_failed}/{e_total})"
             text_color = RED
 
-        # Truncate column name if too long
-        col_display = col[:30] if len(col) > 30 else col
-        # Render the entire row with colored background
-        row_content = f"  {icon} {col_display:<32} {result_padded:>12} "
+        entity_display = entity[:35] if len(entity) > 35 else entity
+        row_content = f"  {icon} {entity_display:<40} {result_str:>12} "
         print(f"  {row_bg}{WHITE_TEXT}│{row_content}│{RESET}", flush=True)
+
+        # Show per-column breakdown
+        failures_by_col = {}
+        for f in entity_result.get("failures", []):
+            col = f["field"]
+            failures_by_col[col] = failures_by_col.get(col, 0) + 1
+
+        for col in entity_result["computed_columns"]:
+            col_failures = failures_by_col.get(col, 0)
+            if col_failures == 0:
+                col_status = f"{GREEN}✓{RESET}"
+            else:
+                col_status = f"{RED}{col_failures}{RESET}"
+            col_display = col[:30] if len(col) > 30 else col
+            print(f"  {header_bg}{header_text}│     {col_display:<40} {col_status:>18} │{RESET}", flush=True)
+
+    if execution_failed:
+        error_msg = grades.get("error", "Unknown error")[:50]
+        print(f"  {RED_BG}{WHITE_TEXT}│ ERROR: {error_msg:<{box_width - 9}} │{RESET}", flush=True)
 
     print(f"  {header_bg}{header_text}└{'─' * box_width}┘{RESET}", flush=True)
     print(flush=True)
 
 
-# =============================================================================
-# STEP 4: Generate Summary Report
-# =============================================================================
-
-def generate_summary_report(all_grades):
+def generate_summary_report(all_grades: dict, rulebook: dict):
     """Generate all-tests-results.md with summary of all substrates"""
-    print(f"Step 4: Generating summary report...", flush=True)
+    print("Step 4: Generating summary report...", flush=True)
+
+    # Collect all computed columns across all entities
+    all_computed_cols = set()
+    for substrate_grades in all_grades.values():
+        for entity_result in substrate_grades.get("entities", {}).values():
+            all_computed_cols.update(entity_result.get("computed_columns", []))
 
     lines = [
         "# Test Orchestrator Results",
         "",
         "## Configuration",
         "",
-        f"- **View:** `{VIEW_NAME}`",
-        f"- **Primary Key:** `{PRIMARY_KEY}`",
-        f"- **Computed Columns:** {len(COMPUTED_COLUMNS)}",
+        f"- **Rulebook:** `{RULEBOOK_PATH}`",
+        f"- **Substrates Tested:** {len(all_grades)}",
+        f"- **Computed Columns Tested:** {len(all_computed_cols)}",
         "",
         "## Summary by Substrate",
         "",
@@ -578,8 +860,8 @@ def generate_summary_report(all_grades):
         "",
         "## Overall Statistics",
         "",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Total Substrates | {len(all_grades)} |",
         f"| Total Fields Tested | {total_tests} |",
         f"| Total Passed | {total_passed} |",
@@ -587,76 +869,9 @@ def generate_summary_report(all_grades):
         f"| Overall Score | {overall_score:.1f}% |",
         f"| Total Duration | {format_duration(total_time)} |",
         "",
-    ])
-
-    # Summary by Test (computed column)
-    lines.extend([
-        "## Summary by Test",
-        "",
-        "| Test (Computed Column) | Substrates Passing | Substrates Failing | Pass Rate |",
-        "|------------------------|--------------------|--------------------|-----------|",
-    ])
-
-    # Calculate per-test statistics
-    for col in COMPUTED_COLUMNS:
-        passing_substrates = []
-        failing_substrates = []
-
-        for substrate_name in sorted(all_grades.keys()):
-            grades = all_grades[substrate_name]
-            # Count failures for this specific column
-            col_failures = [f for f in grades.get("failures", []) if f.get("field") == col]
-
-            if len(col_failures) == 0 and not grades.get("error"):
-                passing_substrates.append(substrate_name)
-            else:
-                failing_substrates.append(substrate_name)
-
-        total_substrates = len(all_grades)
-        pass_rate = (len(passing_substrates) / total_substrates * 100) if total_substrates > 0 else 0
-
-        lines.append(f"| `{col}` | {len(passing_substrates)} | {len(failing_substrates)} | {pass_rate:.1f}% |")
-
-    lines.extend([
-        "",
-        "### Test Details",
-        "",
-    ])
-
-    # Detailed breakdown for each test
-    for col in COMPUTED_COLUMNS:
-        passing_substrates = []
-        failing_substrates = []
-
-        for substrate_name in sorted(all_grades.keys()):
-            grades = all_grades[substrate_name]
-            col_failures = [f for f in grades.get("failures", []) if f.get("field") == col]
-
-            if len(col_failures) == 0 and not grades.get("error"):
-                passing_substrates.append(substrate_name)
-            else:
-                failing_substrates.append(substrate_name)
-
-        lines.append(f"**`{col}`**")
-        if passing_substrates:
-            lines.append(f"- Passing: {', '.join(passing_substrates)}")
-        if failing_substrates:
-            lines.append(f"- Failing: {', '.join(failing_substrates)}")
-        lines.append("")
-
-    lines.extend([
-        "## Computed Columns Being Tested",
-        "",
-    ])
-
-    for col in COMPUTED_COLUMNS:
-        lines.append(f"- `{col}`")
-
-    lines.extend([
-        "",
         "---",
         "",
-        "*Generated by test-orchestrator.py*",
+        "*Generated by test-orchestrator.py (generic/domain-agnostic)*",
     ])
 
     with open(SUMMARY_PATH, 'w') as f:
@@ -668,172 +883,57 @@ def generate_summary_report(all_grades):
     return total_passed, total_failed, total_tests, overall_score
 
 
-def split_column_name(name, max_lines=3):
-    """Split a column name by underscores into multiple lines, centered.
-
-    Ensures at least max_lines lines are returned (padded with empty strings).
-    """
-    parts = name.replace('_', '\n').split('\n')
-    # Pad to ensure we have at least max_lines
-    while len(parts) < max_lines:
-        parts.insert(0, '')  # Add empty lines at the beginning
-    return parts[-max_lines:]  # Return only the last max_lines
-
-
-def print_final_summary_table(all_grades):
-    """Print a final summary table to console showing all substrates"""
+def print_final_summary_table(all_grades: dict, rulebook: dict):
+    """Print a final summary table to console"""
     print(flush=True)
-    print("=" * 70, flush=True)
+    print("=" * 80, flush=True)
     print(f"{BOLD}FINAL RESULTS SUMMARY{RESET}", flush=True)
-    print("=" * 70, flush=True)
+    print("=" * 80, flush=True)
     print(flush=True)
 
-    # Calculate column widths
-    substrate_width = 15
-    test_width = 12  # Wider to accommodate longer column name parts
-    duration_width = 10  # For duration column
-    status_width = 18  # Wide enough for "FAILED TO COMPUTE"
+    # Header
+    print(f"{'Substrate':<20} {'Passed':>8} {'Failed':>8} {'Total':>8} {'Score':>8} {'Duration':>10} {'Status':>12}", flush=True)
+    print("-" * 80, flush=True)
 
-    # Build multi-line header (3 lines for column names)
-    header_lines = [[], [], []]
-    col_name_parts = []
-
-    for col in COMPUTED_COLUMNS:
-        parts = split_column_name(col, max_lines=3)
-        col_name_parts.append(parts)
-
-    # Print 3-line header
-    for line_idx in range(3):
-        if line_idx == 1:
-            # Middle line includes "Substrate" label
-            line = f"{'Substrate':<{substrate_width}}"
-        else:
-            line = f"{'':<{substrate_width}}"
-
-        for parts in col_name_parts:
-            line += f" │ {parts[line_idx]:^{test_width}}"
-
-        # Add Total/Score/Duration/Status on middle line only
-        if line_idx == 1:
-            line += f" │ {'Total':^8} │ {'Score':^7} │ {'Duration':^{duration_width}} │ {'Status':^{status_width}}"
-        else:
-            line += f" │ {'':^8} │ {'':^7} │ {'':^{duration_width}} │ {'':^{status_width}}"
-
-        print(line, flush=True)
-
-    # Calculate header width for separator
-    header_width = substrate_width + (len(COMPUTED_COLUMNS) * (test_width + 3)) + 8 + 3 + 7 + 3 + duration_width + 3 + status_width + 3
-    print("─" * header_width, flush=True)
-
-    # Data rows
     total_passed = 0
     total_failed = 0
     total_time = 0.0
-    failed_substrates = []
 
-    # Sort substrates by score (highest to lowest)
-    def get_substrate_score(name):
-        grades = all_grades[name]
-        passed = grades["fields_passed"]
-        total = grades["total_fields_tested"]
-        return (passed / total * 100) if total > 0 else 0
+    # Sort by score
+    def get_score(name):
+        g = all_grades[name]
+        p = g["fields_passed"]
+        t = g["total_fields_tested"]
+        return (p / t * 100) if t > 0 else 0
 
-    for substrate_name in sorted(all_grades.keys(), key=get_substrate_score, reverse=True):
+    for substrate_name in sorted(all_grades.keys(), key=get_score, reverse=True):
         grades = all_grades[substrate_name]
-        has_error = grades.get("error") is not None
-        execution_failed = grades.get("execution_failed", False) or (has_error and grades.get("total_fields_tested", 0) == 0)
-        elapsed = grades.get("elapsed_seconds", 0.0)
-        total_time += elapsed
-
-        # Track failed substrates (execution failures only)
-        if execution_failed:
-            failed_substrates.append(substrate_name)
-
-        # Group failures by field
-        failures_by_field = {}
-        for failure in grades.get("failures", []):
-            field = failure.get("field")
-            if field not in failures_by_field:
-                failures_by_field[field] = 0
-            failures_by_field[field] += 1
-
-        # Print substrate name (with strikethrough if execution failed)
-        if execution_failed:
-            print(f"{RED}{STRIKETHROUGH}{substrate_name:<{substrate_width}}{RESET}", end="", flush=True)
-        else:
-            print(f"{substrate_name:<{substrate_width}}", end="", flush=True)
-
-        substrate_passed = 0
-        substrate_total = 0
-
-        for col in COMPUTED_COLUMNS:
-            col_failures = failures_by_field.get(col, 0)
-            col_total = grades["total_records"]
-
-            substrate_passed += (col_total - col_failures)
-            substrate_total += col_total
-
-            if execution_failed:
-                # Show -- for execution failures (we have no data)
-                cell_str = "--"
-                padding = (test_width - len(cell_str)) // 2
-                print(f" │ {' ' * padding}{RED}{DIM}{cell_str}{RESET}{' ' * (test_width - padding - len(cell_str))}", end="", flush=True)
-            elif col_failures == 0:
-                # Center the checkmark with padding
-                padding = (test_width - 1) // 2
-                print(f" │ {' ' * padding}{GREEN}✓{RESET}{' ' * (test_width - padding - 1)}", end="", flush=True)
-            else:
-                # Center the failure count with padding
-                cell_str = str(col_failures)
-                padding = (test_width - len(cell_str)) // 2
-                print(f" │ {' ' * padding}{RED}{cell_str}{RESET}{' ' * (test_width - padding - len(cell_str))}", end="", flush=True)
-
-        # For execution failures, don't count towards totals
-        if not execution_failed:
-            total_passed += substrate_passed
-            total_failed += (substrate_total - substrate_passed)
-
         passed = grades["fields_passed"]
+        failed = grades["fields_failed"]
         total = grades["total_fields_tested"]
         score = (passed / total * 100) if total > 0 else 0
-        duration_str = format_duration(elapsed)
+        elapsed = grades.get("elapsed_seconds", 0.0)
 
-        # Use gradient color for score
+        total_passed += passed
+        total_failed += failed
+        total_time += elapsed
+
         score_color = get_score_color(score)
 
-        # Status column (with duration)
-        if execution_failed:
-            status_text = "FAILED TO COMPUTE"
-            # Show --/-- for total since we have no data
-            print(f" │ {'--':>3}/{'--':<3} │ {RED}{DIM}{'--':>5}%{RESET} │ {duration_str:>{duration_width}} │ {RED}{BOLD}{status_text:^{status_width}}{RESET}", flush=True)
-        elif grades["fields_failed"] == 0:
-            status_text = "PASS"
-            print(f" │ {passed:>3}/{total:<3} │ {score_color}{score:>5.1f}%{RESET} │ {duration_str:>{duration_width}} │ {GREEN}{status_text:^{status_width}}{RESET}", flush=True)
+        if grades.get("error") and total == 0:
+            status = f"{RED}FAILED{RESET}"
+        elif failed == 0:
+            status = f"{GREEN}PASS{RESET}"
         else:
-            status_text = "PARTIAL"
-            print(f" │ {passed:>3}/{total:<3} │ {score_color}{score:>5.1f}%{RESET} │ {duration_str:>{duration_width}} │ {YELLOW}{status_text:^{status_width}}{RESET}", flush=True)
+            status = f"{YELLOW}PARTIAL{RESET}"
 
-    print("─" * header_width, flush=True)
+        print(f"{substrate_name:<20} {passed:>8} {failed:>8} {total:>8} {score_color}{score:>7.1f}%{RESET} {format_duration(elapsed):>10} {status:>12}", flush=True)
 
-    # Overall totals
+    print("-" * 80, flush=True)
     overall_total = total_passed + total_failed
     overall_score = (total_passed / overall_total * 100) if overall_total > 0 else 0
-    total_duration_str = f"{total_time:.1f}s"
-    print(f"{BOLD}{'OVERALL':<{substrate_width}}{RESET}", end="", flush=True)
-    for _ in COMPUTED_COLUMNS:
-        print(f" │ {'':^{test_width}}", end="", flush=True)
-    print(f" │ {total_passed:>3}/{overall_total:<3} │ {BOLD}{overall_score:>5.1f}%{RESET} │ {BOLD}{total_duration_str:>{duration_width}}{RESET} │ {' ':^{status_width}}", flush=True)
+    print(f"{BOLD}{'OVERALL':<20}{RESET} {total_passed:>8} {total_failed:>8} {overall_total:>8} {BOLD}{overall_score:>7.1f}%{RESET} {format_duration(total_time):>10}", flush=True)
     print(flush=True)
-
-    # Print failed substrates summary if any
-    if failed_substrates:
-        print(f"{RED}{'─' * 70}{RESET}", flush=True)
-        print(f"{RED}{BOLD}⚠️  FAILED TO EXECUTE ({len(failed_substrates)} substrates):{RESET}", flush=True)
-        print(flush=True)
-        for substrate_name in failed_substrates:
-            error_msg = all_grades[substrate_name].get("error", "Unknown error")
-            print(f"  {RED}✗{RESET} {BOLD}{substrate_name}{RESET}: {DIM}{error_msg}{RESET}", flush=True)
-        print(flush=True)
 
 
 # =============================================================================
@@ -842,30 +942,48 @@ def print_final_summary_table(all_grades):
 
 def main():
     print("=" * 60, flush=True)
-    print("TEST ORCHESTRATOR", flush=True)
+    print("TEST ORCHESTRATOR (Generic / Domain-Agnostic)", flush=True)
     print("=" * 60, flush=True)
     print(flush=True)
 
-    # Step 1: Generate answer key from Postgres
-    answer_key = generate_answer_key()
+    # Load rulebook
+    rulebook = load_rulebook()
+    entities = discover_entities(rulebook)
+    print(f"Discovered {len(entities)} entities in rulebook: {', '.join(entities)}", flush=True)
     print(flush=True)
 
-    # Step 2: Generate blank test
-    generate_blank_test(answer_key)
+    # Connect to database
+    try:
+        conn = psycopg2.connect(DB_CONNECTION)
+        print(f"Connected to database", flush=True)
+    except Exception as e:
+        print(f"ERROR: Failed to connect to database: {e}", flush=True)
+        print(f"  Connection string: {DB_CONNECTION}", flush=True)
+        sys.exit(1)
+
     print(flush=True)
 
-    # Step 3: Run and grade each substrate (shows summary after each test)
-    all_grades = run_and_grade_all_substrates(answer_key)
+    # Step 1: Generate answer keys from all views
+    all_answer_keys = generate_all_answer_keys(conn, rulebook)
+    print(flush=True)
+
+    conn.close()
+
+    # Step 2: Generate blank tests
+    generate_all_blank_tests(all_answer_keys, rulebook)
+    print(flush=True)
+
+    # Step 3: Run and grade each substrate
+    all_grades = run_and_grade_all_substrates(all_answer_keys, rulebook)
     print(flush=True)
 
     # Step 4: Generate summary report
-    # Breathing room before summary
-    print("\n" * 5, flush=True)
-    generate_summary_report(all_grades)
+    print("\n" * 3, flush=True)
+    generate_summary_report(all_grades, rulebook)
     print(flush=True)
 
-    # Step 5: Print final summary table to console
-    print_final_summary_table(all_grades)
+    # Step 5: Print final summary table
+    print_final_summary_table(all_grades, rulebook)
 
     print("=" * 60, flush=True)
     print("DONE", flush=True)

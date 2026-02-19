@@ -1,26 +1,93 @@
-language_candidate_id,name,category,family_fued_question,top_family_feud_answer,chosen_language_candidate,family_feud_mismatch,has_syntax,has_identity,can_be_held,has_grammar,requires_parsing,resolves_to_an_ast,has_linear_decoding_pressure,is_stable_ontology_reference,is_live_ontology_editor,is_open_world,is_closed_world,is_description_of,distance_from_concept,is_open_closed_world_conflicted,dimensionality_while_editing,relationship_to_concept,model_object_facility_layer,sort_order
-falsifier-a,Falsifier A,MISSING: Have you seen this Language?,Is Falsifier A a language?,true,false,"Falsifier A Is a Family Feud Language, but Is Not marked as a 'Language Candidate.'",true,false,false,true,true,true,true,true,false,false,false,,2,false,N/A,IsDescriptionOf,M1,0
-falsifier-b,Falsifier B,MISSING: Have you seen this Language?,Is Falsifier B a language?,false,true,"Falsifier B Isn't a Family Feud Language, but Is marked as a 'Language Candidate.'",false,true,true,false,true,true,false,true,false,false,false,,1,false,N/A,IsMirrorOf,NA,1
-falsifier-c,Falsifier C,MISSING: Have you seen this Language?,Is Falsifier C a language?,true,true, - Open World vs. Closed World Conflict.,true,false,false,true,true,true,true,true,false,true,true,,2,true,OneDimensionalSymbolic,IsDescriptionOf,M1,2
-english,English,Natural Language,Is English a language?,true,true,,true,false,false,true,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,3
-airtable-editing,Airtable - Editing,Running Software,Is Airtable - Editing a language?,false,false,,false,true,false,false,false,true,false,true,true,false,true,,2,false,MultiDimensionalNonSymbolic,IsDescriptionOf,M4,3
-spoken-words,Spoken Words,Natural Language,Is Spoken Words a language?,true,true,,true,false,false,true,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,4
-a-coffee-mug,A Coffee Mug,Physical Object,Is A Coffee Mug a language?,false,false,,false,true,true,false,false,false,false,false,false,false,true,,1,false,N/A,IsMirrorOf,NA,5
-a-game-of-fortnite,A Game of Fortnite,Running Software,Is A Game of Fortnite a language?,false,false,,false,true,false,false,true,false,false,false,false,false,true,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,6
-sign-language,Sign Language,Natural Language,Is Sign Language a language?,true,true,,true,false,false,true,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,7
-python,Python,Formal Language,Is Python a language?,true,true,,true,false,false,true,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,8
-a-smartphone,A Smartphone,Physical Object,Is A Smartphone a language?,false,false,,false,true,true,false,false,false,true,false,false,false,true,,1,false,N/A,IsMirrorOf,NA,9
-a-running-app,A Running App ,Running Software,Is A Running App  a language?,false,false,,false,true,false,false,true,false,true,false,true,false,true,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,22
-an-xlsx-doc,An XLSX Doc,Formal Language,Is An XLSX Doc a language?,true,true,,true,false,false,true,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,23
-xlsx-editing,XLSX - Editing,Running Software,Is XLSX - Editing a language?,false,false,,false,false,false,false,false,true,false,false,true,false,false,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,24
-an-docx-doc,An DOCX Doc,Formal Language,Is An DOCX Doc a language?,true,true,,true,false,false,true,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,25
-docx-editing,DOCX - Editing,Running Software,Is DOCX - Editing a language?,false,false,,false,false,false,false,false,false,false,true,true,false,false,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,25
-a-csv-file,A CSV File,Formal Language,Is A CSV File a language?,true,true,,true,false,false,true,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,10
-owl-rdf-graphql-generally,OWL/RDF/GraphQL/... generally,Natural Language,Is OWL/RDF/GraphQL/... generally a language?,true,true,,true,false,false,true,true,true,true,true,false,false,true,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,11
-a-thunderstorm,A Thunderstorm,Physical event,Is A Thunderstorm a language?,false,false,,false,true,true,false,true,true,false,false,false,false,false,,1,false,N/A,IsMirrorOf,NA,13
-a-uml-file,A UML File,Formal Language,Is A UML File a language?,true,true,,true,false,false,true,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,14
-binary-code,Binary Code,Formal Language,Is Binary Code a language?,true,true,,true,false,false,true,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,15
-the-mona-lisa,The Mona Lisa,Physical Object,Is The Mona Lisa a language?,false,false,,false,true,true,false,false,false,false,true,false,false,false,,1,false,N/A,IsMirrorOf,NA,16
-running-calculator-app,Running Calculator App,Running Software,Is Running Calculator App a language?,false,false,,false,true,false,false,true,true,false,false,false,false,false,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M1,17
-javascript,JavaScript,Formal Language,Is JavaScript a language?,true,true,,true,false,false,true,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,18
-french,French,Natural Language,Is French a language?,true,true,,true,false,false,true,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,19
+language_candidate_id,name,is_language,has_grammar,has_syntax,can_be_held,question,predicted_answer,prediction_predicates,prediction_fail,category,has_identity,requires_parsing,resolves_to_an_ast,has_linear_decoding_pressure,is_stable_ontology_reference,is_live_ontology_editor,is_open_world,is_closed_world,is_description_of,distance_from_concept,is_open_closed_world_conflicted,dimensionality_while_editing,relationship_to_concept,model_object_facility_layer,sort_order
+english,English,true,true,true,false,Is English a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Natural Language,false,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,1
+a-coffee-mug,A Coffee Mug,false,false,false,true,Is A Coffee Mug a language?,false,"No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, "" &
+""  Not 'Ontology'\n AND "" &
+""  Can Be Held, "" &
+""  Has Identity",,Physical Object,true,false,false,false,false,false,false,true,,1,false,N/A,IsMirrorOf,NA,2
+spoken-words,Spoken Words,true,true,true,false,Is Spoken Words a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Natural Language,false,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,3
+a-game-of-fortnite,A Game of Fortnite,false,false,false,false,Is A Game of Fortnite a language?,false,"No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & No AST, "" &
+""  Not 'Ontology'\n AND "" &
+""  Can't Be Held, "" &
+""  Has Identity",,Running Software,true,true,false,false,false,false,false,true,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,4
+sign-language,Sign Language,true,true,true,false,Is Sign Language a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Natural Language,false,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,5
+editing-airtable-base,Editing Airtable Base,false,false,false,false,Is Editing Airtable Base a language?,false,"No Syntax & No Parsing Neede & Describes the thing & No Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has Identity",,Running Software,true,false,true,false,true,true,false,true,,2,false,MultiDimensionalNonSymbolic,IsDescriptionOf,M4,6
+math,Math,true,true,true,false,Is Math a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Formal Language,false,true,true,true,true,false,false,true,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,7
+falsifier-a,Falsifier A,true,false,false,true,Is Falsifier A a language?,false,"No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can Be Held, "" &
+""  Has Identity","Falsifier A Isn't a Family Feud Language, but Is marked as a 'Language Candidate.'",MISSING: Have you seen this Language?,true,true,true,false,true,false,false,false,,1,false,N/A,IsMirrorOf,NA,8
+falsifier-b,Falsifier B,false,true,true,false,Is Falsifier B a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity","Falsifier B Is a Family Feud Language, but Is Not marked as a 'Language Candidate.'",MISSING: Have you seen this Language?,false,true,true,true,true,false,false,false,,2,false,N/A,IsDescriptionOf,M1,9
+a-smartphone,A Smartphone,false,false,false,true,Is A Smartphone a language?,false,"No Syntax & No Parsing Neede & Is the Thing & Has Linear Decoding Pressure & No AST, "" &
+""  Not 'Ontology'\n AND "" &
+""  Can Be Held, "" &
+""  Has Identity",,Physical Object,true,false,false,true,false,false,false,true,,1,false,N/A,IsMirrorOf,NA,10
+python,Python,true,true,true,false,Is Python a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Formal Language,false,true,true,true,true,false,true,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M1,11
+a-running-app,A Running App ,false,false,false,false,Is A Running App  a language?,false,"No Syntax & Requires Parsing & Is the Thing & Has Linear Decoding Pressure & No AST, "" &
+""  Not 'Ontology'\n AND "" &
+""  Can't Be Held, "" &
+""  Has Identity",,Running Software,true,true,false,true,false,true,false,true,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,12
+an-xlsx-doc,An XLSX Doc,true,true,true,false,Is An XLSX Doc a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Formal Language,false,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,13
+xlsx-editing,XLSX - Editing,false,false,false,false,Is XLSX - Editing a language?,false,"No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & Resolves to AST, "" &
+""  Not 'Ontology'\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Running Software,false,false,true,false,false,true,false,false,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,14
+an-docx-doc,An DOCX Doc,true,true,true,false,Is An DOCX Doc a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Formal Language,false,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,15
+docx-editing,DOCX - Editing,false,false,false,false,Is DOCX - Editing a language?,false,"No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Running Software,false,false,false,false,true,true,false,false,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M4,16
+owl-rdf-graphql-generally,OWL/RDF/GraphQL/... generally,true,true,true,false,Is OWL/RDF/GraphQL/... generally a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Natural Language,false,true,true,true,true,false,false,true,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,17
+a-thunderstorm,A Thunderstorm,false,false,false,true,Is A Thunderstorm a language?,false,"No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, "" &
+""  Not 'Ontology'\n AND "" &
+""  Can Be Held, "" &
+""  Has Identity",,Physical event,true,true,true,false,false,false,false,false,,1,false,N/A,IsMirrorOf,NA,18
+a-uml-file,A UML File,true,true,true,false,Is A UML File a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Formal Language,false,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,23
+the-mona-lisa,The Mona Lisa,false,false,false,true,Is The Mona Lisa a language?,false,"No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can Be Held, "" &
+""  Has Identity",,Physical Object,true,false,false,false,true,false,false,false,,1,false,N/A,IsMirrorOf,NA,20
+binary-code,Binary Code,true,true,true,false,Is Binary Code a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity",,Formal Language,false,true,true,true,true,false,false,false,,2,false,OneDimensionalSymbolic,IsDescriptionOf,M2,21
+running-calculator-app,Running Calculator App,false,false,false,false,Is Running Calculator App a language?,false,"No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, "" &
+""  Not 'Ontology'\n AND "" &
+""  Can't Be Held, "" &
+""  Has Identity",,Running Software,true,true,true,false,false,false,false,false,,1,false,MultiDimensionalNonSymbolic,IsMirrorOf,M1,22
+owa-cwa-falsifier,OWA & CWA Falsifier,true,true,true,false,Is OWA & CWA Falsifier a language?,true,"Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, "" &
+""  Is Stable Ontology\n AND "" &
+""  Can't Be Held, "" &
+""  Has no Identity", - Open World vs. Closed World Conflict.,MISSING: Have you seen this Language?,false,true,true,true,true,false,true,true,,2,true,OneDimensionalSymbolic,IsDescriptionOf,M1,23

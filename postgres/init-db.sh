@@ -14,15 +14,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SQL_FILES=(
     "${SCRIPT_DIR}/000-drop-all.sql"
     "${SCRIPT_DIR}/01-drop-and-create-tables.sql"
+    "${SCRIPT_DIR}/01b-customize-schema.sql"
     "${SCRIPT_DIR}/02-create-functions.sql"
-    "${SCRIPT_DIR}/02b-custom-functions.sql"
+    "${SCRIPT_DIR}/02b-customize-functions.sql"
     "${SCRIPT_DIR}/03-create-views.sql"
+    "${SCRIPT_DIR}/03b-customize-views.sql"
     "${SCRIPT_DIR}/04-create-policies.sql"
+    "${SCRIPT_DIR}/04b-customize-policies.sql"
     "${SCRIPT_DIR}/05-insert-data.sql"
+    "${SCRIPT_DIR}/05b-customize-data.sql"
 )
 
 # Default connection string
-DEFAULT_CONN="postgresql://postgres@localhost:5432/wikidata-language-candidates"
+DEFAULT_CONN="postgresql://postgres@localhost:5432/effortless-rulebook-starter"
 
 # Get connection string from argument or use default
 CONNECTION_STRING="${1:-$DEFAULT_CONN}"

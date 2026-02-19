@@ -6,6 +6,40 @@
 # RDF Schema for ERB
 # Generated from effortless-rulebook.json
 
+# === Class: ERBCustomizations ===
+erb:ERBCustomizations a rdfs:Class ;
+    rdfs:label "ERBCustomizations" .
+
+erb:eRBCustomizationId a rdf:Property ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "ERBCustomizationId" .
+
+erb:name a rdf:Property ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "Name" .
+
+erb:title a rdf:Property ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "Title" .
+
+erb:sQLCode a rdf:Property ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "SQLCode" .
+
+erb:sQLTarget a rdf:Property ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "SQLTarget" .
+
+erb:customizationType a rdf:Property ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "CustomizationType" .
+
 # === Class: IsEverythingALanguage ===
 erb:IsEverythingALanguage a rdfs:Class ;
     rdfs:label "IsEverythingALanguage" .
@@ -79,50 +113,55 @@ erb:name a rdf:Property ;
     rdfs:range xsd:string ;
     rdfs:label "Name" .
 
-erb:category a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "Category" .
-
-erb:familyFuedQuestion a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "FamilyFuedQuestion" .
-
-erb:topFamilyFeudAnswer a rdf:Property ;
+erb:isLanguage a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "TopFamilyFeudAnswer" .
+    rdfs:label "IsLanguage" .
 
-erb:chosenLanguageCandidate a rdf:Property ;
+erb:hasGrammar a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "ChosenLanguageCandidate" .
-
-erb:familyFeudMismatch a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "FamilyFeudMismatch" .
+    rdfs:label "HasGrammar" .
 
 erb:hasSyntax a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
     rdfs:label "HasSyntax" .
 
-erb:hasIdentity a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "HasIdentity" .
-
 erb:canBeHeld a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
     rdfs:label "CanBeHeld" .
 
-erb:hasGrammar a rdf:Property ;
+erb:question a rdf:Property ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "Question" .
+
+erb:predictedAnswer a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:boolean ;
-    rdfs:label "HasGrammar" .
+    rdfs:label "PredictedAnswer" .
+
+erb:predictionPredicates a rdf:Property ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "PredictionPredicates" .
+
+erb:predictionFail a rdf:Property ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "PredictionFail" .
+
+erb:category a rdf:Property ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "Category" .
+
+erb:hasIdentity a rdf:Property ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "HasIdentity" .
 
 erb:requiresParsing a rdf:Property ;
     rdfs:domain erb:LanguageCandidates ;

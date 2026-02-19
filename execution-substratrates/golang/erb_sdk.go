@@ -49,11 +49,11 @@ func nilIfEmpty(s string) *string {
 type LanguageCandidate struct {
 	LanguageCandidateId string `json:"language_candidate_id"`
 	Name *string `json:"name"`
-	Category *string `json:"category"`
-	ChosenLanguageCandidate *bool `json:"chosen_language_candidate"`
+	IsLanguage *bool `json:"is_language"`
 	HasSyntax *bool `json:"has_syntax"`
-	HasIdentity *bool `json:"has_identity"`
 	CanBeHeld *bool `json:"can_be_held"`
+	Category *string `json:"category"`
+	HasIdentity *bool `json:"has_identity"`
 	RequiresParsing *bool `json:"requires_parsing"`
 	ResolvesToAnAST *bool `json:"resolves_to_an_ast"`
 	HasLinearDecodingPressure *bool `json:"has_linear_decoding_pressure"`
@@ -65,10 +65,11 @@ type LanguageCandidate struct {
 	DimensionalityWhileEditing *string `json:"dimensionality_while_editing"`
 	ModelObjectFacilityLayer *string `json:"model_object_facility_layer"`
 	SortOrder *int `json:"sort_order"`
-	FamilyFuedQuestion *string `json:"family_fued_question"`
-	TopFamilyFeudAnswer *bool `json:"top_family_feud_answer"`
-	FamilyFeudMismatch *string `json:"family_feud_mismatch"`
 	HasGrammar *bool `json:"has_grammar"`
+	Question *string `json:"question"`
+	PredictedAnswer *bool `json:"predicted_answer"`
+	PredictionPredicates *string `json:"prediction_predicates"`
+	PredictionFail *string `json:"prediction_fail"`
 	IsDescriptionOf *bool `json:"is_description_of"`
 	IsOpenClosedWorldConflicted *bool `json:"is_open_closed_world_conflicted"`
 	RelationshipToConcept *string `json:"relationship_to_concept"`
@@ -76,28 +77,34 @@ type LanguageCandidate struct {
 
 // --- Individual Calculation Functions ---
 
-// CalcFamilyFuedQuestion computes the FamilyFuedQuestion calculated field
-// Formula: ="Is " & {{Name}} & " a language?"
-func (tc *LanguageCandidate) CalcFamilyFuedQuestion() string {
-	return "Is " + stringVal(tc.Name) + " a language?"
-}
-
-// CalcTopFamilyFeudAnswer computes the TopFamilyFeudAnswer calculated field
-// Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescriptionOf}},   {{HasLinearDecodingPressure}},   {{ResolvesToAnAST}},   {{IsStableOntologyReference}},   NOT({{CanBeHeld}}),   NOT({{HasIdentity}}) )
-func (tc *LanguageCandidate) CalcTopFamilyFeudAnswer() bool {
-	return (boolVal(tc.HasSyntax) && boolVal(tc.RequiresParsing) && boolVal(tc.IsDescriptionOf) && boolVal(tc.HasLinearDecodingPressure) && boolVal(tc.ResolvesToAnAST) && boolVal(tc.IsStableOntologyReference) && !boolVal(tc.CanBeHeld) && !boolVal(tc.HasIdentity))
-}
-
-// CalcFamilyFeudMismatch computes the FamilyFeudMismatch calculated field
-// Formula: =IF(NOT({{TopFamilyFeudAnswer}} = {{ChosenLanguageCandidate}}),   {{Name}} & " " & IF({{TopFamilyFeudAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " &    IF({{ChosenLanguageCandidate}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
-func (tc *LanguageCandidate) CalcFamilyFeudMismatch() string {
-	return func() string { if !((boolVal(tc.TopFamilyFeudAnswer) == boolVal(tc.ChosenLanguageCandidate))) { return stringVal(tc.Name) + " " + func() string { if boolVal(tc.TopFamilyFeudAnswer) { return "Is" }; return "Isn't" }() + " a Family Feud Language, but " + func() string { if boolVal(tc.ChosenLanguageCandidate) { return "Is" }; return "Is Not" }() + " marked as a 'Language Candidate.'" }; return "" }() + func() string { if boolVal(tc.IsOpenClosedWorldConflicted) { return " - Open World vs. Closed World Conflict." }; return "" }()
-}
-
 // CalcHasGrammar computes the HasGrammar calculated field
 // Formula: ={{HasSyntax}} = TRUE()
 func (tc *LanguageCandidate) CalcHasGrammar() bool {
 	return (boolVal(tc.HasSyntax) == true)
+}
+
+// CalcQuestion computes the Question calculated field
+// Formula: ="Is " & {{Name}} & " a language?"
+func (tc *LanguageCandidate) CalcQuestion() string {
+	return "Is " + stringVal(tc.Name) + " a language?"
+}
+
+// CalcPredictedAnswer computes the PredictedAnswer calculated field
+// Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescriptionOf}},   {{HasLinearDecodingPressure}},   {{ResolvesToAnAST}},   {{IsStableOntologyReference}},   NOT({{CanBeHeld}}),   NOT({{HasIdentity}}) )
+func (tc *LanguageCandidate) CalcPredictedAnswer() bool {
+	return (boolVal(tc.HasSyntax) && boolVal(tc.RequiresParsing) && boolVal(tc.IsDescriptionOf) && boolVal(tc.HasLinearDecodingPressure) && boolVal(tc.ResolvesToAnAST) && boolVal(tc.IsStableOntologyReference) && !boolVal(tc.CanBeHeld) && !boolVal(tc.HasIdentity))
+}
+
+// CalcPredictionPredicates computes the PredictionPredicates calculated field
+// Formula: =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Neede") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & "  " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & "\n AND " & "  " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & "  " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")
+func (tc *LanguageCandidate) CalcPredictionPredicates() string {
+	return func() string { if boolVal(tc.HasSyntax) { return "Has Syntax" }; return "No Syntax" }() + " & " + func() string { if boolVal(tc.RequiresParsing) { return "Requires Parsing" }; return "No Parsing Neede" }() + " & " + func() string { if boolVal(tc.IsDescriptionOf) { return "Describes the thing" }; return "Is the Thing" }() + " & " + func() string { if boolVal(tc.HasLinearDecodingPressure) { return "Has Linear Decoding Pressure" }; return "No Decoding Pressure" }() + " & " + func() string { if boolVal(tc.ResolvesToAnAST) { return "Resolves to AST" }; return "No AST" }() + ", " + "  " + func() string { if boolVal(tc.IsStableOntologyReference) { return "Is Stable Ontology" }; return "Not 'Ontology'" }() + "\\n AND " + "  " + func() string { if boolVal(tc.CanBeHeld) { return "Can Be Held" }; return "Can't Be Held" }() + ", " + "  " + func() string { if boolVal(tc.HasIdentity) { return "Has Identity" }; return "Has no Identity" }()
+}
+
+// CalcPredictionFail computes the PredictionFail calculated field
+// Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " &    IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
+func (tc *LanguageCandidate) CalcPredictionFail() string {
+	return func() string { if !((boolVal(tc.PredictedAnswer) == boolVal(tc.IsLanguage))) { return stringVal(tc.Name) + " " + func() string { if boolVal(tc.PredictedAnswer) { return "Is" }; return "Isn't" }() + " a Family Feud Language, but " + func() string { if boolVal(tc.IsLanguage) { return "Is" }; return "Is Not" }() + " marked as a 'Language Candidate.'" }; return "" }() + func() string { if boolVal(tc.IsOpenClosedWorldConflicted) { return " - Open World vs. Closed World Conflict." }; return "" }()
 }
 
 // CalcIsDescriptionOf computes the IsDescriptionOf calculated field
@@ -123,26 +130,27 @@ func (tc *LanguageCandidate) CalcRelationshipToConcept() string {
 // ComputeAll computes all calculated fields and returns an updated struct
 func (tc *LanguageCandidate) ComputeAll() *LanguageCandidate {
 	// Level 1 calculations
-	familyFuedQuestion := "Is " + stringVal(tc.Name) + " a language?"
 	hasGrammar := (boolVal(tc.HasSyntax) == true)
+	question := "Is " + stringVal(tc.Name) + " a language?"
 	isDescriptionOf := (tc.DistanceFromConcept != nil && *tc.DistanceFromConcept > 1)
 	isOpenClosedWorldConflicted := (boolVal(tc.IsOpenWorld) && boolVal(tc.IsClosedWorld))
 	relationshipToConcept := func() string { if (tc.DistanceFromConcept != nil && *tc.DistanceFromConcept == 1) { return "IsMirrorOf" }; return "IsDescriptionOf" }()
 
 	// Level 2 calculations
-	topFamilyFeudAnswer := (boolVal(tc.HasSyntax) && boolVal(tc.RequiresParsing) && isDescriptionOf && boolVal(tc.HasLinearDecodingPressure) && boolVal(tc.ResolvesToAnAST) && boolVal(tc.IsStableOntologyReference) && !boolVal(tc.CanBeHeld) && !boolVal(tc.HasIdentity))
+	predictedAnswer := (boolVal(tc.HasSyntax) && boolVal(tc.RequiresParsing) && isDescriptionOf && boolVal(tc.HasLinearDecodingPressure) && boolVal(tc.ResolvesToAnAST) && boolVal(tc.IsStableOntologyReference) && !boolVal(tc.CanBeHeld) && !boolVal(tc.HasIdentity))
+	predictionPredicates := func() string { if boolVal(tc.HasSyntax) { return "Has Syntax" }; return "No Syntax" }() + " & " + func() string { if boolVal(tc.RequiresParsing) { return "Requires Parsing" }; return "No Parsing Neede" }() + " & " + func() string { if isDescriptionOf { return "Describes the thing" }; return "Is the Thing" }() + " & " + func() string { if boolVal(tc.HasLinearDecodingPressure) { return "Has Linear Decoding Pressure" }; return "No Decoding Pressure" }() + " & " + func() string { if boolVal(tc.ResolvesToAnAST) { return "Resolves to AST" }; return "No AST" }() + ", " + "  " + func() string { if boolVal(tc.IsStableOntologyReference) { return "Is Stable Ontology" }; return "Not 'Ontology'" }() + "\\n AND " + "  " + func() string { if boolVal(tc.CanBeHeld) { return "Can Be Held" }; return "Can't Be Held" }() + ", " + "  " + func() string { if boolVal(tc.HasIdentity) { return "Has Identity" }; return "Has no Identity" }()
 
 	// Level 3 calculations
-	familyFeudMismatch := func() string { if !((topFamilyFeudAnswer == boolVal(tc.ChosenLanguageCandidate))) { return stringVal(tc.Name) + " " + func() string { if topFamilyFeudAnswer { return "Is" }; return "Isn't" }() + " a Family Feud Language, but " + func() string { if boolVal(tc.ChosenLanguageCandidate) { return "Is" }; return "Is Not" }() + " marked as a 'Language Candidate.'" }; return "" }() + func() string { if isOpenClosedWorldConflicted { return " - Open World vs. Closed World Conflict." }; return "" }()
+	predictionFail := func() string { if !((predictedAnswer == boolVal(tc.IsLanguage))) { return stringVal(tc.Name) + " " + func() string { if predictedAnswer { return "Is" }; return "Isn't" }() + " a Family Feud Language, but " + func() string { if boolVal(tc.IsLanguage) { return "Is" }; return "Is Not" }() + " marked as a 'Language Candidate.'" }; return "" }() + func() string { if isOpenClosedWorldConflicted { return " - Open World vs. Closed World Conflict." }; return "" }()
 
 	return &LanguageCandidate{
 		LanguageCandidateId: tc.LanguageCandidateId,
 		Name: tc.Name,
-		Category: tc.Category,
-		ChosenLanguageCandidate: tc.ChosenLanguageCandidate,
+		IsLanguage: tc.IsLanguage,
 		HasSyntax: tc.HasSyntax,
-		HasIdentity: tc.HasIdentity,
 		CanBeHeld: tc.CanBeHeld,
+		Category: tc.Category,
+		HasIdentity: tc.HasIdentity,
 		RequiresParsing: tc.RequiresParsing,
 		ResolvesToAnAST: tc.ResolvesToAnAST,
 		HasLinearDecodingPressure: tc.HasLinearDecodingPressure,
@@ -154,10 +162,11 @@ func (tc *LanguageCandidate) ComputeAll() *LanguageCandidate {
 		DimensionalityWhileEditing: tc.DimensionalityWhileEditing,
 		ModelObjectFacilityLayer: tc.ModelObjectFacilityLayer,
 		SortOrder: tc.SortOrder,
-		FamilyFuedQuestion: nilIfEmpty(familyFuedQuestion),
-		TopFamilyFeudAnswer: &topFamilyFeudAnswer,
-		FamilyFeudMismatch: nilIfEmpty(familyFeudMismatch),
 		HasGrammar: &hasGrammar,
+		Question: nilIfEmpty(question),
+		PredictedAnswer: &predictedAnswer,
+		PredictionPredicates: nilIfEmpty(predictionPredicates),
+		PredictionFail: nilIfEmpty(predictionFail),
 		IsDescriptionOf: &isDescriptionOf,
 		IsOpenClosedWorldConflicted: &isOpenClosedWorldConflicted,
 		RelationshipToConcept: nilIfEmpty(relationshipToConcept),
@@ -181,6 +190,20 @@ type IsEverythingALanguage struct {
 	RelatedCandidateId *string `json:"related_candidate_id"`
 	EvidenceFromRulebook *string `json:"evidence_from_rulebook"`
 	Notes *string `json:"notes"`
+}
+
+// =============================================================================
+// ERBCUSTOMIZATIONS TABLE
+// =============================================================================
+
+// ERBCustomization represents a row in the ERBCustomizations table
+type ERBCustomization struct {
+	ERBCustomizationId string `json:"erb_customization_id"`
+	Name *string `json:"name"`
+	Title *string `json:"title"`
+	SQLCode *string `json:"sql_code"`
+	SQLTarget *string `json:"sql_target"`
+	CustomizationType *string `json:"customization_type"`
 }
 
 // =============================================================================

@@ -144,6 +144,7 @@ echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 1:${NC} ${YELLOW}Generating 
 echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────┘${NC}"
 python3 -c "
 import sys
+import psycopg2
 sys.path.insert(0, '$SCRIPT_DIR')
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader
@@ -153,9 +154,15 @@ spec = spec_from_loader('test_orchestrator', SourceFileLoader('test_orchestrator
 test_orch = module_from_spec(spec)
 spec.loader.exec_module(test_orch)
 
-# Run steps 1 and 2
-answer_key = test_orch.generate_answer_key()
-test_orch.generate_blank_test(answer_key)
+# Load rulebook and connect to database
+rulebook = test_orch.load_rulebook()
+conn = psycopg2.connect(test_orch.DB_CONNECTION)
+
+# Run steps 1 and 2 (new generic functions)
+all_answer_keys = test_orch.generate_all_answer_keys(conn, rulebook)
+test_orch.generate_all_blank_tests(all_answer_keys, rulebook)
+
+conn.close()
 "
 echo ""
 
@@ -226,6 +233,7 @@ for substrate in $SUBSTRATES_TO_RUN; do
 import sys
 import json
 import os
+import glob
 sys.path.insert(0, '$SCRIPT_DIR')
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader
@@ -234,31 +242,33 @@ spec = spec_from_loader('test_orchestrator', SourceFileLoader('test_orchestrator
 test_orch = module_from_spec(spec)
 spec.loader.exec_module(test_orch)
 
-with open(test_orch.ANSWER_KEY_PATH, 'r') as f:
-    answer_key = json.load(f)
+# Load all answer keys
+all_answer_keys = {}
+for entity_file in glob.glob(os.path.join(test_orch.ANSWER_KEYS_DIR, '*.json')):
+    entity = os.path.basename(entity_file).replace('.json', '')
+    with open(entity_file, 'r') as f:
+        all_answer_keys[entity] = json.load(f)
+
+# Load rulebook for grading
+rulebook = test_orch.load_rulebook()
 
 substrate = '$substrate'
 inject_exit_code = $INJECT_EXIT_CODE
 elapsed_seconds = $ELAPSED_TIME
 
-# If inject failed, mark as error regardless of stale test-answers.json
+# Grade substrate (new generic function)
 if inject_exit_code != 0:
-    grades = test_orch.grade_substrate(substrate, answer_key, None)
+    grades = test_orch.grade_substrate(substrate, all_answer_keys, rulebook)
     grades['error'] = 'FAILED TO EXECUTE (inject-substrate.sh returned non-zero)'
     grades['execution_failed'] = True
 else:
-    answers_path = os.path.join(test_orch.SUBSTRATES_DIR, substrate, 'test-answers.json')
-    if os.path.exists(answers_path):
-        grades = test_orch.grade_substrate(substrate, answer_key, answers_path)
-    else:
-        grades = test_orch.grade_substrate(substrate, answer_key, None)
-        grades['error'] = 'No test-answers.json'
+    grades = test_orch.grade_substrate(substrate, all_answer_keys, rulebook)
 
 # Add timing information
 grades['elapsed_seconds'] = elapsed_seconds
 
-test_orch.generate_substrate_report(substrate, grades)
-test_orch.print_substrate_test_summary(substrate, grades)
+test_orch.generate_substrate_report(substrate, grades, rulebook)
+test_orch.print_substrate_test_summary(substrate, grades, rulebook)
 
 # Save grades to temp file for final summary
 import pickle
@@ -295,6 +305,9 @@ spec = spec_from_loader('test_orchestrator', SourceFileLoader('test_orchestrator
 test_orch = module_from_spec(spec)
 spec.loader.exec_module(test_orch)
 
+# Load rulebook for reporting
+rulebook = test_orch.load_rulebook()
+
 # Collect grades from temp files
 run_single = '$RUN_SINGLE'
 if run_single:
@@ -313,10 +326,10 @@ for substrate in substrates:
 # Generate summary report and print final table
 if run_single:
     # For single substrate, just print the summary table (no full report)
-    test_orch.print_final_summary_table(all_grades)
+    test_orch.print_final_summary_table(all_grades, rulebook)
 else:
-    test_orch.generate_summary_report(all_grades)
-    test_orch.print_final_summary_table(all_grades)
+    test_orch.generate_summary_report(all_grades, rulebook)
+    test_orch.print_final_summary_table(all_grades, rulebook)
 "
 echo ""
 

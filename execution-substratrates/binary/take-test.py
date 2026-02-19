@@ -3,11 +3,15 @@
 Take Test - Binary Execution Substrate
 
 This script runs the test by:
-1. Loading test-answers.json
+1. Loading test data (multi-entity or legacy)
 2. Packing each record into a TestAnswer struct (bytes)
 3. Calling the GENERATED assembly evaluators via ctypes
 4. Unpacking results back to Python
-5. Saving test-answers.json
+5. Saving test-answers
+
+Supports two modes:
+1. Multi-entity (--multi-entity): Processes all files in blank-tests/ -> test-answers/
+2. Legacy: Processes single test-answers.json file
 
 The ABI (ARM64 Apple Silicon):
     - Input: TestAnswer struct pointer (x0 -> saved to x19)
@@ -15,8 +19,11 @@ The ABI (ARM64 Apple Silicon):
     - String functions: return (ptr, len) in (x0, x1)
 """
 
+import argparse
 import ctypes
+import glob as glob_module
 import json
+import os
 import platform
 import re
 import struct
@@ -296,87 +303,12 @@ JSON_OUTPUT_KEYS = {
 
 
 # =============================================================================
-# MAIN
+# CORE PROCESSING FUNCTION
 # =============================================================================
 
-def main():
-    script_dir = Path(__file__).resolve().parent
-    test_file = script_dir / "test-answers.json"
-
-    print("=" * 70)
-    print("Binary Execution Substrate - Test Execution")
-    print("=" * 70)
-    print()
-
-    # Determine library path
-    system = platform.system()
-    if system == "Darwin":
-        lib_name = "erb_calc.dylib"
-    elif system == "Linux":
-        lib_name = "erb_calc.so"
-    else:
-        print(f"ERROR: Unsupported platform: {system}")
-        sys.exit(1)
-
-    lib_path = script_dir / lib_name
-
-    # Check library exists
-    print(f"Loading library: {lib_path}")
-    if not lib_path.exists():
-        print(f"ERROR: Library not found at {lib_path}")
-        print("Run: python inject-into-binary.py first")
-        sys.exit(1)
-
-    # Load the library
-    try:
-        lib = load_library(lib_path)
-        print("Library loaded successfully")
-    except Exception as e:
-        print(f"ERROR: Failed to load library: {e}")
-        sys.exit(1)
-
-    # Load rulebook to get schema
-    print("\nLoading rulebook...")
-    try:
-        rulebook = load_rulebook()
-    except FileNotFoundError as e:
-        print(f"ERROR: {e}")
-        sys.exit(1)
-
-    # Build schema
-    language_candidates = rulebook.get("LanguageCandidates", {})
-    columns = language_candidates.get("schema", [])
-    schema, struct_size = build_schema(columns)
-    print(f"Schema built: {len(schema)} fields, struct size: {struct_size} bytes")
-
-    # Load test data
-    print(f"\nLoading test data: {test_file}")
-    if not test_file.exists():
-        print(f"ERROR: Test file not found: {test_file}")
-        sys.exit(1)
-
-    with open(test_file, "r") as f:
-        data = json.load(f)
-    print(f"Loaded {len(data)} records")
-
-    # Verify calculated field functions exist
-    print("\nVerifying assembly functions...")
-    available_funcs = {}
-    for field_name, (func_name, ret_type) in CALCULATED_FIELDS.items():
-        try:
-            func = getattr(lib, func_name)
-            available_funcs[field_name] = (func_name, ret_type)
-            print(f"  Found: {func_name} -> {ret_type}")
-        except AttributeError:
-            print(f"  Missing: {func_name}")
-
-    if not available_funcs:
-        print("ERROR: No assembly functions found!")
-        sys.exit(1)
-
-    # Process each record
-    print(f"\nProcessing {len(data)} records...")
-
+def process_records(data: List[dict], lib: ctypes.CDLL, schema: Dict[str, FieldInfo],
+                    struct_size: int, available_funcs: dict) -> List[dict]:
+    """Process a list of records and compute calculated fields."""
     # Keep all string tables alive for the duration
     all_string_tables = []
 
@@ -409,21 +341,219 @@ def main():
                     import traceback
                     traceback.print_exc()
 
-            if (i + 1) % 5 == 0 or i == len(data) - 1:
-                print(f"  Processed {i + 1}/{len(data)} records")
         except Exception as e:
             print(f"ERROR processing record {i}: {e}")
             import traceback
             traceback.print_exc()
             continue
 
+    return data
+
+
+def load_binary_library(script_dir: Path) -> tuple:
+    """Load the binary library and return (lib, lib_path)."""
+    system = platform.system()
+    if system == "Darwin":
+        lib_name = "erb_calc.dylib"
+    elif system == "Linux":
+        lib_name = "erb_calc.so"
+    else:
+        print(f"ERROR: Unsupported platform: {system}")
+        sys.exit(1)
+
+    lib_path = script_dir / lib_name
+
+    if not lib_path.exists():
+        print(f"ERROR: Library not found at {lib_path}")
+        print("Run: python inject-into-binary.py first")
+        sys.exit(1)
+
+    lib = load_library(lib_path)
+    return lib, lib_path
+
+
+def get_available_functions(lib: ctypes.CDLL) -> dict:
+    """Verify and return available assembly functions."""
+    available_funcs = {}
+    for field_name, (func_name, ret_type) in CALCULATED_FIELDS.items():
+        try:
+            func = getattr(lib, func_name)
+            available_funcs[field_name] = (func_name, ret_type)
+        except AttributeError:
+            pass
+    return available_funcs
+
+
+# =============================================================================
+# MULTI-ENTITY MODE
+# =============================================================================
+
+def run_multi_entity(script_dir: Path):
+    """Process all entity files in blank-tests/ directory."""
+    blank_tests_dir = script_dir / "blank-tests"
+    test_answers_dir = script_dir / "test-answers"
+
+    if not blank_tests_dir.is_dir():
+        print(f"Error: {blank_tests_dir} not found")
+        sys.exit(1)
+
+    # Ensure output directory exists
+    test_answers_dir.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 70)
+    print("Binary Execution Substrate - Multi-Entity Test Execution")
+    print("=" * 70)
+    print()
+
+    # Load library
+    lib, lib_path = load_binary_library(script_dir)
+    print(f"Loaded library: {lib_path}")
+
+    # Load rulebook to get schema
+    print("Loading rulebook...")
+    try:
+        rulebook = load_rulebook()
+    except FileNotFoundError as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
+
+    # Build schema from LanguageCandidates (primary entity)
+    language_candidates = rulebook.get("LanguageCandidates", {})
+    columns = language_candidates.get("schema", [])
+    schema, struct_size = build_schema(columns)
+    print(f"Schema built: {len(schema)} fields, struct size: {struct_size} bytes")
+
+    # Get available functions
+    available_funcs = get_available_functions(lib)
+    print(f"Found {len(available_funcs)} assembly functions")
+
+    if not available_funcs:
+        print("ERROR: No assembly functions found!")
+        sys.exit(1)
+
+    # Process each entity file (skip metadata files starting with _)
+    total_records = 0
+    entity_count = 0
+
+    for input_path in sorted(glob_module.glob(str(blank_tests_dir / "*.json"))):
+        filename = os.path.basename(input_path)
+
+        # Skip metadata files
+        if filename.startswith('_'):
+            continue
+
+        entity = filename.replace('.json', '')
+        output_path = test_answers_dir / filename
+
+        # Load input data
+        with open(input_path, 'r') as f:
+            data = json.load(f)
+
+        if not data:
+            # Copy empty arrays as-is
+            with open(output_path, 'w') as f:
+                json.dump(data, f, indent=2)
+            print(f"  -> {entity}: 0 records (empty)")
+            continue
+
+        # Process records
+        processed = process_records(data, lib, schema, struct_size, available_funcs)
+
+        # Save results
+        with open(output_path, 'w') as f:
+            json.dump(processed, f, indent=2)
+
+        total_records += len(processed)
+        entity_count += 1
+        print(f"  -> {entity}: {len(processed)} records")
+
+    print(f"\nBinary substrate: Processed {entity_count} entities, {total_records} total records")
+    print("=" * 70)
+
+
+# =============================================================================
+# LEGACY MODE
+# =============================================================================
+
+def run_legacy(script_dir: Path):
+    """Process single test-answers.json file (legacy mode)."""
+    test_file = script_dir / "test-answers.json"
+
+    print("=" * 70)
+    print("Binary Execution Substrate - Test Execution")
+    print("=" * 70)
+    print()
+
+    # Load library
+    lib, lib_path = load_binary_library(script_dir)
+    print(f"Loaded library: {lib_path}")
+
+    # Load rulebook to get schema
+    print("\nLoading rulebook...")
+    try:
+        rulebook = load_rulebook()
+    except FileNotFoundError as e:
+        print(f"ERROR: {e}")
+        sys.exit(1)
+
+    # Build schema
+    language_candidates = rulebook.get("LanguageCandidates", {})
+    columns = language_candidates.get("schema", [])
+    schema, struct_size = build_schema(columns)
+    print(f"Schema built: {len(schema)} fields, struct size: {struct_size} bytes")
+
+    # Load test data
+    print(f"\nLoading test data: {test_file}")
+    if not test_file.exists():
+        print(f"ERROR: Test file not found: {test_file}")
+        sys.exit(1)
+
+    with open(test_file, "r") as f:
+        data = json.load(f)
+    print(f"Loaded {len(data)} records")
+
+    # Get available functions
+    print("\nVerifying assembly functions...")
+    available_funcs = get_available_functions(lib)
+    for field_name, (func_name, ret_type) in available_funcs.items():
+        print(f"  Found: {func_name} -> {ret_type}")
+
+    if not available_funcs:
+        print("ERROR: No assembly functions found!")
+        sys.exit(1)
+
+    # Process records
+    print(f"\nProcessing {len(data)} records...")
+    processed = process_records(data, lib, schema, struct_size, available_funcs)
+
     # Save results
     print(f"\nSaving results to: {test_file}")
     with open(test_file, "w") as f:
-        json.dump(data, f, indent=2)
+        json.dump(processed, f, indent=2)
 
     print("\nTest execution complete!")
     print("=" * 70)
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+def main():
+    parser = argparse.ArgumentParser(description="Binary Substrate Test Runner")
+    parser.add_argument(
+        "--multi-entity",
+        action="store_true",
+        help="Process all entities in blank-tests/ directory"
+    )
+    args = parser.parse_args()
+
+    script_dir = Path(__file__).resolve().parent
+
+    if args.multi_entity:
+        run_multi_entity(script_dir)
+    else:
+        run_legacy(script_dir)
 
 
 if __name__ == "__main__":
