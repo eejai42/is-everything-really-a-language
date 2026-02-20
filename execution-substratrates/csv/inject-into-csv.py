@@ -320,23 +320,17 @@ def to_snake_case(name):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
-def export_language_candidates_csv(rulebook, output_path):
-    """Export the LanguageCandidates table as a CSV file.
+def export_entity_csv(table_name, table_data, output_path):
+    """Export a single entity table as a CSV file.
 
     This produces a flat CSV with computed values (not formulas).
     """
-    # Find the LanguageCandidates table
-    table_data = rulebook.get('LanguageCandidates')
-    if not table_data:
-        print("Warning: LanguageCandidates table not found")
-        return
-
     schema = table_data.get('schema', [])
     data = table_data.get('data', [])
 
-    if not schema or not data:
-        print("Warning: LanguageCandidates has no schema or data")
-        return
+    if not schema:
+        print(f"Warning: {table_name} has no schema")
+        return 0
 
     # Build column map for formula evaluation
     column_map = build_column_map(schema)
@@ -362,7 +356,33 @@ def export_language_candidates_csv(rulebook, output_path):
                 row.append(value)
             writer.writerow(row)
 
-    print(f"Exported {len(data)} rows to {output_path}")
+    print(f"  -> {table_name}: {len(data)} rows -> {output_path.name}")
+    return len(data)
+
+
+def export_all_entities_csv(rulebook, output_dir):
+    """Export all entity tables as separate CSV files.
+
+    Each entity gets its own {entity_snake_case}.csv file.
+    """
+    table_names = get_table_names(rulebook)
+    total_rows = 0
+
+    for table_name in table_names:
+        table_data = rulebook.get(table_name)
+
+        # Skip if not a table structure (must have schema)
+        if not isinstance(table_data, dict) or 'schema' not in table_data:
+            continue
+
+        # Convert table name to snake_case for filename
+        csv_filename = to_snake_case(table_name) + '.csv'
+        output_path = output_dir / csv_filename
+
+        rows = export_entity_csv(table_name, table_data, output_path)
+        total_rows += rows
+
+    return total_rows
 
 
 def export_column_formulas_csv(rulebook, output_path):
@@ -407,12 +427,13 @@ def export_column_formulas_csv(rulebook, output_path):
 
 def main():
     # Define generated files for this substrate
+    # Note: Entity CSV files (e.g., customers.csv) are generated dynamically
     GENERATED_FILES = [
         'rulebook.xlsx',
-        'language_candidates.csv',
         'column_formulas.csv',
-        'test-answers.json',
         'test-results.md',
+        # Legacy file - may exist from older versions
+        'language_candidates.csv',
     ]
 
     # Handle --clean argument
@@ -429,11 +450,8 @@ def main():
         print(f"Error: {e}")
         sys.exit(1)
 
-    # Capture existing CSV content before regenerating
-    csv_path = Path('language_candidates.csv')
-    old_csv_content = None
-    if csv_path.exists():
-        old_csv_content = csv_path.read_text(encoding='utf-8')
+    # Working directory as Path
+    output_dir = Path('.')
 
     # Create workbook
     wb = Workbook()
@@ -482,21 +500,13 @@ def main():
     print(f"\nGenerated: {xlsx_path}")
     print(f"  - {len(wb.sheetnames)} worksheets")
 
-    # Export LanguageCandidates as CSV
-    export_language_candidates_csv(rulebook, csv_path)
+    # Export all entities as separate CSV files
+    print(f"\nExporting entities as CSV:")
+    export_all_entities_csv(rulebook, output_dir)
 
     # Export column formulas as CSV
     formulas_path = Path('column_formulas.csv')
     export_column_formulas_csv(rulebook, formulas_path)
-
-    # Check if CSV changed - if not, delete the xlsx
-    if old_csv_content is not None:
-        new_csv_content = csv_path.read_text(encoding='utf-8')
-        if old_csv_content == new_csv_content:
-            print(f"\nCSV unchanged - deleting {xlsx_path}")
-            xlsx_path.unlink()
-        else:
-            print(f"\nCSV changed - keeping {xlsx_path}")
 
     print(f"\nDone generating {candidate_name}.")
 

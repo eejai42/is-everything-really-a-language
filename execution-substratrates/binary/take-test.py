@@ -36,7 +36,7 @@ from enum import Enum, auto
 # Add project root to path for shared imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from orchestration.shared import load_rulebook
+from orchestration.shared import load_rulebook, discover_entities, get_entity_schema, to_snake_case, get_calculated_fields
 
 
 # =============================================================================
@@ -63,33 +63,9 @@ class FieldInfo:
 # FIELD NAME NORMALIZATION (must match inject-into-binary.py)
 # =============================================================================
 
-FIELD_NAME_MAP = {
-    'NAME': 'name',
-    'CATEGORY': 'category',
-    'HASSYNTAX': 'has_syntax',
-    'HASIDENTITY': 'has_identity',
-    'CANBEHELD': 'can_be_held',
-    'REQUIRESPARSING': 'requires_parsing',
-    'MEANINGISSERIALIZED': 'meaning_is_serialized',
-    'ISONGOLOGYDESCRIPTOR': 'is_ongology_descriptor',
-    'CHOSENLANGUAGECANDIDATE': 'chosen_language_candidate',
-    'DISTANCEFROMCONCEPT': 'distance_from_concept',
-    'ISOPENWORLD': 'is_open_world',
-    'ISCLOSEDWORLD': 'is_closed_world',
-    'SORTORDER': 'sort_order',
-    'TOPFAMILYFEUDANSWER': 'top_family_feud_answer',
-    'ISOPENCLOTEDWORLDCONFLICTED': 'is_open_closed_world_conflicted',
-    'ISOPENCLOSEDWORLDCONFLICTED': 'is_open_closed_world_conflicted',
-}
-
-
 def normalize_field_name(name: str) -> str:
-    """Normalize field name to internal format (must match compiler)."""
-    upper = name.replace(' ', '').upper()
-    if upper in FIELD_NAME_MAP:
-        return FIELD_NAME_MAP[upper]
-    result = re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
-    return result
+    """Normalize field name to snake_case format (must match compiler)."""
+    return to_snake_case(name)
 
 
 def json_key_to_snake(name: str) -> str:
@@ -277,29 +253,39 @@ def call_bool_function(lib: ctypes.CDLL, func_name: str, struct_ptr: int) -> boo
 
 
 # =============================================================================
-# CALCULATED FIELD DEFINITIONS
+# CALCULATED FIELD DISCOVERY
 # =============================================================================
 
-# Map of calculated field names to their function names and return types
-# Note: On macOS, ctypes automatically adds underscore prefix to symbol names
-CALCULATED_FIELDS = {
-    'family_fued_question': ('eval_family_fued_question', 'string'),
-    'top_family_feud_answer': ('eval_top_family_feud_answer', 'bool'),
-    'family_feud_mismatch': ('eval_family_feud_mismatch', 'string'),
-    'has_grammar': ('eval_has_grammar', 'bool'),
-    'is_open_closed_world_conflicted': ('eval_is_open_closed_world_conflicted', 'bool'),
-    'relationship_to_concept': ('eval_relationship_to_concept', 'string'),
-}
+def discover_calculated_fields(rulebook: dict, entity_name: str) -> dict:
+    """
+    Discover calculated fields for an entity from the rulebook.
 
-# Map internal names to JSON output keys
-JSON_OUTPUT_KEYS = {
-    'family_fued_question': 'family_fued_question',
-    'top_family_feud_answer': 'top_family_feud_answer',
-    'family_feud_mismatch': 'family_feud_mismatch',
-    'has_grammar': 'has_grammar',
-    'is_open_closed_world_conflicted': 'is_open_closed_world_conflicted',
-    'relationship_to_concept': 'relationship_to_concept',
-}
+    Returns a dict mapping field names to (function_name, return_type) tuples.
+    Function names follow the pattern: eval_{entity}_{field}
+    """
+    schema = get_entity_schema(rulebook, entity_name)
+    calc_fields = get_calculated_fields(schema)
+
+    entity_snake = to_snake_case(entity_name)
+    result = {}
+
+    for field in calc_fields:
+        field_name = to_snake_case(field['name'])
+        datatype = field.get('datatype', 'string').lower()
+
+        # Map datatype to return type
+        if datatype == 'boolean':
+            ret_type = 'bool'
+        elif datatype == 'integer':
+            ret_type = 'int'
+        else:
+            ret_type = 'string'
+
+        # Function name follows pattern from inject-into-binary.py
+        func_name = f"eval_{entity_snake}_{field_name}"
+        result[field_name] = (func_name, ret_type)
+
+    return result
 
 
 # =============================================================================
@@ -327,15 +313,13 @@ def process_records(data: List[dict], lib: ctypes.CDLL, schema: Dict[str, FieldI
 
             # Call each available function
             for field_name, (func_name, ret_type) in available_funcs.items():
-                json_key = JSON_OUTPUT_KEYS.get(field_name, field_name)
-
                 try:
                     if ret_type == 'bool':
                         result = call_bool_function(lib, func_name, struct_ptr)
                     else:  # string
                         result = call_string_function(lib, func_name, struct_ptr)
 
-                    record[json_key] = result
+                    record[field_name] = result
                 except Exception as e:
                     print(f"  Warning: Error calling {func_name} for record {i}: {e}")
                     import traceback
@@ -372,25 +356,15 @@ def load_binary_library(script_dir: Path) -> tuple:
     return lib, lib_path
 
 
-def get_available_functions(lib: ctypes.CDLL) -> dict:
-    """Verify and return available assembly functions."""
-    available_funcs = {}
-    for field_name, (func_name, ret_type) in CALCULATED_FIELDS.items():
-        try:
-            func = getattr(lib, func_name)
-            available_funcs[field_name] = (func_name, ret_type)
-        except AttributeError:
-            pass
-    return available_funcs
-
-
 # =============================================================================
 # MULTI-ENTITY MODE
 # =============================================================================
 
 def run_multi_entity(script_dir: Path):
-    """Process all entity files in blank-tests/ directory."""
-    blank_tests_dir = script_dir / "blank-tests"
+    """Process all entity files from shared testing/blank-tests/ directory."""
+    # Use shared blank-tests directory at project root
+    project_root = script_dir.parent.parent
+    blank_tests_dir = project_root / "testing" / "blank-tests"
     test_answers_dir = script_dir / "test-answers"
 
     if not blank_tests_dir.is_dir():
@@ -409,7 +383,7 @@ def run_multi_entity(script_dir: Path):
     lib, lib_path = load_binary_library(script_dir)
     print(f"Loaded library: {lib_path}")
 
-    # Load rulebook to get schema
+    # Load rulebook to get schemas
     print("Loading rulebook...")
     try:
         rulebook = load_rulebook()
@@ -417,19 +391,9 @@ def run_multi_entity(script_dir: Path):
         print(f"ERROR: {e}")
         sys.exit(1)
 
-    # Build schema from LanguageCandidates (primary entity)
-    language_candidates = rulebook.get("LanguageCandidates", {})
-    columns = language_candidates.get("schema", [])
-    schema, struct_size = build_schema(columns)
-    print(f"Schema built: {len(schema)} fields, struct size: {struct_size} bytes")
-
-    # Get available functions
-    available_funcs = get_available_functions(lib)
-    print(f"Found {len(available_funcs)} assembly functions")
-
-    if not available_funcs:
-        print("ERROR: No assembly functions found!")
-        sys.exit(1)
+    # Discover all entities
+    entities = discover_entities(rulebook)
+    print(f"Discovered {len(entities)} entities: {', '.join(entities)}")
 
     # Process each entity file (skip metadata files starting with _)
     total_records = 0
@@ -445,6 +409,47 @@ def run_multi_entity(script_dir: Path):
         entity = filename.replace('.json', '')
         output_path = test_answers_dir / filename
 
+        # Find matching rulebook entity (case-insensitive)
+        rulebook_entity = None
+        for e in entities:
+            if to_snake_case(e) == entity:
+                rulebook_entity = e
+                break
+
+        if not rulebook_entity:
+            print(f"  -> {entity}: No matching entity in rulebook, copying as-is")
+            with open(input_path, 'r') as f:
+                data = json.load(f)
+            with open(output_path, 'w') as f:
+                json.dump(data, f, indent=2)
+            continue
+
+        # Build schema for this entity
+        columns = get_entity_schema(rulebook, rulebook_entity)
+        schema, struct_size = build_schema(columns)
+        print(f"  Schema for {entity}: {len(schema)} fields, {struct_size} bytes")
+
+        # Discover calculated fields for this entity
+        calc_fields = discover_calculated_fields(rulebook, rulebook_entity)
+
+        # Get available functions for this entity
+        available_funcs = {}
+        for field_name, (func_name, ret_type) in calc_fields.items():
+            try:
+                func = getattr(lib, func_name)
+                available_funcs[field_name] = (func_name, ret_type)
+                print(f"    Found: {func_name} -> {ret_type}")
+            except AttributeError:
+                print(f"    Missing: {func_name}")
+
+        if not available_funcs:
+            print(f"  -> {entity}: No assembly functions available, copying blank test")
+            with open(input_path, 'r') as f:
+                data = json.load(f)
+            with open(output_path, 'w') as f:
+                json.dump(data, f, indent=2)
+            continue
+
         # Load input data
         with open(input_path, 'r') as f:
             data = json.load(f)
@@ -456,7 +461,7 @@ def run_multi_entity(script_dir: Path):
             print(f"  -> {entity}: 0 records (empty)")
             continue
 
-        # Process records
+        # Process records using entity-specific schema and functions
         processed = process_records(data, lib, schema, struct_size, available_funcs)
 
         # Save results
@@ -540,20 +545,8 @@ def run_legacy(script_dir: Path):
 # =============================================================================
 
 def main():
-    parser = argparse.ArgumentParser(description="Binary Substrate Test Runner")
-    parser.add_argument(
-        "--multi-entity",
-        action="store_true",
-        help="Process all entities in blank-tests/ directory"
-    )
-    args = parser.parse_args()
-
     script_dir = Path(__file__).resolve().parent
-
-    if args.multi_entity:
-        run_multi_entity(script_dir)
-    else:
-        run_legacy(script_dir)
+    run_multi_entity(script_dir)
 
 
 if __name__ == "__main__":

@@ -1,58 +1,7 @@
 table_name,field_name,field_type,dag_level,formula
-LanguageCandidates,language_candidate_id,raw,0,
-LanguageCandidates,name,raw,0,
-LanguageCandidates,is_language,raw,0,
-LanguageCandidates,has_grammar,calculated,,={{HasSyntax}} = TRUE()
-LanguageCandidates,has_syntax,raw,0,
-LanguageCandidates,can_be_held,raw,0,
-LanguageCandidates,question,calculated,,"=""Is "" & {{Name}} & "" a language?"""
-LanguageCandidates,predicted_answer,calculated,,"=AND(
-  {{HasSyntax}},
-  {{RequiresParsing}},
-  {{IsDescriptionOf}},
-  {{HasLinearDecodingPressure}},
-  {{ResolvesToAnAST}},
-  {{IsStableOntologyReference}},
-  NOT({{CanBeHeld}}),
-  NOT({{HasIdentity}})
-)"
-LanguageCandidates,prediction_predicates,calculated,,"=IF({{HasSyntax}}, ""Has Syntax"", ""No Syntax"") & "" & "" & IF({{RequiresParsing}}, ""Requires Parsing"", ""No Parsing Neede"") & "" & "" & IF({{IsDescriptionOf}}, ""Describes the thing"", ""Is the Thing"") & "" & "" & IF({{HasLinearDecodingPressure}}, ""Has Linear Decoding Pressure"", ""No Decoding Pressure"") & "" & "" & IF({{ResolvesToAnAST}}, ""Resolves to AST"", ""No AST"") & "", "" &
-""  "" & IF({{IsStableOntologyReference}}, ""Is Stable Ontology"", ""Not 'Ontology'"") & ""\n AND "" &
-""  "" & IF({{CanBeHeld}}, ""Can Be Held"", ""Can't Be Held"") & "", "" &
-""  "" & IF({{HasIdentity}}, ""Has Identity"", ""Has no Identity"")"
-LanguageCandidates,prediction_fail,calculated,,"=IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),
-  {{Name}} & "" "" & IF({{PredictedAnswer}}, ""Is"", ""Isn't"") & "" a Family Feud Language, but "" & 
-  IF({{IsLanguage}}, ""Is"", ""Is Not"") & "" marked as a 'Language Candidate.'"") & IF({{IsOpenClosedWorldConflicted}}, "" - Open World vs. Closed World Conflict."")"
-LanguageCandidates,category,raw,0,
-LanguageCandidates,has_identity,raw,0,
-LanguageCandidates,requires_parsing,raw,0,
-LanguageCandidates,resolves_to_an_ast,raw,0,
-LanguageCandidates,has_linear_decoding_pressure,raw,0,
-LanguageCandidates,is_stable_ontology_reference,raw,0,
-LanguageCandidates,is_live_ontology_editor,raw,0,
-LanguageCandidates,is_open_world,raw,0,
-LanguageCandidates,is_closed_world,raw,0,
-LanguageCandidates,is_description_of,calculated,,={{DistanceFromConcept}} > 1
-LanguageCandidates,distance_from_concept,raw,0,
-LanguageCandidates,is_open_closed_world_conflicted,calculated,,"=AND({{IsOpenWorld}}, {{IsClosedWorld}})"
-LanguageCandidates,dimensionality_while_editing,raw,0,
-LanguageCandidates,relationship_to_concept,calculated,,"=IF({{DistanceFromConcept}} = 1, ""IsMirrorOf"", ""IsDescriptionOf"")"
-LanguageCandidates,model_object_facility_layer,raw,0,
-LanguageCandidates,sort_order,raw,0,
-IsEverythingALanguage,is_everything_a_language_id,raw,0,
-IsEverythingALanguage,name,raw,0,
-IsEverythingALanguage,argument_name,raw,0,
-IsEverythingALanguage,argument_category,raw,0,
-IsEverythingALanguage,step_type,raw,0,
-IsEverythingALanguage,statement,raw,0,
-IsEverythingALanguage,formalization,raw,0,
-IsEverythingALanguage,related_candidate_name,raw,0,
-IsEverythingALanguage,related_candidate_id,raw,0,
-IsEverythingALanguage,evidence_from_rulebook,raw,0,
-IsEverythingALanguage,notes,raw,0,
-ERBCustomizations,erb_customization_id,raw,0,
-ERBCustomizations,name,raw,0,
-ERBCustomizations,title,raw,0,
-ERBCustomizations,sql_code,raw,0,
-ERBCustomizations,sql_target,raw,0,
-ERBCustomizations,customization_type,raw,0,
+Customers,customer_id,raw,0,
+Customers,customer,raw,0,
+Customers,email_address,raw,0,
+Customers,first_name,raw,0,
+Customers,last_name,raw,0,
+Customers,full_name,calculated,,"={{FirstName}} & "" "" & {{LastName}}"

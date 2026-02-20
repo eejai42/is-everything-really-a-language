@@ -220,12 +220,14 @@ def view_to_entity_name(view_name: str) -> str:
 def generate_all_answer_keys(conn, rulebook: dict) -> dict:
     """
     Query all vw_* views and export to answer-keys/{entity}.json.
-    Also generates legacy answer-key.json for backward compatibility.
     Returns dict of entity_name -> list of records.
     """
     print("Step 1: Generating answer keys from all views...", flush=True)
 
-    # Ensure directory exists
+    # Clear and recreate answer-keys directory to remove stale files
+    import shutil
+    if os.path.exists(ANSWER_KEYS_DIR):
+        shutil.rmtree(ANSWER_KEYS_DIR)
     os.makedirs(ANSWER_KEYS_DIR, exist_ok=True)
 
     views = discover_views(conn)
@@ -257,19 +259,7 @@ def generate_all_answer_keys(conn, rulebook: dict) -> dict:
             json.dump(records, f, indent=2, default=str)
 
         all_answer_keys[entity] = records
-
-        # Track first entity with computed columns for legacy file
-        if computed_cols and first_entity_with_computed is None:
-            first_entity_with_computed = entity
-
         print(f"  -> {entity}: {len(records)} records", flush=True)
-
-    # Generate legacy answer-key.json for backward compatibility
-    if first_entity_with_computed and first_entity_with_computed in all_answer_keys:
-        legacy_path = os.path.join(TESTING_DIR, "answer-key.json")
-        with open(legacy_path, 'w') as f:
-            json.dump(all_answer_keys[first_entity_with_computed], f, indent=2, default=str)
-        print(f"  -> Legacy answer-key.json: {first_entity_with_computed}", flush=True)
 
     return all_answer_keys
 
@@ -281,16 +271,18 @@ def generate_all_answer_keys(conn, rulebook: dict) -> dict:
 def generate_all_blank_tests(all_answer_keys: dict, rulebook: dict) -> dict:
     """
     Create blank tests by nulling computed columns for each entity.
-    Also generates legacy blank-test.json for backward compatibility.
+    Generates testing/blank-tests/{entity}.json files and testing/_metadata.json.
     """
     print("Step 2: Generating blank tests...", flush=True)
 
-    # Ensure directory exists
+    # Clear and recreate blank-tests directory to remove stale files
+    import shutil
+    if os.path.exists(BLANK_TESTS_DIR):
+        shutil.rmtree(BLANK_TESTS_DIR)
     os.makedirs(BLANK_TESTS_DIR, exist_ok=True)
 
     all_blank_tests = {}
     entity_metadata = {}
-    first_entity_with_computed = None
 
     for entity, records in all_answer_keys.items():
         computed_cols = discover_computed_columns(rulebook, entity)
@@ -323,24 +315,13 @@ def generate_all_blank_tests(all_answer_keys: dict, rulebook: dict) -> dict:
             "record_count": len(blank_records)
         }
 
-        # Track first entity for legacy file
-        if first_entity_with_computed is None:
-            first_entity_with_computed = entity
-
         print(f"  -> {entity}: Nulled {len(computed_cols)} columns: {', '.join(computed_cols)}", flush=True)
 
-    # Generate legacy blank-test.json for backward compatibility
-    if first_entity_with_computed and first_entity_with_computed in all_blank_tests:
-        legacy_path = os.path.join(TESTING_DIR, "blank-test.json")
-        with open(legacy_path, 'w') as f:
-            json.dump(all_blank_tests[first_entity_with_computed], f, indent=2, default=str)
-        print(f"  -> Legacy blank-test.json: {first_entity_with_computed}", flush=True)
-
-    # Generate entity metadata for grading context
-    metadata_path = os.path.join(BLANK_TESTS_DIR, "_metadata.json")
+    # Generate shared entity metadata at testing/_metadata.json (not in blank-tests/)
+    metadata_path = os.path.join(TESTING_DIR, "_metadata.json")
     with open(metadata_path, 'w') as f:
         json.dump(entity_metadata, f, indent=2)
-    print(f"  -> Entity metadata: {len(entity_metadata)} entities", flush=True)
+    print(f"  -> Entity metadata: {len(entity_metadata)} entities -> testing/_metadata.json", flush=True)
 
     return all_blank_tests
 
@@ -360,41 +341,27 @@ def get_substrates() -> list:
     return substrates
 
 
-def distribute_blank_tests_to_substrate(substrate_name: str) -> int:
+def prepare_substrate_for_test(substrate_name: str) -> int:
     """
-    Copy blank tests from testing/blank-tests/ to substrate's blank-tests/ directory.
-    Also clears the substrate's test-answers/ directory.
-    Returns number of test files distributed.
+    Prepare a substrate for testing by clearing its test-answers/ directory.
+    Substrates now read blank-tests from the shared testing/blank-tests/ location.
+    Returns number of test files that will be processed.
     """
     import shutil
 
     substrate_dir = os.path.join(SUBSTRATES_DIR, substrate_name)
-    substrate_blank_tests = os.path.join(substrate_dir, "blank-tests")
     substrate_test_answers = os.path.join(substrate_dir, "test-answers")
-
-    # Clear and recreate blank-tests directory
-    if os.path.exists(substrate_blank_tests):
-        shutil.rmtree(substrate_blank_tests)
-    os.makedirs(substrate_blank_tests, exist_ok=True)
 
     # Clear and recreate test-answers directory
     if os.path.exists(substrate_test_answers):
         shutil.rmtree(substrate_test_answers)
     os.makedirs(substrate_test_answers, exist_ok=True)
 
-    # Copy all blank test files (excluding metadata)
+    # Count blank test files (for reporting)
     count = 0
     for filename in os.listdir(BLANK_TESTS_DIR):
         if filename.endswith('.json') and not filename.startswith('_'):
-            src = os.path.join(BLANK_TESTS_DIR, filename)
-            dst = os.path.join(substrate_blank_tests, filename)
-            shutil.copy(src, dst)
             count += 1
-
-    # Also copy metadata file
-    metadata_src = os.path.join(BLANK_TESTS_DIR, "_metadata.json")
-    if os.path.exists(metadata_src):
-        shutil.copy(metadata_src, os.path.join(substrate_blank_tests, "_metadata.json"))
 
     return count
 
@@ -597,9 +564,9 @@ def run_and_grade_all_substrates(all_answer_keys: dict, rulebook: dict) -> dict:
     for i, substrate in enumerate(substrates, 1):
         print(f"  [{i}/{len(substrates)}] Testing {substrate}...", flush=True)
 
-        # Distribute blank tests to substrate directory
-        test_count = distribute_blank_tests_to_substrate(substrate)
-        print(f"      Distributed {test_count} blank tests to {substrate}/blank-tests/", flush=True)
+        # Prepare substrate for test (clear old test-answers)
+        test_count = prepare_substrate_for_test(substrate)
+        print(f"      Prepared {substrate} ({test_count} tests from shared testing/blank-tests/)", flush=True)
 
         # Run the test
         success, error, elapsed = run_substrate_test(substrate)
@@ -626,10 +593,8 @@ def run_and_grade_all_substrates(all_answer_keys: dict, rulebook: dict) -> dict:
 
 def format_duration(seconds: float) -> str:
     """Format duration in human-readable form"""
-    if seconds < 1:
-        return f"{seconds * 1000:.0f}ms"
-    elif seconds < 60:
-        return f"{seconds:.2f}s"
+    if seconds < 60:
+        return f"{seconds:.1f}s"
     else:
         mins = int(seconds // 60)
         secs = seconds % 60

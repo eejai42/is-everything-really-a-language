@@ -422,30 +422,25 @@ show_menu() {
     echo -e "${BOLD}${WHITE}Select an option:${NC}"
     echo ""
 
+    # Primary options (always available)
+    echo -e "  ${GREEN}[1]${NC} Run Substrate Tests ${DIM}(default - press Enter)${NC}"
+    echo -e "  ${CYAN}[2]${NC} View Results"
+    echo ""
+
+    # Separator
+    echo -e "  ${DIM}────────────────────────────────────────${NC}"
+    echo ""
+
     # SSoTME options
     if $SSOTME_AVAILABLE; then
-        echo -e "  ${CYAN}[1]${NC} Pull/Update from Airtable"
-        echo -e "  ${CYAN}[2]${NC} Change Airtable Base ID"
+        echo -e "  ${CYAN}[3]${NC} Pull/Update from Airtable"
+        echo -e "  ${CYAN}[4]${NC} Change Airtable Base ID"
     else
-        echo -e "  ${CYAN}[1]${NC} Setup SSoTME ${DIM}(required for Airtable sync)${NC}"
-        echo -e "  ${DIM}[2] Change Airtable Base ID (requires SSoTME)${NC}"
+        echo -e "  ${DIM}[3] Pull/Update from Airtable (requires SSoTME)${NC}"
+        echo -e "  ${DIM}[4] Change Airtable Base ID (requires SSoTME)${NC}"
     fi
 
-    echo ""
-
-    # PostgreSQL options
-    if $POSTGRES_AVAILABLE; then
-        echo -e "  ${CYAN}[3]${NC} Initialize PostgreSQL Database"
-    else
-        echo -e "  ${DIM}[3] Initialize PostgreSQL Database (requires psql)${NC}"
-    fi
-
-    echo ""
-
-    # Always available options
-    echo -e "  ${CYAN}[4]${NC} Run Substrate Tests"
-    echo -e "  ${CYAN}[5]${NC} View Results"
-    echo -e "  ${CYAN}[6]${NC} Clean Generated Files"
+    echo -e "  ${CYAN}[5]${NC} Clean Generated Files"
     echo ""
     echo -e "  ${RED}[Q]${NC} Quit"
     echo ""
@@ -468,17 +463,28 @@ main() {
         show_header
         show_menu
 
-        read -p "Enter choice [1-6, Q]: " choice
+        read -p "Enter choice [1-5, Q] (default: 1): " choice
+
+        # Default to 1 if user just presses Enter
+        if [ -z "$choice" ]; then
+            choice="1"
+        fi
 
         case $choice in
             1)
+                action_run_tests
+                ;;
+            2)
+                action_view_results
+                ;;
+            3)
                 if $SSOTME_AVAILABLE; then
                     action_pull_from_airtable
                 else
                     action_setup_ssotme
                 fi
                 ;;
-            2)
+            4)
                 if $SSOTME_AVAILABLE; then
                     action_change_base_id
                 else
@@ -487,16 +493,7 @@ main() {
                     read -p "Press Enter to continue..."
                 fi
                 ;;
-            3)
-                action_init_postgres
-                ;;
-            4)
-                action_run_tests
-                ;;
             5)
-                action_view_results
-                ;;
-            6)
                 action_clean
                 ;;
             [Qq])

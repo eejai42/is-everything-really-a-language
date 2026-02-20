@@ -14,30 +14,33 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Paths
-	blankTestPath := filepath.Join(scriptDir, "..", "..", "testing", "blank-test.json")
-	answersPath := filepath.Join(scriptDir, "test-answers.json")
+	// Shared blank-tests directory at project root
+	blankTestsDir := filepath.Join(scriptDir, "..", "..", "testing", "blank-tests")
+	testAnswersDir := filepath.Join(scriptDir, "test-answers")
 
-	// Step 1: Load blank test data
-	records, err := LoadRecords(blankTestPath)
+	// Ensure output directory exists
+	os.MkdirAll(testAnswersDir, 0755)
+
+	fmt.Println("Golang substrate: Processing entities from shared testing/blank-tests/...")
+
+	// Process customers.json
+	customersInputPath := filepath.Join(blankTestsDir, "customers.json")
+	customersOutputPath := filepath.Join(testAnswersDir, "customers.json")
+
+	customerRecords, err := LoadRecords(customersInputPath)
 	if err != nil {
-		fmt.Printf("Failed to load blank test: %v\n", err)
-		os.Exit(1)
+		fmt.Printf("Failed to load customers: %v\n", err)
+	} else {
+		var computedCustomers []Customer
+		for _, r := range customerRecords {
+			computedCustomers = append(computedCustomers, *r.ComputeAll())
+		}
+		if err := SaveRecords(customersOutputPath, computedCustomers); err != nil {
+			fmt.Printf("Failed to save customers: %v\n", err)
+		} else {
+			fmt.Printf("  -> customers: %d records\n", len(computedCustomers))
+		}
 	}
 
-	fmt.Printf("Golang substrate: Processing %d records...\n", len(records))
-
-	// Step 2: Compute all calculated fields using the SDK
-	var computed []LanguageCandidate
-	for _, r := range records {
-		computed = append(computed, *r.ComputeAll())
-	}
-
-	// Step 3: Save test answers
-	if err := SaveRecords(answersPath, computed); err != nil {
-		fmt.Printf("Failed to save test answers: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("Golang substrate: Saved results to %s\n", answersPath)
+	fmt.Println("Golang substrate: Test completed")
 }

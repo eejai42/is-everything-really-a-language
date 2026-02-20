@@ -6,229 +6,36 @@
 # RDF Schema for ERB
 # Generated from effortless-rulebook.json
 
-# === Class: ERBCustomizations ===
-erb:ERBCustomizations a rdfs:Class ;
-    rdfs:label "ERBCustomizations" .
+# === Class: Customers ===
+erb:Customers a rdfs:Class ;
+    rdfs:label "Customers" .
 
-erb:eRBCustomizationId a rdf:Property ;
-    rdfs:domain erb:ERBCustomizations ;
+erb:customerId a rdf:Property ;
+    rdfs:domain erb:Customers ;
     rdfs:range xsd:string ;
-    rdfs:label "ERBCustomizationId" .
+    rdfs:label "CustomerId" .
 
-erb:name a rdf:Property ;
-    rdfs:domain erb:ERBCustomizations ;
+erb:customer a rdf:Property ;
+    rdfs:domain erb:Customers ;
     rdfs:range xsd:string ;
-    rdfs:label "Name" .
+    rdfs:label "Customer" .
 
-erb:title a rdf:Property ;
-    rdfs:domain erb:ERBCustomizations ;
+erb:emailAddress a rdf:Property ;
+    rdfs:domain erb:Customers ;
     rdfs:range xsd:string ;
-    rdfs:label "Title" .
+    rdfs:label "EmailAddress" .
 
-erb:sQLCode a rdf:Property ;
-    rdfs:domain erb:ERBCustomizations ;
+erb:firstName a rdf:Property ;
+    rdfs:domain erb:Customers ;
     rdfs:range xsd:string ;
-    rdfs:label "SQLCode" .
+    rdfs:label "FirstName" .
 
-erb:sQLTarget a rdf:Property ;
-    rdfs:domain erb:ERBCustomizations ;
+erb:lastName a rdf:Property ;
+    rdfs:domain erb:Customers ;
     rdfs:range xsd:string ;
-    rdfs:label "SQLTarget" .
+    rdfs:label "LastName" .
 
-erb:customizationType a rdf:Property ;
-    rdfs:domain erb:ERBCustomizations ;
+erb:fullName a rdf:Property ;
+    rdfs:domain erb:Customers ;
     rdfs:range xsd:string ;
-    rdfs:label "CustomizationType" .
-
-# === Class: IsEverythingALanguage ===
-erb:IsEverythingALanguage a rdfs:Class ;
-    rdfs:label "IsEverythingALanguage" .
-
-erb:isEverythingALanguageId a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "IsEverythingALanguageId" .
-
-erb:name a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "Name" .
-
-erb:argumentName a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "ArgumentName" .
-
-erb:argumentCategory a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "ArgumentCategory" .
-
-erb:stepType a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "StepType" .
-
-erb:statement a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "Statement" .
-
-erb:formalization a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "Formalization" .
-
-erb:relatedCandidateName a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "RelatedCandidateName" .
-
-erb:relatedCandidateId a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "RelatedCandidateId" .
-
-erb:evidenceFromRulebook a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "EvidenceFromRulebook" .
-
-erb:notes a rdf:Property ;
-    rdfs:domain erb:IsEverythingALanguage ;
-    rdfs:range xsd:string ;
-    rdfs:label "Notes" .
-
-# === Class: LanguageCandidates ===
-erb:LanguageCandidates a rdfs:Class ;
-    rdfs:label "LanguageCandidates" .
-
-erb:languageCandidateId a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "LanguageCandidateId" .
-
-erb:name a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "Name" .
-
-erb:isLanguage a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "IsLanguage" .
-
-erb:hasGrammar a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "HasGrammar" .
-
-erb:hasSyntax a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "HasSyntax" .
-
-erb:canBeHeld a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "CanBeHeld" .
-
-erb:question a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "Question" .
-
-erb:predictedAnswer a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "PredictedAnswer" .
-
-erb:predictionPredicates a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "PredictionPredicates" .
-
-erb:predictionFail a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "PredictionFail" .
-
-erb:category a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "Category" .
-
-erb:hasIdentity a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "HasIdentity" .
-
-erb:requiresParsing a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "RequiresParsing" .
-
-erb:resolvesToAnAST a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "ResolvesToAnAST" .
-
-erb:hasLinearDecodingPressure a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "HasLinearDecodingPressure" .
-
-erb:isStableOntologyReference a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "IsStableOntologyReference" .
-
-erb:isLiveOntologyEditor a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "IsLiveOntologyEditor" .
-
-erb:isOpenWorld a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "IsOpenWorld" .
-
-erb:isClosedWorld a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "IsClosedWorld" .
-
-erb:isDescriptionOf a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "IsDescriptionOf" .
-
-erb:distanceFromConcept a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:integer ;
-    rdfs:label "DistanceFromConcept" .
-
-erb:isOpenClosedWorldConflicted a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:boolean ;
-    rdfs:label "IsOpenClosedWorldConflicted" .
-
-erb:dimensionalityWhileEditing a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "DimensionalityWhileEditing" .
-
-erb:relationshipToConcept a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "RelationshipToConcept" .
-
-erb:modelObjectFacilityLayer a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:string ;
-    rdfs:label "ModelObjectFacilityLayer" .
-
-erb:sortOrder a rdf:Property ;
-    rdfs:domain erb:LanguageCandidates ;
-    rdfs:range xsd:integer ;
-    rdfs:label "SortOrder" .
+    rdfs:label "FullName" .

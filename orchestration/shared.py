@@ -146,3 +146,143 @@ def handle_clean_arg(generated_files: list, description: str = None):
         return True
 
     return False
+
+
+# =============================================================================
+# ENTITY DISCOVERY FUNCTIONS
+# =============================================================================
+# These functions discover entities, schemas, and computed columns from the
+# rulebook. They enable multi-entity processing across all substrates.
+# =============================================================================
+
+import re
+
+
+def to_snake_case(name: str) -> str:
+    """Convert PascalCase to snake_case: LanguageCandidates -> language_candidates"""
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def to_pascal_case(name: str) -> str:
+    """Convert snake_case to PascalCase: language_candidates -> LanguageCandidates"""
+    return ''.join(word.capitalize() for word in name.split('_'))
+
+
+def discover_entities(rulebook: dict) -> list:
+    """
+    Discover all entities from the rulebook.
+    Entities are top-level keys that have a 'schema' array.
+    Returns list of entity names in PascalCase (as they appear in rulebook).
+    """
+    entities = []
+    skip_keys = {'$schema', 'model_name', 'Description', '_meta'}
+
+    for key, value in rulebook.items():
+        if key in skip_keys:
+            continue
+        if isinstance(value, dict) and 'schema' in value:
+            entities.append(key)
+
+    return entities
+
+
+def get_entity_schema(rulebook: dict, entity_name: str) -> list:
+    """
+    Get the schema array for an entity.
+    Handles both PascalCase and snake_case entity names.
+    """
+    # Try direct lookup first
+    if entity_name in rulebook:
+        return rulebook[entity_name].get('schema', [])
+
+    # Try converting from snake_case to PascalCase
+    pascal_name = to_pascal_case(entity_name)
+    if pascal_name in rulebook:
+        return rulebook[pascal_name].get('schema', [])
+
+    # Try converting from PascalCase to snake_case and look up
+    snake_name = to_snake_case(entity_name)
+    for key in rulebook:
+        if to_snake_case(key) == snake_name:
+            return rulebook[key].get('schema', [])
+
+    return []
+
+
+def get_entity_data(rulebook: dict, entity_name: str) -> list:
+    """
+    Get the data array for an entity.
+    Handles both PascalCase and snake_case entity names.
+    """
+    # Try direct lookup first
+    if entity_name in rulebook:
+        return rulebook[entity_name].get('data', [])
+
+    # Try converting from snake_case to PascalCase
+    pascal_name = to_pascal_case(entity_name)
+    if pascal_name in rulebook:
+        return rulebook[pascal_name].get('data', [])
+
+    # Try converting from PascalCase to snake_case and look up
+    snake_name = to_snake_case(entity_name)
+    for key in rulebook:
+        if to_snake_case(key) == snake_name:
+            return rulebook[key].get('data', [])
+
+    return []
+
+
+def discover_primary_key(rulebook: dict, entity_name: str) -> str:
+    """
+    Discover the primary key for an entity.
+    Returns the first non-nullable field, or first field ending in 'Id'.
+    """
+    schema = get_entity_schema(rulebook, entity_name)
+
+    # First try: find first non-nullable field
+    for field in schema:
+        if field.get('nullable') == False:
+            return to_snake_case(field['name'])
+
+    # Second try: find first field ending in 'Id'
+    for field in schema:
+        if field['name'].endswith('Id'):
+            return to_snake_case(field['name'])
+
+    # Fallback: first field
+    if schema:
+        return to_snake_case(schema[0]['name'])
+
+    return None
+
+
+def discover_computed_columns(rulebook: dict, entity_name: str) -> list:
+    """
+    Discover computed columns for an entity.
+    Returns list of snake_case column names where type == "calculated".
+    """
+    schema = get_entity_schema(rulebook, entity_name)
+
+    computed = []
+    for field in schema:
+        if field.get('type') == 'calculated':
+            computed.append(to_snake_case(field['name']))
+
+    return computed
+
+
+def get_calculated_fields(schema: list) -> list:
+    """
+    Extract all calculated fields from a schema.
+    Returns list of field dicts where type == "calculated" and formula exists.
+    """
+    return [
+        field for field in schema
+        if field.get('type') == 'calculated' and field.get('formula')
+    ]
+
+
+def get_raw_fields(schema: list) -> list:
+    """Extract all raw fields from a schema."""
+    return [field for field in schema if field.get('type') == 'raw']

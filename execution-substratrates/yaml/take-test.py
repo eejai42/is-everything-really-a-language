@@ -90,7 +90,7 @@ def log_schema_info():
             print(f"  ... and {len(calculated_fields) - 5} more")
 
 
-def process_entity(input_path: str, output_path: str) -> int:
+def process_entity(input_path: str, output_path: str, entity_name: str) -> int:
     """Process a single entity file, computing all calculated fields."""
     with open(input_path, 'r') as f:
         records = json.load(f)
@@ -98,7 +98,7 @@ def process_entity(input_path: str, output_path: str) -> int:
     # Compute all calculated fields for each record
     computed_records = []
     for record in records:
-        computed = compute_all_calculated_fields(record)
+        computed = compute_all_calculated_fields(record, entity_name)
         computed_records.append(computed)
 
     # Save results
@@ -109,8 +109,10 @@ def process_entity(input_path: str, output_path: str) -> int:
 
 
 def run_multi_entity():
-    """Process all entity files in blank-tests/ directory."""
-    blank_tests_dir = os.path.join(script_dir, "blank-tests")
+    """Process all entity files from shared testing/blank-tests/ directory."""
+    # Use shared blank-tests directory at project root
+    project_root = os.path.join(script_dir, "..", "..")
+    blank_tests_dir = os.path.join(project_root, "testing", "blank-tests")
     test_answers_dir = os.path.join(script_dir, "test-answers")
 
     if not os.path.isdir(blank_tests_dir):
@@ -137,7 +139,7 @@ def run_multi_entity():
         entity = filename.replace('.json', '')
         output_path = os.path.join(test_answers_dir, filename)
 
-        count = process_entity(input_path, output_path)
+        count = process_entity(input_path, output_path, entity)
         total_records += count
         entity_count += 1
 
@@ -178,18 +180,7 @@ def run_legacy():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="YAML Substrate Test Runner")
-    parser.add_argument(
-        "--multi-entity",
-        action="store_true",
-        help="Process all entities in blank-tests/ directory"
-    )
-    args = parser.parse_args()
-
-    if args.multi_entity:
-        run_multi_entity()
-    else:
-        run_legacy()
+    run_multi_entity()
 
 
 if __name__ == "__main__":

@@ -162,10 +162,12 @@ def find_csv_for_entity(script_dir, entity):
 
 
 def run_multi_entity(script_dir):
-    """Process all entity files in blank-tests/ directory."""
+    """Process all entity files from shared testing/blank-tests/ directory."""
     import shutil
 
-    blank_tests_dir = script_dir / 'blank-tests'
+    # Use shared blank-tests directory at project root
+    project_root = script_dir.parent.parent
+    blank_tests_dir = project_root / 'testing' / 'blank-tests'
     test_answers_dir = script_dir / 'test-answers'
 
     if not blank_tests_dir.is_dir():
@@ -213,45 +215,8 @@ def run_multi_entity(script_dir):
 
 
 def main():
-    import argparse
-
-    parser = argparse.ArgumentParser(description="CSV Substrate Test Runner")
-    parser.add_argument(
-        "--multi-entity",
-        action="store_true",
-        help="Process all entities in blank-tests/ directory"
-    )
-    args = parser.parse_args()
-
     script_dir = Path(__file__).parent
-
-    if args.multi_entity:
-        run_multi_entity(script_dir)
-    else:
-        # Legacy mode - try to find any CSV file
-        csv_path = script_dir / 'language_candidates.csv'
-
-        # If specific file doesn't exist, try first csv file
-        if not csv_path.exists():
-            csv_files = list(script_dir.glob('*.csv'))
-            csv_files = [f for f in csv_files if not f.name.startswith('_')]
-            if csv_files:
-                csv_path = csv_files[0]
-
-        answers_path = script_dir / 'test-answers.json'
-
-        if not csv_path.exists():
-            print(f"Error: No CSV file found in {script_dir}")
-            print("Run inject-into-csv.py first to generate the CSV file")
-            sys.exit(1)
-
-        if not answers_path.exists():
-            print(f"Error: {answers_path} not found")
-            print("Ensure blank-test.json was copied to test-answers.json")
-            sys.exit(1)
-
-        fill_null_fields_from_csv(csv_path, answers_path)
-        print(f"csv: test-answers.json updated with values from {csv_path.name}")
+    run_multi_entity(script_dir)
 
 
 if __name__ == "__main__":

@@ -3,9 +3,9 @@
 Generate Python calculation library from the Effortless Rulebook.
 
 This script reads formulas from the rulebook and generates erb_calc.py
-with proper calculation functions for all calculated fields.
+with proper calculation functions for ALL entities with calculated fields.
 
-Generated file is shared by Python and YAML substrates.
+Generated file is shared by Python, English, YAML, and other substrates.
 """
 
 import sys
@@ -15,24 +15,15 @@ from typing import Dict, List, Any, Set
 # Add project root to path for shared imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from orchestration.shared import load_rulebook, get_candidate_name_from_cwd, handle_clean_arg
+from orchestration.shared import (
+    load_rulebook, get_candidate_name_from_cwd, handle_clean_arg,
+    discover_entities, get_entity_schema, to_snake_case,
+    get_calculated_fields, get_raw_fields
+)
 from orchestration.formula_parser import (
     parse_formula, compile_to_python, get_field_dependencies,
-    to_snake_case, ASTNode, FieldRef, FuncCall, Concat, LiteralString
+    ASTNode, FieldRef, FuncCall, Concat, LiteralString
 )
-
-
-def get_calculated_fields(schema: List[Dict]) -> List[Dict]:
-    """Extract all calculated fields from a schema."""
-    return [
-        field for field in schema
-        if field.get('type') == 'calculated' and field.get('formula')
-    ]
-
-
-def get_raw_fields(schema: List[Dict]) -> List[Dict]:
-    """Extract all raw fields from a schema."""
-    return [field for field in schema if field.get('type') == 'raw']
 
 
 def build_dag_levels(calculated_fields: List[Dict], raw_field_names: Set[str]) -> List[List[Dict]]:
@@ -82,30 +73,22 @@ def build_dag_levels(calculated_fields: List[Dict], raw_field_names: Set[str]) -
     return levels
 
 
-def generate_function_params(deps: List[str]) -> str:
-    """Generate function parameter list from dependencies."""
-    if not deps:
-        return ""
-    params = [f"{to_snake_case(d)}" for d in deps]
-    return ", ".join(params)
-
-
-def generate_function_signature(field_name: str, deps: List[str], return_type: str) -> str:
-    """Generate function signature with type hints."""
-    func_name = f"calc_{to_snake_case(field_name)}"
-    params = []
-    for d in deps:
-        param_name = to_snake_case(d)
-        params.append(f"{param_name}")
+def generate_function_signature(entity_name: str, field_name: str, deps: List[str]) -> str:
+    """Generate function signature with entity-namespaced function name."""
+    entity_snake = to_snake_case(entity_name)
+    field_snake = to_snake_case(field_name)
+    func_name = f"calc_{entity_snake}_{field_snake}"
+    params = [to_snake_case(d) for d in deps]
     params_str = ", ".join(params) if params else ""
     return f"def {func_name}({params_str}):"
 
 
-def generate_calc_function(field: Dict) -> str:
-    """Generate a calculation function for a field."""
+def generate_calc_function(entity_name: str, field: Dict) -> str:
+    """Generate a calculation function for a field, namespaced by entity."""
     name = field['name']
     formula = field.get('formula', '')
-    datatype = field.get('datatype', 'string')
+    entity_snake = to_snake_case(entity_name)
+    field_snake = to_snake_case(name)
 
     try:
         ast = parse_formula(formula)
@@ -113,7 +96,7 @@ def generate_calc_function(field: Dict) -> str:
         python_expr = compile_to_python(ast)
     except Exception as e:
         return f'''
-def calc_{to_snake_case(name)}():
+def calc_{entity_snake}_{field_snake}():
     """ERROR: Could not parse formula: {formula}
     Error: {e}
     """
@@ -122,7 +105,7 @@ def calc_{to_snake_case(name)}():
 
     # Generate function
     lines = []
-    sig = generate_function_signature(name, deps, datatype)
+    sig = generate_function_signature(entity_name, name, deps)
     lines.append(sig)
 
     # Docstring with formula (escape triple quotes and trailing double quotes)
@@ -138,18 +121,18 @@ def calc_{to_snake_case(name)}():
     return '\n'.join(lines)
 
 
-def generate_compute_all_function(
+def generate_entity_compute_function(
+    entity_name: str,
     calculated_fields: List[Dict],
     dag_levels: List[List[Dict]],
-    raw_field_names: Set[str]
+    string_fields: List[str]
 ) -> str:
-    """Generate the compute_all_calculated_fields function."""
+    """Generate compute function for a specific entity."""
+    entity_snake = to_snake_case(entity_name)
+
     lines = []
-    lines.append('def compute_all_calculated_fields(record: dict) -> dict:')
-    lines.append('    """')
-    lines.append('    Compute all calculated fields for a record.')
-    lines.append('    Generated from rulebook formulas.')
-    lines.append('    """')
+    lines.append(f'def compute_{entity_snake}_fields(record: dict) -> dict:')
+    lines.append(f'    """Compute all calculated fields for {entity_name}."""')
     lines.append('    result = dict(record)')
     lines.append('')
 
@@ -159,40 +142,75 @@ def generate_compute_all_function(
         for field in level_fields:
             name = field['name']
             snake_name = to_snake_case(name)
-            formula = field.get('formula', '')
 
             try:
-                ast = parse_formula(formula)
+                ast = parse_formula(field.get('formula', ''))
                 deps = get_field_dependencies(ast)
             except:
                 deps = []
 
             # Generate function call
+            func_name = f"calc_{entity_snake}_{snake_name}"
             if deps:
-                args = []
-                for dep in deps:
-                    dep_snake = to_snake_case(dep)
-                    args.append(f"result.get('{dep_snake}')")
+                args = [f"result.get('{to_snake_case(dep)}')" for dep in deps]
                 args_str = ', '.join(args)
-                lines.append(f"    result['{snake_name}'] = calc_{snake_name}({args_str})")
+                lines.append(f"    result['{snake_name}'] = {func_name}({args_str})")
             else:
-                lines.append(f"    result['{snake_name}'] = calc_{snake_name}()")
+                lines.append(f"    result['{snake_name}'] = {func_name}()")
         lines.append('')
 
     # Post-process: convert empty strings to None for string fields
-    lines.append('    # Convert empty strings to None for string fields')
-    lines.append("    for key in ['family_feud_mismatch']:")
-    lines.append("        if result.get(key) == '':")
-    lines.append('            result[key] = None')
-    lines.append('')
+    if string_fields:
+        lines.append('    # Convert empty strings to None for string fields')
+        fields_list = ', '.join(f"'{f}'" for f in string_fields)
+        lines.append(f"    for key in [{fields_list}]:")
+        lines.append("        if result.get(key) == '':")
+        lines.append('            result[key] = None')
+        lines.append('')
 
     lines.append('    return result')
 
     return '\n'.join(lines)
 
 
+def generate_dispatcher_function(entities_with_calcs: List[str]) -> str:
+    """Generate a dispatcher that routes to the correct entity's compute function."""
+    lines = []
+    lines.append('def compute_all_calculated_fields(record: dict, entity_name: str = None) -> dict:')
+    lines.append('    """')
+    lines.append('    Compute all calculated fields for a record.')
+    lines.append('    ')
+    lines.append('    Args:')
+    lines.append('        record: The record dict with raw field values')
+    lines.append('        entity_name: Entity name (snake_case or PascalCase)')
+    lines.append('    ')
+    lines.append('    Returns:')
+    lines.append('        Record dict with calculated fields filled in')
+    lines.append('    """')
+    lines.append('    if entity_name is None:')
+    lines.append('        # Try to infer from record keys')
+    lines.append('        return dict(record)')
+    lines.append('')
+    lines.append('    # Normalize to snake_case')
+    lines.append("    entity_lower = entity_name.lower().replace('-', '_')")
+    lines.append('')
+
+    # Generate dispatch logic
+    for i, entity in enumerate(entities_with_calcs):
+        entity_snake = to_snake_case(entity)
+        prefix = 'if' if i == 0 else 'elif'
+        lines.append(f"    {prefix} entity_lower == '{entity_snake}':")
+        lines.append(f"        return compute_{entity_snake}_fields(record)")
+
+    lines.append('    else:')
+    lines.append('        # Unknown entity, return as-is')
+    lines.append('        return dict(record)')
+
+    return '\n'.join(lines)
+
+
 def generate_erb_calc(rulebook: Dict) -> str:
-    """Generate the complete erb_calc.py content."""
+    """Generate the complete erb_calc.py content for ALL entities."""
     lines = []
 
     # Header
@@ -202,62 +220,87 @@ def generate_erb_calc(rulebook: Dict) -> str:
     lines.append('Generated from: effortless-rulebook/effortless-rulebook.json')
     lines.append('')
     lines.append('This file contains pure functions that compute calculated fields')
-    lines.append('from raw field values. Shared by Python and YAML substrates.')
+    lines.append('from raw field values. Supports multiple entities.')
     lines.append('"""')
     lines.append('')
     lines.append('from typing import Optional, Any')
     lines.append('')
 
-    # Process LanguageCandidates table
-    lc_table = rulebook.get('LanguageCandidates', {})
-    schema = lc_table.get('schema', [])
+    # Discover all entities
+    entities = discover_entities(rulebook)
+    entities_with_calcs = []
 
-    calculated_fields = get_calculated_fields(schema)
-    raw_fields = get_raw_fields(schema)
-    raw_field_names = {f['name'] for f in raw_fields}
+    # Process each entity
+    for entity_name in entities:
+        schema = get_entity_schema(rulebook, entity_name)
+        calculated_fields = get_calculated_fields(schema)
 
-    # Build DAG levels
-    dag_levels = build_dag_levels(calculated_fields, raw_field_names)
+        if not calculated_fields:
+            continue  # Skip entities with no calculated fields
 
-    # Generate calculation functions for each level
-    for level_idx, level_fields in enumerate(dag_levels):
+        entities_with_calcs.append(entity_name)
+        raw_fields = get_raw_fields(schema)
+        raw_field_names = {f['name'] for f in raw_fields}
+
+        # Find string calculated fields (for empty string -> None conversion)
+        string_fields = [
+            to_snake_case(f['name'])
+            for f in calculated_fields
+            if f.get('datatype') == 'string'
+        ]
+
+        # Build DAG levels
+        dag_levels = build_dag_levels(calculated_fields, raw_field_names)
+
+        # Section header for this entity
+        entity_snake = to_snake_case(entity_name)
         lines.append('')
         lines.append('# ' + '=' * 77)
-        lines.append(f'# LEVEL {level_idx + 1} CALCULATIONS')
+        lines.append(f'# {entity_name.upper()} CALCULATIONS')
         lines.append('# ' + '=' * 77)
-        lines.append('')
 
-        for field in level_fields:
-            lines.append(generate_calc_function(field))
+        # Generate calculation functions for each level
+        for level_idx, level_fields in enumerate(dag_levels):
             lines.append('')
+            lines.append(f'# Level {level_idx + 1}')
 
-    # Generate compute_all function
+            for field in level_fields:
+                lines.append('')
+                lines.append(generate_calc_function(entity_name, field))
+
+        # Generate entity-specific compute function
+        lines.append('')
+        lines.append('')
+        lines.append(generate_entity_compute_function(
+            entity_name, calculated_fields, dag_levels, string_fields
+        ))
+
+    # Generate dispatcher function
+    lines.append('')
     lines.append('')
     lines.append('# ' + '=' * 77)
-    lines.append('# COMPOSITE FUNCTION')
+    lines.append('# DISPATCHER FUNCTION')
     lines.append('# ' + '=' * 77)
     lines.append('')
-    lines.append(generate_compute_all_function(calculated_fields, dag_levels, raw_field_names))
+    lines.append(generate_dispatcher_function(entities_with_calcs))
 
     return '\n'.join(lines)
 
 
 def main():
     # Files actually generated by THIS script
-    # Note: test-answers.json, test-results.md are test outputs, not generated here
     GENERATED_FILES = [
         'erb_calc.py',
     ]
 
     # Handle --clean argument
-    if handle_clean_arg(GENERATED_FILES, "Python substrate: Removes generated calculation library and test outputs"):
+    if handle_clean_arg(GENERATED_FILES, "Python substrate: Removes generated calculation library"):
         return
 
-    candidate_name = get_candidate_name_from_cwd()
     script_dir = Path(__file__).resolve().parent
 
     print("=" * 70)
-    print("Python Execution Substrate - Formula Compiler")
+    print("Python Execution Substrate - Multi-Entity Formula Compiler")
     print("=" * 70)
     print()
 
@@ -269,15 +312,24 @@ def main():
         print(f"ERROR: {e}")
         sys.exit(1)
 
-    # Get schema info
-    lc_table = rulebook.get('LanguageCandidates', {})
-    schema = lc_table.get('schema', [])
-    calculated_fields = get_calculated_fields(schema)
+    # Discover entities
+    entities = discover_entities(rulebook)
+    print(f"Discovered {len(entities)} entities: {', '.join(entities)}")
+    print()
 
-    print(f"Found {len(calculated_fields)} calculated fields to compile")
-    for field in calculated_fields:
-        print(f"  - {field['name']}")
+    # Show calculated fields per entity
+    total_fields = 0
+    for entity_name in entities:
+        schema = get_entity_schema(rulebook, entity_name)
+        calculated_fields = get_calculated_fields(schema)
+        if calculated_fields:
+            print(f"  {entity_name}: {len(calculated_fields)} calculated fields")
+            for field in calculated_fields:
+                print(f"    - {field['name']}")
+            total_fields += len(calculated_fields)
 
+    print()
+    print(f"Total: {total_fields} calculated fields to compile")
     print()
     print("-" * 70)
     print()

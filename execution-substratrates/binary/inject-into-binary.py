@@ -24,7 +24,7 @@ from enum import Enum, auto
 # Add project root to path for shared imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from orchestration.shared import load_rulebook, handle_clean_arg
+from orchestration.shared import load_rulebook, handle_clean_arg, discover_entities, get_entity_schema, to_snake_case
 
 
 # =============================================================================
@@ -465,37 +465,12 @@ def parse_formula(formula_text: str) -> ASTNode:
 # PHASE 2: IR LOWERING
 # =============================================================================
 
-# Canonical field name mapping (from various casing to internal names)
-FIELD_NAME_MAP = {
-    'NAME': 'name',
-    'CATEGORY': 'category',
-    'HASSYNTAX': 'has_syntax',
-    'HASIDENTITY': 'has_identity',
-    'CANBEHELD': 'can_be_held',
-    'REQUIRESPARSING': 'requires_parsing',
-    'MEANINGISSERIALIZED': 'meaning_is_serialized',
-    'ISONGOLOGYDESCRIPTOR': 'is_ongology_descriptor',
-    'CHOSENLANGUAGECANDIDATE': 'chosen_language_candidate',
-    'DISTANCEFROMCONCEPT': 'distance_from_concept',
-    'ISOPENWORLD': 'is_open_world',
-    'ISCLOSEDWORLD': 'is_closed_world',
-    'SORTORDER': 'sort_order',
-    # Calculated fields (for referencing other calculations)
-    'TOPFAMILYFEUDANSWER': 'top_family_feud_answer',
-    'ISOPENCLOTEDWORLDCONFLICTED': 'is_open_closed_world_conflicted',
-    'ISOPENCLOSEDWORLDCONFLICTED': 'is_open_closed_world_conflicted',
-}
-
-
 def normalize_field_name(name: str) -> str:
-    """Normalize field name to internal format."""
-    # Remove spaces and convert to uppercase for lookup
-    upper = name.replace(' ', '').upper()
-    if upper in FIELD_NAME_MAP:
-        return FIELD_NAME_MAP[upper]
-    # Convert CamelCase to snake_case
-    result = re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
-    return result
+    """Normalize field name to snake_case format.
+
+    Uses the shared to_snake_case function for consistent naming across substrates.
+    """
+    return to_snake_case(name)
 
 
 class IRLowerer:
@@ -1237,27 +1212,45 @@ def main():
         print(f"ERROR: {e}")
         sys.exit(1)
 
-    # Extract schema and formulas
-    language_candidates = rulebook.get("LanguageCandidates", {})
-    columns = language_candidates.get("schema", [])  # Note: it's "schema" not "columns"
+    # Discover all entities in the rulebook
+    entities = discover_entities(rulebook)
+    print(f"\nDiscovered {len(entities)} entities: {', '.join(entities)}")
 
-    # Build schema with field offsets
-    print("\n📐 Building schema...")
-    schema = build_schema(columns)
-    for field_name, info in schema.items():
-        print(f"   {field_name}: offset={info.offset}, type={info.datatype.name}, size={info.size}")
+    # Process all entities and collect calculated fields
+    all_calculated_fields = []
+    all_schemas = {}
 
-    # Find calculated fields (those with formulas)
-    calculated_fields = []
-    for col in columns:
-        formula = col.get("formula") or col.get("calculation")
-        if formula:
-            field_name = normalize_field_name(col.get("name", ""))
-            calculated_fields.append({
-                "name": field_name,
-                "formula": formula,
-                "type": col.get("datatype", "string")
-            })
+    for entity in entities:
+        columns = get_entity_schema(rulebook, entity)
+        entity_snake = to_snake_case(entity)
+
+        if not columns:
+            print(f"  {entity}: No schema found, skipping")
+            continue
+
+        # Build schema with field offsets for this entity
+        print(f"\n📐 Building schema for {entity}...")
+        schema = build_schema(columns)
+        all_schemas[entity_snake] = schema
+
+        for field_name, info in schema.items():
+            print(f"   {field_name}: offset={info.offset}, type={info.datatype.name}, size={info.size}")
+
+        # Find calculated fields (those with formulas)
+        for col in columns:
+            formula = col.get("formula") or col.get("calculation")
+            if formula:
+                field_name = normalize_field_name(col.get("name", ""))
+                all_calculated_fields.append({
+                    "name": field_name,
+                    "entity": entity_snake,
+                    "formula": formula,
+                    "type": col.get("datatype", "string"),
+                    "schema": schema  # Include schema for this entity
+                })
+
+    # Use the collected calculated fields
+    calculated_fields = all_calculated_fields
 
     print(f"\n📋 Found {len(calculated_fields)} calculated fields to compile:")
     for cf in calculated_fields:
@@ -1277,7 +1270,11 @@ def main():
     all_functions = []
 
     for cf in calculated_fields:
-        print(f"\n>>> Compiling: {cf['name']}")
+        # Use the per-entity schema
+        entity_schema = cf['schema']
+        func_name = f"{cf['entity']}_{cf['name']}"  # e.g., customers_full_name
+
+        print(f"\n>>> Compiling: {func_name}")
         print(f"    Formula: {cf['formula']}")
 
         # Phase 1: Parse
@@ -1292,7 +1289,7 @@ def main():
         # Phase 2: Lower to IR
         print("    Phase 2: Lowering to IR...")
         try:
-            ir = lower_to_ir(ast, schema, string_literals)
+            ir = lower_to_ir(ast, entity_schema, string_literals)
             print(f"    IR: {type(ir).__name__}, result_type={ir.result_type.name}")
         except Exception as e:
             print(f"    ❌ Lowering error: {e}")
@@ -1303,7 +1300,7 @@ def main():
         # Phase 3: Generate assembly
         print("    Phase 3: Generating assembly...")
         try:
-            asm = generate_assembly(ir, cf['name'], string_literals)
+            asm = generate_assembly(ir, func_name, string_literals)
             all_functions.append(asm)
             print(f"    Generated {len(asm.splitlines())} lines of assembly")
         except Exception as e:

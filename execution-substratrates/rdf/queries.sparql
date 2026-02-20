@@ -6,132 +6,17 @@
 
 
 
-# Computed field: HasGrammar
-# Formula: ={{HasSyntax}} = TRUE()
+# Computed field: FullName
+# Formula: ={{FirstName}} & " " & {{LastName}}
 PREFIX erb: <http://example.org/erb#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
 CONSTRUCT {
-    ?entity erb:hasGrammar ?_result .
+    ?entity erb:fullName ?_result .
 }
 WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:hasSyntax ?has_syntax . }
-    BIND((?has_syntax = true) AS ?_result)
-}
-
-# Computed field: Question
-# Formula: ="Is " & {{Name}} & " a language?"
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:question ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:name ?name . }
-    BIND(CONCAT("Is ", ?name, " a language?") AS ?_result)
-}
-
-# Computed field: PredictedAnswer
-# Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescriptionOf}},   {{HasLinearDecodingPressure}},   {{ResolvesToAnAST}},   {{IsStableOntologyReference}},   NOT({{CanBeHeld}}),   NOT({{HasIdentity}}) )
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:predictedAnswer ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:canBeHeld ?can_be_held . }
-    OPTIONAL { ?entity erb:hasIdentity ?has_identity . }
-    OPTIONAL { ?entity erb:hasLinearDecodingPressure ?has_linear_decoding_pressure . }
-    OPTIONAL { ?entity erb:hasSyntax ?has_syntax . }
-    OPTIONAL { ?entity erb:isDescriptionOf ?is_description_of . }
-    OPTIONAL { ?entity erb:isStableOntologyReference ?is_stable_ontology_reference . }
-    OPTIONAL { ?entity erb:requiresParsing ?requires_parsing . }
-    OPTIONAL { ?entity erb:resolvesToAnAST ?resolves_to_an_ast . }
-    BIND((?has_syntax && ?requires_parsing && ?is_description_of && ?has_linear_decoding_pressure && ?resolves_to_an_ast && ?is_stable_ontology_reference && (!(?can_be_held)) && (!(?has_identity))) AS ?_result)
-}
-
-# Computed field: PredictionPredicates
-# Formula: =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Neede") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & "  " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & "\n AND " & "  " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & "  " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:predictionPredicates ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:canBeHeld ?can_be_held . }
-    OPTIONAL { ?entity erb:hasIdentity ?has_identity . }
-    OPTIONAL { ?entity erb:hasLinearDecodingPressure ?has_linear_decoding_pressure . }
-    OPTIONAL { ?entity erb:hasSyntax ?has_syntax . }
-    OPTIONAL { ?entity erb:isDescriptionOf ?is_description_of . }
-    OPTIONAL { ?entity erb:isStableOntologyReference ?is_stable_ontology_reference . }
-    OPTIONAL { ?entity erb:requiresParsing ?requires_parsing . }
-    OPTIONAL { ?entity erb:resolvesToAnAST ?resolves_to_an_ast . }
-    BIND(CONCAT(IF(?has_syntax, "Has Syntax", "No Syntax"), " & ", IF(?requires_parsing, "Requires Parsing", "No Parsing Neede"), " & ", IF(?is_description_of, "Describes the thing", "Is the Thing"), " & ", IF(?has_linear_decoding_pressure, "Has Linear Decoding Pressure", "No Decoding Pressure"), " & ", IF(?resolves_to_an_ast, "Resolves to AST", "No AST"), ", ", "  ", IF(?is_stable_ontology_reference, "Is Stable Ontology", "Not 'Ontology'"), "\\n AND ", "  ", IF(?can_be_held, "Can Be Held", "Can't Be Held"), ", ", "  ", IF(?has_identity, "Has Identity", "Has no Identity")) AS ?_result)
-}
-
-# Computed field: PredictionFail
-# Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " &    IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.")
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:predictionFail ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:isLanguage ?is_language . }
-    OPTIONAL { ?entity erb:isOpenClosedWorldConflicted ?is_open_closed_world_conflicted . }
-    OPTIONAL { ?entity erb:name ?name . }
-    OPTIONAL { ?entity erb:predictedAnswer ?predicted_answer . }
-    BIND(CONCAT(IF((!((?predicted_answer = ?is_language))), CONCAT(?name, " ", IF(?predicted_answer, "Is", "Isn't"), " a Family Feud Language, but ", IF(?is_language, "Is", "Is Not"), " marked as a 'Language Candidate.'"), ""), IF(?is_open_closed_world_conflicted, " - Open World vs. Closed World Conflict.", "")) AS ?_result)
-}
-
-# Computed field: IsDescriptionOf
-# Formula: ={{DistanceFromConcept}} > 1
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:isDescriptionOf ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:distanceFromConcept ?distance_from_concept . }
-    BIND((?distance_from_concept > 1) AS ?_result)
-}
-
-# Computed field: IsOpenClosedWorldConflicted
-# Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:isOpenClosedWorldConflicted ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:isClosedWorld ?is_closed_world . }
-    OPTIONAL { ?entity erb:isOpenWorld ?is_open_world . }
-    BIND((?is_open_world && ?is_closed_world) AS ?_result)
-}
-
-# Computed field: RelationshipToConcept
-# Formula: =IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")
-PREFIX erb: <http://example.org/erb#>
-PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-
-CONSTRUCT {
-    ?entity erb:relationshipToConcept ?_result .
-}
-WHERE {
-    ?entity a erb:LanguageCandidates .
-    OPTIONAL { ?entity erb:distanceFromConcept ?distance_from_concept . }
-    BIND(IF((?distance_from_concept = 1), "IsMirrorOf", "IsDescriptionOf") AS ?_result)
+    ?entity a erb:Customers .
+    OPTIONAL { ?entity erb:firstName ?first_name . }
+    OPTIONAL { ?entity erb:lastName ?last_name . }
+    BIND(CONCAT(?first_name, " ", ?last_name) AS ?_result)
 }
