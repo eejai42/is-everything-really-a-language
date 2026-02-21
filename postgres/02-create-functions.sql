@@ -9,6 +9,13 @@
 -- These functions perform lookups via foreign key relationships
 -- ============================================================================
 
+CREATE OR REPLACE FUNCTION get_orders_order_number(p_order_id TEXT)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (SELECT order_number FROM orders WHERE order_id = p_order_id);
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
 
 CREATE OR REPLACE FUNCTION calc_customers_full_name(p_customer_id TEXT)
 RETURNS TEXT AS $$
@@ -17,8 +24,71 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
+
+CREATE OR REPLACE FUNCTION calc_orders_customer_email_address(p_order_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT email_address::text FROM customers WHERE customer_id = (SELECT customer FROM orders WHERE order_id = p_order_id));
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION calc_orders_customer_full_name(p_order_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN calc_customers_full_name((SELECT customer FROM orders WHERE order_id = p_order_id));
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION get_customers_customer(p_customer_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT customer FROM customers WHERE customer_id = p_customer_id);
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION get_customers_email_address(p_customer_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT email_address FROM customers WHERE customer_id = p_customer_id);
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION get_customers_first_name(p_customer_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT first_name FROM customers WHERE customer_id = p_customer_id);
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION get_customers_last_name(p_customer_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (SELECT last_name FROM customers WHERE customer_id = p_customer_id);
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION calc_orders_name(p_order_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (CONCAT('ORD', (SELECT order_number FROM orders WHERE order_id = p_order_id)))::text;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
 -- ============================================================================
 -- MANY-SIDE RELATIONSHIP FUNCTIONS
 -- These functions aggregate child records for many-side relationships
 -- ============================================================================
+
+CREATE OR REPLACE FUNCTION calc_customers_orders(p_customer_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (
+    SELECT STRING_AGG(order_id::TEXT, ', ' ORDER BY order_id)
+    FROM orders
+    WHERE customer = p_customer_id
+  );
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 

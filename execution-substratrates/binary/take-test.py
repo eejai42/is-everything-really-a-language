@@ -433,10 +433,15 @@ def run_multi_entity(script_dir: Path):
         calc_fields = discover_calculated_fields(rulebook, rulebook_entity)
 
         # Get available functions for this entity
+        # NOTE: String-returning functions are skipped due to ARM64 ctypes ABI incompatibility
+        # (ctypes expects indirect struct return via x8, but assembly returns in x0/x1)
         available_funcs = {}
         for field_name, (func_name, ret_type) in calc_fields.items():
             try:
                 func = getattr(lib, func_name)
+                if ret_type == 'string':
+                    print(f"    Skipping: {func_name} -> {ret_type} (ARM64 ABI incompatible)")
+                    continue
                 available_funcs[field_name] = (func_name, ret_type)
                 print(f"    Found: {func_name} -> {ret_type}")
             except AttributeError:

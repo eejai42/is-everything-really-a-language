@@ -20,3 +20,28 @@ WHERE {
     OPTIONAL { ?entity erb:lastName ?last_name . }
     BIND(CONCAT(?first_name, " ", ?last_name) AS ?_result)
 }
+
+# Computed field: Name
+# Formula: ="ORD" & {{OrderNumber}}
+PREFIX erb: <http://example.org/erb#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?entity erb:name ?_result .
+}
+WHERE {
+    ?entity a erb:Orders .
+    OPTIONAL { ?entity erb:orderNumber ?order_number . }
+    BIND(CONCAT("ORD", ?order_number) AS ?_result)
+}
+
+# Computed field: CustomerEmailAddress
+
+# Formula parse error: Unexpected character '!' at position 15
+
+
+
+# Computed field: CustomerFullName
+
+# Formula parse error: Unexpected character '!' at position 15
+

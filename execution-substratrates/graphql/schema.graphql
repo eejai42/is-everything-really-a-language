@@ -23,8 +23,23 @@ type Customers {
   emailAddress: String
   firstName: String
   lastName: String
+  orders: String
 
   # Calculated Fields
   """Formula: ={{FirstName}} & " " & {{LastName}}"""
   fullName: String
+}
+
+"""Entity: Orders"""
+type Orders {
+  # Raw Fields
+  orderId: String!
+  orderNumber: Int
+  customer: String
+  customerEmailAddress: String
+  customerFullName: String
+
+  # Calculated Fields
+  """Formula: ="ORD" & {{OrderNumber}}"""
+  name: String
 }

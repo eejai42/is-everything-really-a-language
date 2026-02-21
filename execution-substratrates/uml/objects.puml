@@ -6,6 +6,7 @@ object "Customers_0" as Customers_0 {
   EmailAddress = "jane.smith@email.com"
   FirstName = "Jane"
   LastName = "Smith"
+  Orders = "ord1001, ord1002"
 }
 
 object "Customers_1" as Customers_1 {
@@ -14,6 +15,7 @@ object "Customers_1" as Customers_1 {
   EmailAddress = "john.doe@email.com"
   FirstName = "John"
   LastName = "Doe"
+  Orders = "ord1002"
 }
 
 object "Customers_2" as Customers_2 {
@@ -22,6 +24,31 @@ object "Customers_2" as Customers_2 {
   EmailAddress = "emily.jones@email.com"
   FirstName = "Emily"
   LastName = "Jones"
+  Orders = ""
+}
+
+object "ORD1001" as Orders_0 {
+  OrderId = "ord1001"
+  OrderNumber = 1001
+  Customer = "cust0001"
+  CustomerEmailAddress = "jane.smith@email.com"
+  CustomerFullName = "Jane Smith"
+}
+
+object "ORD1002" as Orders_1 {
+  OrderId = "ord1002"
+  OrderNumber = 1002
+  Customer = "cust0002"
+  CustomerEmailAddress = "john.doe@email.com"
+  CustomerFullName = "John Doe"
+}
+
+object "ORD1002" as Orders_2 {
+  OrderId = "ord1002"
+  OrderNumber = 1002
+  Customer = "cust0001"
+  CustomerEmailAddress = "jane.smith@email.com"
+  CustomerFullName = "Jane Smith"
 }
 
 @enduml

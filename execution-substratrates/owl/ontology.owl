@@ -42,3 +42,45 @@ erb:fullName a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "FullName" .
     # calculated: calculated
+
+erb:orders a owl:DatatypeProperty ;
+    rdfs:domain erb:Customers ;
+    rdfs:range xsd:string ;
+    rdfs:label "Orders" .
+
+# === Class: Orders ===
+erb:Orders a owl:Class ;
+    rdfs:label "Orders" .
+
+erb:orderId a owl:DatatypeProperty ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "OrderId" .
+
+erb:name a owl:DatatypeProperty ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "Name" .
+    # calculated: calculated
+
+erb:orderNumber a owl:DatatypeProperty ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:integer ;
+    rdfs:label "OrderNumber" .
+
+erb:customer a owl:DatatypeProperty ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "Customer" .
+
+erb:customerEmailAddress a owl:DatatypeProperty ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "CustomerEmailAddress" .
+    # calculated: lookup
+
+erb:customerFullName a owl:DatatypeProperty ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "CustomerFullName" .
+    # calculated: lookup

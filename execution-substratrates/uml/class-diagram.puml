@@ -7,8 +7,19 @@ class Customers {
   +EmailAddress: String
   +FirstName: String
   +LastName: String
+  +Orders: String
   --
   /FullName: String  {derived}
+}
+
+class Orders {
+  +OrderId: String
+  +OrderNumber: Integer
+  +Customer: String
+  +CustomerEmailAddress: String
+  +CustomerFullName: String
+  --
+  /Name: String  {derived}
 }
 
 @enduml

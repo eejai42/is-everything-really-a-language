@@ -5,3 +5,14 @@ context Customers
 
 -- Formula: ={{FirstName}} & " " & {{LastName}}
 derive FullName: self.firstName + ' ' + self.lastName
+
+context Orders
+
+-- Formula: ="ORD" & {{OrderNumber}}
+derive Name: 'ORD' + self.orderNumber
+
+-- Formula for CustomerEmailAddress - parse error: Unexpected character '!' at position 15
+-- Original: =INDEX(Customers!{{EmailAddress}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))
+
+-- Formula for CustomerFullName - parse error: Unexpected character '!' at position 15
+-- Original: =INDEX(Customers!{{FullName}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))

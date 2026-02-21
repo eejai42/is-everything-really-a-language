@@ -5,3 +5,10 @@ Customers,email_address,raw,0,
 Customers,first_name,raw,0,
 Customers,last_name,raw,0,
 Customers,full_name,calculated,,"={{FirstName}} & "" "" & {{LastName}}"
+Customers,orders,relationship,,
+Orders,order_id,raw,0,
+Orders,name,calculated,,"=""ORD"" & {{OrderNumber}}"
+Orders,order_number,raw,0,
+Orders,customer,relationship,,
+Orders,customer_email_address,lookup,,"=INDEX(Customers!{{EmailAddress}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))"
+Orders,customer_full_name,lookup,,"=INDEX(Customers!{{FullName}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))"

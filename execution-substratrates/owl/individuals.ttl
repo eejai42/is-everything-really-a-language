@@ -10,18 +10,44 @@ erb:Customers_0 a erb:Customers ;
     erb:customer "CUST0001" ;
     erb:emailAddress "jane.smith@email.com" ;
     erb:firstName "Jane" ;
-    erb:lastName "Smith" .
+    erb:lastName "Smith" ;
+    erb:orders "ord1001, ord1002" .
 
 erb:Customers_1 a erb:Customers ;
     erb:customerId "cust0002" ;
     erb:customer "CUST0002" ;
     erb:emailAddress "john.doe@email.com" ;
     erb:firstName "John" ;
-    erb:lastName "Doe" .
+    erb:lastName "Doe" ;
+    erb:orders "ord1002" .
 
 erb:Customers_2 a erb:Customers ;
     erb:customerId "cust0003" ;
     erb:customer "CUST0003" ;
     erb:emailAddress "emily.jones@email.com" ;
     erb:firstName "Emily" ;
-    erb:lastName "Jones" .
+    erb:lastName "Jones" ;
+    erb:orders "" .
+
+# === Individuals: Orders ===
+
+erb:Orders_0 a erb:Orders ;
+    erb:orderId "ord1001" ;
+    erb:orderNumber 1001 ;
+    erb:customer "cust0001" ;
+    erb:customerEmailAddress "jane.smith@email.com" ;
+    erb:customerFullName "Jane Smith" .
+
+erb:Orders_1 a erb:Orders ;
+    erb:orderId "ord1002" ;
+    erb:orderNumber 1002 ;
+    erb:customer "cust0002" ;
+    erb:customerEmailAddress "john.doe@email.com" ;
+    erb:customerFullName "John Doe" .
+
+erb:Orders_2 a erb:Orders ;
+    erb:orderId "ord1002" ;
+    erb:orderNumber 1002 ;
+    erb:customer "cust0001" ;
+    erb:customerEmailAddress "jane.smith@email.com" ;
+    erb:customerFullName "Jane Smith" .

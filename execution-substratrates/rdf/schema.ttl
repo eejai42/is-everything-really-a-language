@@ -39,3 +39,42 @@ erb:fullName a rdf:Property ;
     rdfs:domain erb:Customers ;
     rdfs:range xsd:string ;
     rdfs:label "FullName" .
+
+erb:orders a rdf:Property ;
+    rdfs:domain erb:Customers ;
+    rdfs:range xsd:string ;
+    rdfs:label "Orders" .
+
+# === Class: Orders ===
+erb:Orders a rdfs:Class ;
+    rdfs:label "Orders" .
+
+erb:orderId a rdf:Property ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "OrderId" .
+
+erb:name a rdf:Property ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "Name" .
+
+erb:orderNumber a rdf:Property ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:integer ;
+    rdfs:label "OrderNumber" .
+
+erb:customer a rdf:Property ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "Customer" .
+
+erb:customerEmailAddress a rdf:Property ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "CustomerEmailAddress" .
+
+erb:customerFullName a rdf:Property ;
+    rdfs:domain erb:Orders ;
+    rdfs:range xsd:string ;
+    rdfs:label "CustomerFullName" .

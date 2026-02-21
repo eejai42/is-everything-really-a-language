@@ -55,6 +55,7 @@ The following entities have been evaluated against the operational definition of
 | `FirstName` | raw | string | Yes | - |
 | `LastName` | raw | string | Yes | - |
 | `FullName` | calculated | string | Yes | - |
+| `Orders` | relationship | string | Yes | - |
 
 **Formula for `FullName`:**
 ```
@@ -72,6 +73,51 @@ The following entities have been evaluated against the operational definition of
 | `FirstName` | Jane |
 | `LastName` | Smith |
 | `FullName` | Jane Smith |
+| `Orders` | ord1001, ord1002 |
+
+---
+
+### Table: Orders
+
+> Table: Orders
+
+#### Schema
+
+| Field | Type | Data Type | Nullable | Description |
+|-------|------|-----------|----------|-------------|
+| `OrderId` | raw | string | No | - |
+| `Name` | calculated | string | Yes | - |
+| `OrderNumber` | raw | integer | Yes | - |
+| `Customer` | relationship | string | Yes | - |
+| `CustomerEmailAddress` | lookup | string | Yes | - |
+| `CustomerFullName` | lookup | string | Yes | - |
+
+**Formula for `Name`:**
+```
+="ORD" & {{OrderNumber}}
+```
+
+**Formula for `CustomerEmailAddress`:**
+```
+=INDEX(Customers!{{EmailAddress}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))
+```
+
+**Formula for `CustomerFullName`:**
+```
+=INDEX(Customers!{{FullName}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))
+```
+
+
+#### Sample Data (3 records)
+
+| Field | Value |
+|-------|-------|
+| `OrderId` | ord1001 |
+| `Name` | ORD1001 |
+| `Customer` | cust0001 |
+| `CustomerFullName` | Jane Smith |
+| `CustomerEmailAddress` | jane.smith@email.com |
+| `OrderNumber` | 1001 |
 
 ---
 
@@ -85,7 +131,7 @@ The following entities have been evaluated against the operational definition of
 | Property | Value |
 |----------|-------|
 | Source Base ID | `appEMeBJDL9wcHWOS` |
-| Table Count | 1 |
+| Table Count | 2 |
 | Tool Version | 2.0.0 |
 | Export Mode | schema_first_type_mapping |
 | Field Type Mapping | checkbox→boolean, number→number/integer, multipleRecordLinks→relationship, multipleLookupValues→lookup, rollup→aggregation, count→aggregation, formula→calculated |

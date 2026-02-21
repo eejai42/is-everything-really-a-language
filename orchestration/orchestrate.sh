@@ -2,8 +2,8 @@
 # =============================================================================
 # ORCHESTRATE.SH
 # =============================================================================
-# Runs inject-substrate.sh (which also runs tests) for all execution substrates
-# and then grades the results.
+# Central orchestration for ERB execution substrates.
+# Handles: Airtable sync, running tests, viewing results, cleaning.
 # =============================================================================
 
 set -e
@@ -11,6 +11,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 SUBSTRATES_DIR="$PROJECT_ROOT/execution-substratrates"
+SSOTME_JSON="$PROJECT_ROOT/ssotme.json"
 
 # =============================================================================
 # COLORS
@@ -42,53 +43,253 @@ SUBSTRATE_COLORS=(
     '\033[38;5;120m'  # Light green
 )
 
-echo ""
-echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BOLD}${CYAN}║${NC}          ${BOLD}${WHITE}EXECUTION SUBSTRATE ORCHESTRATOR${NC}                  ${BOLD}${CYAN}║${NC}"
-echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
-echo ""
-
 # =============================================================================
-# MENU: Select run mode
+# PARSE ARGUMENTS
 # =============================================================================
-
-# Get list of substrates for the menu
-SUBSTRATES=$(ls -d "$SUBSTRATES_DIR"/*/ 2>/dev/null | xargs -n1 basename)
-SUBSTRATES_ARRAY=($SUBSTRATES)
-TOTAL_SUBSTRATES=${#SUBSTRATES_ARRAY[@]}
-
-echo -e "${BOLD}${WHITE}Select an option:${NC}"
-echo ""
-echo -e "  ${RED}[C]${NC} ${BOLD}CLEAN${NC} all generated files from substrates"
-echo -e "  ${GREEN}[A]${NC} Run ${BOLD}ALL${NC} substrates ($TOTAL_SUBSTRATES total)"
-echo ""
-echo -e "  ${YELLOW}Or select a specific substrate:${NC}"
-echo ""
-
-# Display substrates with numbers
-INDEX=1
-for substrate in $SUBSTRATES; do
-    substrate_dir="$SUBSTRATES_DIR/$substrate"
-    inject_script="$substrate_dir/inject-substrate.sh"
-    if [ -f "$inject_script" ]; then
-        echo -e "  ${CYAN}[$INDEX]${NC} $substrate"
-    # else
-    #   echo -e "  ${DIM}[$INDEX] $substrate (no inject-substrate.sh)${NC}"
-    fi
-    INDEX=$((INDEX + 1))
+CI_MODE=false
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --ci)
+            CI_MODE=true
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
 done
-echo ""
 
-# Read user input
-read -p "Enter choice [C, A, or 1-$TOTAL_SUBSTRATES] (default: A): " USER_CHOICE
-
-# Default to 'A' if user just presses Enter
-if [ -z "$USER_CHOICE" ]; then
-    USER_CHOICE="A"
+# =============================================================================
+# SSOTME DETECTION (may be passed from start.sh or detected here)
+# =============================================================================
+if [ -z "$SSOTME_AVAILABLE" ]; then
+    if command -v ssotme &> /dev/null; then
+        SSOTME_AVAILABLE=true
+    else
+        SSOTME_AVAILABLE=false
+    fi
 fi
 
-# Handle CLEAN option
-if [[ "$USER_CHOICE" =~ ^[Cc]$ ]]; then
+# =============================================================================
+# HELPER FUNCTIONS
+# =============================================================================
+get_current_base_id() {
+    if [ -f "$SSOTME_JSON" ]; then
+        python3 -c "
+import json
+with open('$SSOTME_JSON', 'r') as f:
+    config = json.load(f)
+for setting in config.get('ProjectSettings', []):
+    if setting.get('Name') == 'baseId':
+        print(setting.get('Value', ''))
+        break
+"
+    else
+        echo ""
+    fi
+}
+
+get_project_name() {
+    if [ -f "$SSOTME_JSON" ]; then
+        python3 -c "
+import json
+with open('$SSOTME_JSON', 'r') as f:
+    config = json.load(f)
+print(config.get('Name', 'Unknown'))
+"
+    else
+        echo "Unknown"
+    fi
+}
+
+# =============================================================================
+# MENU DISPLAY
+# =============================================================================
+show_menu() {
+    PROJECT_NAME=$(get_project_name)
+    CURRENT_BASE=$(get_current_base_id)
+
+    echo ""
+    echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}          ${BOLD}${WHITE}EXECUTION SUBSTRATE ORCHESTRATOR${NC}                  ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "  Project:  ${WHITE}$PROJECT_NAME${NC}"
+    echo -e "  Base ID:  ${WHITE}$CURRENT_BASE${NC}"
+    echo ""
+
+    # Get list of substrates for the menu
+    SUBSTRATES=$(ls -d "$SUBSTRATES_DIR"/*/ 2>/dev/null | xargs -n1 basename)
+    SUBSTRATES_ARRAY=($SUBSTRATES)
+    TOTAL_SUBSTRATES=${#SUBSTRATES_ARRAY[@]}
+
+    echo -e "${BOLD}${WHITE}Select an option:${NC}"
+    echo ""
+    echo -e "  ${GREEN}[A]${NC} Run ${BOLD}ALL${NC} substrates ($TOTAL_SUBSTRATES total) ${DIM}(default)${NC}"
+    echo -e "  ${MAGENTA}[V]${NC} ${BOLD}VIEW RESULTS${NC} - Generate and open HTML report"
+    echo -e "  ${RED}[C]${NC} ${BOLD}CLEAN${NC} all generated files"
+    echo ""
+
+    # Airtable options
+    echo -e "  ${DIM}────────────────────────────────────────${NC}"
+    echo -e "  ${BOLD}Airtable:${NC}"
+    if [ "$SSOTME_AVAILABLE" = true ]; then
+        echo -e "  ${CYAN}[P]${NC} ${BOLD}PULL${NC} from Airtable (ssotme -buildall)"
+        echo -e "  ${CYAN}[B]${NC} ${BOLD}CHANGE BASE ID${NC} and pull"
+    else
+        echo -e "  ${DIM}[P] Pull from Airtable (requires SSoTME)${NC}"
+        echo -e "  ${DIM}[B] Change Base ID (requires SSoTME)${NC}"
+    fi
+    echo ""
+
+    echo -e "  ${DIM}────────────────────────────────────────${NC}"
+    echo -e "  ${YELLOW}Or select a specific substrate:${NC}"
+    echo ""
+
+    # Display substrates with numbers
+    INDEX=1
+    for substrate in $SUBSTRATES; do
+        substrate_dir="$SUBSTRATES_DIR/$substrate"
+        inject_script="$substrate_dir/inject-substrate.sh"
+        if [ -f "$inject_script" ]; then
+            echo -e "  ${CYAN}[$INDEX]${NC} $substrate"
+        fi
+        INDEX=$((INDEX + 1))
+    done
+    echo ""
+    echo -e "  [${RED}Q${NC}] Back to Dev-Ops menu"
+    echo ""
+}
+
+# =============================================================================
+# ACTION FUNCTIONS
+# =============================================================================
+action_pull_airtable() {
+    CURRENT_BASE=$(get_current_base_id)
+
+    if [ "$SSOTME_AVAILABLE" != true ]; then
+        echo ""
+        echo -e "${RED}SSoTME is not installed.${NC}"
+        echo -e "Visit ${CYAN}https://www.ssotme.com${NC} for installation instructions."
+        echo ""
+        read -p "Press Enter to continue..."
+        return
+    fi
+
+    echo ""
+    echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}              ${BOLD}${WHITE}PULL FROM AIRTABLE${NC}                           ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "  Base ID: ${WHITE}$CURRENT_BASE${NC}"
+    echo ""
+    echo -e "${YELLOW}Running ssotme -buildall...${NC}"
+    echo ""
+
+    cd "$PROJECT_ROOT"
+    ssotme -buildall
+
+    echo ""
+    echo -e "${GREEN}Pull complete!${NC}"
+    echo ""
+    read -p "Press Enter to continue..."
+}
+
+action_change_base_id() {
+    CURRENT_BASE=$(get_current_base_id)
+
+    if [ "$SSOTME_AVAILABLE" != true ]; then
+        echo ""
+        echo -e "${RED}SSoTME is not installed.${NC}"
+        echo -e "Base swapping requires SSoTME to regenerate code after changing the base."
+        echo ""
+        read -p "Press Enter to continue..."
+        return
+    fi
+
+    echo ""
+    echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}              ${BOLD}${WHITE}CHANGE AIRTABLE BASE ID${NC}                      ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "  Current Base ID: ${YELLOW}${CURRENT_BASE}${NC}"
+    echo ""
+    read -p "  Enter new Airtable base ID (or press Enter to cancel): " NEW_BASE_ID
+
+    if [ -z "$NEW_BASE_ID" ]; then
+        echo ""
+        echo -e "  ${DIM}Cancelled - no changes made${NC}"
+        echo ""
+        return
+    fi
+
+    # Validate format (Airtable base IDs start with 'app')
+    if [[ ! "$NEW_BASE_ID" =~ ^app[A-Za-z0-9]+ ]]; then
+        echo ""
+        echo -e "${RED}Invalid Base ID format.${NC}"
+        echo -e "Airtable Base IDs typically start with 'app' followed by alphanumeric characters."
+        echo -e "Example: appC8XTj95lubn6hz"
+        echo ""
+        read -p "Press Enter to continue..."
+        return
+    fi
+
+    # Update ssotme.json
+    python3 -c "
+import json
+
+with open('$SSOTME_JSON', 'r') as f:
+    config = json.load(f)
+
+for setting in config.get('ProjectSettings', []):
+    if setting.get('Name') == 'baseId':
+        setting['Value'] = '$NEW_BASE_ID'
+        break
+
+with open('$SSOTME_JSON', 'w') as f:
+    json.dump(config, f, indent=2)
+
+print('Base ID updated to: $NEW_BASE_ID')
+"
+
+    echo ""
+    echo -e "${YELLOW}Regenerating from new base...${NC}"
+    echo ""
+
+    cd "$PROJECT_ROOT"
+    ssotme -buildall
+
+    if [ $? -eq 0 ]; then
+        echo ""
+        echo -e "${GREEN}Base swap complete!${NC}"
+        echo -e "New Base ID: ${WHITE}$NEW_BASE_ID${NC}"
+    else
+        echo ""
+        echo -e "${RED}Regeneration failed.${NC}"
+        echo -e "You may need to restore the previous base ID: ${WHITE}$CURRENT_BASE${NC}"
+    fi
+    echo ""
+    read -p "Press Enter to continue..."
+}
+
+action_view_results() {
+    echo ""
+    echo -e "${BOLD}${MAGENTA}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${MAGENTA}║${NC}              ${BOLD}${WHITE}GENERATING HTML REPORT${NC}                       ${BOLD}${MAGENTA}║${NC}"
+    echo -e "${BOLD}${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    python3 "$SCRIPT_DIR/generate-report.py"
+    echo ""
+    echo -e "${BOLD}${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${GREEN}║${NC}              ${BOLD}${WHITE}REPORT GENERATED${NC}                              ${BOLD}${GREEN}║${NC}"
+    echo -e "${BOLD}${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    read -p "Press Enter to continue..."
+}
+
+action_clean() {
+    SUBSTRATES=$(ls -d "$SUBSTRATES_DIR"/*/ 2>/dev/null | xargs -n1 basename)
+
     echo ""
     echo -e "${BOLD}${RED}╔════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${BOLD}${RED}║${NC}              ${BOLD}${WHITE}CLEANING ALL SUBSTRATES${NC}                       ${BOLD}${RED}║${NC}"
@@ -116,29 +317,23 @@ if [[ "$USER_CHOICE" =~ ^[Cc]$ ]]; then
     echo -e "${BOLD}${GREEN}║${NC}              ${BOLD}${WHITE}CLEAN COMPLETE${NC}                                ${BOLD}${GREEN}║${NC}"
     echo -e "${BOLD}${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    exit 0
-fi
+    read -p "Press Enter to continue..."
+}
 
-# Determine which substrates to run
-RUN_SINGLE=""
-if [[ "$USER_CHOICE" =~ ^[Aa]$ ]]; then
-    echo ""
-    echo -e "${GREEN}Running ALL substrates...${NC}"
-    echo ""
-elif [[ "$USER_CHOICE" =~ ^[0-9]+$ ]] && [ "$USER_CHOICE" -ge 1 ] && [ "$USER_CHOICE" -le "$TOTAL_SUBSTRATES" ]; then
-    RUN_SINGLE="${SUBSTRATES_ARRAY[$((USER_CHOICE - 1))]}"
-    echo ""
-    echo -e "${GREEN}Running single substrate: ${BOLD}$RUN_SINGLE${NC}"
-    echo ""
-else
-    echo ""
-    echo -e "${RED}Invalid choice. Exiting.${NC}"
-    exit 1
-fi
+# =============================================================================
+# RUN SUBSTRATES (extracted as function for reuse)
+# =============================================================================
+run_substrates() {
+    local RUN_SINGLE="$1"
 
-# -----------------------------------------------------------------------------
-# Step 1: Generate answer key and blank test from database
-# -----------------------------------------------------------------------------
+    # Get substrates list
+    SUBSTRATES=$(ls -d "$SUBSTRATES_DIR"/*/ 2>/dev/null | xargs -n1 basename)
+    SUBSTRATES_ARRAY=($SUBSTRATES)
+    TOTAL_SUBSTRATES=${#SUBSTRATES_ARRAY[@]}
+
+    # -----------------------------------------------------------------------------
+    # Step 1: Generate answer key and blank test from database
+    # -----------------------------------------------------------------------------
 echo -e "${BOLD}${BLUE}┌──────────────────────────────────────────────────────────────┐${NC}"
 echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 1:${NC} ${YELLOW}Generating answer key and blank test...${NC}              ${BOLD}${BLUE}│${NC}"
 echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────┘${NC}"
@@ -206,6 +401,15 @@ for substrate in $SUBSTRATES_TO_RUN; do
         echo -e "${COLOR}╔══════════════════════════════════════════════════════════════╗${NC}"
         echo -e "${COLOR}║${NC} ${BOLD}[$CURRENT/$TOTAL_TO_RUN]${NC} ${COLOR}▶ ${BOLD}${substrate_upper}${NC}"
         echo -e "${COLOR}╚══════════════════════════════════════════════════════════════╝${NC}"
+
+        # CRITICAL: Clear ALL previous test-answers to ensure fresh test run
+        # This keeps the repo in sync with actual test results
+        test_answers_dir="$substrate_dir/test-answers"
+        if [ -d "$test_answers_dir" ]; then
+            echo -e "  ${DIM}Clearing previous test-answers...${NC}"
+            rm -rf "$test_answers_dir"
+        fi
+        mkdir -p "$test_answers_dir"
 
         # Run script with real-time output AND capture for error reporting
         # Use tee to show output live while also saving to temp file
@@ -334,7 +538,16 @@ else:
 echo ""
 
 # -----------------------------------------------------------------------------
-# Step 4: Show Failed Substrates Summary (if any)
+# Step 4: Generate HTML Report
+# -----------------------------------------------------------------------------
+echo -e "${BOLD}${BLUE}┌──────────────────────────────────────────────────────────────┐${NC}"
+echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 4:${NC} ${YELLOW}Generating HTML report...${NC}                            ${BOLD}${BLUE}│${NC}"
+echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────┘${NC}"
+python3 "$SCRIPT_DIR/generate-report.py"
+echo ""
+
+# -----------------------------------------------------------------------------
+# Step 5: Show Failed Substrates Summary (if any)
 # -----------------------------------------------------------------------------
 # Trim leading space from FAILED_SUBSTRATES
 FAILED_SUBSTRATES=$(echo "$FAILED_SUBSTRATES" | xargs)
@@ -383,18 +596,105 @@ else
     echo -e "${BOLD}${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
 fi
 echo ""
+echo -e "${CYAN}Results written to:${NC}"
 if [ -n "$RUN_SINGLE" ]; then
-    echo -e "${CYAN}Results written to:${NC}"
     echo -e "  ${DIM}•${NC} Per-substrate: ${WHITE}execution-substratrates/$RUN_SINGLE/test-results.md${NC}"
 else
-    echo -e "${CYAN}Results written to:${NC}"
     echo -e "  ${DIM}•${NC} Per-substrate: ${WHITE}execution-substratrates/*/test-results.md${NC}"
     echo -e "  ${DIM}•${NC} Summary:       ${WHITE}orchestration/all-tests-results.md${NC}"
 fi
+echo -e "  ${DIM}•${NC} HTML Report:   ${WHITE}orchestration/orchestration-report.html${NC}"
 echo ""
 
-# Exit with error code if any substrates failed
+# Open browser (skip in CI mode)
+if ! $CI_MODE; then
+    echo -e "${CYAN}Opening HTML report in browser...${NC}"
+    open "$SCRIPT_DIR/orchestration-report.html"
+    echo ""
+fi
+
+# Return failure status (don't exit, let caller handle)
 if [ -n "$FAILED_SUBSTRATES" ]; then
     echo -e "${RED}${BOLD}⚠️  $FAILED_COUNT substrate(s) failed to execute: $FAILED_SUBSTRATES${NC}"
-    exit 1
+    return 1
 fi
+return 0
+}
+
+# =============================================================================
+# MAIN LOOP
+# =============================================================================
+
+# CI MODE: Run all tests immediately and exit
+if $CI_MODE; then
+    echo ""
+    echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}          ${BOLD}${WHITE}EXECUTION SUBSTRATE ORCHESTRATOR${NC}                  ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${BOLD}Running in CI mode - executing all substrates...${NC}"
+    run_substrates ""
+    exit $?
+fi
+
+# Interactive menu loop
+while true; do
+    show_menu
+
+    # Get substrates for numbered selection
+    SUBSTRATES=$(ls -d "$SUBSTRATES_DIR"/*/ 2>/dev/null | xargs -n1 basename)
+    SUBSTRATES_ARRAY=($SUBSTRATES)
+    TOTAL_SUBSTRATES=${#SUBSTRATES_ARRAY[@]}
+
+    read -p "Enter choice [A, V, C, P, B, 1-$TOTAL_SUBSTRATES, Q] (default: A): " USER_CHOICE
+
+    # Default to 'A' if user just presses Enter
+    if [ -z "$USER_CHOICE" ]; then
+        USER_CHOICE="A"
+    fi
+
+    case $USER_CHOICE in
+        [Aa])
+            echo ""
+            echo -e "${GREEN}Running ALL substrates...${NC}"
+            run_substrates ""
+            echo ""
+            read -p "Press Enter to continue..."
+            ;;
+        [Vv])
+            action_view_results
+            ;;
+        [Cc])
+            action_clean
+            ;;
+        [Pp])
+            action_pull_airtable
+            ;;
+        [Bb])
+            action_change_base_id
+            ;;
+        [Qq])
+            echo ""
+            exit 0
+            ;;
+        [0-9]|[0-9][0-9])
+            if [ "$USER_CHOICE" -ge 1 ] && [ "$USER_CHOICE" -le "$TOTAL_SUBSTRATES" ]; then
+                RUN_SINGLE="${SUBSTRATES_ARRAY[$((USER_CHOICE - 1))]}"
+                echo ""
+                echo -e "${GREEN}Running single substrate: ${BOLD}$RUN_SINGLE${NC}"
+                run_substrates "$RUN_SINGLE"
+                echo ""
+                read -p "Press Enter to continue..."
+            else
+                echo ""
+                echo -e "${RED}Invalid substrate number: $USER_CHOICE${NC}"
+                sleep 1
+            fi
+            ;;
+        *)
+            echo ""
+            echo -e "${RED}Invalid option: $USER_CHOICE${NC}"
+            sleep 1
+            ;;
+    esac
+done

@@ -41,6 +41,13 @@
         "type": "calculated",
         "nullable": true,
         "formula": "={{FirstName}} \u0026 \u0022 \u0022 \u0026 {{LastName}}"
+      },
+      {
+        "name": "Orders",
+        "datatype": "string",
+        "type": "relationship",
+        "nullable": true,
+        "RelatedTo": "Orders"
       }
     ],
     "data": [
@@ -50,7 +57,8 @@
         "EmailAddress": "jane.smith@email.com",
         "FirstName": "Jane",
         "LastName": "Smith",
-        "FullName": "Jane Smith"
+        "FullName": "Jane Smith",
+        "Orders": "ord1001, ord1002"
       },
       {
         "CustomerId": "cust0002",
@@ -58,7 +66,8 @@
         "EmailAddress": "john.doe@email.com",
         "FirstName": "John",
         "LastName": "Doe",
-        "FullName": "John Doe"
+        "FullName": "John Doe",
+        "Orders": "ord1002"
       },
       {
         "CustomerId": "cust0003",
@@ -66,7 +75,79 @@
         "EmailAddress": "emily.jones@email.com",
         "FirstName": "Emily",
         "LastName": "Jones",
-        "FullName": "Emily Jones"
+        "FullName": "Emily Jones",
+        "Orders": ""
+      }
+    ]
+  },
+  "Orders": {
+    "Description": "Table: Orders",
+    "schema": [
+      {
+        "name": "OrderId",
+        "datatype": "string",
+        "type": "raw",
+        "nullable": false
+      },
+      {
+        "name": "Name",
+        "datatype": "string",
+        "type": "calculated",
+        "nullable": true,
+        "formula": "=\u0022ORD\u0022 \u0026 {{OrderNumber}}"
+      },
+      {
+        "name": "OrderNumber",
+        "datatype": "integer",
+        "type": "raw",
+        "nullable": true
+      },
+      {
+        "name": "Customer",
+        "datatype": "string",
+        "type": "relationship",
+        "nullable": true,
+        "RelatedTo": "Customers"
+      },
+      {
+        "name": "CustomerEmailAddress",
+        "datatype": "string",
+        "type": "lookup",
+        "nullable": true,
+        "formula": "=INDEX(Customers!{{EmailAddress}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))"
+      },
+      {
+        "name": "CustomerFullName",
+        "datatype": "string",
+        "type": "lookup",
+        "nullable": true,
+        "formula": "=INDEX(Customers!{{FullName}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))"
+      }
+    ],
+    "data": [
+      {
+        "OrderId": "ord1001",
+        "Name": "ORD1001",
+        "Customer": "cust0001",
+        "CustomerFullName": "Jane Smith",
+        "CustomerEmailAddress": "jane.smith@email.com",
+        "OrderNumber": 1001
+      },
+      {
+        "OrderId": "ord1002",
+        "Name": "ORD1002",
+        "Customer": "cust0002",
+        "CustomerFullName": "John Doe",
+        "CustomerEmailAddress": "john.doe@email.com",
+        "OrderNumber": 1002
+      },
+      {
+        "OrderId": "ord1002",
+        "Name": "ORD1002",
+        "Customer": "cust0001",
+        "CustomerFullName": "Jane Smith",
+        "CustomerEmailAddress": "jane.smith@email.com",
+        "OrderNumber": 1002
       }
     ]
   },
@@ -74,7 +155,7 @@
     "_CMCC_Summary": "Airtable export with schema-first type mapping: Schemas, Data, Relationships (FK links), Lookups (INDEX/MATCH), Aggregations (SUMIFS/COUNTIFS/Rollups), and Calculated fields (formulas) in Excel dialect. Field types are determined from Airtable\u0027s schema metadata FIRST (no coercion), with intelligent fallback to formula/data analysis only when schema is unavailable.",
     "_conversion_metadata": {
       "source_base_id": "appEMeBJDL9wcHWOS",
-      "table_count": 1,
+      "table_count": 2,
       "tool_version": "2.0.0",
       "field_type_mapping": "checkbox\u2192boolean, number\u2192number/integer, multipleRecordLinks\u2192relationship, multipleLookupValues\u2192lookup, rollup\u2192aggregation, count\u2192aggregation, formula\u2192calculated",
       "export_mode": "schema_first_type_mapping",

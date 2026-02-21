@@ -35,6 +35,31 @@ def compute_customers_fields(record: dict) -> dict:
 
     return result
 
+# =============================================================================
+# ORDERS CALCULATIONS
+# =============================================================================
+
+# Level 1
+
+def calc_orders_name(order_number):
+    """Formula: ="ORD" & {{OrderNumber}}"""
+    return ('ORD' + str(order_number or ""))
+
+
+def compute_orders_fields(record: dict) -> dict:
+    """Compute all calculated fields for Orders."""
+    result = dict(record)
+
+    # Level 1 calculations
+    result['name'] = calc_orders_name(result.get('order_number'))
+
+    # Convert empty strings to None for string fields
+    for key in ['name']:
+        if result.get(key) == '':
+            result[key] = None
+
+    return result
+
 
 # =============================================================================
 # DISPATCHER FUNCTION
@@ -60,6 +85,8 @@ def compute_all_calculated_fields(record: dict, entity_name: str = None) -> dict
 
     if entity_lower == 'customers':
         return compute_customers_fields(record)
+    elif entity_lower == 'orders':
+        return compute_orders_fields(record)
     else:
         # Unknown entity, return as-is
         return dict(record)

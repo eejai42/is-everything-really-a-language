@@ -5,5 +5,12 @@
       "full_name"
     ],
     "record_count": 3
+  },
+  "orders": {
+    "primary_key": "order_id",
+    "computed_columns": [
+      "name"
+    ],
+    "record_count": 2
   }
 }

@@ -21,6 +21,10 @@
         {
           "name": "LastName",
           "type": "string"
+        },
+        {
+          "name": "Orders",
+          "type": "string"
         }
       ],
       "derived": [
@@ -28,6 +32,39 @@
           "name": "FullName",
           "type": "string",
           "formula": "={{FirstName}} & \" \" & {{LastName}}"
+        }
+      ]
+    },
+    "Orders": {
+      "attributes": [
+        {
+          "name": "OrderId",
+          "type": "string"
+        },
+        {
+          "name": "OrderNumber",
+          "type": "integer"
+        },
+        {
+          "name": "Customer",
+          "type": "string"
+        }
+      ],
+      "derived": [
+        {
+          "name": "Name",
+          "type": "string",
+          "formula": "=\"ORD\" & {{OrderNumber}}"
+        },
+        {
+          "name": "CustomerEmailAddress",
+          "type": "string",
+          "formula": "=INDEX(Customers!{{EmailAddress}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))"
+        },
+        {
+          "name": "CustomerFullName",
+          "type": "string",
+          "formula": "=INDEX(Customers!{{FullName}}, MATCH(Orders!{{Customer}}, Customers!{{CustomerId}}, 0))"
         }
       ]
     }
@@ -41,7 +78,8 @@
         "Customer": "CUST0001",
         "EmailAddress": "jane.smith@email.com",
         "FirstName": "Jane",
-        "LastName": "Smith"
+        "LastName": "Smith",
+        "Orders": "ord1001, ord1002"
       }
     },
     {
@@ -52,7 +90,8 @@
         "Customer": "CUST0002",
         "EmailAddress": "john.doe@email.com",
         "FirstName": "John",
-        "LastName": "Doe"
+        "LastName": "Doe",
+        "Orders": "ord1002"
       }
     },
     {
@@ -63,7 +102,41 @@
         "Customer": "CUST0003",
         "EmailAddress": "emily.jones@email.com",
         "FirstName": "Emily",
-        "LastName": "Jones"
+        "LastName": "Jones",
+        "Orders": ""
+      }
+    },
+    {
+      "class": "Orders",
+      "id": "Orders_0",
+      "values": {
+        "OrderId": "ord1001",
+        "OrderNumber": 1001,
+        "Customer": "cust0001",
+        "CustomerEmailAddress": "jane.smith@email.com",
+        "CustomerFullName": "Jane Smith"
+      }
+    },
+    {
+      "class": "Orders",
+      "id": "Orders_1",
+      "values": {
+        "OrderId": "ord1002",
+        "OrderNumber": 1002,
+        "Customer": "cust0002",
+        "CustomerEmailAddress": "john.doe@email.com",
+        "CustomerFullName": "John Doe"
+      }
+    },
+    {
+      "class": "Orders",
+      "id": "Orders_2",
+      "values": {
+        "OrderId": "ord1002",
+        "OrderNumber": 1002,
+        "Customer": "cust0001",
+        "CustomerEmailAddress": "jane.smith@email.com",
+        "CustomerFullName": "Jane Smith"
       }
     }
   ]

@@ -12,9 +12,37 @@ It does so by:
 
 ## Single Source of Truth Architecture
 
-![Effortless Rulebook Architecture](./effortless_rulebook_architecture.png)
+```
+                    ┌─────────────────────────────┐
+                    │         Airtable            │
+                    │   (Single Source of Truth)  │
+                    └──────────────┬──────────────┘
+                                   │
+                                   ▼
+                    ┌─────────────────────────────┐
+                    │    Effortless Rulebook      │
+                    │  (effortless-rulebook.json) │
+                    │      Declarative Hub        │
+                    └──────────────┬──────────────┘
+                                   │
+        ┌──────────┬───────────┬───┴───┬───────────┬──────────┐
+        │          │           │       │           │          │
+        ▼          ▼           ▼       ▼           ▼          ▼
+   ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+   │ Python │ │   Go   │ │  SQL   │ │  XLSX  │ │GraphQL │ │  OWL   │
+   └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+   ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
+   │  RDF   │ │  YAML  │ │  CSV   │ │  UML   │ │English │ │ Binary │
+   └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+```
 
 **One declarative rulebook. Many execution substrates. Identical results.**
+
+### All 11 Substrates Pass — 100% Agreement
+
+![Orchestration Results](./orchestration-results.png)
+
+Every substrate independently computes the same answers from the same rulebook. Binary, CSV, English, Go, GraphQL, OWL, Python, RDF, UML, XLSX, YAML — all pass with 100% agreement.
 
 The Airtable model is the single source of truth.
 The generated `effortless-rulebook.json` is the canonical hub.

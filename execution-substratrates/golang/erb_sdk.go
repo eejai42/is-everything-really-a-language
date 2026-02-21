@@ -81,6 +81,39 @@ func (tc *Customer) ComputeAll() *Customer {
 }
 
 // =============================================================================
+// ORDERS TABLE
+// =============================================================================
+
+// Order represents a row in the Orders table
+type Order struct {
+	OrderId string `json:"order_id"`
+	OrderNumber *int `json:"order_number"`
+	Name *string `json:"name"`
+}
+
+// --- Individual Calculation Functions ---
+
+// CalcName computes the Name calculated field
+// Formula: ="ORD" & {{OrderNumber}}
+func (tc *Order) CalcName() string {
+	return "ORD" + stringVal(tc.OrderNumber)
+}
+
+// --- Compute All Calculated Fields ---
+
+// ComputeAll computes all calculated fields and returns an updated struct
+func (tc *Order) ComputeAll() *Order {
+	// Level 1 calculations
+	name := "ORD" + stringVal(tc.OrderNumber)
+
+	return &Order{
+		OrderId: tc.OrderId,
+		OrderNumber: tc.OrderNumber,
+		Name: nilIfEmpty(name),
+	}
+}
+
+// =============================================================================
 // FILE I/O (for Customers)
 // =============================================================================
 

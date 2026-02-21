@@ -26,4 +26,27 @@ erb:CustomersShape a sh:NodeShape ;
         """ ;
     ] .
 
-# Generated 1 SHACL rules
+# === Shape with rules for Orders ===
+erb:OrdersShape a sh:NodeShape ;
+    sh:targetClass erb:Orders ;
+    sh:rule [
+        a sh:SPARQLRule ;
+        rdfs:label "rule_Orders_Name" ;
+        sh:prefixes erb: ;
+        sh:construct """
+            PREFIX erb: <http://example.org/erb#>
+            PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+            CONSTRUCT {
+                $this erb:name ?_result .
+            }
+            WHERE {
+    $this a erb:Orders .
+    OPTIONAL { $this erb:orderNumber ?order_number . }
+                BIND(CONCAT("ORD", ?order_number) AS ?_result)
+            }
+        """ ;
+    ] ;
+    # Rule for CustomerEmailAddress - parse error: Unexpected character '!' at position 15
+    # Rule for CustomerFullName - parse error: Unexpected character '!' at position 15 .
+
+# Generated 4 SHACL rules

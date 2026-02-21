@@ -4,13 +4,18 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Fields Tested | 3 |
-| Passed | 3 |
+| Total Fields Tested | 5 |
+| Passed | 5 |
 | Failed | 0 |
 | Score | 100.0% |
-| Duration | 0.0s |
+| Duration | 0.1s |
 
 ## Results by Entity
+
+### orders
+
+- Fields: 2/2 (100.0%)
+- Computed columns: name
 
 ### customers
 

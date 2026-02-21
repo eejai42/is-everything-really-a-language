@@ -4,34 +4,34 @@
 
 - **Rulebook:** `/Users/eejai42/effortlessapi-app-root/users/user_ee42ai73-18a9-47d5-8f99-954b00f6c041/my-projects/ERB_effortless-rulebook-starter/effortless-rulebook/effortless-rulebook.json`
 - **Substrates Tested:** 11
-- **Computed Columns Tested:** 1
+- **Computed Columns Tested:** 2
 
 ## Summary by Substrate
 
 | Substrate | Passed | Failed | Total | Score | Duration | Status |
 |-----------|--------|--------|-------|-------|----------|--------|
-| binary | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
-| csv | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
-| english | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
-| golang | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
-| graphql | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
-| owl | 3 | 0 | 3 | 100.0% | 0.1s | PASS |
-| python | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
-| rdf | 3 | 0 | 3 | 100.0% | 0.1s | PASS |
-| uml | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
-| xlsx | 3 | 0 | 3 | 100.0% | 0.1s | PASS |
-| yaml | 3 | 0 | 3 | 100.0% | 0.0s | PASS |
+| binary | 0 | 0 | 0 | 0.0% | 0.1s | ERROR: No test-answers found |
+| csv | 4 | 1 | 5 | 80.0% | 0.2s | FAIL |
+| english | 0 | 0 | 0 | 0.0% | 1.4s | ERROR: No test-answers found |
+| golang | 0 | 0 | 0 | 0.0% | 0.1s | ERROR: No test-answers found |
+| graphql | 5 | 0 | 5 | 100.0% | 0.1s | PASS |
+| owl | 5 | 0 | 5 | 100.0% | 0.1s | PASS |
+| python | 5 | 0 | 5 | 100.0% | 0.1s | PASS |
+| rdf | 5 | 0 | 5 | 100.0% | 0.1s | PASS |
+| uml | 5 | 0 | 5 | 100.0% | 0.1s | PASS |
+| xlsx | 4 | 1 | 5 | 80.0% | 0.3s | FAIL |
+| yaml | 5 | 0 | 5 | 100.0% | 0.1s | PASS |
 
 ## Overall Statistics
 
 | Metric | Value |
 |--------|-------|
 | Total Substrates | 11 |
-| Total Fields Tested | 33 |
-| Total Passed | 33 |
-| Total Failed | 0 |
-| Overall Score | 100.0% |
-| Total Duration | 0.5s |
+| Total Fields Tested | 40 |
+| Total Passed | 38 |
+| Total Failed | 2 |
+| Overall Score | 95.0% |
+| Total Duration | 2.6s |
 
 ---
 

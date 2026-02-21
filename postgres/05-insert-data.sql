@@ -13,3 +13,12 @@ VALUES ('cust0002', 'CUST0002', 'john.doe@email.com', 'John', 'Doe');
 INSERT INTO customers (customer_id, customer, email_address, first_name, last_name)
 VALUES ('cust0003', 'CUST0003', 'emily.jones@email.com', 'Emily', 'Jones');
 
+INSERT INTO orders (order_id, order_number, customer)
+VALUES ('ord1001', 1001, 'cust0001');
+
+INSERT INTO orders (order_id, order_number, customer)
+VALUES ('ord1002', 1002, 'cust0002');
+
+INSERT INTO orders (order_id, order_number, customer)
+VALUES ('ord1002', 1002, 'cust0001');
+
