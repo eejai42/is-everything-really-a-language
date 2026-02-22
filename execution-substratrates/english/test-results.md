@@ -4,14 +4,20 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Fields Tested | 0 |
-| Passed | 0 |
+| Total Fields Tested | 200 |
+| Passed | 200 |
 | Failed | 0 |
-| Score | 0.0% |
-| Duration | 1.4s |
+| Score | 100.0% |
+| Duration | 46.4s |
 
-## Error
+## Results by Entity
 
-```
-No test-answers found
-```
+### language_candidates
+
+- Fields: 184/184 (100.0%)
+- Computed columns: has_grammar, question, predicted_answer, prediction_predicates, prediction_fail, is_description_of, is_open_closed_world_conflicted, relationship_to_concept
+
+### is_everything_a_language
+
+- Fields: 16/16 (100.0%)
+- Computed columns: temp

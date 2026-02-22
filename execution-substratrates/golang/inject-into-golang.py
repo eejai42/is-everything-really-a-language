@@ -54,6 +54,14 @@ def get_raw_fields(schema: List[Dict]) -> List[Dict]:
     return [field for field in schema if field.get('type') == 'raw']
 
 
+def build_field_types(schema: List[Dict]) -> Dict[str, str]:
+    """Build a dict mapping field names to their datatypes.
+
+    Used for type-aware code generation (e.g., intToString vs stringVal in Go).
+    """
+    return {field['name']: field.get('datatype', 'string') for field in schema}
+
+
 def datatype_to_go(datatype: str, nullable: bool = True) -> str:
     """Convert rulebook datatype to Go type."""
     dt = datatype.lower()
@@ -133,7 +141,8 @@ def generate_struct_field(field: Dict) -> str:
     return f'\t{name} {go_type} `json:"{json_tag}"`'
 
 
-def compile_formula_to_go(field: Dict, struct_var: str = 'tc', calc_vars: Dict[str, str] = None) -> str:
+def compile_formula_to_go(field: Dict, struct_var: str = 'tc', calc_vars: Dict[str, str] = None,
+                          field_types: Dict[str, str] = None) -> str:
     """Compile a field's formula to a Go expression.
 
     Returns the Go expression string, or a panic statement if parsing fails.
@@ -143,11 +152,12 @@ def compile_formula_to_go(field: Dict, struct_var: str = 'tc', calc_vars: Dict[s
         struct_var: Variable name for the struct (e.g., 'tc' for tc.FieldName)
         calc_vars: Dict mapping calculated field names to their local variable names.
                    Used to substitute struct field refs with local vars for deps.
+        field_types: Dict mapping field names to their datatypes (e.g., {'OrderNumber': 'integer'})
     """
     formula = field.get('formula', '')
     try:
         ast = parse_formula(formula)
-        go_expr = compile_to_go(ast, struct_var)
+        go_expr = compile_to_go(ast, struct_var, field_types or {})
 
         # Substitute references to already-computed calculated fields
         # with their local variable names. Order matters - more specific patterns first.
@@ -182,7 +192,8 @@ def compile_formula_to_go(field: Dict, struct_var: str = 'tc', calc_vars: Dict[s
         return f'func() interface{{}} {{ panic("Formula parse error: {e}") }}()'
 
 
-def generate_calc_function(field: Dict, struct_name: str, struct_var: str = 'tc') -> List[str]:
+def generate_calc_function(field: Dict, struct_name: str, struct_var: str = 'tc',
+                           field_types: Dict[str, str] = None) -> List[str]:
     """Generate an individual Calc* function for a calculated field.
 
     This mirrors the postgres calc_* function pattern - each calculated field
@@ -206,7 +217,7 @@ def generate_calc_function(field: Dict, struct_name: str, struct_var: str = 'tc'
     lines.append(f'func ({struct_var} *{struct_name}) Calc{name}() {return_type} {{')
 
     # Compile the formula
-    go_expr = compile_formula_to_go(field, struct_var)
+    go_expr = compile_formula_to_go(field, struct_var, field_types=field_types)
     lines.append(f'\treturn {go_expr}')
     lines.append('}')
 
@@ -218,7 +229,8 @@ def generate_compute_all_function(
     raw_fields: List[Dict],
     calculated_fields: List[Dict],
     dag_levels: List[List[Dict]],
-    struct_var: str = 'tc'
+    struct_var: str = 'tc',
+    field_types: Dict[str, str] = None
 ) -> List[str]:
     """Generate the ComputeAll function that computes all calculated fields.
 
@@ -242,7 +254,7 @@ def generate_compute_all_function(
             # For level 2+, we need to pass already-computed values
             # But since Calc* methods read from struct, we need to update struct first
             # Actually, let's compute inline for proper dependency handling
-            go_expr = compile_formula_to_go(field, struct_var, calc_vars)
+            go_expr = compile_formula_to_go(field, struct_var, calc_vars, field_types)
             lines.append(f'\t{var_name} := {go_expr}')
 
             calc_vars[name] = var_name
@@ -305,6 +317,9 @@ def generate_table_sdk(table_name: str, table_data: Dict) -> List[str]:
     calculated_fields = get_calculated_fields(schema)
     raw_field_names = {f['name'] for f in raw_fields}
 
+    # Build field types map for type-aware code generation
+    field_types = build_field_types(schema)
+
     # Section header
     lines.append(f'// =============================================================================')
     lines.append(f'// {table_name.upper()} TABLE')
@@ -323,14 +338,14 @@ def generate_table_sdk(table_name: str, table_data: Dict) -> List[str]:
         lines.append(f'// --- Individual Calculation Functions ---')
         lines.append('')
         for field in calculated_fields:
-            lines.extend(generate_calc_function(field, struct_name))
+            lines.extend(generate_calc_function(field, struct_name, field_types=field_types))
             lines.append('')
 
         # ComputeAll function
         lines.append(f'// --- Compute All Calculated Fields ---')
         lines.append('')
         lines.extend(generate_compute_all_function(
-            struct_name, raw_fields, calculated_fields, dag_levels
+            struct_name, raw_fields, calculated_fields, dag_levels, field_types=field_types
         ))
         lines.append('')
 
@@ -359,6 +374,7 @@ def generate_erb_sdk(rulebook: Dict) -> str:
     lines.append('\t"encoding/json"')
     lines.append('\t"fmt"')
     lines.append('\t"os"')
+    lines.append('\t"strconv"')
     lines.append(')')
     lines.append('')
 
@@ -391,6 +407,22 @@ def generate_erb_sdk(rulebook: Dict) -> str:
     lines.append('\treturn &s')
     lines.append('}')
     lines.append('')
+    lines.append('// intToString safely converts a *int to string, returning "" if nil')
+    lines.append('func intToString(i *int) string {')
+    lines.append('\tif i == nil {')
+    lines.append('\t\treturn ""')
+    lines.append('\t}')
+    lines.append('\treturn strconv.Itoa(*i)')
+    lines.append('}')
+    lines.append('')
+    lines.append('// boolToString converts a bool to "true" or "false"')
+    lines.append('func boolToString(b bool) string {')
+    lines.append('\tif b {')
+    lines.append('\t\treturn "true"')
+    lines.append('\t}')
+    lines.append('\treturn "false"')
+    lines.append('}')
+    lines.append('')
 
     # Get all table names from the rulebook (domain-agnostic discovery)
     table_names = get_table_names(rulebook)
@@ -404,110 +436,177 @@ def generate_erb_sdk(rulebook: Dict) -> str:
 
         lines.extend(generate_table_sdk(table_name, table_data))
 
-    # Find the primary table (first table with calculated fields)
-    primary_table = None
+    # Find ALL tables with calculated fields (not just the first one!)
+    tables_with_calc = []
     for table_name in table_names:
         table_data = rulebook.get(table_name, {})
         if isinstance(table_data, dict) and 'schema' in table_data:
             calc_fields = get_calculated_fields(table_data.get('schema', []))
             if calc_fields:
-                primary_table = table_name
-                break
+                tables_with_calc.append(table_name)
 
-    if primary_table:
-        struct_name = table_name_to_struct_name(primary_table)
-
-        # File I/O functions for the primary table
+    # Generate File I/O functions for ALL tables with calculated fields
+    if tables_with_calc:
         lines.append('// =============================================================================')
-        lines.append(f'// FILE I/O (for {primary_table})')
+        lines.append('// FILE I/O FUNCTIONS (for all tables with calculated fields)')
         lines.append('// =============================================================================')
         lines.append('')
-        lines.append(f'// LoadRecords loads records from a JSON file')
-        lines.append(f'func LoadRecords(path string) ([]{struct_name}, error) {{')
-        lines.append('\tdata, err := os.ReadFile(path)')
-        lines.append('\tif err != nil {')
-        lines.append('\t\treturn nil, fmt.Errorf("failed to read file: %w", err)')
-        lines.append('\t}')
-        lines.append('')
-        lines.append(f'\tvar records []{struct_name}')
-        lines.append('\tif err := json.Unmarshal(data, &records); err != nil {')
-        lines.append('\t\treturn nil, fmt.Errorf("failed to parse file: %w", err)')
-        lines.append('\t}')
-        lines.append('')
-        lines.append('\treturn records, nil')
-        lines.append('}')
-        lines.append('')
-        lines.append(f'// SaveRecords saves computed records to a JSON file')
-        lines.append(f'func SaveRecords(path string, records []{struct_name}) error {{')
-        lines.append('\tdata, err := json.MarshalIndent(records, "", "  ")')
-        lines.append('\tif err != nil {')
-        lines.append('\t\treturn fmt.Errorf("failed to marshal records: %w", err)')
-        lines.append('\t}')
-        lines.append('')
-        lines.append('\tif err := os.WriteFile(path, data, 0644); err != nil {')
-        lines.append('\t\treturn fmt.Errorf("failed to write records: %w", err)')
-        lines.append('\t}')
-        lines.append('')
-        lines.append('\treturn nil')
-        lines.append('}')
+
+        for table_name in tables_with_calc:
+            struct_name = table_name_to_struct_name(table_name)
+            lines.append(f'// Load{struct_name}Records loads {table_name} records from a JSON file')
+            lines.append(f'func Load{struct_name}Records(path string) ([]{struct_name}, error) {{')
+            lines.append('\tdata, err := os.ReadFile(path)')
+            lines.append('\tif err != nil {')
+            lines.append('\t\treturn nil, fmt.Errorf("failed to read file: %w", err)')
+            lines.append('\t}')
+            lines.append('')
+            lines.append(f'\tvar records []{struct_name}')
+            lines.append('\tif err := json.Unmarshal(data, &records); err != nil {')
+            lines.append('\t\treturn nil, fmt.Errorf("failed to parse file: %w", err)')
+            lines.append('\t}')
+            lines.append('')
+            lines.append('\treturn records, nil')
+            lines.append('}')
+            lines.append('')
+            lines.append(f'// Save{struct_name}Records saves computed {table_name} records to a JSON file')
+            lines.append(f'func Save{struct_name}Records(path string, records []{struct_name}) error {{')
+            lines.append('\tdata, err := json.MarshalIndent(records, "", "  ")')
+            lines.append('\tif err != nil {')
+            lines.append('\t\treturn fmt.Errorf("failed to marshal records: %w", err)')
+            lines.append('\t}')
+            lines.append('')
+            lines.append('\tif err := os.WriteFile(path, data, 0644); err != nil {')
+            lines.append('\t\treturn fmt.Errorf("failed to write records: %w", err)')
+            lines.append('\t}')
+            lines.append('')
+            lines.append('\treturn nil')
+            lines.append('}')
+            lines.append('')
 
     return '\n'.join(lines)
 
 
-def generate_main_go(struct_name: str) -> str:
-    """Generate main.go content for the given struct type."""
-    return f'''// ERB SDK - Go Test Runner (GENERATED - DO NOT EDIT)
-package main
+def generate_main_go(tables_with_calc: list) -> str:
+    """Generate main.go content that processes ALL tables with calculated fields.
 
-import (
-	"fmt"
-	"os"
-	"path/filepath"
-)
+    IMPORTANT: This file is ALWAYS regenerated when inject-into-golang.py runs.
+    This ensures main.go stays in sync with erb_sdk.go when the rulebook changes.
 
-func main() {{
-	scriptDir, err := os.Getwd()
-	if err != nil {{
-		fmt.Printf("Failed to get working directory: %v\\n", err)
-		os.Exit(1)
-	}}
+    Args:
+        tables_with_calc: List of table names that have calculated fields
+    """
+    lines = []
+    lines.append('// ERB SDK - Go Test Runner (GENERATED - DO NOT EDIT)')
+    lines.append('// =======================================================')
+    lines.append('// This file is REGENERATED every time inject-into-golang.py runs.')
+    lines.append('// It must stay in sync with erb_sdk.go and the rulebook.')
+    lines.append('//')
+    lines.append(f'// Tables with calculated fields: {", ".join(tables_with_calc)}')
+    lines.append('//')
+    lines.append('// IMPORTANT: This runner processes ALL tables, not just a "primary" one.')
+    lines.append('// If ANY table fails to process, the entire run fails with exit code 1.')
+    lines.append('')
+    lines.append('package main')
+    lines.append('')
+    lines.append('import (')
+    lines.append('\t"fmt"')
+    lines.append('\t"os"')
+    lines.append('\t"path/filepath"')
+    lines.append(')')
+    lines.append('')
+    lines.append('func main() {')
+    lines.append('\tscriptDir, err := os.Getwd()')
+    lines.append('\tif err != nil {')
+    lines.append('\t\tfmt.Fprintf(os.Stderr, "FATAL: Failed to get working directory: %v\\n", err)')
+    lines.append('\t\tos.Exit(1)')
+    lines.append('\t}')
+    lines.append('')
+    lines.append('\t// Shared blank-tests directory at project root')
+    lines.append('\tblankTestsDir := filepath.Join(scriptDir, "..", "..", "testing", "blank-tests")')
+    lines.append('\ttestAnswersDir := filepath.Join(scriptDir, "test-answers")')
+    lines.append('')
+    lines.append('\t// Ensure output directory exists')
+    lines.append('\tif err := os.MkdirAll(testAnswersDir, 0755); err != nil {')
+    lines.append('\t\tfmt.Fprintf(os.Stderr, "FATAL: Failed to create test-answers directory: %v\\n", err)')
+    lines.append('\t\tos.Exit(1)')
+    lines.append('\t}')
+    lines.append('')
+    lines.append(f'\tfmt.Println("Golang substrate: Processing {len(tables_with_calc)} tables with calculated fields...")')
+    lines.append(f'\tfmt.Println("  Expected tables: {", ".join(tables_with_calc)}")')
+    lines.append('\tfmt.Println("")')
+    lines.append('')
+    lines.append('\t// Track success/failure for ALL tables')
+    lines.append('\tvar errors []string')
+    lines.append('\tvar totalRecords int')
+    lines.append('')
 
-	// Paths
-	blankTestPath := filepath.Join(scriptDir, "..", "..", "testing", "blank-test.json")
-	answersPath := filepath.Join(scriptDir, "test-answers.json")
+    # Generate processing code for each table
+    for table_name in tables_with_calc:
+        struct_name = table_name_to_struct_name(table_name)
+        table_snake = to_snake_case(table_name)
 
-	// Step 1: Load blank test data
-	records, err := LoadRecords(blankTestPath)
-	if err != nil {{
-		fmt.Printf("Failed to load blank test: %v\\n", err)
-		os.Exit(1)
-	}}
+        lines.append(f'\t// ─────────────────────────────────────────────────────────────────')
+        lines.append(f'\t// Process {table_name}')
+        lines.append(f'\t// ─────────────────────────────────────────────────────────────────')
+        lines.append(f'\tfmt.Println("Processing {table_name}...")')
+        lines.append(f'\t{table_snake}Input := filepath.Join(blankTestsDir, "{table_snake}.json")')
+        lines.append(f'\t{table_snake}Output := filepath.Join(testAnswersDir, "{table_snake}.json")')
+        lines.append('')
+        lines.append(f'\t{table_snake}Records, err := Load{struct_name}Records({table_snake}Input)')
+        lines.append('\tif err != nil {')
+        lines.append(f'\t\terrMsg := fmt.Sprintf("{table_name}: failed to load - %v", err)')
+        lines.append('\t\tfmt.Fprintf(os.Stderr, "ERROR: %s\\n", errMsg)')
+        lines.append('\t\terrors = append(errors, errMsg)')
+        lines.append('\t} else {')
+        lines.append(f'\t\tvar computed{struct_name} []{struct_name}')
+        lines.append(f'\t\tfor _, r := range {table_snake}Records {{')
+        lines.append(f'\t\t\tcomputed{struct_name} = append(computed{struct_name}, *r.ComputeAll())')
+        lines.append('\t\t}')
+        lines.append('')
+        lines.append(f'\t\tif err := Save{struct_name}Records({table_snake}Output, computed{struct_name}); err != nil {{')
+        lines.append(f'\t\t\terrMsg := fmt.Sprintf("{table_name}: failed to save - %v", err)')
+        lines.append('\t\t\tfmt.Fprintf(os.Stderr, "ERROR: %s\\n", errMsg)')
+        lines.append('\t\t\terrors = append(errors, errMsg)')
+        lines.append('\t\t} else {')
+        lines.append(f'\t\t\tfmt.Printf("  ✓ {table_snake}: %d records processed\\n", len(computed{struct_name}))')
+        lines.append(f'\t\t\ttotalRecords += len(computed{struct_name})')
+        lines.append('\t\t}')
+        lines.append('\t}')
+        lines.append('\tfmt.Println("")')
+        lines.append('')
 
-	fmt.Printf("Golang substrate: Processing %d records...\\n", len(records))
+    # Final validation
+    lines.append('\t// ─────────────────────────────────────────────────────────────────')
+    lines.append('\t// Final validation - FAIL LOUDLY if any errors occurred')
+    lines.append('\t// ─────────────────────────────────────────────────────────────────')
+    lines.append('\tif len(errors) > 0 {')
+    lines.append('\t\tfmt.Fprintf(os.Stderr, "\\n")')
+    lines.append('\t\tfmt.Fprintf(os.Stderr, "════════════════════════════════════════════════════════════════\\n")')
+    lines.append('\t\tfmt.Fprintf(os.Stderr, "FATAL: %d table(s) FAILED to process\\n", len(errors))')
+    lines.append('\t\tfmt.Fprintf(os.Stderr, "════════════════════════════════════════════════════════════════\\n")')
+    lines.append('\t\tfor _, e := range errors {')
+    lines.append('\t\t\tfmt.Fprintf(os.Stderr, "  • %s\\n", e)')
+    lines.append('\t\t}')
+    lines.append('\t\tfmt.Fprintf(os.Stderr, "\\n")')
+    lines.append('\t\tos.Exit(1)')
+    lines.append('\t}')
+    lines.append('')
+    lines.append('\tfmt.Println("════════════════════════════════════════════════════════════════")')
+    lines.append(f'\tfmt.Printf("Golang substrate: ALL %d tables processed successfully (%d total records)\\n", {len(tables_with_calc)}, totalRecords)')
+    lines.append('\tfmt.Println("════════════════════════════════════════════════════════════════")')
+    lines.append('}')
 
-	// Step 2: Compute all calculated fields using the SDK
-	var computed []{struct_name}
-	for _, r := range records {{
-		computed = append(computed, *r.ComputeAll())
-	}}
-
-	// Step 3: Save test answers
-	if err := SaveRecords(answersPath, computed); err != nil {{
-		fmt.Printf("Failed to save test answers: %v\\n", err)
-		os.Exit(1)
-	}}
-
-	fmt.Printf("Golang substrate: Saved results to %s\\n", answersPath)
-}}
-'''
+    return '\n'.join(lines)
 
 
 def main():
     # Files generated by THIS script that should be cleaned
-    # Note: main.go is a source file (only created if missing), NOT cleaned
-    # Note: erb_test, test-answers.json, test-results.md are build/test outputs
+    # main.go is now ALWAYS regenerated to stay in sync with erb_sdk.go
+    # Note: erb_test, test-answers/, test-results.md are build/test outputs
     GENERATED_FILES = [
         'erb_sdk.go',
+        'main.go',
     ]
 
     # Handle --clean argument
@@ -535,17 +634,16 @@ def main():
     print(f"Found {len(table_names)} tables: {', '.join(table_names)}")
     print()
 
-    # Report on calculated fields per table and find primary table
+    # Report on calculated fields per table and collect ALL tables with calc fields
     total_calc_fields = 0
-    primary_table = None
+    tables_with_calc = []
     for table_name in table_names:
         table_data = rulebook.get(table_name, {})
         if isinstance(table_data, dict) and 'schema' in table_data:
             schema = table_data.get('schema', [])
             calc_fields = get_calculated_fields(schema)
             if calc_fields:
-                if primary_table is None:
-                    primary_table = table_name
+                tables_with_calc.append(table_name)
                 print(f"  {table_name}: {len(calc_fields)} calculated fields")
                 for field in calc_fields:
                     print(f"    - {field['name']}")
@@ -553,8 +651,7 @@ def main():
 
     print()
     print(f"Total calculated fields to compile: {total_calc_fields}")
-    if primary_table:
-        print(f"Primary table for test runner: {primary_table}")
+    print(f"Tables with calculated fields ({len(tables_with_calc)}): {', '.join(tables_with_calc)}")
     print()
     print("-" * 70)
     print()
@@ -567,16 +664,17 @@ def main():
     erb_sdk_path.write_text(erb_sdk_content, encoding='utf-8')
     print(f"Wrote: {erb_sdk_path} ({len(erb_sdk_content)} bytes)")
 
-    # Generate main.go (only if it doesn't exist - it's a source file, not regenerated)
+    # Generate main.go - ALWAYS regenerated to stay in sync with erb_sdk.go
+    # IMPORTANT: Now processes ALL tables with calculated fields, not just one!
     main_go_path = script_dir / "main.go"
-    if not main_go_path.exists():
-        print("Generating main.go (first time only)...")
-        struct_name = table_name_to_struct_name(primary_table) if primary_table else "Record"
-        main_go_content = generate_main_go(struct_name)
+    if tables_with_calc:
+        print(f"Generating main.go (processes ALL {len(tables_with_calc)} tables)...")
+        main_go_content = generate_main_go(tables_with_calc)
         main_go_path.write_text(main_go_content, encoding='utf-8')
         print(f"Wrote: {main_go_path} ({len(main_go_content)} bytes)")
     else:
-        print(f"Skipping main.go (already exists as source file)")
+        print("ERROR: No tables with calculated fields found - cannot generate main.go")
+        sys.exit(1)
 
     print()
     print("=" * 70)

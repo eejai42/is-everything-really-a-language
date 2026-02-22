@@ -9,70 +9,67 @@
 -- These functions perform lookups via foreign key relationships
 -- ============================================================================
 
-CREATE OR REPLACE FUNCTION get_orders_order_number(p_order_id TEXT)
-RETURNS INTEGER AS $$
+
+CREATE OR REPLACE FUNCTION calc_language_candidates_has_grammar(p_language_candidate_id TEXT)
+RETURNS BOOLEAN AS $$
 BEGIN
-  RETURN (SELECT order_number FROM orders WHERE order_id = p_order_id);
+  RETURN ((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = TRUE)::boolean;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_customers_full_name(p_customer_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_question(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
-  RETURN (CONCAT((SELECT NULLIF(first_name, '') FROM customers WHERE customer_id = p_customer_id), ' ', (SELECT NULLIF(last_name, '') FROM customers WHERE customer_id = p_customer_id)))::text;
+  RETURN ('Is " & (SELECT NULLIF(name, '''') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) & " a language?')::text;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_orders_customer_email_address(p_order_id TEXT)
-RETURNS TEXT AS $$
+CREATE OR REPLACE FUNCTION calc_language_candidates_predicted_answer(p_language_candidate_id TEXT)
+RETURNS BOOLEAN AS $$
 BEGIN
-  RETURN (SELECT email_address::text FROM customers WHERE customer_id = (SELECT customer FROM orders WHERE order_id = p_order_id));
+  RETURN ((COALESCE((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT requires_parsing FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND (calc_language_candidates_is_description_of(p_language_candidate_id) = 'true') AND COALESCE((SELECT has_linear_decoding_pressure FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT resolves_to_an_ast FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT is_stable_ontology_reference FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND NOT (COALESCE((SELECT can_be_held FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)) AND NOT (COALESCE((SELECT has_identity FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE))))::boolean;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_orders_customer_full_name(p_order_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_prediction_predicates(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
-  RETURN calc_customers_full_name((SELECT customer FROM orders WHERE order_id = p_order_id));
-END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION get_customers_customer(p_customer_id TEXT)
-RETURNS TEXT AS $$
-BEGIN
-  RETURN (SELECT customer FROM customers WHERE customer_id = p_customer_id);
-END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION get_customers_email_address(p_customer_id TEXT)
-RETURNS TEXT AS $$
-BEGIN
-  RETURN (SELECT email_address FROM customers WHERE customer_id = p_customer_id);
-END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION get_customers_first_name(p_customer_id TEXT)
-RETURNS TEXT AS $$
-BEGIN
-  RETURN (SELECT first_name FROM customers WHERE customer_id = p_customer_id);
-END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION get_customers_last_name(p_customer_id TEXT)
-RETURNS TEXT AS $$
-BEGIN
-  RETURN (SELECT last_name FROM customers WHERE customer_id = p_customer_id);
+  RETURN (CONCAT(CASE WHEN COALESCE((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Has Syntax' ELSE 'No Syntax' END, ', ', CASE WHEN COALESCE((SELECT requires_parsing FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Requires Parsing' ELSE 'No Parsing Needed' END, ', ', CASE WHEN (calc_language_candidates_is_description_of(p_language_candidate_id) = 'true') THEN 'Describes the thing' ELSE 'Is the Thing' END, ', ', CASE WHEN COALESCE((SELECT has_linear_decoding_pressure FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Has Linear Decoding Pressure' ELSE 'No Decoding Pressure' END, ', ', CASE WHEN COALESCE((SELECT resolves_to_an_ast FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Resolves to AST' ELSE 'No AST' END, ', ', CASE WHEN COALESCE((SELECT is_stable_ontology_reference FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Is Stable Ontology' ELSE 'Not ''Ontology''' END, ', ', CASE WHEN COALESCE((SELECT can_be_held FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Can Be Held' ELSE 'Can''t Be Held' END, ' And ', CASE WHEN COALESCE((SELECT has_identity FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Has Identity' ELSE 'Has no Identity' END))::text;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
 
-CREATE OR REPLACE FUNCTION calc_orders_name(p_order_id TEXT)
+CREATE OR REPLACE FUNCTION calc_language_candidates_prediction_fail(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
 BEGIN
-  RETURN (CONCAT('ORD', (SELECT order_number FROM orders WHERE order_id = p_order_id)))::text;
+  RETURN (CONCAT(CASE WHEN NOT (calc_language_candidates_predicted_answer(p_language_candidate_id) = (SELECT is_language FROM language_candidates WHERE language_candidate_id = p_language_candidate_id)) THEN CONCAT((SELECT NULLIF(name, '') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), ' ', CASE WHEN (calc_language_candidates_predicted_answer(p_language_candidate_id) = 'true') THEN 'Is' ELSE 'Isn''t' END, ' a Family Feud Language, but ', CASE WHEN COALESCE((SELECT is_language FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) THEN 'Is' ELSE 'Is Not' END, ' marked as a ''Language Candidate.''') ELSE '' END, CASE WHEN (calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id) = 'true') THEN ' - Open World vs. Closed World Conflict.' ELSE '' END))::text;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION calc_language_candidates_is_description_of(p_language_candidate_id TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN ((SELECT distance_from_concept FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) > 1)::boolean;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN ((COALESCE((SELECT is_open_world FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE) AND COALESCE((SELECT is_closed_world FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)))::boolean;
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
+
+
+CREATE OR REPLACE FUNCTION calc_language_candidates_relationship_to_concept(p_language_candidate_id TEXT)
+RETURNS TEXT AS $$
+BEGIN
+  RETURN (CASE WHEN COALESCE((SELECT distance_from_concept FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = 1, FALSE) THEN 'IsMirrorOf' ELSE 'IsDescriptionOf' END)::text;
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 
@@ -80,15 +77,4 @@ $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 -- MANY-SIDE RELATIONSHIP FUNCTIONS
 -- These functions aggregate child records for many-side relationships
 -- ============================================================================
-
-CREATE OR REPLACE FUNCTION calc_customers_orders(p_customer_id TEXT)
-RETURNS TEXT AS $$
-BEGIN
-  RETURN (
-    SELECT STRING_AGG(order_id::TEXT, ', ' ORDER BY order_id)
-    FROM orders
-    WHERE customer = p_customer_id
-  );
-END;
-$$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 

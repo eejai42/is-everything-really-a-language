@@ -5,7 +5,7 @@
   "ProjectSettings": [
     {
       "Name": "baseId",
-      "Value": "appEMeBJDL9wcHWOS"
+      "Value": "appC8XTj95lubn6hz"
     },
     {
       "Name": "project-name",
@@ -42,7 +42,7 @@
       "IsSSoTTranspiler": false,
       "Name": "init-db",
       "RelativePath": "/postgres",
-      "CommandLine": "-exec ./init-db.sh",
+      "CommandLine": "-exec ./init-db.sh -w 90000",
       "IsDisabled": false
     },
     {

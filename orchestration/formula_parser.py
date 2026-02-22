@@ -618,12 +618,21 @@ def compile_to_javascript(ast: ASTNode, obj_name: str = 'candidate') -> str:
 # GO CODE GENERATOR
 # =============================================================================
 
-def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
+def compile_to_go(ast: ASTNode, struct_name: str = 'lc', field_types: dict = None) -> str:
     """Compile an AST to a Go expression.
 
     Uses boolVal() helper for nil-safe boolean access.
     Field references use PascalCase struct field names.
+
+    Args:
+        ast: The AST node to compile
+        struct_name: Variable name for the struct (e.g., 'tc' for tc.FieldName)
+        field_types: Optional dict mapping field names to their datatypes
+                     (e.g., {'OrderNumber': 'integer', 'Name': 'string'})
     """
+    if field_types is None:
+        field_types = {}
+
     if isinstance(ast, LiteralBool):
         return 'true' if ast.value else 'false'
 
@@ -641,7 +650,7 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
 
     if isinstance(ast, UnaryOp):
         if ast.op == 'NOT':
-            operand = compile_to_go(ast.operand, struct_name)
+            operand = compile_to_go(ast.operand, struct_name, field_types)
             # Wrap in boolVal for nil-safe access
             if isinstance(ast.operand, FieldRef):
                 return f'!boolVal({operand})'
@@ -652,15 +661,15 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
         # Handle comparisons involving field refs (pointer fields in Go)
         if isinstance(ast.left, FieldRef) and isinstance(ast.right, FieldRef):
             # Both sides are field refs - wrap both in boolVal for nil-safe comparison
-            left = compile_to_go(ast.left, struct_name)
-            right = compile_to_go(ast.right, struct_name)
+            left = compile_to_go(ast.left, struct_name, field_types)
+            right = compile_to_go(ast.right, struct_name, field_types)
             op_map = {'=': '==', '<>': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>='}
             return f'(boolVal({left}) {op_map[ast.op]} boolVal({right}))'
 
         if isinstance(ast.left, FieldRef) and isinstance(ast.right, LiteralInt):
             # Field ref compared to integer - need nil check and dereference
             left_field = ast.left.name
-            right = compile_to_go(ast.right, struct_name)
+            right = compile_to_go(ast.right, struct_name, field_types)
             op_go = {'=': '==', '<>': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>='}[ast.op]
             if ast.op == '=':
                 return f'({struct_name}.{left_field} != nil && *{struct_name}.{left_field} == {right})'
@@ -672,13 +681,27 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
 
         if isinstance(ast.left, FieldRef) and isinstance(ast.right, LiteralBool):
             # Field ref compared to boolean literal - use boolVal for nil-safe access
-            left = compile_to_go(ast.left, struct_name)
-            right = compile_to_go(ast.right, struct_name)
+            left = compile_to_go(ast.left, struct_name, field_types)
+            right = compile_to_go(ast.right, struct_name, field_types)
             op_map = {'=': '==', '<>': '!='}
             return f'(boolVal({left}) {op_map[ast.op]} {right})'
 
-        left = compile_to_go(ast.left, struct_name)
-        right = compile_to_go(ast.right, struct_name)
+        if isinstance(ast.left, FieldRef) and isinstance(ast.right, LiteralString):
+            # Field ref compared to string literal - use stringVal for nil-safe access
+            left = compile_to_go(ast.left, struct_name, field_types)
+            right = compile_to_go(ast.right, struct_name, field_types)
+            op_map = {'=': '==', '<>': '!='}
+            return f'(stringVal({left}) {op_map[ast.op]} {right})'
+
+        if isinstance(ast.left, LiteralString) and isinstance(ast.right, FieldRef):
+            # String literal compared to field ref - use stringVal for nil-safe access
+            left = compile_to_go(ast.left, struct_name, field_types)
+            right = compile_to_go(ast.right, struct_name, field_types)
+            op_map = {'=': '==', '<>': '!='}
+            return f'({left} {op_map[ast.op]} stringVal({right}))'
+
+        left = compile_to_go(ast.left, struct_name, field_types)
+        right = compile_to_go(ast.right, struct_name, field_types)
         op_map = {'=': '==', '<>': '!=', '<': '<', '<=': '<=', '>': '>', '>=': '>='}
         return f'({left} {op_map[ast.op]} {right})'
 
@@ -686,7 +709,7 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
         if ast.name == 'AND':
             parts = []
             for arg in ast.args:
-                compiled = compile_to_go(arg, struct_name)
+                compiled = compile_to_go(arg, struct_name, field_types)
                 if isinstance(arg, FieldRef):
                     parts.append(f'boolVal({compiled})')
                 elif isinstance(arg, UnaryOp) and arg.op == 'NOT':
@@ -702,7 +725,7 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
         if ast.name == 'OR':
             parts = []
             for arg in ast.args:
-                compiled = compile_to_go(arg, struct_name)
+                compiled = compile_to_go(arg, struct_name, field_types)
                 if isinstance(arg, FieldRef):
                     parts.append(f'boolVal({compiled})')
                 else:
@@ -712,16 +735,16 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
         if ast.name == 'IF':
             if len(ast.args) < 2:
                 raise ValueError("IF requires at least 2 arguments")
-            cond = compile_to_go(ast.args[0], struct_name)
-            then_val = compile_to_go(ast.args[1], struct_name)
-            else_val = compile_to_go(ast.args[2], struct_name) if len(ast.args) > 2 else '""'
+            cond = compile_to_go(ast.args[0], struct_name, field_types)
+            then_val = compile_to_go(ast.args[1], struct_name, field_types)
+            else_val = compile_to_go(ast.args[2], struct_name, field_types) if len(ast.args) > 2 else '""'
             # Go doesn't have ternary - generate inline func
             return f'func() string {{ if {cond} {{ return {then_val} }}; return {else_val} }}()'
 
         if ast.name == 'NOT':
             if len(ast.args) != 1:
                 raise ValueError("NOT requires 1 argument")
-            operand = compile_to_go(ast.args[0], struct_name)
+            operand = compile_to_go(ast.args[0], struct_name, field_types)
             if isinstance(ast.args[0], FieldRef):
                 return f'!boolVal({operand})'
             return f'!({operand})'
@@ -729,21 +752,28 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
         if ast.name == 'LOWER':
             if len(ast.args) != 1:
                 raise ValueError("LOWER requires 1 argument")
-            arg = compile_to_go(ast.args[0], struct_name)
+            arg = compile_to_go(ast.args[0], struct_name, field_types)
             return f'strings.ToLower(stringVal({arg}))'
 
         if ast.name == 'FIND':
             if len(ast.args) != 2:
                 raise ValueError("FIND requires 2 arguments")
-            needle = compile_to_go(ast.args[0], struct_name)
-            haystack = compile_to_go(ast.args[1], struct_name)
+            needle = compile_to_go(ast.args[0], struct_name, field_types)
+            haystack = compile_to_go(ast.args[1], struct_name, field_types)
             return f'strings.Contains(stringVal({haystack}), {needle})'
 
         if ast.name == 'CAST':
             if len(ast.args) >= 1:
-                arg = compile_to_go(ast.args[0], struct_name)
+                arg = compile_to_go(ast.args[0], struct_name, field_types)
                 if isinstance(ast.args[0], FieldRef):
-                    return f'boolToString(boolVal({arg}))'
+                    # Check field type for appropriate conversion
+                    field_type = field_types.get(ast.args[0].name, 'boolean').lower()
+                    if field_type == 'integer':
+                        return f'intToString({arg})'
+                    elif field_type == 'boolean':
+                        return f'boolToString(boolVal({arg}))'
+                    else:
+                        return f'stringVal({arg})'
                 return f'fmt.Sprintf("%v", {arg})'
             raise ValueError("CAST requires at least 1 argument")
 
@@ -756,9 +786,16 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc') -> str:
                 escaped = part.value.replace('\\', '\\\\').replace('"', '\\"')
                 parts.append(f'"{escaped}"')
             else:
-                var = compile_to_go(part, struct_name)
+                var = compile_to_go(part, struct_name, field_types)
                 if isinstance(part, FieldRef):
-                    parts.append(f'stringVal({var})')
+                    # Check field type to use appropriate conversion
+                    field_type = field_types.get(part.name, 'string').lower()
+                    if field_type == 'integer':
+                        parts.append(f'intToString({var})')
+                    elif field_type == 'boolean':
+                        parts.append(f'boolToString(boolVal({var}))')
+                    else:
+                        parts.append(f'stringVal({var})')
                 else:
                     parts.append(var)
         if len(parts) == 1:

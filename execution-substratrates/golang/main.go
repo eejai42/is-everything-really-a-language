@@ -1,4 +1,13 @@
 // ERB SDK - Go Test Runner (GENERATED - DO NOT EDIT)
+// =======================================================
+// This file is REGENERATED every time inject-into-golang.py runs.
+// It must stay in sync with erb_sdk.go and the rulebook.
+//
+// Tables with calculated fields: LanguageCandidates
+//
+// IMPORTANT: This runner processes ALL tables, not just a "primary" one.
+// If ANY table fails to process, the entire run fails with exit code 1.
+
 package main
 
 import (
@@ -10,7 +19,7 @@ import (
 func main() {
 	scriptDir, err := os.Getwd()
 	if err != nil {
-		fmt.Printf("Failed to get working directory: %v\n", err)
+		fmt.Fprintf(os.Stderr, "FATAL: Failed to get working directory: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -19,28 +28,64 @@ func main() {
 	testAnswersDir := filepath.Join(scriptDir, "test-answers")
 
 	// Ensure output directory exists
-	os.MkdirAll(testAnswersDir, 0755)
-
-	fmt.Println("Golang substrate: Processing entities from shared testing/blank-tests/...")
-
-	// Process customers.json
-	customersInputPath := filepath.Join(blankTestsDir, "customers.json")
-	customersOutputPath := filepath.Join(testAnswersDir, "customers.json")
-
-	customerRecords, err := LoadRecords(customersInputPath)
-	if err != nil {
-		fmt.Printf("Failed to load customers: %v\n", err)
-	} else {
-		var computedCustomers []Customer
-		for _, r := range customerRecords {
-			computedCustomers = append(computedCustomers, *r.ComputeAll())
-		}
-		if err := SaveRecords(customersOutputPath, computedCustomers); err != nil {
-			fmt.Printf("Failed to save customers: %v\n", err)
-		} else {
-			fmt.Printf("  -> customers: %d records\n", len(computedCustomers))
-		}
+	if err := os.MkdirAll(testAnswersDir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "FATAL: Failed to create test-answers directory: %v\n", err)
+		os.Exit(1)
 	}
 
-	fmt.Println("Golang substrate: Test completed")
+	fmt.Println("Golang substrate: Processing 1 tables with calculated fields...")
+	fmt.Println("  Expected tables: LanguageCandidates")
+	fmt.Println("")
+
+	// Track success/failure for ALL tables
+	var errors []string
+	var totalRecords int
+
+	// ─────────────────────────────────────────────────────────────────
+	// Process LanguageCandidates
+	// ─────────────────────────────────────────────────────────────────
+	fmt.Println("Processing LanguageCandidates...")
+	language_candidatesInput := filepath.Join(blankTestsDir, "language_candidates.json")
+	language_candidatesOutput := filepath.Join(testAnswersDir, "language_candidates.json")
+
+	language_candidatesRecords, err := LoadLanguageCandidateRecords(language_candidatesInput)
+	if err != nil {
+		errMsg := fmt.Sprintf("LanguageCandidates: failed to load - %v", err)
+		fmt.Fprintf(os.Stderr, "ERROR: %s\n", errMsg)
+		errors = append(errors, errMsg)
+	} else {
+		var computedLanguageCandidate []LanguageCandidate
+		for _, r := range language_candidatesRecords {
+			computedLanguageCandidate = append(computedLanguageCandidate, *r.ComputeAll())
+		}
+
+		if err := SaveLanguageCandidateRecords(language_candidatesOutput, computedLanguageCandidate); err != nil {
+			errMsg := fmt.Sprintf("LanguageCandidates: failed to save - %v", err)
+			fmt.Fprintf(os.Stderr, "ERROR: %s\n", errMsg)
+			errors = append(errors, errMsg)
+		} else {
+			fmt.Printf("  ✓ language_candidates: %d records processed\n", len(computedLanguageCandidate))
+			totalRecords += len(computedLanguageCandidate)
+		}
+	}
+	fmt.Println("")
+
+	// ─────────────────────────────────────────────────────────────────
+	// Final validation - FAIL LOUDLY if any errors occurred
+	// ─────────────────────────────────────────────────────────────────
+	if len(errors) > 0 {
+		fmt.Fprintf(os.Stderr, "\n")
+		fmt.Fprintf(os.Stderr, "════════════════════════════════════════════════════════════════\n")
+		fmt.Fprintf(os.Stderr, "FATAL: %d table(s) FAILED to process\n", len(errors))
+		fmt.Fprintf(os.Stderr, "════════════════════════════════════════════════════════════════\n")
+		for _, e := range errors {
+			fmt.Fprintf(os.Stderr, "  • %s\n", e)
+		}
+		fmt.Fprintf(os.Stderr, "\n")
+		os.Exit(1)
+	}
+
+	fmt.Println("════════════════════════════════════════════════════════════════")
+	fmt.Printf("Golang substrate: ALL %d tables processed successfully (%d total records)\n", 1, totalRecords)
+	fmt.Println("════════════════════════════════════════════════════════════════")
 }

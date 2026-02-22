@@ -1,5 +1,5 @@
 erb_customization_id,name,title,sql_code,sql_target,customization_type
-03a-customize-schema-sql,03a-customize-schema.sql,Customize Schema,"-- ============================================================================
+01b-customize-schema-sql,01b-customize-schema.sql,Customize Schema,"-- ============================================================================
 -- CUSTOMIZE SCHEMA - User-defined tables and schema modifications
 -- ============================================================================
 -- This file is for YOUR custom schema changes that should persist across
@@ -20,13 +20,38 @@ erb_customization_id,name,title,sql_code,sql_target,customization_type
 
 -- Your custom schema changes go here:
 ",Postgres,Schema
-03b-customize-functions-sql,03b-customize-functions.sql,Customize Functions,"-- Formula: =""Is "" & {{Name}} & "" a language?""
-CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_question(p_language_candidate_id TEXT)
+02b-customize-functions-sql,02b-customize-functions.sql,Customize Functions,"-- Prediction Fail: Returns TRUE when predicted_answer doesn't match is_language
+DROP FUNCTION IF EXISTS calc_language_candidates_prediction_fail_x;
+
+CREATE OR REPLACE FUNCTION calc_language_candidates_prediction_fail_x(p_language_candidate_id TEXT)
 RETURNS TEXT AS $$
-  SELECT 'Is ' || COALESCE(name, '') || ' a language?'
+  SELECT NULLIF(
+    COALESCE(
+      CASE
+        WHEN COALESCE(calc_language_candidates_predicted_answer(p_language_candidate_id), FALSE)
+             != COALESCE(is_language, FALSE)
+        THEN name || ' ' ||
+             CASE WHEN calc_language_candidates_predicted_answer(p_language_candidate_id) THEN 'Is' ELSE 'Isn''t' END ||
+             ' a Family Feud Language, but ' ||
+             CASE WHEN is_language THEN 'Is' ELSE 'Is Not' END ||
+             ' marked as a ''Language Candidate.'''
+      END,
+      ''
+    ) ||
+    COALESCE(
+      CASE
+        WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)
+        THEN ' - Open World vs. Closed World Conflict.'
+      END,
+      ''
+    ),
+    ''
+  )
   FROM language_candidates
   WHERE language_candidate_id = p_language_candidate_id;
 $$ LANGUAGE SQL STABLE SECURITY DEFINER;
+
+DROP FUNCTION calc_language_candidates_question;
 
 CREATE OR REPLACE FUNCTION public.calc_language_candidates_question(p_language_candidate_id text)
  RETURNS text
@@ -36,40 +61,9 @@ AS $function$
 BEGIN
   RETURN ('Is ' || (SELECT NULLIF(name, '''') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) || ' a language?')::text;
 END;
-$function$;
-
-
--- Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),
---   {{Name}} & "" "" & IF({{PredictedAnswer}}, ""Is"", ""Isn't"") & "" a Family Feud Language, but "" &
---   IF({{IsLanguage}}, ""Is"", ""Is Not"") & "" marked as a 'Language Candidate.'"") &
---   IF({{IsOpenClosedWorldConflicted}}, "" - Open World vs. Closed World Conflict."")
-CREATE OR REPLACE FUNCTION calc_language_candidates_family_feud_mismatch(p_language_candidate_id TEXT)
-RETURNS TEXT AS $$
-  SELECT
-    CASE
-      WHEN COALESCE(calc_language_candidates_predicted_answer(p_language_candidate_id), FALSE)
-           = COALESCE(is_language, FALSE)
-      THEN
-        CASE
-          WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)
-          THEN ' - Open World vs. Closed World Conflict.'
-          ELSE NULL
-        END
-      ELSE name || ' ' ||
-           CASE WHEN calc_language_candidates_predicted_answer(p_language_candidate_id) THEN 'Is' ELSE 'Isn''t' END ||
-           ' a Family Feud Language, but ' ||
-           CASE WHEN is_language THEN 'Is' ELSE 'Is Not' END ||
-           ' marked as a ''Language Candidate.''' ||
-           CASE
-             WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)
-             THEN ' - Open World vs. Closed World Conflict.'
-             ELSE ''
-           END
-    END
-  FROM language_candidates
-  WHERE language_candidate_id = p_language_candidate_id;
-$$ LANGUAGE SQL STABLE SECURITY DEFINER;",Postgres,Functions
-03c-customize-views-sql,03c-customize-views.sql,Customize Views,"-- ============================================================================
+$function$
+",Postgres,Functions
+03b-customize-views-sql,03b-customize-views.sql,Customize Views,"-- ============================================================================
 -- CUSTOMIZE VIEWS - User-defined views and view extensions
 -- ============================================================================
 -- This file is for YOUR custom views that should persist across
@@ -84,7 +78,7 @@ $$ LANGUAGE SQL STABLE SECURITY DEFINER;",Postgres,Functions
 
 -- Your custom views go here:
 ",Postgres,Views
-03d-customize-rls-sql,03d-customize-rls.sql,Customize Policies (RLS),"-- ============================================================================
+04b-customize-rls-sql,04b-customize-rls.sql,Customize Policies (RLS),"-- ============================================================================
 -- CUSTOMIZE POLICIES - User-defined Row Level Security policies
 -- ============================================================================
 -- This file is for YOUR custom RLS policies that should persist across
@@ -99,7 +93,7 @@ $$ LANGUAGE SQL STABLE SECURITY DEFINER;",Postgres,Functions
 
 -- Your custom policies go here:
 ",Postgres,RLS
-03e-customize-data-sql,03e-customize-data.sql,Customize Data (Seeds / Migrations),"-- ============================================================================
+05b-customize-data-sql,05b-customize-data.sql,Customize Data (Seeds / Migrations),"-- ============================================================================
 -- CUSTOMIZE DATA - User-defined seed data and data migrations
 -- ============================================================================
 -- This file is for YOUR custom seed data that should persist across

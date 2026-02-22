@@ -4,24 +4,20 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Fields Tested | 5 |
-| Passed | 4 |
-| Failed | 1 |
-| Score | 80.0% |
-| Duration | 0.2s |
+| Total Fields Tested | 200 |
+| Passed | 200 |
+| Failed | 0 |
+| Score | 100.0% |
+| Duration | 0.3s |
 
 ## Results by Entity
 
-### orders
+### language_candidates
 
-- Fields: 2/2 (100.0%)
-- Computed columns: name
+- Fields: 184/184 (100.0%)
+- Computed columns: has_grammar, question, predicted_answer, prediction_predicates, prediction_fail, is_description_of, is_open_closed_world_conflicted, relationship_to_concept
 
-### customers
+### is_everything_a_language
 
-- Fields: 2/3 (66.7%)
-- Computed columns: full_name
-
-| PK | Field | Expected | Actual |
-|-----|-------|----------|--------|
-| cust0001 | full_name | Linda Smith | Jane Smith |
+- Fields: 16/16 (100.0%)
+- Computed columns: temp

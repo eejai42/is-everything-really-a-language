@@ -694,10 +694,6 @@ Environment Variables:
             return 2  # Exit code 2 = skipped (not an error)
 
         sys.stdout.flush()
-        response = input("Re-run all LLM prompts? [y/N]: ").strip().lower()
-        if response not in ('y', 'yes'):
-            print("Skipping LLM regeneration. Use --regenerate to force.")
-            return 2  # Exit code 2 = skipped by user choice (not an error)
 
     print(f"Generating {candidate_name} substrate (LLM-assisted)...")
 

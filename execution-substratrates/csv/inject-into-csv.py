@@ -137,6 +137,23 @@ def evaluate_formula(formula, row_data):
             false_val = eval_expr(args[2]) if len(args) > 2 else None
             return true_val if condition else false_val
 
+        # Handle comparison operators (check multi-char operators first)
+        for op, op_fn in [(' >= ', lambda a, b: a >= b),
+                          (' <= ', lambda a, b: a <= b),
+                          (' > ', lambda a, b: a > b),
+                          (' < ', lambda a, b: a < b),
+                          ('>=', lambda a, b: a >= b),
+                          ('<=', lambda a, b: a <= b),
+                          ('>', lambda a, b: a > b),
+                          ('<', lambda a, b: a < b)]:
+            if op in expr:
+                parts = expr.split(op, 1)
+                if len(parts) == 2:
+                    left = eval_expr(parts[0])
+                    right = eval_expr(parts[1])
+                    if left is not None and right is not None:
+                        return op_fn(left, right)
+
         # Handle equality: {{Field}} = value or value = value
         if ' = ' in expr or '=' in expr:
             # Split by = but be careful of ==

@@ -101,6 +101,93 @@ def get_score_color(score: float) -> str:
 
 
 # =============================================================================
+# RUN METADATA: Track success/failure history per substrate
+# =============================================================================
+
+# Central substrate results file - THE source of truth for all substrate stats
+CENTRAL_RESULTS_PATH = os.path.join(TESTING_DIR, "_substrate_results.json")
+
+
+def load_central_results() -> dict:
+    """Load the central _substrate_results.json from testing folder"""
+    if os.path.exists(CENTRAL_RESULTS_PATH):
+        with open(CENTRAL_RESULTS_PATH, 'r') as f:
+            return json.load(f)
+    return {}
+
+
+def save_central_results(results: dict):
+    """Save the central _substrate_results.json to testing folder"""
+    with open(CENTRAL_RESULTS_PATH, 'w') as f:
+        json.dump(results, f, indent=2, default=str)
+
+
+def load_run_metadata(substrate_name: str) -> dict:
+    """Load metadata for a substrate from the CENTRAL results file"""
+    central = load_central_results()
+    return central.get(substrate_name, {"last_run": None, "last_successful_run": None})
+
+
+def save_run_metadata(substrate_name: str, metadata: dict):
+    """Save metadata for a substrate to the CENTRAL results file"""
+    central = load_central_results()
+    central[substrate_name] = metadata
+    save_central_results(central)
+
+
+def update_run_metadata(substrate_name: str, grades: dict, success: bool, error_msg: str = None):
+    """Update run metadata after a test run.
+
+    IMPORTANT: Only updates last_successful_run when score is 100%.
+    This preserves previous successful run data including duration.
+
+    Args:
+        substrate_name: Name of the substrate
+        grades: Grading results dict
+        success: Whether the take-test.sh returned exit code 0
+        error_msg: Error message if run failed
+    """
+    metadata = load_run_metadata(substrate_name)
+    timestamp = datetime.now().isoformat()
+    elapsed = grades.get("elapsed_seconds", 0.0)
+
+    total = grades.get("total_fields_tested", 0)
+    passed = grades.get("fields_passed", 0)
+    failed = grades.get("fields_failed", 0)
+    score = (passed / total * 100) if total > 0 else 0.0
+
+    # Always update last_run (even if it failed or got < 100%)
+    run_record = {
+        "timestamp": timestamp,
+        "status": "success" if success else "failure",
+        "duration_seconds": elapsed,
+        "exit_code": 0 if success else 1,
+        "score": score
+    }
+    if error_msg:
+        run_record["error_message"] = error_msg
+
+    metadata["last_run"] = run_record
+
+    # Only update last_successful_run on success AND 100% score
+    # This preserves the previous duration/results if current run fails or scores < 100%
+    if success and total > 0 and score >= 100.0:
+        metadata["last_successful_run"] = {
+            "timestamp": timestamp,
+            "duration_seconds": elapsed,
+            "status": "success",
+            "test_results": {
+                "total_fields_tested": total,
+                "fields_passed": passed,
+                "fields_failed": failed,
+                "score": score
+            }
+        }
+
+    save_run_metadata(substrate_name, metadata)
+
+
+# =============================================================================
 # AUTO-DISCOVERY: Views, Computed Columns, Primary Keys
 # =============================================================================
 
@@ -452,8 +539,21 @@ def get_substrate_answers(substrate_name: str, rulebook: dict) -> dict:
 # =============================================================================
 
 def compare_values(expected, actual) -> bool:
-    """Compare two values, handling type differences"""
-    return str(expected) == str(actual)
+    """Compare two values, handling type differences.
+
+    Treats empty strings and None/null as equivalent since many substrates
+    cannot distinguish between 'no value' representations.
+    """
+    # Normalize empty/null values - treat "", None, "None", "null" as equivalent
+    def normalize(val):
+        if val is None:
+            return ""
+        s = str(val)
+        if s in ("None", "null", "NULL"):
+            return ""
+        return s
+
+    return normalize(expected) == normalize(actual)
 
 
 def grade_substrate(substrate_name: str, all_answer_keys: dict, rulebook: dict) -> dict:
@@ -612,9 +712,41 @@ def generate_substrate_report(substrate_name: str, results: dict, rulebook: dict
     score = (passed / total * 100) if total > 0 else 0
     elapsed = results.get("elapsed_seconds", 0.0)
 
+    # Check run metadata for error banner
+    run_metadata = load_run_metadata(substrate_name)
+    last_run = run_metadata.get("last_run", {})
+    last_success = run_metadata.get("last_successful_run", {})
+
     lines = [
         f"# Test Results: {substrate_name}",
         "",
+    ]
+
+    # Add error banner if latest run failed but we have prior successful results
+    if last_run.get("status") == "failure" and last_success:
+        error_msg = last_run.get("error_message", "Unknown error")
+        failure_time = last_run.get("timestamp", "Unknown")[:19].replace("T", " ")
+        success_time = last_success.get("timestamp", "Unknown")[:19].replace("T", " ")
+        success_results = last_success.get("test_results", {})
+
+        lines.extend([
+            "> **WARNING: Latest Run Failed**",
+            "> ",
+            f"> The test run at {failure_time} failed: `{error_msg}`",
+            "> ",
+            f"> Showing results from last successful run ({success_time}).",
+            "",
+        ])
+
+        # Use the successful run's results for display
+        if success_results:
+            total = success_results.get("total_fields_tested", total)
+            passed = success_results.get("fields_passed", passed)
+            failed = success_results.get("fields_failed", failed)
+            score = success_results.get("score", score)
+            elapsed = last_success.get("duration_seconds", elapsed)
+
+    lines.extend([
         "## Summary",
         "",
         "| Metric | Value |",
@@ -625,7 +757,7 @@ def generate_substrate_report(substrate_name: str, results: dict, rulebook: dict
         f"| Score | {score:.1f}% |",
         f"| Duration | {format_duration(elapsed)} |",
         "",
-    ]
+    ])
 
     if results.get("error"):
         lines.extend([
@@ -796,7 +928,19 @@ def generate_summary_report(all_grades: dict, rulebook: dict):
     total_tests = 0
     total_time = 0.0
 
-    for substrate_name in sorted(all_grades.keys()):
+    # Sort by: 1) 100% substrates first (sorted by time), 2) <100% substrates at bottom (sorted by score desc)
+    def sort_key(name):
+        g = all_grades[name]
+        elapsed = g.get("elapsed_seconds", 0.0)
+        p = g["fields_passed"]
+        t = g["total_fields_tested"]
+        score = (p / t * 100) if t > 0 else 0
+        is_perfect = score >= 100.0
+        # Primary: is_perfect (True=0, False=1 - so perfect scores come first)
+        # Secondary: time for perfect scores, -score for imperfect (highest score first among failures)
+        return (0 if is_perfect else 1, elapsed if is_perfect else -score)
+
+    for substrate_name in sorted(all_grades.keys(), key=sort_key):
         grades = all_grades[substrate_name]
 
         passed = grades["fields_passed"]
@@ -864,14 +1008,19 @@ def print_final_summary_table(all_grades: dict, rulebook: dict):
     total_failed = 0
     total_time = 0.0
 
-    # Sort by score
-    def get_score(name):
+    # Sort by: 1) 100% substrates first (sorted by time), 2) <100% substrates at bottom (sorted by score desc)
+    def sort_key(name):
         g = all_grades[name]
+        elapsed = g.get("elapsed_seconds", 0.0)
         p = g["fields_passed"]
         t = g["total_fields_tested"]
-        return (p / t * 100) if t > 0 else 0
+        score = (p / t * 100) if t > 0 else 0
+        is_perfect = score >= 100.0
+        # Primary: is_perfect (True=0, False=1 - so perfect scores come first)
+        # Secondary: time for perfect scores, -score for imperfect (highest score first among failures)
+        return (0 if is_perfect else 1, elapsed if is_perfect else -score)
 
-    for substrate_name in sorted(all_grades.keys(), key=get_score, reverse=True):
+    for substrate_name in sorted(all_grades.keys(), key=sort_key):
         grades = all_grades[substrate_name]
         passed = grades["fields_passed"]
         failed = grades["fields_failed"]

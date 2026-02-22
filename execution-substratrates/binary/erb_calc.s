@@ -180,10 +180,10 @@ str_3_len:
     .quad 9
     .globl str_4
 str_4:
-    .asciz " & "
+    .asciz ", "
     .globl str_4_len
 str_4_len:
-    .quad 3
+    .quad 2
     .globl str_5
 str_5:
     .asciz "Requires Parsing"
@@ -192,10 +192,10 @@ str_5_len:
     .quad 16
     .globl str_6
 str_6:
-    .asciz "No Parsing Neede"
+    .asciz "No Parsing Needed"
     .globl str_6_len
 str_6_len:
-    .quad 16
+    .quad 17
     .globl str_7
 str_7:
     .asciz "Describes the thing"
@@ -234,132 +234,120 @@ str_12_len:
     .quad 6
     .globl str_13
 str_13:
-    .asciz ", "
+    .asciz "Is Stable Ontology"
     .globl str_13_len
 str_13_len:
-    .quad 2
+    .quad 18
     .globl str_14
 str_14:
-    .asciz "  "
+    .asciz "Not 'Ontology'"
     .globl str_14_len
 str_14_len:
-    .quad 2
+    .quad 14
     .globl str_15
 str_15:
-    .asciz "Is Stable Ontology"
+    .asciz "Can Be Held"
     .globl str_15_len
 str_15_len:
-    .quad 18
+    .quad 11
     .globl str_16
 str_16:
-    .asciz "Not 'Ontology'"
+    .asciz "Can't Be Held"
     .globl str_16_len
 str_16_len:
-    .quad 14
+    .quad 13
     .globl str_17
 str_17:
-    .asciz "\\n AND "
+    .asciz " And "
     .globl str_17_len
 str_17_len:
-    .quad 7
+    .quad 5
     .globl str_18
 str_18:
-    .asciz "Can Be Held"
+    .asciz "Has Identity"
     .globl str_18_len
 str_18_len:
-    .quad 11
+    .quad 12
     .globl str_19
 str_19:
-    .asciz "Can't Be Held"
+    .asciz "Has no Identity"
     .globl str_19_len
 str_19_len:
-    .quad 13
+    .quad 15
     .globl str_20
 str_20:
-    .asciz "Has Identity"
+    .asciz " "
     .globl str_20_len
 str_20_len:
-    .quad 12
+    .quad 1
     .globl str_21
 str_21:
-    .asciz "Has no Identity"
+    .asciz "Is"
     .globl str_21_len
 str_21_len:
-    .quad 15
+    .quad 2
     .globl str_22
 str_22:
-    .asciz " "
+    .asciz "Isn't"
     .globl str_22_len
 str_22_len:
-    .quad 1
+    .quad 5
     .globl str_23
 str_23:
-    .asciz "Is"
+    .asciz " a Family Feud Language, but "
     .globl str_23_len
 str_23_len:
-    .quad 2
+    .quad 29
     .globl str_24
 str_24:
-    .asciz "Isn't"
+    .asciz "Is Not"
     .globl str_24_len
 str_24_len:
-    .quad 5
+    .quad 6
     .globl str_25
 str_25:
-    .asciz " a Family Feud Language, but "
+    .asciz " marked as a 'Language Candidate.'"
     .globl str_25_len
 str_25_len:
-    .quad 29
+    .quad 34
     .globl str_26
 str_26:
-    .asciz "Is Not"
+    .asciz ""
     .globl str_26_len
 str_26_len:
-    .quad 6
+    .quad 0
     .globl str_27
 str_27:
-    .asciz " marked as a 'Language Candidate.'"
+    .asciz " - Open World vs. Closed World Conflict."
     .globl str_27_len
 str_27_len:
-    .quad 34
+    .quad 40
     .globl str_28
 str_28:
-    .asciz ""
+    .asciz "IsMirrorOf"
     .globl str_28_len
 str_28_len:
-    .quad 0
+    .quad 10
     .globl str_29
 str_29:
-    .asciz " - Open World vs. Closed World Conflict."
+    .asciz "IsDescriptionOf"
     .globl str_29_len
 str_29_len:
-    .quad 40
-    .globl str_30
-str_30:
-    .asciz "IsMirrorOf"
-    .globl str_30_len
-str_30_len:
-    .quad 10
-    .globl str_31
-str_31:
-    .asciz "IsDescriptionOf"
-    .globl str_31_len
-str_31_len:
     .quad 15
 
     ; Static result buffers for string concatenation
     .bss
-    .globl _result_buf_eval_language_candidates_prediction_predicates
+    .globl _result_buf_eval_language_candidates_question
     .p2align 3
-_result_buf_eval_language_candidates_prediction_predicates:
+_result_buf_eval_language_candidates_question:
     .space 1024
     .globl _result_buf_eval_language_candidates_prediction_fail
     .p2align 3
 _result_buf_eval_language_candidates_prediction_fail:
     .space 1024
-    .globl _result_buf_eval_language_candidates_question
+    .globl _result_buf_eval_language_candidates_prediction_predicates
     .p2align 3
-_result_buf_eval_language_candidates_question:
+_result_buf_eval_language_candidates_prediction_predicates:
     .space 1024
 
     .text
@@ -504,7 +492,7 @@ if_end_4:
     str x1, [sp, #24]
     adrp x0, str_4@PAGE
     add x0, x0, str_4@PAGEOFF
-    mov x1, #3
+    mov x1, #2
     str x0, [sp, #32]
     str x1, [sp, #40]
     ldrb w0, [x19, #113]
@@ -518,7 +506,7 @@ if_end_4:
 if_else_5:
     adrp x0, str_6@PAGE
     add x0, x0, str_6@PAGEOFF
-    mov x1, #16
+    mov x1, #17
     mov x20, x0
     mov x21, x1
 if_end_6:
@@ -528,7 +516,7 @@ if_end_6:
     str x1, [sp, #56]
     adrp x0, str_4@PAGE
     add x0, x0, str_4@PAGEOFF
-    mov x1, #3
+    mov x1, #2
     str x0, [sp, #64]
     str x1, [sp, #72]
     ldrb w0, [x19, #120]
@@ -552,7 +540,7 @@ if_end_8:
     str x1, [sp, #88]
     adrp x0, str_4@PAGE
     add x0, x0, str_4@PAGEOFF
-    mov x1, #3
+    mov x1, #2
     str x0, [sp, #96]
     str x1, [sp, #104]
     ldrb w0, [x19, #115]
@@ -576,7 +564,7 @@ if_end_10:
     str x1, [sp, #120]
     adrp x0, str_4@PAGE
     add x0, x0, str_4@PAGEOFF
-    mov x1, #3
+    mov x1, #2
     str x0, [sp, #128]
     str x1, [sp, #136]
     ldrb w0, [x19, #114]
@@ -598,93 +586,78 @@ if_end_12:
     mov x1, x21
     str x0, [sp, #144]
     str x1, [sp, #152]
-    adrp x0, str_13@PAGE
-    add x0, x0, str_13@PAGEOFF
+    adrp x0, str_4@PAGE
+    add x0, x0, str_4@PAGEOFF
     mov x1, #2
     str x0, [sp, #160]
     str x1, [sp, #168]
-    adrp x0, str_14@PAGE
-    add x0, x0, str_14@PAGEOFF
-    mov x1, #2
-    str x0, [sp, #176]
-    str x1, [sp, #184]
     ldrb w0, [x19, #116]
     cbz w0, if_else_13
-    adrp x0, str_15@PAGE
-    add x0, x0, str_15@PAGEOFF
+    adrp x0, str_13@PAGE
+    add x0, x0, str_13@PAGEOFF
     mov x1, #18
     mov x20, x0
     mov x21, x1
     b if_end_14
 if_else_13:
-    adrp x0, str_16@PAGE
-    add x0, x0, str_16@PAGEOFF
+    adrp x0, str_14@PAGE
+    add x0, x0, str_14@PAGEOFF
     mov x1, #14
     mov x20, x0
     mov x21, x1
 if_end_14:
     mov x0, x20
     mov x1, x21
+    str x0, [sp, #176]
+    str x1, [sp, #184]
+    adrp x0, str_4@PAGE
+    add x0, x0, str_4@PAGEOFF
+    mov x1, #2
     str x0, [sp, #192]
     str x1, [sp, #200]
-    adrp x0, str_17@PAGE
-    add x0, x0, str_17@PAGEOFF
-    mov x1, #7
-    str x0, [sp, #208]
-    str x1, [sp, #216]
-    adrp x0, str_14@PAGE
-    add x0, x0, str_14@PAGEOFF
-    mov x1, #2
-    str x0, [sp, #224]
-    str x1, [sp, #232]
     ldrb w0, [x19, #35]
     cbz w0, if_else_15
-    adrp x0, str_18@PAGE
-    add x0, x0, str_18@PAGEOFF
+    adrp x0, str_15@PAGE
+    add x0, x0, str_15@PAGEOFF
     mov x1, #11
     mov x20, x0
     mov x21, x1
     b if_end_16
 if_else_15:
-    adrp x0, str_19@PAGE
-    add x0, x0, str_19@PAGEOFF
+    adrp x0, str_16@PAGE
+    add x0, x0, str_16@PAGEOFF
     mov x1, #13
     mov x20, x0
     mov x21, x1
 if_end_16:
     mov x0, x20
     mov x1, x21
-    str x0, [sp, #240]
-    str x1, [sp, #248]
-    adrp x0, str_13@PAGE
-    add x0, x0, str_13@PAGEOFF
-    mov x1, #2
-    str x0, [sp, #256]
-    str x1, [sp, #264]
-    adrp x0, str_14@PAGE
-    add x0, x0, str_14@PAGEOFF
-    mov x1, #2
-    str x0, [sp, #272]
-    str x1, [sp, #280]
+    str x0, [sp, #208]
+    str x1, [sp, #216]
+    adrp x0, str_17@PAGE
+    add x0, x0, str_17@PAGEOFF
+    mov x1, #5
+    str x0, [sp, #224]
+    str x1, [sp, #232]
     ldrb w0, [x19, #112]
     cbz w0, if_else_17
-    adrp x0, str_20@PAGE
-    add x0, x0, str_20@PAGEOFF
+    adrp x0, str_18@PAGE
+    add x0, x0, str_18@PAGEOFF
     mov x1, #12
     mov x20, x0
     mov x21, x1
     b if_end_18
 if_else_17:
-    adrp x0, str_21@PAGE
-    add x0, x0, str_21@PAGEOFF
+    adrp x0, str_19@PAGE
+    add x0, x0, str_19@PAGEOFF
     mov x1, #15
     mov x20, x0
     mov x21, x1
 if_end_18:
     mov x0, x20
     mov x1, x21
-    str x0, [sp, #288]
-    str x1, [sp, #296]
+    str x0, [sp, #240]
+    str x1, [sp, #248]
     ldr x0, [sp, #16]
     ldr x1, [sp, #24]
     adrp x22, _result_buf_eval_language_candidates_prediction_predicates@PAGE
@@ -773,24 +746,6 @@ if_end_18:
     mov x1, x0
     mov x0, x22
     bl _string_concat
-    ldr x4, [sp, #264]
-    ldr x3, [sp, #256]
-    mov x2, x1
-    mov x1, x0
-    mov x0, x22
-    bl _string_concat
-    ldr x4, [sp, #280]
-    ldr x3, [sp, #272]
-    mov x2, x1
-    mov x1, x0
-    mov x0, x22
-    bl _string_concat
-    ldr x4, [sp, #296]
-    ldr x3, [sp, #288]
-    mov x2, x1
-    mov x1, x0
-    mov x0, x22
-    bl _string_concat
     add sp, sp, #256
     ldp x23, x24, [sp], #16
     ldp x21, x22, [sp], #16
@@ -819,22 +774,22 @@ _eval_language_candidates_prediction_fail:
     ldr x1, [x19, #24]
     str x0, [sp, #16]
     str x1, [sp, #24]
-    adrp x0, str_22@PAGE
-    add x0, x0, str_22@PAGEOFF
+    adrp x0, str_20@PAGE
+    add x0, x0, str_20@PAGEOFF
     mov x1, #1
     str x0, [sp, #32]
     str x1, [sp, #40]
     ldrb w0, [x19, #56]
     cbz w0, if_else_21
-    adrp x0, str_23@PAGE
-    add x0, x0, str_23@PAGEOFF
+    adrp x0, str_21@PAGE
+    add x0, x0, str_21@PAGEOFF
     mov x1, #2
     mov x20, x0
     mov x21, x1
     b if_end_22
 if_else_21:
-    adrp x0, str_24@PAGE
-    add x0, x0, str_24@PAGEOFF
+    adrp x0, str_22@PAGE
+    add x0, x0, str_22@PAGEOFF
     mov x1, #5
     mov x20, x0
     mov x21, x1
@@ -843,22 +798,22 @@ if_end_22:
     mov x1, x21
     str x0, [sp, #48]
     str x1, [sp, #56]
-    adrp x0, str_25@PAGE
-    add x0, x0, str_25@PAGEOFF
+    adrp x0, str_23@PAGE
+    add x0, x0, str_23@PAGEOFF
     mov x1, #29
     str x0, [sp, #64]
     str x1, [sp, #72]
     ldrb w0, [x19, #32]
     cbz w0, if_else_23
-    adrp x0, str_23@PAGE
-    add x0, x0, str_23@PAGEOFF
+    adrp x0, str_21@PAGE
+    add x0, x0, str_21@PAGEOFF
     mov x1, #2
     mov x20, x0
     mov x21, x1
     b if_end_24
 if_else_23:
-    adrp x0, str_26@PAGE
-    add x0, x0, str_26@PAGEOFF
+    adrp x0, str_24@PAGE
+    add x0, x0, str_24@PAGEOFF
     mov x1, #6
     mov x20, x0
     mov x21, x1
@@ -867,8 +822,8 @@ if_end_24:
     mov x1, x21
     str x0, [sp, #80]
     str x1, [sp, #88]
-    adrp x0, str_27@PAGE
-    add x0, x0, str_27@PAGEOFF
+    adrp x0, str_25@PAGE
+    add x0, x0, str_25@PAGEOFF
     mov x1, #34
     str x0, [sp, #96]
     str x1, [sp, #104]
@@ -910,8 +865,8 @@ if_end_24:
     mov x21, x1
     b if_end_20
 if_else_19:
-    adrp x0, str_28@PAGE
-    add x0, x0, str_28@PAGEOFF
+    adrp x0, str_26@PAGE
+    add x0, x0, str_26@PAGEOFF
     mov x1, #0
     mov x20, x0
     mov x21, x1
@@ -922,15 +877,15 @@ if_end_20:
     str x1, [sp, #24]
     ldrb w0, [x19, #136]
     cbz w0, if_else_25
-    adrp x0, str_29@PAGE
-    add x0, x0, str_29@PAGEOFF
+    adrp x0, str_27@PAGE
+    add x0, x0, str_27@PAGEOFF
     mov x1, #40
     mov x20, x0
     mov x21, x1
     b if_end_26
 if_else_25:
-    adrp x0, str_28@PAGE
-    add x0, x0, str_28@PAGEOFF
+    adrp x0, str_26@PAGE
+    add x0, x0, str_26@PAGEOFF
     mov x1, #0
     mov x20, x0
     mov x21, x1
@@ -1020,15 +975,15 @@ _eval_language_candidates_relationship_to_concept:
     cmp x20, x0
     cset w0, eq
     cbz w0, if_else_29
-    adrp x0, str_30@PAGE
-    add x0, x0, str_30@PAGEOFF
+    adrp x0, str_28@PAGE
+    add x0, x0, str_28@PAGEOFF
     mov x1, #10
     mov x20, x0
     mov x21, x1
     b if_end_30
 if_else_29:
-    adrp x0, str_31@PAGE
-    add x0, x0, str_31@PAGEOFF
+    adrp x0, str_29@PAGE
+    add x0, x0, str_29@PAGEOFF
     mov x1, #15
     mov x20, x0
     mov x21, x1

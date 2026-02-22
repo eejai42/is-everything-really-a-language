@@ -106,7 +106,10 @@ def get_field_formula(rulebook: dict, entity_name: str, field_name: str) -> str:
     pascal_field = to_pascal_case(field_name)
     for field in schema:
         if field['name'] == field_name or field['name'] == pascal_field:
-            return field.get('formula', '')
+            formula = field.get('formula', '')
+            # Strip {{ and }} from field references for cleaner display
+            formula = formula.replace('{{', '').replace('}}', '')
+            return formula
     return ''
 
 
@@ -139,6 +142,21 @@ def get_substrates():
             if os.path.isdir(path) and not name.startswith('.'):
                 substrates.append(name)
     return substrates
+
+
+def load_run_metadata(substrate_name: str) -> dict:
+    """Load metadata for a substrate from the CENTRAL results file in testing/"""
+    central_path = os.path.join(TESTING_DIR, "_substrate_results.json")
+    if os.path.exists(central_path):
+        with open(central_path, 'r') as f:
+            central = json.load(f)
+            return central.get(substrate_name, {"last_run": None, "last_successful_run": None})
+    # Fallback to old per-substrate file for migration
+    metadata_path = os.path.join(SUBSTRATES_DIR, substrate_name, "_run_metadata.json")
+    if os.path.exists(metadata_path):
+        with open(metadata_path, 'r') as f:
+            return json.load(f)
+    return {"last_run": None, "last_successful_run": None}
 
 
 def load_substrate_grades(substrate_name: str) -> dict:
@@ -210,14 +228,46 @@ def parse_test_results_md(filepath: str, substrate_name: str) -> dict:
     if duration_match:
         grades["elapsed_seconds"] = float(duration_match.group(1))
 
-    # Extract per-entity results
-    entity_sections = re.findall(r'### (\w+)\n\n- Fields: (\d+)/(\d+)', content)
-    for entity, passed, total in entity_sections:
+    # Extract per-entity results with failure details
+    # Split content by entity sections (### entity_name)
+    entity_pattern = r'### (\w+)\n\n- Fields: (\d+)/(\d+)'
+    entity_matches = list(re.finditer(entity_pattern, content))
+
+    for i, match in enumerate(entity_matches):
+        entity = match.group(1)
+        passed = int(match.group(2))
+        total = int(match.group(3))
+
+        # Get the section content (from this match to the next entity or end)
+        start = match.end()
+        end = entity_matches[i + 1].start() if i + 1 < len(entity_matches) else len(content)
+        section_content = content[start:end]
+
+        # Parse failure table rows: | pk | field | expected | actual |
+        # Skip header row (PK | Field | Expected | Actual) and separator (|-----|...)
+        failure_rows = re.findall(
+            r'\| ([^|]+) \| ([^|]+) \| ([^|]+) \| ([^|]+) \|',
+            section_content
+        )
+
+        failures = []
+        for row in failure_rows:
+            pk, field, expected, actual = [cell.strip() for cell in row]
+            # Skip header and separator rows
+            if pk in ('PK', '-----', '...') or field in ('Field', '-------'):
+                continue
+            failures.append({
+                "pk": pk,
+                "field": field,
+                "expected": expected,
+                "actual": actual
+            })
+
         grades["entities"][entity] = {
-            "fields_tested": int(total),
-            "fields_passed": int(passed),
-            "fields_failed": int(total) - int(passed),
-            "failures": []
+            "fields_tested": total,
+            "fields_passed": passed,
+            "fields_failed": total - passed,
+            "failures": failures
         }
 
     return grades
@@ -280,6 +330,18 @@ def collect_all_data():
                 }
             grades["total_fields_tested"] = total_computed
             grades["fields_passed"] = total_computed
+
+        # Load run metadata (for tracking failure/success status)
+        if substrate != 'postgres':
+            run_meta = load_run_metadata(substrate)
+            grades["run_metadata"] = run_meta
+
+            # Use duration from central metadata (last_successful_run) as source of truth
+            last_success = run_meta.get("last_successful_run")
+            if last_success and "duration_seconds" in last_success:
+                grades["elapsed_seconds"] = last_success["duration_seconds"]
+        else:
+            grades["run_metadata"] = {"last_run": None, "last_successful_run": None}
 
         all_grades[substrate] = grades
 
@@ -390,11 +452,10 @@ def generate_html(data: dict) -> str:
         </button>
     </header>
 
-    <nav class="tabs">
+    <nav class="tabs" id="main-tabs">
         <button class="tab active" data-tab="overview">Overview</button>
         <button class="tab" data-tab="entities">Entities</button>
         <button class="tab" data-tab="substrates">Substrates</button>
-        <button class="tab" data-tab="details">Details</button>
     </nav>
 
     <main>
@@ -426,6 +487,11 @@ def generate_html(data: dict) -> str:
                 </div>
             </div>
 
+            <h2>Substrates</h2>
+            <div class="substrate-links">
+                {generate_substrate_links(data)}
+            </div>
+
             <h2>Substrate Health Matrix</h2>
             <div class="matrix-container">
                 <table class="health-matrix" id="health-matrix">
@@ -445,31 +511,19 @@ def generate_html(data: dict) -> str:
         </section>
 
         <section id="entities" class="tab-content">
-            <div class="entity-selector">
-                <label for="entity-select">Select Entity:</label>
-                <select id="entity-select">
-                    {generate_entity_options(data)}
-                </select>
-            </div>
+            <nav class="sub-tabs" id="entity-tabs">
+                {generate_entity_tabs(data)}
+            </nav>
             <div id="entity-details"></div>
         </section>
 
         <section id="substrates" class="tab-content">
-            <div class="substrate-selector">
-                <label for="substrate-select">Select Substrate:</label>
-                <select id="substrate-select">
-                    {generate_substrate_options(data)}
-                </select>
-            </div>
+            <nav class="sub-tabs" id="substrate-tabs">
+                {generate_substrate_tabs(data)}
+            </nav>
             <div id="substrate-details"></div>
         </section>
 
-        <section id="details" class="tab-content">
-            <h2>Failure Details</h2>
-            <div id="failure-list">
-                {generate_failure_details(data)}
-            </div>
-        </section>
     </main>
 
     <footer>
@@ -499,11 +553,24 @@ def get_score_class(score: float) -> str:
         return "danger"
 
 
+def sorted_substrates(data: dict) -> list:
+    """Sort substrates: 100% first (by time), <100% at bottom (by score desc)"""
+    def sort_key(name):
+        g = data["substrates"][name]
+        elapsed = g.get("elapsed_seconds", 0.0)
+        p = g["fields_passed"]
+        t = g["total_fields_tested"]
+        score = (p / t * 100) if t > 0 else 0
+        is_perfect = score >= 100.0
+        return (0 if is_perfect else 1, elapsed if is_perfect else -score)
+    return sorted(data["substrates"].keys(), key=sort_key)
+
+
 def generate_entity_headers(data: dict) -> str:
-    """Generate table headers for entities"""
+    """Generate table headers for entities with clickable links"""
     headers = []
     for entity in sorted(data["entities"].keys()):
-        headers.append(f'<th class="entity-col">{escape(entity)}</th>')
+        headers.append(f'<th class="entity-col entity-link" data-entity="{escape(entity)}">{escape(entity)}</th>')
     return '\n                            '.join(headers)
 
 
@@ -512,7 +579,7 @@ def generate_matrix_rows(data: dict) -> str:
     rows = []
     entities = sorted(data["entities"].keys())
 
-    for substrate_name in sorted(data["substrates"].keys()):
+    for substrate_name in sorted_substrates(data):
         grades = data["substrates"][substrate_name]
         is_master = grades.get("is_master", False)
 
@@ -521,14 +588,25 @@ def generate_matrix_rows(data: dict) -> str:
         score = (passed / total * 100) if total > 0 else 0
         elapsed = grades.get("elapsed_seconds", 0)
 
-        row_class = "master-row" if is_master else ""
+        # Check run metadata for failure status
+        run_meta = grades.get("run_metadata", {})
+        last_run = run_meta.get("last_run", {})
+        last_success = run_meta.get("last_successful_run", {})
+        has_failure = last_run.get("status") == "failure" if last_run else False
+        is_restored = has_failure and last_success is not None
+
+        row_class = "master-row" if is_master else ("restored-row" if is_restored else "")
         score_class = get_score_class(score)
 
         cells = []
 
-        # Substrate name cell
+        # Substrate name cell with warning badge if last run failed
         substrate_label = f"{substrate_name} (master)" if is_master else substrate_name
-        cells.append(f'<td class="substrate-name">{escape(substrate_label)}</td>')
+        warning_badge = ""
+        if is_restored:
+            error_msg = last_run.get("error_message", "Unknown error")
+            warning_badge = f' <span class="warning-badge" title="Last run failed: {escape(error_msg)}">&#9888;</span>'
+        cells.append(f'<td class="substrate-name substrate-row-link" data-substrate="{escape(substrate_name)}">{escape(substrate_label)}{warning_badge}</td>')
 
         # Entity cells
         for entity in entities:
@@ -582,11 +660,46 @@ def generate_entity_options(data: dict) -> str:
 def generate_substrate_options(data: dict) -> str:
     """Generate <option> elements for substrate selector"""
     options = []
-    for substrate in sorted(data["substrates"].keys()):
+    for substrate in sorted_substrates(data):
         is_master = data["substrates"][substrate].get("is_master", False)
         label = f"{substrate} (master)" if is_master else substrate
         options.append(f'<option value="{escape(substrate)}">{escape(label)}</option>')
     return '\n                    '.join(options)
+
+
+def generate_entity_tabs(data: dict) -> str:
+    """Generate tab buttons for entity selector"""
+    tabs = []
+    for i, entity in enumerate(sorted(data["entities"].keys())):
+        active = "active" if i == 0 else ""
+        tabs.append(f'<button class="sub-tab {active}" data-entity="{escape(entity)}">{escape(entity)}</button>')
+    return '\n                '.join(tabs)
+
+
+def generate_substrate_tabs(data: dict) -> str:
+    """Generate tab buttons for substrate selector"""
+    tabs = []
+    for i, substrate in enumerate(sorted_substrates(data)):
+        is_master = data["substrates"][substrate].get("is_master", False)
+        label = f"{substrate} (master)" if is_master else substrate
+        active = "active" if i == 0 else ""
+        tabs.append(f'<button class="sub-tab {active}" data-substrate="{escape(substrate)}">{escape(label)}</button>')
+    return '\n                '.join(tabs)
+
+
+def generate_substrate_links(data: dict) -> str:
+    """Generate clickable substrate links for overview"""
+    links = []
+    for substrate in sorted_substrates(data):
+        grades = data["substrates"][substrate]
+        is_master = grades.get("is_master", False)
+        total = grades["total_fields_tested"]
+        passed = grades["fields_passed"]
+        score = (passed / total * 100) if total > 0 else 0
+        score_class = get_score_class(score)
+        label = f"{substrate} (master)" if is_master else substrate
+        links.append(f'<a href="#" class="substrate-link score-{score_class}" data-substrate="{escape(substrate)}">{escape(label)}: {score:.0f}%</a>')
+    return '\n                    '.join(links)
 
 
 def generate_failure_details(data: dict) -> str:
@@ -913,6 +1026,17 @@ h2 {
     color: var(--master-color);
 }
 
+.restored-row {
+    background: rgba(255, 193, 7, 0.08);
+}
+
+.warning-badge {
+    color: var(--warning-color);
+    font-size: 0.9rem;
+    cursor: help;
+    margin-left: 0.25rem;
+}
+
 .score-cell {
     font-weight: 600;
 }
@@ -922,26 +1046,80 @@ h2 {
     font-family: monospace;
 }
 
-.entity-selector,
-.substrate-selector {
+.sub-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+}
+
+.sub-tab {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    border-radius: var(--radius);
+    transition: all 0.2s;
+}
+
+.sub-tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    border-color: var(--accent-color);
+}
+
+.sub-tab.active {
+    color: var(--accent-color);
+    background: var(--bg-primary);
+    border-color: var(--accent-color);
+    font-weight: 500;
+}
+
+.substrate-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
-.entity-selector label,
-.substrate-selector label {
+.substrate-link {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    text-decoration: none;
     font-weight: 500;
-    margin-right: 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    transition: all 0.2s;
 }
 
-.entity-selector select,
-.substrate-selector select {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    min-width: 200px;
+.substrate-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.entity-link {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.entity-link:hover {
+    color: var(--accent-color);
+    background: rgba(13, 110, 253, 0.1);
+}
+
+.substrate-row-link {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.substrate-row-link:hover {
+    color: var(--accent-color) !important;
 }
 
 #entity-details,
@@ -1021,6 +1199,33 @@ h2 {
 
 .data-table .computed {
     background: rgba(13, 110, 253, 0.1);
+}
+
+.warning-banner {
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid var(--warning-color);
+    border-left: 4px solid var(--warning-color);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.warning-banner strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--warning-color);
+}
+
+.warning-banner p {
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
+}
+
+.warning-banner code {
+    background: var(--bg-tertiary);
+    padding: 0.125rem 0.375rem;
+    border-radius: 3px;
+    font-size: 0.8125rem;
 }
 
 .failure-card {
@@ -1359,25 +1564,47 @@ themeToggle.addEventListener('click', () => {
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
 });
 
-// Tab navigation
-const tabs = document.querySelectorAll('.tab');
+// Storage keys
+const STORAGE_KEYS = {
+    selectedEntity: 'erb-selected-entity',
+    selectedSubstrate: 'erb-selected-substrate'
+};
+
+// Main tab navigation with memory
+const mainTabs = document.querySelectorAll('#main-tabs .tab');
 const tabContents = document.querySelectorAll('.tab-content');
 
-tabs.forEach(tab => {
+function switchToMainTab(tabId) {
+    mainTabs.forEach(t => t.classList.remove('active'));
+    tabContents.forEach(c => c.classList.remove('active'));
+
+    const targetTab = document.querySelector(`#main-tabs .tab[data-tab="${tabId}"]`);
+    if (targetTab) targetTab.classList.add('active');
+    document.getElementById(tabId)?.classList.add('active');
+}
+
+mainTabs.forEach(tab => {
     tab.addEventListener('click', () => {
-        const targetId = tab.dataset.tab;
-
-        tabs.forEach(t => t.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-
-        tab.classList.add('active');
-        document.getElementById(targetId).classList.add('active');
+        switchToMainTab(tab.dataset.tab);
     });
 });
 
-// Entity selector
-const entitySelect = document.getElementById('entity-select');
+// Entity sub-tabs
+const entityTabs = document.querySelectorAll('#entity-tabs .sub-tab');
 const entityDetails = document.getElementById('entity-details');
+
+function selectEntityTab(entityName) {
+    // Update tab active state
+    entityTabs.forEach(t => t.classList.remove('active'));
+    const targetTab = document.querySelector(`#entity-tabs .sub-tab[data-entity="${entityName}"]`);
+    if (targetTab) targetTab.classList.add('active');
+
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEYS.selectedEntity, entityName);
+
+    // Render details
+    renderEntityDetails(entityName);
+}
 
 function renderEntityDetails(entityName) {
     const entity = REPORT_DATA.entities[entityName];
@@ -1440,46 +1667,148 @@ function renderEntityDetails(entityName) {
         html += '<p>No data available</p>';
     }
 
-    // Substrate results for this entity
+    // Substrate tabs for this entity's results
     html += '<h3>Substrate Results</h3>';
-    html += '<div class="substrate-entity-results">';
-
-    Object.keys(REPORT_DATA.substrates).sort().forEach(substrate => {
+    html += '<nav class="sub-tabs" id="entity-substrate-tabs">';
+    Object.keys(REPORT_DATA.substrates).sort().forEach((substrate, i) => {
         const grades = REPORT_DATA.substrates[substrate];
         const entityGrades = grades.entities ? grades.entities[entityName] : null;
-
         if (entityGrades) {
             const passed = entityGrades.fields_passed;
             const total = entityGrades.fields_tested;
-            const score = total > 0 ? (passed / total * 100).toFixed(1) : 0;
-            const status = entityGrades.fields_failed === 0 ? 'PASS' : 'FAIL';
-            const statusClass = entityGrades.fields_failed === 0 ? 'score-good' : 'score-danger';
-
-            html += `<div class="substrate-stat">
-                <span class="substrate-stat-label">${escapeHtml(substrate)}:</span>
-                <span class="substrate-stat-value ${statusClass}">${score}% (${status})</span>
-            </div>`;
+            const score = total > 0 ? (passed / total * 100).toFixed(0) : 0;
+            const scoreClass = getScoreClass(score);
+            const active = i === 0 ? 'active' : '';
+            html += `<button class="sub-tab ${active} score-${scoreClass}" data-substrate="${escapeHtml(substrate)}" data-entity="${escapeHtml(entityName)}">${escapeHtml(substrate)}: ${score}%</button>`;
         }
     });
-    html += '</div>';
+    html += '</nav>';
+    html += '<div id="entity-substrate-details"></div>';
 
     entityDetails.innerHTML = html;
+
+    // Attach click handlers to entity substrate tabs
+    document.querySelectorAll('#entity-substrate-tabs .sub-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('#entity-substrate-tabs .sub-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderEntitySubstrateDetails(tab.dataset.entity, tab.dataset.substrate);
+        });
+    });
+
+    // Render first substrate details
+    const firstSubstrateTab = document.querySelector('#entity-substrate-tabs .sub-tab');
+    if (firstSubstrateTab) {
+        renderEntitySubstrateDetails(entityName, firstSubstrateTab.dataset.substrate);
+    }
 }
 
-if (entitySelect && REPORT_DATA.entities) {
-    const firstEntity = Object.keys(REPORT_DATA.entities).sort()[0];
-    if (firstEntity) {
-        renderEntityDetails(firstEntity);
+function renderEntitySubstrateDetails(entityName, substrateName) {
+    const container = document.getElementById('entity-substrate-details');
+    if (!container) return;
+
+    const substrate = REPORT_DATA.substrates[substrateName];
+    const entity = REPORT_DATA.entities[entityName];
+    const entityGrades = substrate?.entities?.[entityName];
+
+    if (!entityGrades) {
+        container.innerHTML = '<p class="no-results">No results for this substrate.</p>';
+        return;
     }
 
-    entitySelect.addEventListener('change', (e) => {
-        renderEntityDetails(e.target.value);
+    const computedCols = entity.computed_columns || [];
+    const answerKey = entity.answer_key || [];
+    const pk = entity.primary_key;
+
+    // Build failure lookup
+    const failureLookup = {};
+    if (entityGrades.failures) {
+        entityGrades.failures.forEach(f => {
+            failureLookup[`${f.pk}|${f.field}`] = f;
+        });
+    }
+
+    let html = `<table class="graded-test-table">
+        <thead><tr>
+            <th>Record (${escapeHtml(pk || 'ID')})</th>`;
+    computedCols.forEach(col => {
+        html += `<th class="computed-col-header">${escapeHtml(col)}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    answerKey.forEach(record => {
+        const pkVal = record[pk];
+        html += `<tr><td class="record-pk">${escapeHtml(String(pkVal))}</td>`;
+
+        computedCols.forEach(col => {
+            const expectedVal = record[col];
+            const failKey = `${pkVal}|${col}`;
+            const failure = failureLookup[failKey];
+
+            if (failure) {
+                html += `<td class="cell-failed">
+                    <div class="expected-actual">
+                        <span class="expected-label">Expected:</span>
+                        <code class="expected">${escapeHtml(String(failure.expected))}</code>
+                    </div>
+                    <div class="expected-actual">
+                        <span class="actual-label">Actual:</span>
+                        <code class="actual">${escapeHtml(String(failure.actual))}</code>
+                    </div>
+                </td>`;
+            } else {
+                html += `<td class="cell-passed">
+                    <span class="check-mark">&#10003;</span>
+                    <code>${escapeHtml(String(expectedVal))}</code>
+                </td>`;
+            }
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    container.innerHTML = html;
+}
+
+// Initialize entity tabs
+if (entityTabs.length > 0 && REPORT_DATA.entities) {
+    // Get saved entity or use first one
+    const savedEntity = localStorage.getItem(STORAGE_KEYS.selectedEntity);
+    const entities = Object.keys(REPORT_DATA.entities).sort();
+    const initialEntity = (savedEntity && entities.includes(savedEntity)) ? savedEntity : entities[0];
+
+    if (initialEntity) {
+        selectEntityTab(initialEntity);
+    }
+
+    entityTabs.forEach(tab => {
+        tab.addEventListener('click', () => selectEntityTab(tab.dataset.entity));
     });
 }
 
-// Substrate selector
-const substrateSelect = document.getElementById('substrate-select');
+// Substrate sub-tabs
+const substrateTabs = document.querySelectorAll('#substrate-tabs .sub-tab');
 const substrateDetails = document.getElementById('substrate-details');
+
+function selectSubstrateTab(substrateName) {
+    // Update tab active state
+    substrateTabs.forEach(t => t.classList.remove('active'));
+    const targetTab = document.querySelector(`#substrate-tabs .sub-tab[data-substrate="${substrateName}"]`);
+    if (targetTab) targetTab.classList.add('active');
+
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEYS.selectedSubstrate, substrateName);
+
+    // Render details
+    renderSubstrateDetails(substrateName);
+}
+
+function getScoreClass(score) {
+    if (score >= 100) return 'perfect';
+    if (score >= 80) return 'good';
+    if (score >= 60) return 'warning';
+    return 'danger';
+}
 
 function renderSubstrateDetails(substrateName) {
     const substrate = REPORT_DATA.substrates[substrateName];
@@ -1514,6 +1843,21 @@ function renderSubstrateDetails(substrateName) {
         <span class="substrate-stat-value">${elapsed.toFixed(2)}s</span>
     </div>`;
     html += '</div></div>';
+
+    // Show warning if last run failed but showing restored results
+    const runMeta = substrate.run_metadata || {};
+    const lastRun = runMeta.last_run || {};
+    const lastSuccess = runMeta.last_successful_run || {};
+    if (lastRun.status === 'failure' && lastSuccess) {
+        const errorMsg = lastRun.error_message || 'Unknown error';
+        const failTime = (lastRun.timestamp || '').substring(0, 19).replace('T', ' ');
+        const successTime = (lastSuccess.timestamp || '').substring(0, 19).replace('T', ' ');
+        html += `<div class="warning-banner">
+            <strong>⚠ Warning: Latest Run Failed</strong>
+            <p>The test run at ${escapeHtml(failTime)} failed: <code>${escapeHtml(errorMsg)}</code></p>
+            <p>Showing results from last successful run (${escapeHtml(successTime)}).</p>
+        </div>`;
+    }
 
     if (substrate.error) {
         html += `<div class="failure-card">
@@ -1635,27 +1979,59 @@ function renderSubstrateDetails(substrateName) {
     substrateDetails.innerHTML = html;
 }
 
-if (substrateSelect && REPORT_DATA.substrates) {
-    const firstSubstrate = Object.keys(REPORT_DATA.substrates).sort()[0];
-    if (firstSubstrate) {
-        renderSubstrateDetails(firstSubstrate);
+// Initialize substrate tabs
+if (substrateTabs.length > 0 && REPORT_DATA.substrates) {
+    // Get saved substrate or use first one
+    const savedSubstrate = localStorage.getItem(STORAGE_KEYS.selectedSubstrate);
+    const substrates = Object.keys(REPORT_DATA.substrates).sort();
+    const initialSubstrate = (savedSubstrate && substrates.includes(savedSubstrate)) ? savedSubstrate : substrates[0];
+
+    if (initialSubstrate) {
+        selectSubstrateTab(initialSubstrate);
     }
 
-    substrateSelect.addEventListener('change', (e) => {
-        renderSubstrateDetails(e.target.value);
+    substrateTabs.forEach(tab => {
+        tab.addEventListener('click', () => selectSubstrateTab(tab.dataset.substrate));
     });
 }
 
-// Matrix cell click handlers
-document.querySelectorAll('.cell-fail').forEach(cell => {
+// Substrate links in overview - click to navigate to substrates tab
+document.querySelectorAll('.substrate-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const substrate = link.dataset.substrate;
+        switchToMainTab('substrates');
+        selectSubstrateTab(substrate);
+    });
+});
+
+// Entity column headers in matrix - click to navigate to entities tab
+document.querySelectorAll('.entity-link').forEach(header => {
+    header.addEventListener('click', () => {
+        const entity = header.dataset.entity;
+        switchToMainTab('entities');
+        selectEntityTab(entity);
+    });
+});
+
+// Substrate row names in matrix - click to navigate to substrates tab
+document.querySelectorAll('.substrate-row-link').forEach(cell => {
+    cell.addEventListener('click', () => {
+        const substrate = cell.dataset.substrate;
+        switchToMainTab('substrates');
+        selectSubstrateTab(substrate);
+    });
+});
+
+// Matrix cell click handlers - navigate to substrate view for that entity
+document.querySelectorAll('.cell-fail, .cell-pass').forEach(cell => {
     cell.addEventListener('click', () => {
         const substrate = cell.dataset.substrate;
         const entity = cell.dataset.entity;
 
-        // Switch to details tab and scroll to relevant failure
-        document.querySelector('.tab[data-tab="details"]').click();
-
-        // Could add highlighting of specific failure here
+        // Navigate to substrates tab and select the substrate
+        switchToMainTab('substrates');
+        selectSubstrateTab(substrate);
     });
 });
 

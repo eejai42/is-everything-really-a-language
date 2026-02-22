@@ -7,6 +7,7 @@
 # =============================================================================
 
 set -e
+set -o pipefail  # CRITICAL: Catch failures in piped commands (e.g., bash script | tee)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -60,7 +61,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # =============================================================================
-# SSOTME DETECTION (may be passed from start.sh or detected here)
+# TOOL DETECTION
 # =============================================================================
 if [ -z "$SSOTME_AVAILABLE" ]; then
     if command -v ssotme &> /dev/null; then
@@ -68,6 +69,12 @@ if [ -z "$SSOTME_AVAILABLE" ]; then
     else
         SSOTME_AVAILABLE=false
     fi
+fi
+
+if command -v psql &> /dev/null; then
+    POSTGRES_AVAILABLE=true
+else
+    POSTGRES_AVAILABLE=false
 fi
 
 # =============================================================================
@@ -130,16 +137,21 @@ show_menu() {
     echo -e "  ${RED}[C]${NC} ${BOLD}CLEAN${NC} all generated files"
     echo ""
 
-    # Airtable options
+    # Airtable/Sync options
     echo -e "  ${DIM}────────────────────────────────────────${NC}"
-    echo -e "  ${BOLD}Airtable:${NC}"
+    echo -e "  ${BOLD}Sync:${NC}"
     if [ "$SSOTME_AVAILABLE" = true ]; then
-        echo -e "  ${CYAN}[P]${NC} ${BOLD}PULL${NC} from Airtable (ssotme -buildall)"
+        echo -e "  ${CYAN}[P]${NC} ${BOLD}PULL${NC} & Inject (Airtable → Postgres → Substrates)"
         echo -e "  ${CYAN}[B]${NC} ${BOLD}CHANGE BASE ID${NC} and pull"
     else
-        echo -e "  ${DIM}[P] Pull from Airtable (requires SSoTME)${NC}"
+        echo -e "  ${DIM}[P] Pull & Inject (requires SSoTME)${NC}"
         echo -e "  ${DIM}[B] Change Base ID (requires SSoTME)${NC}"
     fi
+    echo ""
+
+    # Dev-Ops
+    echo -e "  ${DIM}────────────────────────────────────────${NC}"
+    echo -e "  ${YELLOW}[D]${NC} ${BOLD}DEV-OPS${NC} menu (PostgreSQL init, SSoTME setup)"
     echo ""
 
     echo -e "  ${DIM}────────────────────────────────────────${NC}"
@@ -157,7 +169,7 @@ show_menu() {
         INDEX=$((INDEX + 1))
     done
     echo ""
-    echo -e "  [${RED}Q${NC}] Back to Dev-Ops menu"
+    echo -e "  [${RED}Q${NC}] Quit"
     echo ""
 }
 
@@ -178,19 +190,83 @@ action_pull_airtable() {
 
     echo ""
     echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}${CYAN}║${NC}              ${BOLD}${WHITE}PULL FROM AIRTABLE${NC}                           ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}              ${BOLD}${WHITE}PULL & INJECT RULEBOOK${NC}                        ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "  Base ID: ${WHITE}$CURRENT_BASE${NC}"
     echo ""
-    echo -e "${YELLOW}Running ssotme -buildall...${NC}"
+
+    # Step 1: Pull from Airtable
+    echo -e "${BOLD}${BLUE}┌──────────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 1:${NC} ${YELLOW}Pulling from Airtable (ssotme -buildall)...${NC}        ${BOLD}${BLUE}│${NC}"
+    echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────┘${NC}"
     echo ""
 
     cd "$PROJECT_ROOT"
     ssotme -buildall
 
     echo ""
-    echo -e "${GREEN}Pull complete!${NC}"
+
+    # Step 2: Generate answer keys from PostgreSQL
+    echo -e "${BOLD}${BLUE}┌──────────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 2:${NC} ${YELLOW}Generating answer keys from PostgreSQL...${NC}          ${BOLD}${BLUE}│${NC}"
+    echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────┘${NC}"
+    echo ""
+
+    python3 -c "
+import sys
+import psycopg2
+sys.path.insert(0, '$SCRIPT_DIR')
+from importlib.util import spec_from_loader, module_from_spec
+from importlib.machinery import SourceFileLoader
+
+# Load test-orchestrator module
+spec = spec_from_loader('test_orchestrator', SourceFileLoader('test_orchestrator', '$SCRIPT_DIR/test-orchestrator.py'))
+test_orch = module_from_spec(spec)
+spec.loader.exec_module(test_orch)
+
+# Load rulebook and connect to database
+rulebook = test_orch.load_rulebook()
+conn = psycopg2.connect(test_orch.DB_CONNECTION)
+
+# Generate answer keys and blank tests
+all_answer_keys = test_orch.generate_all_answer_keys(conn, rulebook)
+test_orch.generate_all_blank_tests(all_answer_keys, rulebook)
+
+conn.close()
+print('Answer keys and blank tests generated.')
+"
+
+    echo ""
+
+    # Step 3: Inject rulebook into all substrates
+    echo -e "${BOLD}${BLUE}┌──────────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${BOLD}${BLUE}│${NC} ${BOLD}${WHITE}STEP 3:${NC} ${YELLOW}Injecting rulebook into all substrates...${NC}          ${BOLD}${BLUE}│${NC}"
+    echo -e "${BOLD}${BLUE}└──────────────────────────────────────────────────────────────┘${NC}"
+    echo ""
+
+    SUBSTRATES=$(ls -d "$SUBSTRATES_DIR"/*/ 2>/dev/null | xargs -n1 basename)
+    for substrate in $SUBSTRATES; do
+        substrate_dir="$SUBSTRATES_DIR/$substrate"
+        inject_script="$substrate_dir/inject-into-${substrate}.py"
+
+        if [ -f "$inject_script" ]; then
+            echo -e "  ${CYAN}▶${NC} Injecting into ${BOLD}$substrate${NC}..."
+            (cd "$substrate_dir" && python3 "inject-into-${substrate}.py" 2>&1) || {
+                echo -e "    ${YELLOW}⚠${NC} Warning: inject-into-${substrate}.py had issues"
+            }
+        else
+            echo -e "  ${DIM}○ $substrate: no inject script${NC}"
+        fi
+    done
+
+    echo ""
+    echo -e "${BOLD}${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${BOLD}${GREEN}║${NC}              ${BOLD}${WHITE}PULL & INJECT COMPLETE${NC}                        ${BOLD}${GREEN}║${NC}"
+    echo -e "${BOLD}${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${DIM}Rulebook has been pulled from Airtable and injected into all substrates.${NC}"
+    echo -e "${DIM}Run tests with [A] to verify all substrates.${NC}"
     echo ""
     read -p "Press Enter to continue..."
 }
@@ -321,6 +397,140 @@ action_clean() {
 }
 
 # =============================================================================
+# DEV-OPS ACTIONS
+# =============================================================================
+action_devops_menu() {
+    while true; do
+        echo ""
+        echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${BOLD}${CYAN}║${NC}                    ${BOLD}${WHITE}DEV-OPS MENU${NC}                           ${BOLD}${CYAN}║${NC}"
+        echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+
+        # PostgreSQL
+        if $POSTGRES_AVAILABLE; then
+            echo -e "  [${CYAN}I${NC}] Initialize PostgreSQL Database"
+        else
+            echo -e "  ${DIM}[I] Initialize PostgreSQL (not installed)${NC}"
+        fi
+
+        # SSoTME setup
+        if [ "$SSOTME_AVAILABLE" = true ]; then
+            echo -e "  ${DIM}[S] SSoTME Setup (already installed)${NC}"
+        else
+            echo -e "  [${CYAN}S${NC}] SSoTME Setup Instructions"
+        fi
+
+        echo ""
+        echo -e "  ${DIM}────────────────────────────────────────${NC}"
+        echo -e "  ${BOLD}Tool Status:${NC}"
+        if [ "$SSOTME_AVAILABLE" = true ]; then
+            echo -e "    SSoTME:     ${GREEN}Available${NC}"
+        else
+            echo -e "    SSoTME:     ${YELLOW}Not installed${NC} ${DIM}(Airtable sync disabled)${NC}"
+        fi
+
+        if $POSTGRES_AVAILABLE; then
+            echo -e "    PostgreSQL: ${GREEN}Available${NC}"
+        else
+            echo -e "    PostgreSQL: ${YELLOW}Not installed${NC} ${DIM}(DB init disabled)${NC}"
+        fi
+        echo ""
+
+        echo -e "  [${RED}Q${NC}] Back to main menu"
+        echo ""
+
+        read -p "Enter choice [I/S/Q]: " devops_choice
+
+        case $devops_choice in
+            [Ii])
+                if $POSTGRES_AVAILABLE; then
+                    action_init_postgres
+                else
+                    echo ""
+                    echo -e "${RED}PostgreSQL is not installed.${NC}"
+                    read -p "Press Enter to continue..."
+                fi
+                ;;
+            [Ss])
+                action_setup_ssotme
+                ;;
+            [Qq]|"")
+                return
+                ;;
+            *)
+                echo ""
+                echo -e "${RED}Invalid option: $devops_choice${NC}"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
+action_setup_ssotme() {
+    echo ""
+    echo -e "${BOLD}${CYAN}SSoTME Installation Instructions${NC}"
+    echo ""
+    echo -e "SSoTME (Single Source of Truth Made Easy) is required for:"
+    echo -e "  ${DIM}-${NC} Pulling data from Airtable"
+    echo -e "  ${DIM}-${NC} Regenerating code from rulebook changes"
+    echo ""
+    echo -e "${YELLOW}To install SSoTME:${NC}"
+    echo ""
+    echo -e "  1. Visit: ${CYAN}https://www.ssotme.com${NC}"
+    echo -e "  2. Follow the installation instructions for your platform"
+    echo -e "  3. Run ${WHITE}ssotme --version${NC} to verify installation"
+    echo ""
+    echo -e "${DIM}Note: You can still run substrate tests without SSoTME using existing files.${NC}"
+    echo ""
+    read -p "Press Enter to continue..."
+}
+
+action_init_postgres() {
+    if ! $POSTGRES_AVAILABLE; then
+        echo ""
+        echo -e "${RED}PostgreSQL (psql) is not installed or not in PATH.${NC}"
+        echo ""
+        echo -e "${YELLOW}To install PostgreSQL:${NC}"
+        echo -e "  macOS:  ${WHITE}brew install postgresql${NC}"
+        echo -e "  Ubuntu: ${WHITE}sudo apt install postgresql${NC}"
+        echo ""
+        read -p "Press Enter to continue..."
+        return
+    fi
+
+    echo ""
+    echo -e "${BOLD}${CYAN}Initialize PostgreSQL Database${NC}"
+    echo ""
+
+    local init_script="$PROJECT_ROOT/postgres/init-db.sh"
+
+    if [ ! -f "$init_script" ]; then
+        echo -e "${RED}Error: init-db.sh not found at $init_script${NC}"
+        read -p "Press Enter to continue..."
+        return
+    fi
+
+    echo -e "${YELLOW}This will:${NC}"
+    echo -e "  1. Drop existing tables (if any)"
+    echo -e "  2. Create tables, functions, and views"
+    echo -e "  3. Insert seed data"
+    echo ""
+
+    read -p "Proceed? [Y/n]: " confirm
+    if [[ "$confirm" =~ ^[Nn]$ ]]; then
+        echo "Cancelled."
+        return
+    fi
+
+    echo ""
+    bash "$init_script"
+
+    echo ""
+    read -p "Press Enter to continue..."
+}
+
+# =============================================================================
 # RUN SUBSTRATES (extracted as function for reuse)
 # =============================================================================
 run_substrates() {
@@ -402,20 +612,32 @@ for substrate in $SUBSTRATES_TO_RUN; do
         echo -e "${COLOR}║${NC} ${BOLD}[$CURRENT/$TOTAL_TO_RUN]${NC} ${COLOR}▶ ${BOLD}${substrate_upper}${NC}"
         echo -e "${COLOR}╚══════════════════════════════════════════════════════════════╝${NC}"
 
-        # CRITICAL: Clear ALL previous test-answers to ensure fresh test run
-        # This keeps the repo in sync with actual test results
+        # Backup/restore mechanism to preserve successful results on failure
         test_answers_dir="$substrate_dir/test-answers"
+        test_answers_backup="$substrate_dir/test-answers.bak"
+
+        # Backup existing test-answers before clearing (if they exist and have files)
+        if [ -d "$test_answers_dir" ] && [ "$(ls -A "$test_answers_dir" 2>/dev/null)" ]; then
+            echo -e "  ${DIM}Backing up previous test-answers...${NC}"
+            rm -rf "$test_answers_backup"
+            cp -r "$test_answers_dir" "$test_answers_backup"
+        fi
+
+        # Clear test-answers for fresh run
         if [ -d "$test_answers_dir" ]; then
-            echo -e "  ${DIM}Clearing previous test-answers...${NC}"
             rm -rf "$test_answers_dir"
         fi
         mkdir -p "$test_answers_dir"
 
         # Run script with real-time output AND capture for error reporting
         # Use tee to show output live while also saving to temp file
+        # CRITICAL: Use || true to prevent set -e from exiting, then capture PIPESTATUS
         INJECT_TEMP_FILE=$(mktemp)
         START_TIME=$(python3 -c "import time; print(time.time())")
-        bash "$inject_script" 2>&1 | tee "$INJECT_TEMP_FILE" && INJECT_EXIT_CODE=0 || INJECT_EXIT_CODE=${PIPESTATUS[0]}
+        # Run the script; with pipefail set, pipeline returns first non-zero exit code
+        # The '|| true' prevents set -e from exiting, while PIPESTATUS still captures the real exit code
+        bash "$inject_script" 2>&1 | tee "$INJECT_TEMP_FILE" || true
+        INJECT_EXIT_CODE=${PIPESTATUS[0]}  # Capture IMMEDIATELY - must be first command after pipeline
         END_TIME=$(python3 -c "import time; print(time.time())")
         ELAPSED_TIME=$(python3 -c "print($END_TIME - $START_TIME)")
         INJECT_OUTPUT=$(cat "$INJECT_TEMP_FILE")
@@ -424,12 +646,58 @@ for substrate in $SUBSTRATES_TO_RUN; do
         if [ $INJECT_EXIT_CODE -eq 0 ]; then
             INJECT_RESULTS="$INJECT_RESULTS$substrate:OK\n"
             echo -e "  ${GREEN}✓${NC} ${substrate}: ${GREEN}${BOLD}OK${NC}"
+            # Success: delete backup (new results are good)
+            rm -rf "$test_answers_backup"
         else
             INJECT_RESULTS="$INJECT_RESULTS$substrate:FAILED\n"
             echo -e "  ${RED}✗${NC} ${substrate}: ${RED}${BOLD}FAILED TO EXECUTE${NC}"
             # Store failure information
             FAILED_SUBSTRATES="$FAILED_SUBSTRATES $substrate"
             echo "$INJECT_OUTPUT" > "$FAILED_OUTPUTS_DIR/$substrate.txt"
+            # Failure: restore backup to preserve previous successful results
+            if [ -d "$test_answers_backup" ]; then
+                echo -e "  ${YELLOW}↩${NC} Restoring previous test-answers from backup..."
+                rm -rf "$test_answers_dir"
+                mv "$test_answers_backup" "$test_answers_dir"
+            fi
+
+            # ═══════════════════════════════════════════════════════════════
+            # FAIL LOUDLY: Pause and ask user if they want to continue
+            # ═══════════════════════════════════════════════════════════════
+            if ! $CI_MODE; then
+                echo ""
+                echo -e "${RED}╔════════════════════════════════════════════════════════════════╗${NC}"
+                echo -e "${RED}║${NC}     ${BOLD}${RED}⚠️  SUBSTRATE FAILED: ${substrate_upper}${NC}                          ${RED}║${NC}"
+                echo -e "${RED}╠════════════════════════════════════════════════════════════════╣${NC}"
+                echo -e "${RED}║${NC} ${DIM}Last 10 lines of output:${NC}                                       ${RED}║${NC}"
+                echo -e "${RED}╟────────────────────────────────────────────────────────────────╢${NC}"
+                tail -10 "$FAILED_OUTPUTS_DIR/$substrate.txt" | while IFS= read -r line; do
+                    # Truncate long lines and format
+                    truncated="${line:0:60}"
+                    printf "${RED}║${NC} %-60s ${RED}║${NC}\n" "$truncated"
+                done
+                echo -e "${RED}╠════════════════════════════════════════════════════════════════╣${NC}"
+                echo -e "${RED}║${NC}  ${YELLOW}[C]${NC} Continue with remaining substrates                        ${RED}║${NC}"
+                echo -e "${RED}║${NC}  ${RED}[S]${NC} Stop orchestration now                                    ${RED}║${NC}"
+                echo -e "${RED}╚════════════════════════════════════════════════════════════════╝${NC}"
+                echo ""
+                read -p "  Choice [C/S]: " FAILURE_CHOICE
+                case $FAILURE_CHOICE in
+                    [Ss])
+                        echo ""
+                        echo -e "${RED}${BOLD}Orchestration stopped by user after failure.${NC}"
+                        echo -e "Run ${WHITE}./orchestrate.sh${NC} to retry."
+                        echo ""
+                        # Still grade and save what we have before exiting
+                        return 1
+                        ;;
+                    *)
+                        echo ""
+                        echo -e "${YELLOW}Continuing with remaining substrates...${NC}"
+                        echo ""
+                        ;;
+                esac
+            fi
         fi
 
         # Grade this substrate immediately
@@ -465,11 +733,17 @@ if inject_exit_code != 0:
     grades = test_orch.grade_substrate(substrate, all_answer_keys, rulebook)
     grades['error'] = 'FAILED TO EXECUTE (inject-substrate.sh returned non-zero)'
     grades['execution_failed'] = True
+    error_msg = 'inject-substrate.sh returned non-zero exit code'
 else:
     grades = test_orch.grade_substrate(substrate, all_answer_keys, rulebook)
+    error_msg = None
 
 # Add timing information
 grades['elapsed_seconds'] = elapsed_seconds
+
+# Update run metadata (tracks success/failure history)
+success = inject_exit_code == 0
+test_orch.update_run_metadata(substrate, grades, success, error_msg)
 
 test_orch.generate_substrate_report(substrate, grades, rulebook)
 test_orch.print_substrate_test_summary(substrate, grades, rulebook)
@@ -646,7 +920,7 @@ while true; do
     SUBSTRATES_ARRAY=($SUBSTRATES)
     TOTAL_SUBSTRATES=${#SUBSTRATES_ARRAY[@]}
 
-    read -p "Enter choice [A, V, C, P, B, 1-$TOTAL_SUBSTRATES, Q] (default: A): " USER_CHOICE
+    read -p "Enter choice [A, V, C, P, B, D, 1-$TOTAL_SUBSTRATES, Q] (default: A): " USER_CHOICE
 
     # Default to 'A' if user just presses Enter
     if [ -z "$USER_CHOICE" ]; then
@@ -672,6 +946,9 @@ while true; do
             ;;
         [Bb])
             action_change_base_id
+            ;;
+        [Dd])
+            action_devops_menu
             ;;
         [Qq])
             echo ""

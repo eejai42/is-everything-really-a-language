@@ -15,3 +15,5 @@ postgresql-18.1/**/*
 **/*.pyc
 execution-substratrates/binary/erb_calc.dylib
 execution-substratrates/binary/erb_calc.o
+execution-substratrates/**/_run_metadata.json
+execution-substratrates/**/test-answers.bak

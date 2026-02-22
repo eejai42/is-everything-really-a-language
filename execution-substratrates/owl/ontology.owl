@@ -8,79 +8,237 @@ erb: a owl:Ontology ;
     rdfs:label "ERB Ontology" ;
     rdfs:comment "Generated from effortless-rulebook.json" .
 
-# === Class: Customers ===
-erb:Customers a owl:Class ;
-    rdfs:label "Customers" .
+# === Class: ERBCustomizations ===
+erb:ERBCustomizations a owl:Class ;
+    rdfs:label "ERBCustomizations" .
 
-erb:customerId a owl:DatatypeProperty ;
-    rdfs:domain erb:Customers ;
+erb:eRBCustomizationId a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
     rdfs:range xsd:string ;
-    rdfs:label "CustomerId" .
-
-erb:customer a owl:DatatypeProperty ;
-    rdfs:domain erb:Customers ;
-    rdfs:range xsd:string ;
-    rdfs:label "Customer" .
-
-erb:emailAddress a owl:DatatypeProperty ;
-    rdfs:domain erb:Customers ;
-    rdfs:range xsd:string ;
-    rdfs:label "EmailAddress" .
-
-erb:firstName a owl:DatatypeProperty ;
-    rdfs:domain erb:Customers ;
-    rdfs:range xsd:string ;
-    rdfs:label "FirstName" .
-
-erb:lastName a owl:DatatypeProperty ;
-    rdfs:domain erb:Customers ;
-    rdfs:range xsd:string ;
-    rdfs:label "LastName" .
-
-erb:fullName a owl:DatatypeProperty ;
-    rdfs:domain erb:Customers ;
-    rdfs:range xsd:string ;
-    rdfs:label "FullName" .
-    # calculated: calculated
-
-erb:orders a owl:DatatypeProperty ;
-    rdfs:domain erb:Customers ;
-    rdfs:range xsd:string ;
-    rdfs:label "Orders" .
-
-# === Class: Orders ===
-erb:Orders a owl:Class ;
-    rdfs:label "Orders" .
-
-erb:orderId a owl:DatatypeProperty ;
-    rdfs:domain erb:Orders ;
-    rdfs:range xsd:string ;
-    rdfs:label "OrderId" .
+    rdfs:label "ERBCustomizationId" .
 
 erb:name a owl:DatatypeProperty ;
-    rdfs:domain erb:Orders ;
+    rdfs:domain erb:ERBCustomizations ;
     rdfs:range xsd:string ;
     rdfs:label "Name" .
+
+erb:title a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "Title" .
+
+erb:sQLCode a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "SQLCode" .
+
+erb:sQLTarget a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "SQLTarget" .
+
+erb:customizationType a owl:DatatypeProperty ;
+    rdfs:domain erb:ERBCustomizations ;
+    rdfs:range xsd:string ;
+    rdfs:label "CustomizationType" .
+
+# === Class: IsEverythingALanguage ===
+erb:IsEverythingALanguage a owl:Class ;
+    rdfs:label "IsEverythingALanguage" .
+
+erb:isEverythingALanguageId a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "IsEverythingALanguageId" .
+
+erb:name a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "Name" .
+
+erb:argumentName a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "ArgumentName" .
+
+erb:argumentCategory a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "ArgumentCategory" .
+
+erb:stepType a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "StepType" .
+
+erb:statement a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "Statement" .
+
+erb:formalization a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "Formalization" .
+
+erb:relatedCandidateName a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "RelatedCandidateName" .
+
+erb:relatedCandidateId a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "RelatedCandidateId" .
+
+erb:evidenceFromRulebook a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "EvidenceFromRulebook" .
+
+erb:notes a owl:DatatypeProperty ;
+    rdfs:domain erb:IsEverythingALanguage ;
+    rdfs:range xsd:string ;
+    rdfs:label "Notes" .
+
+# === Class: LanguageCandidates ===
+erb:LanguageCandidates a owl:Class ;
+    rdfs:label "LanguageCandidates" .
+
+erb:languageCandidateId a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "LanguageCandidateId" .
+
+erb:name a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "Name" .
+
+erb:isLanguage a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "IsLanguage" .
+
+erb:hasGrammar a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "HasGrammar" .
     # calculated: calculated
 
-erb:orderNumber a owl:DatatypeProperty ;
-    rdfs:domain erb:Orders ;
+erb:hasSyntax a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "HasSyntax" .
+
+erb:canBeHeld a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "CanBeHeld" .
+
+erb:question a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "Question" .
+    # calculated: calculated
+
+erb:predictedAnswer a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "PredictedAnswer" .
+    # calculated: calculated
+
+erb:predictionPredicates a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "PredictionPredicates" .
+    # calculated: calculated
+
+erb:predictionFail a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "PredictionFail" .
+    # calculated: calculated
+
+erb:category a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "Category" .
+
+erb:hasIdentity a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "HasIdentity" .
+
+erb:requiresParsing a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "RequiresParsing" .
+
+erb:resolvesToAnAST a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "ResolvesToAnAST" .
+
+erb:hasLinearDecodingPressure a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "HasLinearDecodingPressure" .
+
+erb:isStableOntologyReference a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "IsStableOntologyReference" .
+
+erb:isLiveOntologyEditor a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "IsLiveOntologyEditor" .
+
+erb:isOpenWorld a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "IsOpenWorld" .
+
+erb:isClosedWorld a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "IsClosedWorld" .
+
+erb:isDescriptionOf a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "IsDescriptionOf" .
+    # calculated: calculated
+
+erb:distanceFromConcept a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:integer ;
-    rdfs:label "OrderNumber" .
+    rdfs:label "DistanceFromConcept" .
 
-erb:customer a owl:DatatypeProperty ;
-    rdfs:domain erb:Orders ;
-    rdfs:range xsd:string ;
-    rdfs:label "Customer" .
+erb:isOpenClosedWorldConflicted a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "IsOpenClosedWorldConflicted" .
+    # calculated: calculated
 
-erb:customerEmailAddress a owl:DatatypeProperty ;
-    rdfs:domain erb:Orders ;
+erb:dimensionalityWhileEditing a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:string ;
-    rdfs:label "CustomerEmailAddress" .
-    # calculated: lookup
+    rdfs:label "DimensionalityWhileEditing" .
 
-erb:customerFullName a owl:DatatypeProperty ;
-    rdfs:domain erb:Orders ;
+erb:relationshipToConcept a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
     rdfs:range xsd:string ;
-    rdfs:label "CustomerFullName" .
-    # calculated: lookup
+    rdfs:label "RelationshipToConcept" .
+    # calculated: calculated
+
+erb:modelObjectFacilityLayer a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:string ;
+    rdfs:label "ModelObjectFacilityLayer" .
+
+erb:sortOrder a owl:DatatypeProperty ;
+    rdfs:domain erb:LanguageCandidates ;
+    rdfs:range xsd:integer ;
+    rdfs:label "SortOrder" .

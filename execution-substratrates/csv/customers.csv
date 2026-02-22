@@ -1,4 +1,4 @@
-customer_id,customer,email_address,first_name,last_name,full_name,orders
-cust0001,CUST0001,jane.smith@email.com,Jane,Smith,Jane Smith,"ord1001, ord1002"
-cust0002,CUST0002,john.doe@email.com,John,Doe,John Doe,ord1002
-cust0003,CUST0003,emily.jones@email.com,Emily,Jones,Emily Jones,
+customer_id,customer,email_address,first_name,last_name,full_name,orders,count_of_orders
+cust0001,CUST0001,jane.smith@email.com,Jane,Smith,Jane Smith,"ord1001, ord1003",2
+cust0002,CUST0002,john.doe@email.com,John,Doe,John Doe,ord1002,1
+cust0003,CUST0003,emily.jones@email.com,Emily,Jones,Emily Jones,,0

@@ -15,31 +15,70 @@ type Query {
   languageCandidate(id: ID!): LanguageCandidate
 }
 
-"""Entity: Customers"""
-type Customers {
+"""Entity: LanguageCandidates"""
+type LanguageCandidates {
   # Raw Fields
-  customerId: String!
-  customer: String
-  emailAddress: String
-  firstName: String
-  lastName: String
-  orders: String
+  languageCandidateId: String!
+  name: String
+  isLanguage: Boolean
+  hasSyntax: Boolean
+  canBeHeld: Boolean
+  category: String
+  hasIdentity: Boolean
+  requiresParsing: Boolean
+  resolvesToAnAST: Boolean
+  hasLinearDecodingPressure: Boolean
+  isStableOntologyReference: Boolean
+  isLiveOntologyEditor: Boolean
+  isOpenWorld: Boolean
+  isClosedWorld: Boolean
+  distanceFromConcept: Int
+  dimensionalityWhileEditing: String
+  modelObjectFacilityLayer: String
+  sortOrder: Int
 
   # Calculated Fields
-  """Formula: ={{FirstName}} & " " & {{LastName}}"""
-  fullName: String
+  """Formula: ={{HasSyntax}} = TRUE()"""
+  hasGrammar: Boolean
+  """Formula: ="Is " & {{Name}} & " a language?""""
+  question: String
+  """Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescript..."""
+  predictedAnswer: Boolean
+  """Formula: =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & ", " & IF({{..."""
+  predictionPredicates: String
+  """Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} & ..."""
+  predictionFail: String
+  """Formula: ={{DistanceFromConcept}} > 1"""
+  isDescriptionOf: Boolean
+  """Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})"""
+  isOpenClosedWorldConflicted: Boolean
+  """Formula: =IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptio..."""
+  relationshipToConcept: String
 }
 
-"""Entity: Orders"""
-type Orders {
+"""Entity: IsEverythingALanguage"""
+type IsEverythingALanguage {
   # Raw Fields
-  orderId: String!
-  orderNumber: Int
-  customer: String
-  customerEmailAddress: String
-  customerFullName: String
-
-  # Calculated Fields
-  """Formula: ="ORD" & {{OrderNumber}}"""
+  isEverythingALanguageId: String!
   name: String
+  argumentName: String
+  argumentCategory: String
+  stepType: String
+  statement: String
+  formalization: String
+  relatedCandidateName: String
+  relatedCandidateId: String
+  evidenceFromRulebook: String
+  notes: String
+}
+
+"""Entity: ERBCustomizations"""
+type ERBCustomizations {
+  # Raw Fields
+  eRBCustomizationId: String!
+  name: String
+  title: String
+  sQLCode: String
+  sQLTarget: String
+  customizationType: String
 }
