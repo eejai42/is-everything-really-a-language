@@ -347,8 +347,7 @@ post_result() {
   "baseId": "${BASE_ID}",
   "commitMessage": $(printf '%s' "$commit_message" | jq -Rs '.' 2>/dev/null || echo '""'),
   "notes": $(printf '%s' "$notes" | jq -Rs '.' 2>/dev/null || echo '""'),
-  "output": $escaped_output,
-  "timestamp": "$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+  "output": $escaped_output
 }
 EOF
 )

@@ -11,12 +11,12 @@ Business users live in spreadsheets. This article shows how ERB generates fully-
 - **No Installation Required**: Works on any computer
 - **Live Formulas**: Not static values—real computation
 - **Organizational Adoption**: The path of least resistance
-- **Download**: [rulebook.xlsx](../../execution-substratrates/xlsx/rulebook.xlsx)
+- **Download**: [rulebook.xlsx](../../execution-substrates/xlsx/rulebook.xlsx)
 
 ### 2. What Gets Generated
 
 ```
-execution-substratrates/xlsx/
+execution-substrates/xlsx/
 ├── rulebook.xlsx          # The Excel workbook (with live formulas)
 ├── inject-into-xlsx.py    # Injector script
 ├── take-test.py           # Test runner (reads computed values)
@@ -225,9 +225,9 @@ The generated XLSX imports into Google Sheets with formulas intact:
 
 | File | Purpose |
 |------|---------|
-| [rulebook.xlsx](../../execution-substratrates/xlsx/rulebook.xlsx) | Generated Excel workbook |
-| [inject-into-xlsx.py](../../execution-substratrates/xlsx/inject-into-xlsx.py) | Code generator |
-| [take-test.py](../../execution-substratrates/xlsx/take-test.py) | Test runner |
+| [rulebook.xlsx](../../execution-substrates/xlsx/rulebook.xlsx) | Generated Excel workbook |
+| [inject-into-xlsx.py](../../execution-substrates/xlsx/inject-into-xlsx.py) | Code generator |
+| [take-test.py](../../execution-substrates/xlsx/take-test.py) | Test runner |
 
 ---
 

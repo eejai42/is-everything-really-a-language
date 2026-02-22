@@ -122,8 +122,8 @@ ssotme -buildall
 grep -r "has_syntax" postgres/          # Should find nothing
 grep -r "has_grammar_rules" postgres/   # Should find the new name
 
-grep -r "HasSyntax" execution-substratrates/golang/  # Nothing
-grep -r "HasGrammarRules" execution-substratrates/golang/  # Found
+grep -r "HasSyntax" execution-substrates/golang/  # Nothing
+grep -r "HasGrammarRules" execution-substrates/golang/  # Found
 
 # 4. Run tests to verify semantic equivalence
 cd orchestration
@@ -135,16 +135,16 @@ cd orchestration
 
 ```bash
 # 1. Look at a generated OWL file
-cat execution-substratrates/owl/rules.shacl.ttl | grep "CONSTRUCT"
+cat execution-substrates/owl/rules.shacl.ttl | grep "CONSTRUCT"
 # Should see full formula, not a comment reference
 
 # 2. Check that Python has the actual logic
-cat execution-substratrates/python/erb_calc.py | grep "def calc_"
+cat execution-substrates/python/erb_calc.py | grep "def calc_"
 # Should see complete function implementations
 
 # 3. Verify no external interpretation needed
 # Try running a substrate without reading any documentation:
-cd execution-substratrates/python
+cd execution-substrates/python
 python take-test.py
 # It should just work - no human in the loop
 ```

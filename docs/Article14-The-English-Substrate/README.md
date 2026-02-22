@@ -15,7 +15,7 @@ What if your documentation was so precise that an AI could read it and correctly
 ### 2. The Generated Files
 
 ```
-execution-substratrates/english/
+execution-substrates/english/
 ├── specification.md          # Full English specification
 ├── glossary.md               # Term definitions
 ├── candidate-profiles.md     # Individual candidate descriptions
@@ -260,9 +260,9 @@ If your documentation is clear enough for an AI to compute correct answers:
 
 | File | Purpose |
 |------|---------|
-| [specification.md](../../execution-substratrates/english/specification.md) | Full English spec |
-| [glossary.md](../../execution-substratrates/english/glossary.md) | Term definitions |
-| [inject-into-english.py](../../execution-substratrates/english/inject-into-english.py) | Generator |
+| [specification.md](../../execution-substrates/english/specification.md) | Full English spec |
+| [glossary.md](../../execution-substrates/english/glossary.md) | Term definitions |
+| [inject-into-english.py](../../execution-substrates/english/inject-into-english.py) | Generator |
 | [llm-fuzzy-grader.py](../../orchestration/llm-fuzzy-grader.py) | LLM evaluation tool |
 
 ---

@@ -4,6 +4,10 @@
   "Name": "ERB-root-seed",
   "ProjectSettings": [
     {
+      "Name": "baseId_names",
+      "Value": "appWrXPvXbkgQGOxt"
+    },
+    {
       "Name": "baseId",
       "Value": "appC8XTj95lubn6hz"
     },

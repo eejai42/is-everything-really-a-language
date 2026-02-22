@@ -613,7 +613,7 @@ def main():
     substrate_dir = args.substrate_dir
     if not os.path.isabs(substrate_dir):
         # Try relative to project root
-        substrate_dir = os.path.join(PROJECT_ROOT, "execution-substratrates", substrate_dir)
+        substrate_dir = os.path.join(PROJECT_ROOT, "execution-substrates", substrate_dir)
 
     if not os.path.isdir(substrate_dir):
         print(f"Error: Substrate directory not found: {substrate_dir}")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Shared functions for ERB language candidate generators.
+Shared functions for ERB execution substrate generators.
 All inject-into-*.py scripts use these common utilities.
 """
 
@@ -13,7 +13,7 @@ from datetime import datetime
 def get_rulebook_path():
     """Get the path to the effortless-rulebook.json file.
 
-    Scripts run from /execution-substratrates/{candidate}/ so the rulebook
+    Scripts run from /execution-substrates/{candidate}/ so the rulebook
     is at ../../effortless-rulebook/effortless-rulebook.json
     """
     return Path("../../effortless-rulebook/effortless-rulebook.json")
@@ -80,7 +80,7 @@ Generated from: `effortless-rulebook/effortless-rulebook.json`
 def get_candidate_name_from_cwd():
     """Extract the candidate name from the current working directory.
 
-    Assumes we're running from /execution-substratrates/{candidate}/
+    Assumes we're running from /execution-substrates/{candidate}/
     """
     return Path.cwd().name
 
@@ -159,13 +159,13 @@ import re
 
 
 def to_snake_case(name: str) -> str:
-    """Convert PascalCase to snake_case: LanguageCandidates -> language_candidates"""
+    """Convert PascalCase to snake_case: UserAccounts -> user_accounts"""
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
 def to_pascal_case(name: str) -> str:
-    """Convert snake_case to PascalCase: language_candidates -> LanguageCandidates"""
+    """Convert snake_case to PascalCase: user_accounts -> UserAccounts"""
     return ''.join(word.capitalize() for word in name.split('_'))
 
 

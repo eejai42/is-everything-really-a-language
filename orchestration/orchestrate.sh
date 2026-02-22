@@ -11,7 +11,7 @@ set -o pipefail  # CRITICAL: Catch failures in piped commands (e.g., bash script
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-SUBSTRATES_DIR="$PROJECT_ROOT/execution-substratrates"
+SUBSTRATES_DIR="$PROJECT_ROOT/execution-substrates"
 SSOTME_JSON="$PROJECT_ROOT/ssotme.json"
 
 # =============================================================================
@@ -872,9 +872,9 @@ fi
 echo ""
 echo -e "${CYAN}Results written to:${NC}"
 if [ -n "$RUN_SINGLE" ]; then
-    echo -e "  ${DIM}•${NC} Per-substrate: ${WHITE}execution-substratrates/$RUN_SINGLE/test-results.md${NC}"
+    echo -e "  ${DIM}•${NC} Per-substrate: ${WHITE}execution-substrates/$RUN_SINGLE/test-results.md${NC}"
 else
-    echo -e "  ${DIM}•${NC} Per-substrate: ${WHITE}execution-substratrates/*/test-results.md${NC}"
+    echo -e "  ${DIM}•${NC} Per-substrate: ${WHITE}execution-substrates/*/test-results.md${NC}"
     echo -e "  ${DIM}•${NC} Summary:       ${WHITE}orchestration/all-tests-results.md${NC}"
 fi
 echo -e "  ${DIM}•${NC} HTML Report:   ${WHITE}orchestration/orchestration-report.html${NC}"

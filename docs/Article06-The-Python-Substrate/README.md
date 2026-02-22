@@ -16,7 +16,7 @@ Python serves as the most accessible execution substrate—readable code that ma
 ### 2. The Generated File Structure
 
 ```
-execution-substratrates/python/
+execution-substrates/python/
 ├── erb_calc.py          # Generated calculation functions (5.6KB)
 ├── erb_sdk.py           # Dataclass + methods (reusable SDK)
 ├── take-test.py         # Test runner
@@ -256,7 +256,7 @@ result.get('name')  # Missing key → None
 The YAML substrate doesn't implement its own calculations—it imports Python:
 
 ```python
-# In execution-substratrates/yaml/take-test.py:
+# In execution-substrates/yaml/take-test.py:
 sys.path.insert(0, '../python')
 from erb_calc import compute_all_calculated_fields
 
@@ -286,10 +286,10 @@ print(f"top_family_feud_answer: {result['top_family_feud_answer']}")
 
 | File | Purpose |
 |------|---------|
-| [erb_calc.py](../../execution-substratrates/python/erb_calc.py) | Generated calculation functions |
-| [erb_sdk.py](../../execution-substratrates/python/erb_sdk.py) | Dataclass-based SDK |
-| [take-test.py](../../execution-substratrates/python/take-test.py) | Test runner |
-| [inject-into-python.py](../../execution-substratrates/python/inject-into-python.py) | Code generator |
+| [erb_calc.py](../../execution-substrates/python/erb_calc.py) | Generated calculation functions |
+| [erb_sdk.py](../../execution-substrates/python/erb_sdk.py) | Dataclass-based SDK |
+| [take-test.py](../../execution-substrates/python/take-test.py) | Test runner |
+| [inject-into-python.py](../../execution-substrates/python/inject-into-python.py) | Code generator |
 
 ---
 

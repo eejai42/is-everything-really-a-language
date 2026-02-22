@@ -224,7 +224,7 @@ If the rulebook is M4:
 | File | Purpose |
 |------|---------|
 | [effortless-rulebook.json](../../effortless-rulebook/effortless-rulebook.json) | The M4 specification |
-| [All substrate directories](../../execution-substratrates/) | M2 projections |
+| [All substrate directories](../../execution-substrates/) | M2 projections |
 
 ---
 

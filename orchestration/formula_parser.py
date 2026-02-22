@@ -11,7 +11,7 @@ Each substrate then compiles the AST to its target language:
 - Go: compile_to_go()
 - SPARQL: compile_to_sparql()
 
-Extracted from: execution-substratrates/owl/inject-into-owl.py
+Extracted from: execution-substrates/owl/inject-into-owl.py
 """
 
 import re

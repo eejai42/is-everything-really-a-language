@@ -1,0 +1,11 @@
+unit_id,name,conversion_to__metric__factor,metric__unit,unit_of__measure,dimensions
+inch,Inch,2.54,Centimeter,Length,3
+pound,Pound,0.453592,Kilogram,Weight,3
+gallon,Gallon,3.78541,Liter,Volume,3
+foot,Foot,0.3048,Meter,Length,3
+ounce,Ounce,0.0283495,Kilogram,Weight,3
+yard,Yard,0.9144,Meter,Length,3
+quart,Quart,0.946353,Liter,Volume,3
+mile,Mile,1609.34,Meter,Length,3
+cup,Cup,0.236588,Liter,Volume,3
+stone,Stone,6.35029,Kilogram,Weight,3

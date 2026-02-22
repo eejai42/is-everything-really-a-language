@@ -15,7 +15,7 @@ The most audacious claim of ERB: the same business rules that live in an Airtabl
 ### 2. The Generated Artifacts
 
 ```
-execution-substratrates/binary/
+execution-substrates/binary/
 ├── erb_calc.s             # Assembly source (12.8KB)
 ├── erb_calc.o             # Object file (4.1KB)
 ├── erb_calc.dylib         # Dynamic library (35.5KB)
@@ -299,10 +299,10 @@ Even at 69.6%, this substrate proves:
 
 | File | Purpose |
 |------|---------|
-| [erb_calc.s](../../execution-substratrates/binary/erb_calc.s) | Generated assembly source |
-| [erb_calc.dylib](../../execution-substratrates/binary/erb_calc.dylib) | Compiled dynamic library |
-| [inject-into-binary.py](../../execution-substratrates/binary/inject-into-binary.py) | Code generator |
-| [take-test.py](../../execution-substratrates/binary/take-test.py) | Test runner |
+| [erb_calc.s](../../execution-substrates/binary/erb_calc.s) | Generated assembly source |
+| [erb_calc.dylib](../../execution-substrates/binary/erb_calc.dylib) | Compiled dynamic library |
+| [inject-into-binary.py](../../execution-substrates/binary/inject-into-binary.py) | Code generator |
+| [take-test.py](../../execution-substrates/binary/take-test.py) | Test runner |
 
 ---
 

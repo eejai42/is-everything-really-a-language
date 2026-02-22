@@ -50,7 +50,7 @@ effortless-rulebook.json
     │                               ▼ [init-db]
     │                           PostgreSQL database
     │
-    ├──▶ [substrate injectors] ──▶ execution-substratrates/*/
+    ├──▶ [substrate injectors] ──▶ execution-substrates/*/
     │
     └──▶ [JsonHbarsTransform] ──▶ README.SCHEMA.md
 ```
@@ -107,7 +107,7 @@ def generate_blank_test(answer_key):
 
 #### Phase 3: Run Each Substrate's Test
 ```
-For each substrate in execution-substratrates/:
+For each substrate in execution-substrates/:
     1. Run take-test.sh
     2. Load test-answers.json
     3. Compare field-by-field against answer-key.json
@@ -198,10 +198,10 @@ english           90.4%        12     2150ms    ✗
 
 3. Run: ssotme -buildall
    └── postgres/02-create-functions.sql: calc_*_has_grammar_rules()
-   └── execution-substratrates/python/erb_calc.py: has_grammar_rules
-   └── execution-substratrates/golang/erb_sdk.go: HasGrammarRules
-   └── execution-substratrates/xlsx/rulebook.xlsx: Column renamed
-   └── execution-substratrates/owl/ontology.owl: :hasGrammarRules
+   └── execution-substrates/python/erb_calc.py: has_grammar_rules
+   └── execution-substrates/golang/erb_sdk.go: HasGrammarRules
+   └── execution-substrates/xlsx/rulebook.xlsx: Column renamed
+   └── execution-substrates/owl/ontology.owl: :hasGrammarRules
    └── ... (12 total substrates)
 
 4. Run: ./orchestrate.sh

@@ -15,7 +15,7 @@ For production systems that need speed, ERB generates Go code. This article exam
 ### 2. The Generated Files
 
 ```
-execution-substratrates/golang/
+execution-substrates/golang/
 ├── erb_sdk.go             # Generated structs + calc methods (10KB)
 ├── main.go                # Test runner (conditionally generated)
 ├── erb_test               # Compiled binary (2.98MB)
@@ -331,9 +331,9 @@ go run . > test-answers.json
 
 | File | Purpose |
 |------|---------|
-| [erb_sdk.go](../../execution-substratrates/golang/erb_sdk.go) | Generated structs + methods |
-| [main.go](../../execution-substratrates/golang/main.go) | Test runner |
-| [inject-into-golang.py](../../execution-substratrates/golang/inject-into-golang.py) | Generator |
+| [erb_sdk.go](../../execution-substrates/golang/erb_sdk.go) | Generated structs + methods |
+| [main.go](../../execution-substrates/golang/main.go) | Test runner |
+| [inject-into-golang.py](../../execution-substrates/golang/inject-into-golang.py) | Generator |
 
 ---
 

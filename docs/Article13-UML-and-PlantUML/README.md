@@ -15,7 +15,7 @@ UML diagrams are usually documentation that drifts from reality. ERB generates P
 ### 2. The Generated Files
 
 ```
-execution-substratrates/uml/
+execution-substrates/uml/
 ├── model.json             # Machine-readable model with OCL
 ├── model.puml             # PlantUML syntax for diagrams
 ├── inject-into-uml.py     # Code generator
@@ -277,10 +277,10 @@ The generated `model.json` can be imported into:
 
 | File | Purpose |
 |------|---------|
-| [model.json](../../execution-substratrates/uml/model.json) | Machine-readable model + OCL |
-| [model.puml](../../execution-substratrates/uml/model.puml) | PlantUML source |
-| [inject-into-uml.py](../../execution-substratrates/uml/inject-into-uml.py) | Generator |
-| [take-test.py](../../execution-substratrates/uml/take-test.py) | OCL evaluator |
+| [model.json](../../execution-substrates/uml/model.json) | Machine-readable model + OCL |
+| [model.puml](../../execution-substrates/uml/model.puml) | PlantUML source |
+| [inject-into-uml.py](../../execution-substrates/uml/inject-into-uml.py) | Generator |
+| [take-test.py](../../execution-substrates/uml/take-test.py) | OCL evaluator |
 
 ---
 

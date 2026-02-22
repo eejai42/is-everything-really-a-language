@@ -50,8 +50,8 @@ def run_generator(name):
         print(f"Error: Generator script not found: {script_path}")
         return False
 
-    # Create the execution-substratrates/{name} folder if it doesn't exist
-    candidate_dir = project_root / "execution-substratrates" / name
+    # Create the execution-substrates/{name} folder if it doesn't exist
+    candidate_dir = project_root / "execution-substrates" / name
     candidate_dir.mkdir(parents=True, exist_ok=True)
 
     # Run the generator from the candidate directory

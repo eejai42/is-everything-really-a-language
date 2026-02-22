@@ -15,7 +15,7 @@ Most developers think of SPARQL as a query language. ERB proves it's a computati
 ### 2. The Generated Files
 
 ```
-execution-substratrates/rdf/
+execution-substrates/rdf/
 ├── schema.ttl           # RDFS schema (classes and properties)
 ├── data.ttl             # RDF instance data (125 candidates)
 ├── queries.sparql       # SPARQL CONSTRUCT queries
@@ -272,11 +272,11 @@ The business logic lives in the database, not the application.
 
 | File | Purpose |
 |------|---------|
-| [schema.ttl](../../execution-substratrates/rdf/schema.ttl) | RDFS schema |
-| [data.ttl](../../execution-substratrates/rdf/data.ttl) | Instance data |
-| [queries.sparql](../../execution-substratrates/rdf/queries.sparql) | CONSTRUCT queries |
-| [inject-into-rdf.py](../../execution-substratrates/rdf/inject-into-rdf.py) | Generator |
-| [take-test.py](../../execution-substratrates/rdf/take-test.py) | Test runner |
+| [schema.ttl](../../execution-substrates/rdf/schema.ttl) | RDFS schema |
+| [data.ttl](../../execution-substrates/rdf/data.ttl) | Instance data |
+| [queries.sparql](../../execution-substrates/rdf/queries.sparql) | CONSTRUCT queries |
+| [inject-into-rdf.py](../../execution-substrates/rdf/inject-into-rdf.py) | Generator |
+| [take-test.py](../../execution-substrates/rdf/take-test.py) | Test runner |
 
 ---
 

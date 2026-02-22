@@ -15,7 +15,7 @@ The Semantic Web isn't just for knowledge graphs—it's a complete computation e
 ### 2. The Three Generated Files
 
 ```
-execution-substratrates/owl/
+execution-substrates/owl/
 ├── ontology.owl           # OWL 2 class definitions + properties
 ├── individuals.ttl        # RDF instance data (125 candidates)
 ├── rules.shacl.ttl        # SHACL-SPARQL rules for computed fields
@@ -317,11 +317,11 @@ The same business logic that runs in Python, SQL, and assembly also runs in a tr
 
 | File | Purpose |
 |------|---------|
-| [ontology.owl](../../execution-substratrates/owl/ontology.owl) | OWL schema |
-| [individuals.ttl](../../execution-substratrates/owl/individuals.ttl) | RDF instance data |
-| [rules.shacl.ttl](../../execution-substratrates/owl/rules.shacl.ttl) | SHACL-SPARQL rules |
-| [inject-into-owl.py](../../execution-substratrates/owl/inject-into-owl.py) | Generator |
-| [take-test.py](../../execution-substratrates/owl/take-test.py) | Test runner |
+| [ontology.owl](../../execution-substrates/owl/ontology.owl) | OWL schema |
+| [individuals.ttl](../../execution-substrates/owl/individuals.ttl) | RDF instance data |
+| [rules.shacl.ttl](../../execution-substrates/owl/rules.shacl.ttl) | SHACL-SPARQL rules |
+| [inject-into-owl.py](../../execution-substrates/owl/inject-into-owl.py) | Generator |
+| [take-test.py](../../execution-substrates/owl/take-test.py) | Test runner |
 
 ---
 

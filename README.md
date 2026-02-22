@@ -1,133 +1,159 @@
-# Is Everything a Language?
+# Effortless Rulebook (ERB)
 
-This repository is a falsifiable, executable argument about what *is* and *is not* a language.
+**One declarative rulebook. Many execution substrates. Consistent results.**
 
-It does so by:
-- Defining "language" as a set of explicit predicates
-- Encoding those predicates in a single declarative rulebook
-- Executing that same rulebook across 12 independent substrates
-- Verifying that all substrates produce identical classifications
+> **[View Full Orchestration Report](orchestration/orchestration-report.html)** — See how execution substrates compute equivalent answers from the same rulebook.
 
 ---
 
-## Single Source of Truth Architecture
+## 1. Quick Start (60 seconds)
 
-```
-                    ┌─────────────────────────────┐
-                    │         Airtable            │
-                    │   (Single Source of Truth)  │
-                    └──────────────┬──────────────┘
-                                   │
-                                   ▼
-                    ┌─────────────────────────────┐
-                    │    Effortless Rulebook      │
-                    │  (effortless-rulebook.json) │
-                    │      Declarative Hub        │
-                    └──────────────┬──────────────┘
-                                   │
-        ┌──────────┬───────────┬───┴───┬───────────┬──────────┐
-        │          │           │       │           │          │
-        ▼          ▼           ▼       ▼           ▼          ▼
-   ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-   │ Python │ │   Go   │ │  SQL   │ │  XLSX  │ │GraphQL │ │  OWL   │
-   └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
-   ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐
-   │  RDF   │ │  YAML  │ │  CSV   │ │  UML   │ │English │ │ Binary │
-   └────────┘ └────────┘ └────────┘ └────────┘ └────────┘ └────────┘
+```bash
+./start.sh
 ```
 
-**One declarative rulebook. Many execution substrates. Identical results.**
+You'll see the orchestration menu:
 
-### All 11 Substrates Pass — 100% Agreement
+![Orchestration Menu](orchestration/orchestration-menu.png)
 
-![Orchestration Results](./orchestration-results.png)
-
-Every substrate independently computes the same answers from the same rulebook. Binary, CSV, English, Go, GraphQL, OWL, Python, RDF, UML, XLSX, YAML — all pass with 100% agreement.
-
-The Airtable model is the single source of truth.
-The generated `effortless-rulebook.json` is the canonical hub.
-Each execution substrate independently consumes the same rulebook and computes the same answers.
+Pick option **6** to run all substrates. Watch them derive consistent answers from the same rulebook.
 
 ---
 
-## The Core Claim (TL;DR)
+## 2. The Architecture in One Diagram
+
+![Effortless Rulebook Architecture](./effortless_rulebook_architecture.png)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SINGLE SOURCE OF TRUTH                   │
+│                                                             │
+│   Airtable (UI)  →  effortless-rulebook.json (Canonical IR) │
+│                                                             │
+│   • Schema: raw fields vs calculated fields                 │
+│   • Formulas: declarative derivation specs                  │
+│   • Data: ground facts                                      │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼ (generated, not hand-written)
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+        ▼                     ▼                     ▼
+   ┌─────────┐          ┌─────────┐          ┌─────────┐
+   │ Postgres│          │ Python  │          │   Go    │  ...
+   │ calc_*  │          │ Calc*() │          │ Calc*() │
+   │ + views │          │ classes │          │ structs │
+   └────┬────┘          └────┬────┘          └────┬────┘
+        │                     │                     │
+        └─────────────────────┼─────────────────────┘
+                              ▼
+                    ┌─────────────────────┐
+                    │  CONFORMANCE TESTS  │
+                    │  answer-key.json vs │
+                    │  test-answers.json  │
+                    └─────────────────────┘
+```
+
+The **ExplainDAG substrate** makes this architecture inspectable: it emits the materialized inference DAG for every calculated field, showing exactly which inputs produced which outputs. Every derivation is a falsifiable artifact, not a black box.
+
+---
+
+## 3. Execution Substrates
+
+Each substrate independently derives answers from the same rulebook. Conformance is measured against a reference execution using typed field comparison:
+
+| Substrate | Type | Status | Conformance | Description |
+|-----------|------|:------:|:-----------:|-------------|
+| **PostgreSQL** | Database | ✓ | 100% | Tables, `calc_*()` functions, views |
+| **Python** | SDK | ✓ | 100% | Dataclasses with `calc_*()` methods |
+| **Go** | SDK | ✓ | 100% | Structs with `Calc*()` methods |
+| **XLSX** | Spreadsheet | ✓ | 100% | Excel workbook with native formulas |
+| **OWL** | Semantic | ✓ | 100%* | Semantic web ontology with SWRL rules |
+| **YAML** | Schema | ✓ | 100% | LLM-friendly schema |
+| **CSV** | Tabular | ✓ | 100% | Field definitions with computed values |
+| **UML** | Diagram | ✓ | 100% | PlantUML class diagrams with OCL constraints |
+| **ExplainDAG** | Audit | ✓ | 100% | Derivation DAGs with witnessed values |
+| **Binary** | Native | ⚠️ | 54% | C structs + x86 assembly (partial) |
+| **English** | Prose | 🔮 | ~78% | Human-readable specification (LLM graded) |
+
+**Legend**: ✓ = Deterministic execution, ⚠️ = Partial implementation, 🔮 = LLM Fuzzy Grading
+
+**Note on conformance scores**: "100%" means typed-identical output on the tested fragment under declared semantics. Substrates like OWL (*) have richer native semantics than the comparison captures—the score reflects agreement on the shared subset, not full semantic equivalence across paradigms.
+
+→ **For substrate implementation details and testing architecture, see [README.TECHNICAL.md](README.TECHNICAL.md)**
+
+---
+
+## 4. Project Structure
+
+```
+├── effortless-rulebook/
+│   └── effortless-rulebook.json    # ← THE SOURCE OF TRUTH
+├── postgres/
+│   ├── 01-drop-and-create-tables.sql   # generated base tables
+│   ├── 02-create-functions.sql         # generated calc_* functions (the DAG)
+│   └── 03-create-views.sql             # generated views calling calc_*
+├── execution-substrates/
+│   ├── python/                     # Python substrate
+│   ├── golang/                     # Go substrate
+│   ├── xlsx/                       # Excel substrate
+│   ├── owl/                        # OWL substrate
+│   ├── explain-dag/                # Derivation DAGs with witnessed values
+│   └── ...
+├── orchestration/
+│   ├── orchestrate.sh              # run all substrates
+│   └── test-orchestrator.py        # conformance testing harness
+├── testing/
+│   ├── answer-keys/                # expected outputs
+│   └── blank-tests/                # inputs with calculated fields nulled
+├── docs/                           # 20+ deep-dive articles
+└── start.sh                        # ← START HERE
+```
+
+---
+
+## 5. The Domain Doesn't Matter (Swap It Out)
+
+This repo uses "LanguageCandidates" as an example domain (classifying whether things like "English", "Python", "A Coffee Mug" count as languages). But:
+
+- **The pattern works for ANY domain**
+- Point at a different Airtable base → different schema, different data, same machinery
+- The orchestration, conformance testing, and derivation DAG patterns are domain-agnostic
+
+To use your own model:
+1. Export your Airtable base to `effortless-rulebook.json`
+2. Run the generators to create substrate code
+3. Run the orchestration to verify conformance
+
+---
+
+## 6. The Problem: Three Questions Nobody Has Good Answers For
+
+When business logic lives in multiple places—SQL, Python, Go, OWL, application code—three questions become urgent:
+
+1. **"Where does truth live?"** When you change a business rule today, can you point to ONE canonical source that updates immediately—and from which all implementations are re-derived? Or do you expect humans to synchronize meaning across multiple artifacts?
+
+2. **"How do you detect when implementations drift?"** When the same domain semantics exist in your database, your validation layer, your queries, and your app logic, what is your mechanism to detect divergence? Do you have conformance tests across substrates, or is correctness established by informal review and piecemeal debugging?
+
+3. **"What is your explanation of an inference?"** For any derived fact, can you produce a machine-readable derivation that shows which inputs produced it—without appealing to "the reasoner decided" or "the pipeline did it"? (See **ExplainDAG** substrate.)
+
+**The usual answer**: "We don't. We synchronize by hand. We hope. We debug."
+
+**This repo's approach**: A working implementation that addresses all three—including the **ExplainDAG substrate**, which emits witnessed derivation DAGs for every calculated field.
+
+---
+
+## 7. The Core Claim
 
 Truth does not live in syntax, code, or serialization.
 
-Truth lives in a snapshot-consistent declarative model.
-All code, files, and formats are projections.
+Truth lives in a **snapshot-consistent declarative model**. All code, files, and formats are projections.
 
-- [Airtable](https://airtable.com/appC8XTj95lubn6hz/shro5WGKLfkfxltQK) — the source of truth
-- [`effortless-rulebook.json`](effortless-rulebook/effortless-rulebook.json) — the canonical hub
-- 12+ execution substrates — independent hosts computing identical results
+- [Airtable](https://airtable.com/appC8XTj95lubn6hz/shro5WGKLfkfxltQK) — the source of truth (UI)
+- [`effortless-rulebook.json`](effortless-rulebook/effortless-rulebook.json) — the canonical hub (IR)
+- 11 execution substrates — independent hosts deriving consistent results
 
-### Download the Artifacts
-
-| Artifact | Description |
-|----------|-------------|
-| [`effortless-rulebook.json`](effortless-rulebook/effortless-rulebook.json) | The canonical rulebook (JSON) — all schema, formulas, and data |
-| [`rulebook.xlsx`](execution-substratrates/xlsx/rulebook.xlsx) | Excel workbook with live formulas |
-| [`language_candidates.csv`](execution-substratrates/csv/language_candidates.csv) | Flat CSV of all candidates with computed values |
-| [`column_formulas.csv`](execution-substratrates/csv/column_formulas.csv) | CSV of all field definitions and formulas |
-| [`specification.md`](execution-substratrates/english/specification.md) | Human-readable English specification |
-| [`glossary.md`](execution-substratrates/english/glossary.md) | Glossary of terms and predicates |
-
----
-
-## Two Empirical Invariants
-
-This repository is not primarily a linguistic or philosophical argument.
-It is an operational claim about how different kinds of systems behave.
-
-There exist systems that *appear* equivalent at the level of representation (schemas, ontologies, languages), but which behave **fundamentally differently when evolved**.
-This repository is defined by two such differences, both of which are **empirically observable**.
-
-### Invariant 1: Ontology Mutation (The Rename Test)
-
-A system has a **single source of ontological truth** *if and only if* an entity can be renamed **once** and that rename propagates deterministically across **all substrates** without search, heuristics, or manual coordination.
-
-In this repository:
-- Renaming is a **mutation of identity metadata**
-- All serializations, schemas, views, and interfaces are projections
-- Denormalization is safe because it is non-authoritative
-
-Rename a column in Airtable, and the change propagates to PostgreSQL functions, Python dataclasses, Go structs, Excel formulas, GraphQL resolvers, OWL ontologies, x86 assembly functions—**all of them**—deterministically.
-
-> **If renaming an entity does not propagate across all representations, the system does not have a single ontology—it has multiple texts.**
-
-### Invariant 2: Interpreter-Free Semantic Completeness
-
-In traditional ontology and model-driven workflows, formal artifacts (e.g., OWL) are accompanied by **natural-language annotations** that must be read and re-interpreted by a human or custom code to produce constraints, executable rules, or application behavior.
-
-In those systems, semantics are **reconstructed downstream**.
-
-In this repository, the rulebook is **semantically complete prior to projection**.
-
-OWL, RDF, SHACL, and GraphQL are generated as **lossless projections** of a single canonical model.
-No human or algorithmic interpreter is required to "reconnect" the graph to its reasoning.
-
-This distinguishes the rulebook from traditional ontologies, even when they are formally equivalent.
-
----
-
-## The Rulebook Is the Hub
-
-`/effortless-rulebook/effortless-rulebook.json` is the canonical model.
-
-It contains:
-- Predicate definitions
-- Derived fields
-- Test candidates
-- Expected results
-
-All execution substrates consume this file.
-No execution substrate defines truth.
-
----
-
-## What This Repository Settles
-
-This project makes the following claims falsifiable:
+This project makes the following claims **falsifiable**:
 
 - Not everything that can be interpreted is a language
 - Serialization alone is insufficient to define language
@@ -136,256 +162,130 @@ This project makes the following claims falsifiable:
 
 If you disagree with a result, you can point to the exact predicate.
 
----
-
-## Everything Follows Along
-
-**The most radical claim of this architecture: change the source of truth, and everything else follows along automatically.**
-
-This is [Invariant 1](#invariant-1-ontology-mutation-the-rename-test) in action.
-
-Add a new column in Airtable? Twelve execution substrates each regenerate with the new field—from Python dataclasses to PostgreSQL views to *literally x86 assembly code*.
-
-Change a formula? Rename a field? The same change propagates to Go structs, GraphQL resolvers, OWL ontologies, and compiled binaries—**deterministically, without search or manual coordination**.
-
-This isn't abstraction. This is **one truth, many projections**.
-
-### From Airtable to Assembler
-
-Consider what happens when you add a new predicate like `ResolvesToAnAST`:
-
-| Substrate | What Gets Generated |
-|-----------|---------------------|
-| **Airtable** | New column appears in the table |
-| **PostgreSQL** | New `calc_*()` function + view column |
-| **Python** | New field on `@dataclass` + `calc_*()` method |
-| **Go** | New struct field + `Calc*()` method |
-| **Excel** | New column with formula |
-| **GraphQL** | New field + resolver |
-| **English** | New paragraph in specification |
-| **Binary/ASM** | New field in C struct + **x86 assembly function** |
-
-Yes, that last one is real. The same declarative formula that lives in Airtable gets transpiled to assembly:
-
-```asm
-; calc_top_family_feud_answer - implements the 7-condition AND formula
-calc_top_family_feud_answer:
-    push rbp
-    mov rbp, rsp
-    ; Load has_syntax field
-    mov al, [rdi + OFFSET_HAS_SYNTAX]
-    test al, al
-    jz .return_false
-    ; ... continues for all 7 conditions
-```
-
-**The formula doesn't care what language hosts it.** Airtable, Excel, Python, Go, SQL, GraphQL, English prose, or raw machine code—they all compute the same answer because they all project the same truth.
+→ **For the full philosophical argument, see [README.ARGUMENT.md](README.ARGUMENT.md)**
 
 ---
 
-## Explore the Model Interactively
+## 8. How This Answers the Three Questions
 
-The unique value of this project is that you can explore and modify the ontology yourself using familiar tools:
+### 8.1 Where Does Truth Live?
 
-| Format | Link | Description |
-|--------|------|-------------|
-| **Airtable** | [Open in Airtable](https://airtable.com/appC8XTj95lubn6hz/shro5WGKLfkfxltQK) | Browse, filter, and explore the full ontology with linked records and calculated fields |
-| **Excel** | [Download rulebook.xlsx](execution-substratrates/xlsx/rulebook.xlsx) | Native Excel workbook with formulas that compute the same results as all other substrates |
+**Answer**: [`effortless-rulebook.json`](effortless-rulebook/effortless-rulebook.json)
 
-The entire repository—12+ execution substrates, tests, and documentation—is generated from this single source of truth.
+- NOT the SQL (that's generated)
+- NOT the Python (that's generated)
+- One file. One place. Change it here, regenerate everything else.
+
+The rulebook contains declarative formulas:
+
+```json
+{
+  "name": "PredictedAnswer",
+  "type": "calculated",
+  "formula": "=AND(\n  {{HasSyntax}},\n  {{RequiresParsing}},\n  {{IsDescriptionOf}},\n  {{HasLinearDecodingPressure}},\n  {{ResolvesToAnAST}},\n  {{IsStableOntologyReference}},\n  NOT({{CanBeHeld}}),\n  NOT({{HasIdentity}})\n)"
+}
+```
+
+This formula is compiled to Postgres, Python, Go, and any other substrate—not written by hand in each.
+
+### 8.2 How Do You Detect Drift?
+
+**Answer**: Conformance testing against a reference execution.
+
+1. Generate `answer-key.json` from one substrate (the reference execution)
+2. Run every other substrate against `blank-test.json` (same inputs, computed fields nulled)
+3. Compare outputs field-by-field, row-by-row
+4. Drift is detected automatically, not discovered in production
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ SUBSTRATE CONFORMANCE RESULTS                               │
+├─────────────────────────────────────────────────────────────┤
+│ python     ████████████████████████████████████████  100%   │
+│ golang     ████████████████████████████████████████  100%   │
+│ owl        ████████████████████████████████████████  100%   │
+│ xlsx       ████████████████████████████████████████  100%   │
+│ yaml       ████████████████████████████████████████  100%   │
+│ csv        ████████████████████████████████████████  100%   │
+│ uml        ████████████████████████████████████████  100%   │
+│ explaindag ████████████████████████████████████████  100%   │
+│ binary     █████████████████████░░░░░░░░░░░░░░░░░░░   54%   │
+│ english    ███████████████████████████████░░░░░░░░░   78%   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 8.3 What Is Your Explanation of an Inference?
+
+**Answer**: The `calc_*` functions ARE the derivation DAG. The **ExplainDAG substrate** makes this explicit.
+
+**Why no JOINs?** In this architecture, relationships and derived values are first-class nodes in the DAG—not query operators. Each inference depends only on immediate neighbors (its direct inputs), so global semantics emerge from composing local inference nodes. What would be a JOIN in SQL is instead the existence of explicit nodes and edges in the graph.
+
+Every calculated field explicitly shows:
+- **Ground facts**: Which base columns it reads
+- **Dependencies**: Which other calc functions it calls
+- **Logic**: The pure computation
+
+```sql
+-- calc_language_candidates_predicted_answer shows the full derivation:
+CREATE FUNCTION calc_language_candidates_predicted_answer(p_id TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN (
+    COALESCE((SELECT has_syntax FROM language_candidates WHERE ...), FALSE)
+    AND COALESCE((SELECT requires_parsing FROM language_candidates WHERE ...), FALSE)
+    AND (calc_language_candidates_is_description_of(p_id) = 'true')  -- ← calls another calc
+    AND ...
+  );
+END;
+$$
+```
+
+The ExplainDAG substrate goes further—it produces **machine-readable derivation artifacts** with witnessed values at every node:
+
+```json
+{
+  "explanations": {
+    "HasGrammar": {
+      "nodes": {
+        "i_result": {"kind": "result", "value": true},
+        "i_op_1": {"kind": "op", "name": "=", "value": true},
+        "i_ref_1": {"kind": "field_ref", "field": "HasSyntax", "value": true}
+      },
+      "edges": [["i_ref_1", "i_op_1"], ["i_op_1", "i_result"]]
+    }
+  }
+}
+```
+
+You can trace any derived value back to its inputs mechanically. No "the reasoner decided."
 
 ---
 
-## Table of Contents
+## 9. Two Empirical Invariants
 
-1. [The Core Claim (TL;DR)](#the-core-claim-tldr)
-2. [Two Empirical Invariants](#two-empirical-invariants)
-   - [Invariant 1: Ontology Mutation (The Rename Test)](#invariant-1-ontology-mutation-the-rename-test)
-   - [Invariant 2: Interpreter-Free Semantic Completeness](#invariant-2-interpreter-free-semantic-completeness)
-3. [The Rulebook Is the Hub](#the-rulebook-is-the-hub)
-4. [What This Repository Settles](#what-this-repository-settles)
-5. [Everything Follows Along](#everything-follows-along)
-   - [From Airtable to Assembler](#from-airtable-to-assembler)
-6. [The Argument](#the-argument)
-   - [Part I: Language Can Be Formalized](#part-i-language-can-be-formalized)
-   - [Part II: Not Everything Is a Language](#part-ii-not-everything-is-a-language)
-   - [Conclusion](#conclusion)
-7. [Why OWL, RDF, SHACL, and GraphQL Are Projections Here](#why-owl-rdf-shacl-and-graphql-are-projections-here)
-8. [The Predicates](#the-predicates)
-9. [The Evaluation Matrix](#the-evaluation-matrix)
-10. [The DAG (Inference Levels)](#the-dag-inference-levels)
-11. [Independent Execution Substrates](#independent-execution-substrates)
-    - [Substrate Roles in the Three-Phase Contract](#substrate-roles-in-the-three-phase-contract)
-    - [All Execution Substrates](#all-execution-substrates)
-12. [Testing Architecture](#testing-architecture)
-    - [The Three-Phase Testing Model](#the-three-phase-testing-model)
-    - [Phase 1: Substrate Injection](#phase-1-substrate-injection-domain-agnostic)
-    - [Phase 2: Test Execution](#phase-2-test-execution-main)
-    - [Phase 3: Grading](#phase-3-grading)
-13. [Fuzzy Evaluation Layer](#fuzzy-evaluation-layer)
-    - [Concept](#concept)
-    - [Substrates Using Fuzzy Evaluation](#substrates-using-fuzzy-evaluation)
-    - [Running Fuzzy Evaluation](#running-fuzzy-evaluation)
-14. [Quick Start](#quick-start)
-15. [Architecture](#architecture)
-16. [Transpilers](#transpilers)
+This repository is defined by two observable properties that distinguish it from traditional ontology or model-driven workflows.
+
+### The Rename Test
+
+A system approaches a **single source of ontological truth** when an entity can be renamed **once** and that rename propagates across **all generated substrates** without search, heuristics, or manual coordination.
+
+Rename a column in Airtable → regenerate → PostgreSQL functions, Python dataclasses, Go structs, Excel formulas, OWL ontologies all update **consistently**.
+
+> **If renaming does not propagate, the system has multiple texts—not a single ontology.**
+
+### Interpreter-Free Semantic Completeness
+
+In traditional workflows, OWL artifacts require natural-language annotations to be re-interpreted downstream. Here, the rulebook aims for **semantic completeness prior to projection**. Substrates are generated as **high-fidelity projections** of the declared semantics—minimizing the need for downstream interpretation.
+
+→ **For the full treatment of these invariants, see [README.ARGUMENT.md](README.ARGUMENT.md)**
 
 ---
 
-## The Argument
+## 10. The Predicates & Core Formula
 
-### Part I: Language Can Be Formalized
+The evaluation uses 12 raw predicates and 5 calculated fields to classify whether something is a "language."
 
-**Motivation:** The phrase "everything is a language" is seductive but vacuous. If everything can be "interpreted," then "language" loses meaning. We need a stricter, testable definition.
-
-**The Operational Definition:**
-
-An item **x** is a **Language** (i.e., a "Top Family Feud Answer") if and only if:
-
-```
-TopFamilyFeudAnswer(x) := HasSyntax(x) ∧ ¬CanBeHeld(x) ∧ HasLinearDecodingPressure(x) ∧
-                          RequiresParsing(x) ∧ StableOntologyReference(x) ∧
-                          ¬HasIdentity(x) ∧ DistanceFromConcept(x) = 2
-```
-
-In plain English:
-- **HasSyntax** — It has explicit grammar rules
-- **CanBeHeld** — It is NOT a tangible physical object (must be false)
-- **HasLinearDecodingPressure** — It requires sequential/linear interpretation
-- **RequiresParsing** — It must be parsed to be understood
-- **StableOntologyReference** — It provides stable references to concepts
-- **HasIdentity** — It does NOT have persistent individual identity (must be false)
-- **DistanceFromConcept = 2** — It describes things rather than being the thing itself
-
-**Witnesses:** This definition isn't empty. Clear witnesses satisfy it:
-
-| Witness | HasSyntax | CanBeHeld | LinearDecoding | RequiresParsing | StableOntology | HasIdentity | Distance | Language? |
-|---------|:---------:|:---------:|:--------------:|:---------------:|:--------------:|:-----------:|:--------:|:---------:|
-| English | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 | **Yes** |
-| Python  | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 | **Yes** |
-
-**Conclusion:** Language *can* be formalized as a computable classification over explicit predicates.
-
----
-
-### Part II: Not Everything Is a Language
-
-**The Exclusion Principle:** If TopFamilyFeudAnswer(x) requires all seven conditions, then failing *any one* means x is not a language:
-
-```
-∀x (¬(HasSyntax(x) ∧ ¬CanBeHeld(x) ∧ HasLinearDecodingPressure(x) ∧ RequiresParsing(x) ∧
-      StableOntologyReference(x) ∧ ¬HasIdentity(x) ∧ DistanceFromConcept(x) = 2) → ¬Language(x))
-```
-
-**Counterexamples:**
-
-| Candidate | Why It Fails | Verdict |
-|-----------|--------------|:-------:|
-| A Chair | No syntax, can be held, no linear decoding, no parsing, has identity, distance=1 | ❌ Not a language |
-| A Coffee Mug | No syntax, can be held, no linear decoding, no parsing, has identity, distance=1 | ❌ Not a language |
-| A Thunderstorm | No syntax, can be held, no linear decoding, has identity, distance=1 | ❌ Not a language |
-| The Mona Lisa | No syntax, can be held, no linear decoding, no parsing, has identity, distance=1 | ❌ Not a language |
-
-These things can be *interpreted* (semiotically meaningful), but they don't constitute *language systems*.
-
-**Fuzzy Boundaries — Running Software:**
-
-Running applications present an interesting case. They often *contain* languages (source code, UI grammars, config files) but as executing processes, they behave like dynamic systems rather than static serialized language artifacts:
-
-| Candidate | Contains Language? | Is A Language? | Why? |
-|-----------|:------------------:|:--------------:|------|
-| Running Calculator App | Yes (code inside) | ❌ No | No syntax, has identity, distance=1 |
-| A Game of Fortnite | Yes (code inside) | ❌ No | No syntax, has identity, distance=1 |
-| Editing an XLSX Doc | Yes (Excel formulas) | ❌ No | No syntax, no parsing, distance=1 |
-
-**Refinement — Three Categories:**
-
-```
-LanguageSystem(x)    — meets all 7 conditions (top family feud answer)
-SemioticProcess(x)   — interactive/dynamic meaning production (running apps)
-SignVehicle(x)       — object/phenomenon used as a sign (chair, thunderstorm)
-```
-
-This gives us a place to classify running apps and games without forcing "language" to swallow everything.
-
----
-
-### Conclusion
-
-> **Given a formalizable definition of language, not everything is a language; some things are better treated as sign vehicles or semiotic processes, with running applications as a key fuzzy region that benefits from explicit modeling.**
-
-Formally:
-
-```
-Formalizable(Language) ∧ ∃x ¬Language(x) ⇒ ¬(EverythingIsALanguage)
-```
-
----
-
-## Why OWL, RDF, SHACL, and GraphQL Are Projections Here
-
-This repository can emit OWL, RDF, SHACL, and GraphQL representations.
-However, none of these artifacts are treated as authoritative.
-
-In typical workflows:
-- OWL defines structure
-- Comments and annotations define intent
-- Constraints and reasoning are added later by human interpreters
-
-Here:
-- Intent, constraints, and inference semantics exist **first** (in the rulebook)
-- Formal representations are **derived**
-- Annotations are explanatory, not semantic
-
-As a result, the rulebook can implement a **semantically complete traditional ontology** *without requiring an interpreter*.
-
-This difference is not stylistic. It determines whether meaning survives refactoring, renaming, and cross-substrate projection.
-
-When you rename `has_syntax` to `has_grammar` in Airtable:
-- The OWL class property changes
-- The RDF predicate changes
-- The SHACL constraint changes
-- The GraphQL field changes
-- The Python method changes
-- The Go function changes
-- The x86 assembly label changes
-
-All deterministically. All from one edit. No search-and-replace. No interpreter reconstruction.
-
----
-
-## The Predicates
-
-The evaluation uses 12 raw predicates (input properties) and 5 calculated fields:
-
-### Raw Predicates (Inputs)
-
-| Predicate | Type | Question |
-|-----------|------|----------|
-| `has_syntax` | boolean | Does it have explicit grammar rules? |
-| `requires_parsing` | boolean | Must it be parsed to extract meaning? |
-| `can_be_held` | boolean | Is it a tangible physical object? |
-| `has_identity` | boolean | Does it have persistent individual identity? |
-| `has_linear_decoding_pressure` | boolean | Does it require sequential/linear interpretation? |
-| `stable_ontology_reference` | boolean | Does it provide stable references to concepts? |
-| `is_open_world` | boolean | Does it operate under open-world assumption? |
-| `is_closed_world` | boolean | Does it operate under closed-world assumption? |
-| `distance_from_concept` | integer | Is it the thing (1) or a description of it (2)? |
-| `dimensionality_while_editing` | string | What dimensionality during editing? (OneDimensionalSymbolic, MultiDimensionalNonSymbolic, N/A) |
-| `chosen_language_candidate` | boolean | Is it manually marked as a language candidate? |
-| `has_grammar` | boolean | Alias for has_syntax |
-
-### Calculated Fields (Derived)
-
-| Field | Type | Formula |
-|-------|------|---------|
-| `family_fued_question` | string | `"Is " & Name & " a language?"` |
-| `top_family_feud_answer` | boolean | 7-condition AND formula (see below) |
-| `family_feud_mismatch` | string/null | Reports discrepancy if computed ≠ marked |
-| `is_open_closed_world_conflicted` | boolean | `is_open_world AND is_closed_world` |
-| `relationship_to_concept` | string | `IF(distance=1, "IsMirrorOf", "IsDescriptionOf")` |
-
-### The Core Formula: `top_family_feud_answer`
+### The Core Formula
 
 ```
 top_family_feud_answer = AND(
@@ -399,715 +299,148 @@ top_family_feud_answer = AND(
 )
 ```
 
----
+### Quick Evaluation Examples
 
-## The Evaluation Matrix
+| Candidate | Syntax | Holdable | Linear | Parsing | Stable | Identity | Distance | Language? |
+|-----------|:------:|:--------:|:------:|:-------:|:------:|:--------:|:--------:|:---------:|
+| English | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 | **Yes** |
+| Python | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 | **Yes** |
+| A Chair | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ | 1 | **No** |
+| A Coffee Mug | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ | 1 | **No** |
 
-Here's the punchline—25 candidates evaluated against the predicates:
-
-### ✅ Languages (pass all criteria)
-
-| Candidate | Category | Syntax | CanBeHeld | LinearDecoding | Parsing | StableOntology | Identity | Distance |
-|-----------|----------|:------:|:---------:|:--------------:|:-------:|:--------------:|:--------:|:--------:|
-| English | Natural Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| Spoken Words | Natural Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| Sign Language | Natural Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| French | Natural Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| Python | Formal Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| JavaScript | Formal Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| Binary Code | Formal Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| A CSV File | Formal Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| A UML File | Formal Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| An XLSX Doc | Formal Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| An DOCX Doc | Formal Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-| OWL/RDF/GraphQL/... | Natural Language | ✓ | ✗ | ✓ | ✓ | ✓ | ✗ | 2 |
-
-### ❌ Not Languages (fail one or more criteria)
-
-| Candidate | Category | Syntax | CanBeHeld | LinearDecoding | Parsing | StableOntology | Identity | Distance | Fails On |
-|-----------|----------|:------:|:---------:|:--------------:|:-------:|:--------------:|:--------:|:--------:|----------|
-| A Chair | Physical Object | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ | 1 | Most conditions |
-| A Coffee Mug | Physical Object | ✗ | ✓ | ✗ | ✗ | ✗ | ✓ | 1 | Most conditions |
-| A Smartphone | Physical Object | ✗ | ✓ | ✓ | ✗ | ✗ | ✓ | 1 | Syntax, can_be_held, parsing, identity |
-| The Mona Lisa | Physical Object | ✗ | ✓ | ✗ | ✗ | ✓ | ✓ | 1 | Syntax, can_be_held, identity, distance |
-| A Thunderstorm | Physical event | ✗ | ✓ | ✗ | ✓ | ✗ | ✓ | 1 | Syntax, can_be_held, linear_decoding |
-| Running Calculator App | Running Software | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | 1 | Syntax, linear_decoding, identity |
-| A Running App | Running Software | ✗ | ✗ | ✓ | ✓ | ✗ | ✓ | 1 | Syntax, stable_ontology, identity |
-| A Game of Fortnite | Running Software | ✗ | ✗ | ✗ | ✓ | ✗ | ✓ | 1 | Syntax, linear_decoding, identity |
-| Editing an XLSX Doc | Running Software | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ | 1 | Syntax, parsing, linear_decoding |
-| Editing an DOCX Doc | Running Software | ✗ | ✗ | ✗ | ✗ | ✓ | ✗ | 1 | Syntax, parsing, linear_decoding |
-
-### 🧪 Falsifiers (test cases for the formula)
-
-| Candidate | Category | Computed Result | Marked As | Mismatch? |
-|-----------|----------|:---------------:|:---------:|:---------:|
-| Falsifier A | "MISSING: Have you seen this Language?" | ✓ Yes | ✗ No | **Yes** — computed as language but not marked |
-| Falsifier B | "MISSING: Have you seen this Language?" | ✗ No | ✓ Yes | **Yes** — marked as language but formula says no |
-| Falsifier C | "MISSING: Have you seen this Language?" | ✓ Yes | ✓ Yes | **Yes** — Open World vs. Closed World Conflict |
+→ **For the full predicate definitions and 25-candidate evaluation matrix, see [README.ARGUMENT.md](README.ARGUMENT.md)**
 
 ---
 
-## The DAG (Inference Levels)
+## 11. Detailed Walkthrough
 
-Calculated fields are computed in dependency order:
+### 11.1 The Rulebook Format
 
-```
-Level 0 (Raw Data)
-    │
-    ├── has_syntax, requires_parsing, can_be_held, has_identity
-    ├── has_linear_decoding_pressure, stable_ontology_reference
-    ├── is_open_world, is_closed_world, distance_from_concept
-    ├── dimensionality_while_editing, chosen_language_candidate
-    ├── category, name, has_grammar
-    │
-    ▼
-Level 1 (Simple Derivations)
-    │
-    ├── family_fued_question        ← "Is " + name + " a language?"
-    ├── relationship_to_concept     ← IF(distance = 1, "IsMirrorOf", "IsDescriptionOf")
-    ├── is_open_closed_world_conflicted ← AND(is_open_world, is_closed_world)
-    │
-    ▼
-Level 2 (Core Classification)
-    │
-    └── top_family_feud_answer      ← AND(has_syntax, NOT(can_be_held),
-    │                                      has_linear_decoding_pressure, requires_parsing,
-    │                                      stable_ontology_reference, NOT(has_identity),
-    │                                      distance_from_concept = 2)
-    │
-    ▼
-Level 3 (Validation)
-    │
-    └── family_feud_mismatch        ← IF(computed ≠ marked, report discrepancy)
-                                       Also appends conflict warning if is_open_closed_world_conflicted
-```
+The `effortless-rulebook.json` contains:
 
-### For Instance: "Is Python a language?"
+- **Schema**: Each field marked as `"type": "raw"` (ground fact) or `"type": "calculated"` (derived)
+- **Formulas**: Excel-like syntax with `{{FieldName}}` references
+- **Data**: The actual records (ground facts)
 
-**Level 0** — Raw facts from the database:
-```
-name: "Python"
-category: "Formal Language"
-has_syntax: true
-requires_parsing: true
-can_be_held: false
-has_identity: false
-has_linear_decoding_pressure: true
-stable_ontology_reference: true
-distance_from_concept: 2
-is_open_world: true
-is_closed_world: false
-chosen_language_candidate: true
-```
-
-**Level 1** — Derived values:
-```
-family_fued_question: "Is Python a language?"
-relationship_to_concept: "IsDescriptionOf"  ← distance = 2
-is_open_closed_world_conflicted: false      ← NOT(true AND false)
-```
-
-**Level 2** — The verdict:
-```
-top_family_feud_answer: true
-  ← has_syntax (✓)
-  ← NOT(can_be_held) (✓)
-  ← has_linear_decoding_pressure (✓)
-  ← requires_parsing (✓)
-  ← stable_ontology_reference (✓)
-  ← NOT(has_identity) (✓)
-  ← distance_from_concept = 2 (✓)
-```
-
-**Level 3** — Validation:
-```
-family_feud_mismatch: null   ← computed (true) matches marked (true)
-```
-
----
-
-## Independent Execution Substrates
-
-Each execution substrate is a fully independent host that consumes the same rulebook and computes results using domain-agnostic, reusable tooling.
-
-No substrate is privileged.
-Disagreement is therefore about definitions, not implementations.
-
-> **No execution substrate defines truth; all substrates merely project and compute from the rulebook.**
-
-### For Instance: `top_family_feud_answer` in Three Languages
-
-**PostgreSQL** ([postgres/02-create-functions.sql](postgres/02-create-functions.sql)):
-```sql
-CREATE OR REPLACE FUNCTION calc_language_candidates_top_family_feud_answer(p_language_candidate_id TEXT)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN (
-    COALESCE((SELECT has_syntax FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)
-    AND NOT COALESCE((SELECT can_be_held FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)
-    AND COALESCE((SELECT has_linear_decoding_pressure FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)
-    AND COALESCE((SELECT requires_parsing FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)
-    AND COALESCE((SELECT stable_ontology_reference FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)
-    AND NOT COALESCE((SELECT has_identity FROM language_candidates WHERE language_candidate_id = p_language_candidate_id), FALSE)
-    AND COALESCE((SELECT distance_from_concept FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) = 2, FALSE)
-  )::boolean;
-END;
-$$ LANGUAGE plpgsql STABLE;
-```
-
-**Python** ([execution-substratrates/python/erb_sdk.py](execution-substratrates/python/erb_sdk.py)):
-```python
-def calc_top_family_feud_answer(self) -> bool:
-    return (
-        (self.has_syntax or False)
-        and not (self.can_be_held or False)
-        and (self.has_linear_decoding_pressure or False)
-        and (self.requires_parsing or False)
-        and (self.stable_ontology_reference or False)
-        and not (self.has_identity or False)
-        and self.distance_from_concept == 2
-    )
-```
-
-**English Specification** ([execution-substratrates/english/specification.md](execution-substratrates/english/specification.md)):
-```
-TopFamilyFeudAnswer = AND(
-  HasSyntax,
-  NOT(CanBeHeld),
-  HasLinearDecodingPressure,
-  RequiresParsing,
-  StableOntologyReference,
-  NOT(HasIdentity),
-  DistanceFromConcept = 2
-)
-```
-
-### Substrate Roles in the Three-Phase Contract
-
-All substrates follow the same **three-phase contract**:
-
-1. **Inject** (domain-agnostic): Take the rulebook (schema + formulas) and generate a runnable "substrate" artifact (SDK / schema / workbook / ontology / etc.)
-2. **Execute test**: Load `blank-test.json` (raw fields + null computed fields), run the generated rules to compute derived fields, and emit `test-answers.json`
-3. **Grade**: Compare that substrate's `test-answers.json` to the canonical `answer-key.json` field-by-field and report mismatches
-
-The *thing that changes per substrate* is: **what "injection" produces**, **how execution computes**, and **what kind of runtime you need**.
-
-| Substrate | Role | Injection Produces (Domain-Agnostic) | Executable? |
-|-----------|------|--------------------------------------|:-----------:|
-| **PostgreSQL** | Source of truth — canonical computation engine | Tables (1:1 with entities), `calc_*()` functions (1:1 with computed columns), views | ✓ (generates `answer-key.json`) |
-| **XLSX** | Spreadsheet runtime for formulas | Worksheets (1:1 with entities), formula columns (1:1 with computed columns) | ✓ |
-| **Python** | SDK runtime (dataclass + methods) | `@dataclass` classes (1:1 with entities), `calc_*()` methods (1:1 with computed columns) | ✓ |
-| **Go** | Compiled typed runtime (structs + methods) | Go `struct` types (1:1 with entities), `Calc*()` methods (1:1 with computed columns) | ✓ |
-| **GraphQL** | Computation via resolvers | Type definitions (1:1 with entities), resolvers (1:1 with computed columns) | ✓ |
-| **RDF/Turtle** | Semantic-web schema + rules | Classes/properties (1:1 with entities/fields), optional SPARQL rules | ✓ (with rules engine) / 🔮 Fuzzy |
-| **OWL** | Ontology + reasoning | OWL classes (1:1 with entities), optional SWRL rules | ✓ (limited) / 🔮 Fuzzy |
-| **YAML** | LLM-friendly schema serialization | Schema definitions (1:1 with entities/fields) | ✓ (requires runner) |
-| **CSV** | Tabular schema export | Field definitions (1:1 with entities/fields) | ✓ (requires runner) |
-| **UML** | Structural model / diagrams | Class diagrams (1:1 with entities) | 🔮 Fuzzy |
-| **DOCX** | Human-readable document export | Document sections (1:1 with entities/formulas) | 🔮 Fuzzy |
-| **English** | Human-readable specification | Prose descriptions (1:1 with entities/formulas) | 🔮 Fuzzy |
-| **Binary** | Compiled native execution | C structs (1:1 with entities), C functions (1:1 with computed columns) | ✓ |
-
-**Legend**: ✓ = Native execution, 🔮 = LLM Fuzzy Grading (see [Fuzzy Evaluation Layer](#fuzzy-evaluation-layer))
-
-### All Execution Substrates
-
-| Layer | Description | Run | README |
-|-------|-------------|-----|--------|
-| **PostgreSQL** | Source of truth — tables, calc functions, views | [init-db.sh](postgres/init-db.sh) | [README](postgres/README.md) |
-| **XLSX** | Excel workbook with native formulas | [run.sh](execution-substratrates/xlsx/run.sh) | [README](execution-substratrates/xlsx/README.md) |
-| **Python** | SDK with dataclasses and calc methods | [run.sh](execution-substratrates/python/run.sh) | [README](execution-substratrates/python/README.md) |
-| **Go** | Structs with calculation methods | [run.sh](execution-substratrates/golang/run.sh) | [README](execution-substratrates/golang/README.md) |
-| **GraphQL** | Schema with resolvers | [run.sh](execution-substratrates/graphql/run.sh) | [README](execution-substratrates/graphql/README.md) |
-| **RDF/Turtle** | Linked data ontology | [run.sh](execution-substratrates/rdf/run.sh) | [README](execution-substratrates/rdf/README.md) |
-| **OWL** | Semantic web ontology | [run.sh](execution-substratrates/owl/run.sh) | [README](execution-substratrates/owl/README.md) |
-| **YAML** | LLM-friendly schema | [run.sh](execution-substratrates/yaml/run.sh) | [README](execution-substratrates/yaml/README.md) |
-| **CSV** | Tabular field definitions | [run.sh](execution-substratrates/csv/run.sh) | [README](execution-substratrates/csv/README.md) |
-| **UML** | Entity relationship diagrams | [run.sh](execution-substratrates/uml/run.sh) | [README](execution-substratrates/uml/README.md) |
-| **DOCX** | Word document export | [run.sh](execution-substratrates/docx/run.sh) | [README](execution-substratrates/docx/README.md) |
-| **English** | Human-readable specification | — | [specification.md](execution-substratrates/english/specification.md) |
-| **Binary** | Encoded schema representation | [run.sh](execution-substratrates/binary/run.sh) | [README](execution-substratrates/binary/README.md) |
-
----
-
-## Testing Architecture
-
-The project includes a comprehensive testing framework that validates each execution substrate produces identical computed results.
-
-### The Key Insight
-
-**Injection code must be 100% domain-agnostic, general-purpose, and reusable.**
-
-The injector script (`inject-into-*.py`) for any substrate:
-- **NEVER** contains words like "language", "syntax", "grammar", or any domain concept
-- **ONLY** translates generic rulebook structures into target language constructs
-- **Generates** entity structures (structs/classes/tables) and computation functions (1:1 with computed columns)
-
-The test runner (`take-test.py`) for any substrate:
-- **NEVER** knows what the data represents
-- **ONLY** reads JSON → populates structures → calls generated functions → emits JSON
-
-This means **when the rulebook changes** (different domain, different entities, different formulas), the infrastructure "follows along" automatically. The same `inject-into-golang.py` script that generates code for language classification would work identically for inventory management, financial calculations, or any other domain.
-
-### The Three-Phase Testing Model
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         TESTING ARCHITECTURE                                │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-  ┌─────────────────────┐
-  │   PostgreSQL View   │  ← Source of Truth
-  │  (vw_language_...   │    (all computed fields included)
-  └──────────┬──────────┘
-             │
-             ▼
-  ┌─────────────────────┐     ┌─────────────────────┐
-  │   answer-key.json   │     │   blank-test.json   │
-  │  (complete answers) │     │  (nulled computed   │
-  └─────────────────────┘     │   columns)          │
-             │                └──────────┬──────────┘
-             │                           │
-             │    ┌──────────────────────┼──────────────────────┐
-             │    │                      │                      │
-             │    ▼                      ▼                      ▼
-             │  ┌─────────┐         ┌─────────┐           ┌─────────┐
-             │  │  XLSX   │         │ Python  │    ...    │ Golang  │
-             │  │Substrate│         │Substrate│           │Substrate│
-             │  └────┬────┘         └────┬────┘           └────┬────┘
-             │       │                   │                     │
-             │       ▼                   ▼                     ▼
-             │  ┌─────────┐         ┌─────────┐           ┌─────────┐
-             │  │  test-  │         │  test-  │           │  test-  │
-             │  │answers. │         │answers. │           │answers. │
-             │  │  json   │         │  json   │           │  json   │
-             │  └────┬────┘         └────┬────┘           └────┬────┘
-             │       │                   │                     │
-             └───────┼───────────────────┼─────────────────────┤
-                     │                   │                     │
-                     ▼                   ▼                     ▼
-              ┌────────────────────────────────────────────────────┐
-              │              TEST ORCHESTRATOR                     │
-              │         (field-by-field comparison)                │
-              │                                                    │
-              │   For each substrate:                              │
-              │     test-answers.json  vs  answer-key.json         │
-              │                    ↓                               │
-              │            PASS / FAIL + Score                     │
-              └────────────────────────────────────────────────────┘
-```
-
-### Phase 1: Substrate Injection (Domain-Agnostic)
-
-Each substrate has an `inject-substrate.sh` that calls `inject-into-*.py`:
-
-```bash
-inject-substrate.sh → inject-into-*.py
-```
-
-The injection script is **100% domain-agnostic**—it reads the generic `effortless-rulebook.json` and generates the runtime execution substrate/SDK. **The injector knows nothing about "languages", "grammar", "syntax", or any domain concepts.** It simply:
-
-1. **Reads the rulebook schema** — entity names, field names, field types, formula definitions
-2. **Generates entity structures** — structs/classes/tables with fields matching the schema
-3. **Generates computation functions** — one function per computed column, exactly mirroring the formula DAG
-
-When the rulebook changes (new entities, new fields, new formulas), re-running the injector regenerates the substrate artifacts. The injector never needs modification—it's a generic translator.
-
-| Substrate | Entity Structure | Computed Column Functions |
-|-----------|------------------|---------------------------|
-| **postgres** | `CREATE TABLE` statements | `calc_entityname_fieldname()` SQL functions |
-| **xlsx** | Worksheet rows/columns | Excel formula cells (e.g., `=AND(...)`) |
-| **python** | `@dataclass` classes | `calc_fieldname()` methods on the class |
-| **golang** | Go `struct` types | `Calc*()` methods on the struct |
-| **graphql** | GraphQL type definitions | Resolver functions for computed fields |
-| **owl/rdf** | Class/property definitions | SPARQL rules or embedded formula comments |
-| **binary** | C struct definitions | C functions for computed fields |
-
-### Example: Go Substrate Injection
-
-The injector reads the rulebook and generates:
-
-```go
-// GENERATED: Entity struct (one per rulebook entity)
-type LanguageCandidate struct {
-    LanguageCandidateID         *string `json:"language_candidate_id"`
-    Name                        *string `json:"name"`
-    Category                    *string `json:"category"`
-    HasSyntax                   *bool   `json:"has_syntax"`
-    CanBeHeld                   *bool   `json:"can_be_held"`
-    HasLinearDecodingPressure   *bool   `json:"has_linear_decoding_pressure"`
-    RequiresParsing             *bool   `json:"requires_parsing"`
-    StableOntologyReference     *bool   `json:"stable_ontology_reference"`
-    HasIdentity                 *bool   `json:"has_identity"`
-    DistanceFromConcept         *int    `json:"distance_from_concept"`
-    // ... all raw fields from rulebook
-}
-
-// GENERATED: Calc function (one per computed column in rulebook)
-func (c *LanguageCandidate) CalcTopFamilyFeudAnswer() bool {
-    // Implements the 7-condition formula from the rulebook
-}
-
-func (c *LanguageCandidate) CalcIsOpenClosedWorldConflicted() bool {
-    // Implements: is_open_world AND is_closed_world
+```json
+{
+  "name": "HasGrammar",
+  "datatype": "boolean",
+  "type": "calculated",
+  "formula": "={{HasSyntax}} = TRUE()"
 }
 ```
 
-**Note:** The struct field names (`HasSyntax`, `CanBeHeld`) and method names (`CalcTopFamilyFeudAnswer`) come directly from the rulebook schema. The injector doesn't know these fields relate to linguistics—it just translates whatever entities/fields/formulas the rulebook defines.
+### 11.2 Code Generation
 
-### Phase 2: Test Execution (main())
+Each substrate generator reads the rulebook and produces:
 
-Each substrate has a `take-test.sh` that runs the test:
+- **Postgres**: `calc_tablename_fieldname()` functions + `vw_tablename` views
+- **Python**: Classes with `calc_field_name()` methods
+- **Go**: Structs with `CalcFieldName()` methods
+- **Excel**: Workbooks with formula cells
+- **OWL**: Ontology definitions with SWRL rules
 
-```bash
-take-test.sh → take-test.py (or take-test.go, etc.)
-```
+### 11.3 The Orchestration Harness
 
-The `main()` function is **also domain-agnostic**. It follows a simple pattern:
+1. **answer-key.json**: Complete expected outputs (all calculated fields populated)
+2. **blank-test.json**: Same records, but calculated fields set to null
+3. **Per-substrate runners**: Load blank-test, execute Calc*() functions, emit test-answers.json
+4. **Grading**: Compare test-answers.json to answer-key.json, report pass/fail per field per row
 
-1. **Read** `blank-test.json` — JSON array of records with raw fields + null computed fields
-2. **Populate** structs/objects — unmarshal each JSON record into the generated entity structure
-3. **Compute** derived fields — call the generated `Calc*()` functions to fill in nulled computed columns
-4. **Emit** `test-answers.json` — marshal the fully-computed records back to JSON
+### 11.4 Adding a New Substrate
 
-```
-┌─────────────────────┐     ┌─────────────────────┐
-│   blank-test.json   │     │  Generated SDK      │
-│  (raw fields only)  │     │  (structs + funcs)  │
-└──────────┬──────────┘     └──────────┬──────────┘
-           │                           │
-           └───────────┬───────────────┘
-                       ▼
-              ┌─────────────────┐
-              │    main()       │
-              │                 │
-              │  1. Read JSON   │
-              │  2. Populate    │
-              │  3. Calc*()     │
-              │  4. Emit JSON   │
-              └────────┬────────┘
-                       ▼
-              ┌─────────────────┐
-              │ test-answers.json│
-              │ (all fields)    │
-              └─────────────────┘
-```
-
-### Example: Go Test Runner
-
-```go
-func main() {
-    // 1. Read blank test input
-    data, _ := os.ReadFile("../../testing/blank-test.json")
-    var candidates []LanguageCandidate
-    json.Unmarshal(data, &candidates)
-
-    // 2. For each record, compute derived fields using generated Calc functions
-    for i := range candidates {
-        c := &candidates[i]
-        topAnswer := c.CalcTopFamilyFeudAnswer()
-        conflicted := c.CalcIsOpenClosedWorldConflicted()
-        mismatch := c.CalcFamilyFeudMismatch()
-        // ... assign computed values back to struct
-    }
-
-    // 3. Emit computed results
-    output, _ := json.MarshalIndent(candidates, "", "  ")
-    os.WriteFile("test-answers.json", output, 0644)
-}
-```
-
-**The main() function has no domain knowledge.** It doesn't know what a "language" is or what "syntax" means. It just:
-- Loads whatever JSON structure the rulebook defines
-- Calls whatever `Calc*()` functions were generated
-- Writes the results
-
-When the rulebook changes (new fields, new formulas, new test data), the same `main()` pattern continues to work—only the generated SDK changes.
-
-### Phase 3: Grading
-
-The test orchestrator compares each substrate's `test-answers.json` against the `answer-key.json`:
-
-```
-For each computed column:
-    expected = answer-key.json[record][column]
-    actual   = test-answers.json[record][column]
-
-    if expected == actual: PASS
-    else: FAIL
-```
-
-### Running the Tests
-
-```bash
-# Run full orchestration (all substrates)
-cd orchestration
-./orchestrate.sh
-
-# Run a single substrate
-cd execution-substratrates/xlsx
-./inject-substrate.sh
-```
-
-### Test Artifacts
-
-| File | Location | Purpose |
-|------|----------|---------|
-| `answer-key.json` | `testing/` | Ground truth from PostgreSQL |
-| `blank-test.json` | `testing/` | Test input (nulled computed columns) |
-| `test-answers.json` | `execution-substratrates/*/` | Substrate's computed answers |
-| `test-results.md` | `execution-substratrates/*/` | Per-substrate grade report |
-| `all-tests-results.md` | `orchestration/` | Summary across all substrates |
-
-### Why This Architecture?
-
-1. **Separation of Concerns**: Injection is purely structural (schema → SDK). Testing is purely functional (compute → compare).
-
-2. **100% Domain Agnosticism**: The injection and test-runner scripts work for ANY rulebook. They contain:
-   - **Zero domain-specific words** (no "language", "grammar", "syntax", etc.)
-   - **Zero domain-specific logic** (no special cases for this rulebook)
-   - **Only generic translation** (rulebook entities → target language constructs)
-
-3. **"Follow Along" Principle**: When the rulebook changes, everything else automatically follows:
-   - **New entity?** Injector generates new struct/class/table
-   - **New field?** Injector adds it to the entity structure
-   - **New formula?** Injector generates new `Calc*()` function
-   - **New test data?** Test runner processes it without modification
-
-   The infrastructure never needs domain-specific updates—it just translates whatever the rulebook defines.
-
-4. **Falsifiability**: If a substrate computes a different answer, we know immediately which field failed.
-
-5. **Extensibility**: Adding a new substrate means implementing:
-   - `inject-into-*.py` — generic rulebook → SDK translator
-   - `take-test.py` — generic JSON → SDK → JSON runner
-
-   No changes to the orchestrator, no domain knowledge required.
+1. Create a generator that reads `effortless-rulebook.json`
+2. Emit code with Calc*() functions 1:1 with calculated fields
+3. Implement a test runner that loads `blank-test.json`, runs the calcs, emits `test-answers.json`
+4. Add to orchestration menu
 
 ---
 
-## Fuzzy Evaluation Layer
+## 12. FAQ / Objections
 
-Some substrates cannot directly execute computations—they produce **human-readable specifications**, **diagrams**, or **semantic definitions** instead of runnable code. For these substrates, we introduce an **LLM Fuzzy Grading** layer.
+**"Isn't Airtable the source of truth?"**
+No, Airtable is the UI. The exported `effortless-rulebook.json` is the canonical artifact. You could use any UI that produces the same JSON format.
 
-### Concept
+**"What about non-deterministic substrates?"**
+The orchestration includes a "fuzzy evaluation" mode where an LLM grades whether English/DOCX/UML outputs imply the correct computed values. This is explicitly non-deterministic and marked as such.
 
-The fuzzy evaluation layer uses a Large Language Model (LLM) to:
+**"How is this different from dbt/MetricFlow/DMN/Substrait/etc?"**
+Those tools solve subsets of the problem:
+- dbt/MetricFlow: Metrics → SQL (no multi-language conformance)
+- DMN: Decisions → engine execution (no SQL/Python/Go parity)
+- Substrait: Relational IR (no business rule semantics)
 
-1. **Read** the substrate's specification/output (prose, ontology, diagrams)
-2. **Interpret** the instructions to understand the computation logic
-3. **Infer** what the computed field values should be for each candidate
-4. **Compare** the LLM's inferences against the canonical `answer-key.json`
+ERB integrates these pieces: one IR → multiple substrates → conformance testing → derivation traceability.
 
-This tests whether the non-computational substrate **accurately describes** the computation, even though it cannot execute it directly.
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        FUZZY EVALUATION LAYER                               │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-  ┌─────────────────────┐     ┌─────────────────────┐
-  │   Substrate Output  │     │   blank-test.json   │
-  │  (prose, ontology,  │     │  (raw field values) │
-  │   diagrams, etc.)   │     └──────────┬──────────┘
-  └──────────┬──────────┘                │
-             │                           │
-             ▼                           ▼
-  ┌────────────────────────────────────────────────────┐
-  │                    LLM                              │
-  │                                                     │
-  │  "Based on this specification, what should the     │
-  │   computed values be for this candidate?"           │
-  │                                                     │
-  └──────────────────────┬─────────────────────────────┘
-                         │
-                         ▼
-  ┌─────────────────────────────────────────────────────┐
-  │              test-answers.json                       │
-  │            (LLM-inferred values)                     │
-  └──────────────────────┬──────────────────────────────┘
-                         │
-                         ▼
-  ┌─────────────────────────────────────────────────────┐
-  │              Standard Grading                        │
-  │     (compare against answer-key.json)               │
-  └─────────────────────────────────────────────────────┘
-```
-
-### Why Fuzzy Evaluation?
-
-| Question | Answer |
-|----------|--------|
-| Why not just skip non-computational substrates? | We want to verify that the specification **accurately describes** the computation—a prose description that leads to wrong answers is a bad specification |
-| What does a high score mean? | The specification is clear and precise enough that an LLM can correctly interpret and apply the formulas |
-| What does a low score mean? | The specification may be ambiguous, incomplete, or use terminology that differs from the implementation |
-| Is this deterministic? | No—LLM outputs can vary. Use low temperature (0.1) for consistency. Multiple runs may yield slightly different scores |
-
-### Substrates Using Fuzzy Evaluation
-
-| Substrate | Why Fuzzy? | What Gets Evaluated |
-|-----------|------------|---------------------|
-| **English** | Prose cannot execute | Whether the prose clearly describes formulas an LLM can follow |
-| **DOCX** | Documents cannot execute | Whether the formatted spec accurately describes the computation |
-| **UML** | Diagrams cannot execute | Whether class/method signatures imply correct computation |
-| **OWL** | Limited expressivity (no string ops) | Whether the ontology semantics capture the logic |
-| **RDF** | Limited without SPARQL | Whether the schema + comments describe correct formulas |
-
-### Running Fuzzy Evaluation
-
-The `llm-fuzzy-grader.py` tool in the orchestration folder handles fuzzy evaluation:
-
-```bash
-cd orchestration
-
-# Evaluate a specific substrate
-python llm-fuzzy-grader.py english --provider openai --write-answers
-python llm-fuzzy-grader.py docx --provider anthropic --write-answers
-python llm-fuzzy-grader.py uml --provider ollama --write-answers
-
-# Options:
-#   --provider: openai | anthropic | ollama
-#   --write-answers: Generate test-answers.json for standard grading
-#   --sample N: Only evaluate N records (for testing)
-#   --verbose: Show detailed progress
-```
-
-### Supported LLM Providers
-
-| Provider | Model | Requires |
-|----------|-------|----------|
-| `openai` | GPT-4o | `OPENAI_API_KEY` environment variable |
-| `anthropic` | Claude Sonnet | `ANTHROPIC_API_KEY` environment variable |
-| `ollama` | Llama 3.2 (local) | Ollama running on localhost:11434 |
-
-### Fuzzy Grading Output
-
-Each fuzzy-evaluated substrate receives:
-
-| File | Purpose |
-|------|---------|
-| `test-answers.json` | LLM-inferred values (integrates with standard grading) |
-| `fuzzy-grading-report.md` | Detailed report showing inferences and mismatches |
+**"What about versioning/time-travel?"**
+The rulebook is a JSON file—version it with git. Derivation functions are deterministic, so you can replay any version.
 
 ---
 
-## Quick Start
+## 13. What's Next / Roadmap
 
-### Run the Python SDK
-
-```bash
-cd execution-substratrates/python
-./run.sh
-```
-
-Or directly:
-```bash
-python erb_sdk.py
-```
-
-Output:
-```
-Loaded 25 language candidates
-
-First candidate: English
-  language_candidate_id: english
-  name: English
-  top_family_feud_answer: True
-  family_feud_mismatch: None
-  ...
-```
-
-### Query the PostgreSQL View
-
-```sql
--- See all candidates with computed classification
-SELECT name, category, top_family_feud_answer, family_feud_mismatch
-FROM vw_language_candidates
-ORDER BY sort_order;
-
--- Find mismatches between computed and marked
-SELECT name, family_feud_mismatch
-FROM vw_language_candidates
-WHERE family_feud_mismatch IS NOT NULL;
-```
+- [ ] Property-based test generation from the rulebook
+- [ ] Explanation artifacts (emit derivation DAG as queryable data)
+- [ ] More substrates (SPARQL execution, DOCX export)
+- [ ] Bi-temporal support (valid-time + transaction-time)
+- [ ] Complete binary substrate implementation
 
 ---
 
-## Architecture
+## 14. Further Reading
 
-This project follows the **Effortless Rulebook (ERB)** pattern:
+### Deep-Dive Documentation
 
-```
-Airtable (Source of Truth)
-         ↓
-effortless-rulebook.json (CMCC format)
-         ↓
-Code Generation (ssotme transpilers)
-         ↓
-12+ Execution Layers (all implementing the same logic)
-```
+| Document | Description |
+|----------|-------------|
+| **[README.ARGUMENT.md](README.ARGUMENT.md)** | The philosophical foundation: predicates, evaluation matrix, the full argument about what constitutes "language" |
+| **[README.TECHNICAL.md](README.TECHNICAL.md)** | Implementation deep dive: testing architecture, substrate details, fuzzy evaluation, transpilers |
+| **[README.SCHEMA.md](README.SCHEMA.md)** | Schema reference for the rulebook format |
 
-For schema details, see [README.SCHEMA.md](README.SCHEMA.md).
+### Article Series
 
----
+See the [`docs/`](docs/) folder for 20+ deep-dive articles:
 
-## Transpilers
+| Article | Topic |
+|---------|-------|
+| [Article 01](docs/Article01-The-Single-Source-of-Truth-Problem/) | The Single Source of Truth Problem |
+| [Article 02](docs/Article02-The-Airtable-Rulebook/) | The Airtable Rulebook |
+| [Article 03](docs/Article03-The-Orchestration-Layer/) | The Orchestration Layer |
+| [Article 04](docs/Article04-The-Formula-Compilation-Pipeline/) | The Formula Compilation Pipeline |
+| [Article 05](docs/Article05-PostgreSQL/) | PostgreSQL Substrate |
+| [Article 06](docs/Article06-The-Python-Substrate/) | Python Substrate |
+| [Article 07](docs/Article07-Excel-XLSX/) | Excel/XLSX Substrate |
+| [Article 08](docs/Article08-OWL-RDF-and-SHACL/) | OWL, RDF, and SHACL |
+| [Article 09](docs/Article09-The-Binary-Substrate/) | The Binary Substrate |
+| [Article 10](docs/Article10-SPARQL/) | SPARQL |
+| [Article 11](docs/Article11-GraphQL/) | GraphQL |
+| [Article 12](docs/Article12-Go-and-Golang/) | Go/Golang Substrate |
+| [Article 13](docs/Article13-UML-and-PlantUML/) | UML and PlantUML |
+| [Article 14](docs/Article14-The-English-Substrate/) | The English Substrate |
+| [Article 15](docs/Article15-The-Invariant-System/) | The Invariant System |
+| [Article 16](docs/Article16-Falsifiers-and-the-Scientific-Method/) | Falsifiers and the Scientific Method |
+| [Article 17](docs/Article17-The-CMCC-Conjecture/) | The CMCC Conjecture |
+| [Article 18](docs/Article18-Flatland-vs-Spaceland/) | Flatland vs Spaceland |
+| [Article 19](docs/Article19-The-M4-Layer/) | The M4 Layer |
+| [Article 20](docs/Article20-Past-Present-and-Future-Languages/) | Past, Present, and Future Languages |
 
-The build pipeline uses `ssotme` transpilers to generate all execution layers from the single source of truth. Each transpiler reads from `effortless-rulebook.json` and produces a specific output format.
+### Downloadable Artifacts
 
-### Source Sync
-
-| Transpiler | Direction | Description |
-|------------|-----------|-------------|
-| `airtabletorulebook` | Airtable → JSON | Pulls schema + data from Airtable into [effortless-rulebook.json](effortless-rulebook/effortless-rulebook.json) |
-| `rulebooktoairtable` | JSON → Airtable | Pushes local changes back to Airtable (disabled by default) |
-
-### Code Generation
-
-| Transpiler | Output | README |
-|------------|--------|--------|
-| `rulebooktopostgres` | PostgreSQL DDL (tables, functions, views, policies, data) | [postgres/README.md](postgres/README.md) |
-| `rulebooktopython` | Python SDK with dataclasses | [execution-substratrates/python/README.md](execution-substratrates/python/README.md) |
-| `rulebooktogolang` | Go structs with calc methods | [execution-substratrates/golang/README.md](execution-substratrates/golang/README.md) |
-| `rulebooktoenglish` | Human-readable specification | [execution-substratrates/english/README.md](execution-substratrates/english/README.md) |
-| `rulebooktographql` | GraphQL schema + resolvers | [execution-substratrates/graphql/README.md](execution-substratrates/graphql/README.md) |
-| `rulebooktordf` | RDF/Turtle linked data | [execution-substratrates/rdf/README.md](execution-substratrates/rdf/README.md) |
-| `rulebooktoowl` | OWL semantic web ontology | [execution-substratrates/owl/README.md](execution-substratrates/owl/README.md) |
-| `rulebooktoyaml` | YAML schema (LLM-friendly) | [execution-substratrates/yaml/README.md](execution-substratrates/yaml/README.md) |
-| `rulebooktocsv` | CSV field definitions | [execution-substratrates/csv/README.md](execution-substratrates/csv/README.md) |
-| `rulebooktouml` | UML entity diagrams | [execution-substratrates/uml/README.md](execution-substratrates/uml/README.md) |
-| `rulebooktodocx` | Word document export | [execution-substratrates/docx/README.md](execution-substratrates/docx/README.md) |
-| `rulebooktobinary` | Binary schema encoding | [execution-substratrates/binary/README.md](execution-substratrates/binary/README.md) |
-
-### Utility
-
-| Transpiler | Description |
-|------------|-------------|
-| `init-db` | Runs [postgres/init-db.sh](postgres/init-db.sh) to initialize the database |
-| `JsonHbarsTransform` | Generates [README.SCHEMA.md](README.SCHEMA.md) from Handlebars template |
-
-### Running Transpilers
-
-```bash
-# Build all transpilers
-ssotme -buildall
-
-# Build a specific transpiler
-ssotme -build rulebooktopython
-
-# Build with dependencies disabled (faster)
-ssotme -build -id
-```
-
-See [ssotme.json](ssotme.json) for full configuration.
+| Artifact | Description |
+|----------|-------------|
+| [`effortless-rulebook.json`](effortless-rulebook/effortless-rulebook.json) | The canonical rulebook (JSON) |
+| [`rulebook.xlsx`](execution-substrates/xlsx/rulebook.xlsx) | Excel workbook with live formulas |
+| [`language_candidates.csv`](execution-substrates/csv/language_candidates.csv) | Flat CSV of all candidates |
+| [`specification.md`](execution-substrates/english/specification.md) | Human-readable English specification |
 
 ---
 
-## Known Quirks
+## 15. Contributing / License
 
-### The "fued" Typo
+Contributions welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-The field `family_fued_question` contains a typo ("fued" instead of "feud"), while `top_family_feud_answer` uses the correct spelling. This inconsistency originates from the Airtable source of truth and is preserved across all substrates for consistency.
+License: [MIT](LICENSE)
 
 ---
 

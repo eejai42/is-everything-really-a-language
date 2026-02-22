@@ -34,7 +34,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 TESTING_DIR = os.path.join(PROJECT_ROOT, "testing")
 ANSWER_KEYS_DIR = os.path.join(TESTING_DIR, "answer-keys")
 BLANK_TESTS_DIR = os.path.join(TESTING_DIR, "blank-tests")
-SUBSTRATES_DIR = os.path.join(PROJECT_ROOT, "execution-substratrates")
+SUBSTRATES_DIR = os.path.join(PROJECT_ROOT, "execution-substrates")
 RULEBOOK_DIR = os.path.join(PROJECT_ROOT, "effortless-rulebook")
 RULEBOOK_PATH = os.path.join(RULEBOOK_DIR, "effortless-rulebook.json")
 SUMMARY_PATH = os.path.join(SCRIPT_DIR, "all-tests-results.md")
@@ -158,7 +158,6 @@ def update_run_metadata(substrate_name: str, grades: dict, success: bool, error_
 
     # Always update last_run (even if it failed or got < 100%)
     run_record = {
-        "timestamp": timestamp,
         "status": "success" if success else "failure",
         "duration_seconds": elapsed,
         "exit_code": 0 if success else 1,
@@ -173,7 +172,6 @@ def update_run_metadata(substrate_name: str, grades: dict, success: bool, error_
     # This preserves the previous duration/results if current run fails or scores < 100%
     if success and total > 0 and score >= 100.0:
         metadata["last_successful_run"] = {
-            "timestamp": timestamp,
             "duration_seconds": elapsed,
             "status": "success",
             "test_results": {
@@ -198,7 +196,7 @@ def to_snake_case(name: str) -> str:
 
 
 def to_pascal_case(name: str) -> str:
-    """Convert snake_case to PascalCase: language_candidates -> LanguageCandidates"""
+    """Convert snake_case to PascalCase: user_accounts -> UserAccounts"""
     return ''.join(word.capitalize() for word in name.split('_'))
 
 
@@ -296,7 +294,7 @@ def discover_views(conn) -> list:
 
 
 def view_to_entity_name(view_name: str) -> str:
-    """Convert view name to entity name: vw_language_candidates -> language_candidates"""
+    """Convert view name to entity name: vw_products -> products"""
     return view_name.replace('vw_', '')
 
 

@@ -3,35 +3,34 @@
 ## Configuration
 
 - **Rulebook:** `/Users/eejai42/effortlessapi-app-root/users/user_ee42ai73-18a9-47d5-8f99-954b00f6c041/my-projects/ERB_effortless-rulebook-starter/effortless-rulebook/effortless-rulebook.json`
-- **Substrates Tested:** 11
-- **Computed Columns Tested:** 9
+- **Substrates Tested:** 10
+- **Computed Columns Tested:** 8
 
 ## Summary by Substrate
 
 | Substrate | Passed | Failed | Total | Score | Duration | Status |
 |-----------|--------|--------|-------|-------|----------|--------|
-| uml | 200 | 0 | 200 | 100.0% | 0.1s | PASS |
-| yaml | 200 | 0 | 200 | 100.0% | 0.1s | PASS |
-| python | 200 | 0 | 200 | 100.0% | 0.1s | PASS |
-| graphql | 200 | 0 | 200 | 100.0% | 0.1s | PASS |
-| rdf | 200 | 0 | 200 | 100.0% | 0.2s | PASS |
-| owl | 200 | 0 | 200 | 100.0% | 0.2s | PASS |
-| golang | 200 | 0 | 200 | 100.0% | 0.2s | PASS |
-| csv | 200 | 0 | 200 | 100.0% | 0.3s | PASS |
-| xlsx | 200 | 0 | 200 | 100.0% | 0.3s | PASS |
-| english | 200 | 0 | 200 | 100.0% | 46.4s | PASS |
-| binary | 116 | 84 | 200 | 58.0% | 0.3s | FAIL |
+| uml | 184 | 0 | 184 | 100.0% | 0.1s | PASS |
+| yaml | 184 | 0 | 184 | 100.0% | 0.1s | PASS |
+| explain-dag | 184 | 0 | 184 | 100.0% | 0.1s | PASS |
+| python | 184 | 0 | 184 | 100.0% | 0.1s | PASS |
+| csv | 184 | 0 | 184 | 100.0% | 0.3s | PASS |
+| golang | 184 | 0 | 184 | 100.0% | 0.3s | PASS |
+| xlsx | 184 | 0 | 184 | 100.0% | 0.3s | PASS |
+| owl | 184 | 0 | 184 | 100.0% | 11.1s | PASS |
+| binary | 147 | 37 | 184 | 79.9% | 0.3s | FAIL |
+| english | 145 | 39 | 184 | 78.8% | 2m 50.6s | FAIL |
 
 ## Overall Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Substrates | 11 |
-| Total Fields Tested | 2200 |
-| Total Passed | 2116 |
-| Total Failed | 84 |
-| Overall Score | 96.2% |
-| Total Duration | 48.2s |
+| Total Substrates | 10 |
+| Total Fields Tested | 1840 |
+| Total Passed | 1764 |
+| Total Failed | 76 |
+| Overall Score | 95.9% |
+| Total Duration | 3m 3.3s |
 
 ---
 

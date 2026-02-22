@@ -15,7 +15,7 @@ Modern APIs speak GraphQL. This article shows how ERB generates both the SDL sch
 ### 2. The Generated Files
 
 ```
-execution-substratrates/graphql/
+execution-substrates/graphql/
 ├── schema.graphql         # Type definitions (SDL)
 ├── resolvers.js           # JavaScript resolver functions
 ├── inject-into-graphql.py # Code generator
@@ -323,10 +323,10 @@ Generate Hasura metadata from the schema; use computed fields.
 
 | File | Purpose |
 |------|---------|
-| [schema.graphql](../../execution-substratrates/graphql/schema.graphql) | Type definitions |
-| [resolvers.js](../../execution-substratrates/graphql/resolvers.js) | Resolver functions |
-| [inject-into-graphql.py](../../execution-substratrates/graphql/inject-into-graphql.py) | Generator |
-| [take-test.py](../../execution-substratrates/graphql/take-test.py) | Test runner |
+| [schema.graphql](../../execution-substrates/graphql/schema.graphql) | Type definitions |
+| [resolvers.js](../../execution-substrates/graphql/resolvers.js) | Resolver functions |
+| [inject-into-graphql.py](../../execution-substrates/graphql/inject-into-graphql.py) | Generator |
+| [take-test.py](../../execution-substrates/graphql/take-test.py) | Test runner |
 
 ---
 

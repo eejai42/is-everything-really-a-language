@@ -26,7 +26,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 TESTING_DIR = os.path.join(PROJECT_ROOT, "testing")
 ANSWER_KEYS_DIR = os.path.join(TESTING_DIR, "answer-keys")
 BLANK_TESTS_DIR = os.path.join(TESTING_DIR, "blank-tests")
-SUBSTRATES_DIR = os.path.join(PROJECT_ROOT, "execution-substratrates")
+SUBSTRATES_DIR = os.path.join(PROJECT_ROOT, "execution-substrates")
 RULEBOOK_DIR = os.path.join(PROJECT_ROOT, "effortless-rulebook")
 RULEBOOK_PATH = os.path.join(RULEBOOK_DIR, "effortless-rulebook.json")
 POSTGRES_DIR = os.path.join(PROJECT_ROOT, "postgres")
@@ -346,15 +346,14 @@ def collect_all_data():
         all_grades[substrate] = grades
 
     # Build report data structure
-    # Use model_name (Airtable base ID) as the project identifier
-    model_name = rulebook.get("model_name", os.path.basename(PROJECT_ROOT))
+    # Use Name from rulebook as the report title, fallback to directory name
+    rulebook_name = rulebook.get("Name", os.path.basename(PROJECT_ROOT))
     report_data = {
         "meta": {
-            "generated_at": datetime.now().isoformat(),
-            "project_name": model_name,  # Now uses Airtable base ID
+            "project_name": rulebook_name,
             "directory_name": os.path.basename(PROJECT_ROOT),
             "rulebook_path": RULEBOOK_PATH,
-            "model_name": model_name,
+            "rulebook_name": rulebook_name,
             "rulebook_description": rulebook.get("Description", "")
         },
         "summary": {
@@ -432,7 +431,7 @@ def generate_html(data: dict) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orchestration Report - {escape(data["meta"]["project_name"])}</title>
+    <title>{escape(data["meta"]["project_name"])}</title>
     <style>
 {get_css()}
     </style>
@@ -440,10 +439,9 @@ def generate_html(data: dict) -> str:
 <body>
     <header>
         <div class="header-content">
-            <h1>Orchestration Report</h1>
+            <h1>{escape(data["meta"]["project_name"])}</h1>
             <div class="header-meta">
-                <span class="project-name">{escape(data["meta"]["project_name"])}</span>
-                <span class="timestamp">{escape(data["meta"]["generated_at"][:19].replace('T', ' '))}</span>
+                <span class="project-name">Orchestration Report</span>
             </div>
         </div>
         <button id="theme-toggle" title="Toggle dark/light mode">
@@ -761,7 +759,7 @@ def generate_failure_details(data: dict) -> str:
 
 
 def get_css() -> str:
-    """Return embedded CSS"""
+    """Return embedded CSS - Desktop optimized with compact tables"""
     return '''
 :root {
     --bg-primary: #ffffff;
@@ -776,7 +774,7 @@ def get_css() -> str:
     --danger-color: #dc3545;
     --master-color: #6f42c1;
     --shadow: 0 2px 8px rgba(0,0,0,0.1);
-    --radius: 8px;
+    --radius: 6px;
 }
 
 [data-theme="dark"] {
@@ -794,24 +792,20 @@ def get_css() -> str:
     --shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    line-height: 1.6;
+    line-height: 1.4;
     min-height: 100vh;
 }
 
 header {
     background: var(--bg-primary);
     border-bottom: 1px solid var(--border-color);
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -821,42 +815,21 @@ header {
     box-shadow: var(--shadow);
 }
 
-.header-content h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.header-meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-.project-name {
-    font-weight: 500;
-}
+.header-content h1 { font-size: 1.25rem; font-weight: 600; }
+.header-meta { display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-secondary); }
+.project-name { font-weight: 500; }
 
 #theme-toggle {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 32px; height: 32px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
     transition: all 0.2s;
 }
-
-#theme-toggle:hover {
-    background: var(--accent-color);
-    color: white;
-}
-
+#theme-toggle:hover { background: var(--accent-color); color: white; }
 #theme-toggle .moon { display: none; }
 [data-theme="dark"] #theme-toggle .sun { display: none; }
 [data-theme="dark"] #theme-toggle .moon { display: inline; }
@@ -865,94 +838,63 @@ header {
     display: flex;
     gap: 0;
     background: var(--bg-primary);
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
 }
 
 .tab {
     background: none;
     border: none;
-    padding: 1rem 1.5rem;
+    padding: 0.6rem 1.25rem;
     cursor: pointer;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     color: var(--text-secondary);
     border-bottom: 2px solid transparent;
     transition: all 0.2s;
+    white-space: nowrap;
 }
-
-.tab:hover {
-    color: var(--text-primary);
-    background: var(--bg-secondary);
-}
-
-.tab.active {
-    color: var(--accent-color);
-    border-bottom-color: var(--accent-color);
-    font-weight: 500;
-}
+.tab:hover { color: var(--text-primary); background: var(--bg-secondary); }
+.tab.active { color: var(--accent-color); border-bottom-color: var(--accent-color); font-weight: 500; }
 
 main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
+    padding: 1rem 1.5rem;
+    width: 100%;
 }
 
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .stat-card {
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    padding: 1.5rem;
+    padding: 0.75rem 1.25rem;
     text-align: center;
     box-shadow: var(--shadow);
+    min-width: 140px;
 }
 
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
+.stat-value { font-size: 1.5rem; font-weight: 700; }
+.stat-label { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 
 .score-perfect { color: var(--success-color); }
 .score-good { color: var(--success-color); }
 .score-warning { color: var(--warning-color); }
 .score-danger { color: var(--danger-color); }
 
-h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-}
+h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--text-primary); }
 
-.matrix-container {
+/* Matrix and table containers - horizontal scroll */
+.matrix-container, .table-scroll {
     overflow-x: auto;
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
@@ -961,14 +903,14 @@ h2 {
 }
 
 .health-matrix {
-    width: 100%;
     border-collapse: collapse;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
 .health-matrix th,
 .health-matrix td {
-    padding: 0.75rem 1rem;
+    padding: 0.4rem 0.75rem;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
 }
@@ -977,426 +919,206 @@ h2 {
     background: var(--bg-tertiary);
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     letter-spacing: 0.05em;
     color: var(--text-secondary);
 }
 
-.health-matrix .substrate-name {
-    text-align: left;
-    font-weight: 500;
-}
+.health-matrix .substrate-name { text-align: left; font-weight: 500; }
+.health-matrix .entity-col { min-width: 80px; }
 
-.health-matrix .entity-col {
-    min-width: 100px;
-}
+.cell-pass { background: rgba(25, 135, 84, 0.15); color: var(--success-color); font-weight: 600; }
+.cell-fail { background: rgba(220, 53, 69, 0.15); color: var(--danger-color); font-weight: 600; cursor: pointer; }
+.cell-fail:hover { background: rgba(220, 53, 69, 0.25); }
+.cell-na { color: var(--text-secondary); }
+.cell-master { background: rgba(111, 66, 193, 0.15); color: var(--master-color); font-weight: 600; }
+.master-row { background: rgba(111, 66, 193, 0.05); }
+.master-row .substrate-name { color: var(--master-color); }
+.restored-row { background: rgba(255, 193, 7, 0.08); }
+.warning-badge { color: var(--warning-color); font-size: 0.85rem; cursor: help; margin-left: 0.25rem; }
+.score-cell { font-weight: 600; }
+.time-cell { color: var(--text-secondary); font-family: monospace; font-size: 0.75rem; }
 
-.cell-pass {
-    background: rgba(25, 135, 84, 0.15);
-    color: var(--success-color);
-    font-weight: 600;
-}
-
-.cell-fail {
-    background: rgba(220, 53, 69, 0.15);
-    color: var(--danger-color);
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.cell-fail:hover {
-    background: rgba(220, 53, 69, 0.25);
-}
-
-.cell-na {
-    color: var(--text-secondary);
-}
-
-.cell-master {
-    background: rgba(111, 66, 193, 0.15);
-    color: var(--master-color);
-    font-weight: 600;
-}
-
-.master-row {
-    background: rgba(111, 66, 193, 0.05);
-}
-
-.master-row .substrate-name {
-    color: var(--master-color);
-}
-
-.restored-row {
-    background: rgba(255, 193, 7, 0.08);
-}
-
-.warning-badge {
-    color: var(--warning-color);
-    font-size: 0.9rem;
-    cursor: help;
-    margin-left: 0.25rem;
-}
-
-.score-cell {
-    font-weight: 600;
-}
-
-.time-cell {
-    color: var(--text-secondary);
-    font-family: monospace;
-}
-
+/* Sub-tabs - horizontal scrolling */
 .sub-tabs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    padding: 0.5rem;
+    gap: 0.35rem;
+    margin-bottom: 1rem;
+    padding: 0.35rem;
     background: var(--bg-tertiary);
     border-radius: var(--radius);
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 .sub-tab {
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
+    padding: 0.35rem 0.75rem;
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
     border-radius: var(--radius);
-    transition: all 0.2s;
+    transition: all 0.15s;
+    flex-shrink: 0;
 }
-
-.sub-tab:hover {
-    color: var(--text-primary);
-    background: var(--bg-secondary);
-    border-color: var(--accent-color);
-}
-
-.sub-tab.active {
-    color: var(--accent-color);
-    background: var(--bg-primary);
-    border-color: var(--accent-color);
-    font-weight: 500;
-}
+.sub-tab:hover { color: var(--text-primary); border-color: var(--accent-color); }
+.sub-tab.active { color: var(--accent-color); border-color: var(--accent-color); font-weight: 500; }
 
 .substrate-links {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .substrate-link {
-    padding: 0.5rem 1rem;
+    padding: 0.35rem 0.75rem;
     border-radius: var(--radius);
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     border: 1px solid var(--border-color);
     background: var(--bg-primary);
-    transition: all 0.2s;
+    transition: all 0.15s;
 }
+.substrate-link:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 
-.substrate-link:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
+.entity-link, .substrate-row-link { cursor: pointer; transition: all 0.15s; }
+.entity-link:hover, .substrate-row-link:hover { color: var(--accent-color) !important; }
 
-.entity-link {
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.entity-link:hover {
-    color: var(--accent-color);
-    background: rgba(13, 110, 253, 0.1);
-}
-
-.substrate-row-link {
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.substrate-row-link:hover {
-    color: var(--accent-color) !important;
-}
-
-#entity-details,
-#substrate-details {
+#entity-details, #substrate-details {
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
-    padding: 1.5rem;
+    padding: 1rem;
     box-shadow: var(--shadow);
 }
 
+/* Compact schema table */
 .schema-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
 }
-
-.schema-table th,
-.schema-table td {
-    padding: 0.75rem;
+.schema-table th, .schema-table td {
+    padding: 0.35rem 0.5rem;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
 }
-
-.schema-table th {
-    background: var(--bg-tertiary);
-    font-weight: 600;
-    font-size: 0.875rem;
-}
-
-.type-raw {
-    color: var(--text-secondary);
-}
-
-.type-calculated {
-    color: var(--accent-color);
-    font-weight: 500;
-}
-
+.schema-table th { background: var(--bg-tertiary); font-weight: 600; }
+.type-raw { color: var(--text-secondary); }
+.type-calculated { color: var(--accent-color); font-weight: 500; }
 .formula-cell {
     font-family: monospace;
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: var(--master-color);
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-
 .desc-cell {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
-    max-width: 200px;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.entity-header {
-    margin-bottom: 1rem;
-}
+.entity-header { margin-bottom: 0.75rem; }
+.entity-header h3 { font-size: 1rem; margin-bottom: 0.25rem; }
 
-.entity-header h3 {
-    margin-bottom: 0.25rem;
-}
-
+/* Compact data table with ellipsis */
 .data-table {
-    width: 100%;
     border-collapse: collapse;
+    font-size: 0.8rem;
 }
-
-.data-table th,
-.data-table td {
-    padding: 0.5rem 0.75rem;
+.data-table th, .data-table td {
+    padding: 0.3rem 0.5rem;
     text-align: left;
     border: 1px solid var(--border-color);
-    font-size: 0.875rem;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
+.data-table th { background: var(--bg-tertiary); font-weight: 600; font-size: 0.75rem; }
+.data-table .computed { background: rgba(13, 110, 253, 0.1); }
 
-.data-table th {
-    background: var(--bg-tertiary);
-    font-weight: 600;
-}
-
-.data-table .computed {
-    background: rgba(13, 110, 253, 0.1);
-}
-
+/* Warnings and failures */
 .warning-banner {
     background: rgba(255, 193, 7, 0.15);
     border: 1px solid var(--warning-color);
-    border-left: 4px solid var(--warning-color);
+    border-left: 3px solid var(--warning-color);
     border-radius: var(--radius);
-    padding: 1rem;
-    margin-bottom: 1rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
 }
-
-.warning-banner strong {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--warning-color);
-}
-
-.warning-banner p {
-    margin: 0.25rem 0;
-    font-size: 0.875rem;
-}
-
-.warning-banner code {
-    background: var(--bg-tertiary);
-    padding: 0.125rem 0.375rem;
-    border-radius: 3px;
-    font-size: 0.8125rem;
-}
+.warning-banner strong { color: var(--warning-color); margin-right: 0.5rem; }
+.warning-banner code { background: var(--bg-tertiary); padding: 0.1rem 0.25rem; border-radius: 3px; font-size: 0.75rem; }
 
 .failure-card {
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
-    border-left: 4px solid var(--danger-color);
+    border-left: 3px solid var(--danger-color);
     border-radius: var(--radius);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow);
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
 }
 
-.failure-header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.9375rem;
-}
+code.expected { background: rgba(25, 135, 84, 0.15); color: var(--success-color); padding: 0.1rem 0.25rem; border-radius: 3px; }
+code.actual { background: rgba(220, 53, 69, 0.15); color: var(--danger-color); padding: 0.1rem 0.25rem; border-radius: 3px; }
 
-.failure-substrate {
-    font-weight: 600;
-    color: var(--accent-color);
-}
+.no-failures, .no-results { text-align: center; padding: 1.5rem; color: var(--text-secondary); }
 
-.failure-arrow {
-    color: var(--text-secondary);
-}
+/* Substrate info bar */
+.substrate-info { margin-bottom: 1rem; }
+.substrate-info h3 { font-size: 1.1rem; margin-bottom: 0.25rem; }
+.substrate-stats { display: flex; gap: 1.5rem; font-size: 0.85rem; }
+.substrate-stat { display: flex; gap: 0.35rem; align-items: center; }
+.substrate-stat-label { color: var(--text-secondary); }
+.substrate-stat-value { font-weight: 600; }
 
-.failure-entity {
-    font-weight: 500;
-}
-
-.failure-field {
-    font-family: monospace;
-    color: var(--danger-color);
-}
-
-.failure-body {
-    font-size: 0.875rem;
-}
-
-.failure-row {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
-}
-
-.failure-label {
-    font-weight: 500;
-    min-width: 80px;
-    color: var(--text-secondary);
-}
-
-.failure-value {
-    font-family: monospace;
-}
-
-code.expected {
-    background: rgba(25, 135, 84, 0.15);
-    color: var(--success-color);
-    padding: 0.125rem 0.375rem;
-    border-radius: 4px;
-}
-
-code.actual {
-    background: rgba(220, 53, 69, 0.15);
-    color: var(--danger-color);
-    padding: 0.125rem 0.375rem;
-    border-radius: 4px;
-}
-
-.no-failures {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-secondary);
-    font-size: 1.125rem;
-}
-
-.more-failures {
-    text-align: center;
-    padding: 1rem;
-    color: var(--text-secondary);
-    font-style: italic;
-}
-
-.substrate-info {
-    margin-bottom: 1.5rem;
-}
-
-.substrate-stats {
-    display: flex;
-    gap: 2rem;
-    margin-top: 0.5rem;
-}
-
-.substrate-stat {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
-.substrate-stat-label {
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.substrate-stat-value {
-    font-weight: 600;
-}
-
-details {
-    margin-bottom: 1rem;
-}
-
+/* Collapsible schema/formula section */
+details { margin-bottom: 0.75rem; }
 summary {
     cursor: pointer;
     font-weight: 500;
-    padding: 0.5rem;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
     background: var(--bg-tertiary);
     border-radius: var(--radius);
     user-select: none;
+    display: inline-block;
 }
-
-summary:hover {
-    background: var(--bg-secondary);
-}
-
-details[open] summary {
-    margin-bottom: 0.5rem;
-}
+summary:hover { background: var(--bg-secondary); }
+details[open] summary { margin-bottom: 0.5rem; }
 
 footer {
     text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    border-top: 1px solid var(--border-color);
-    margin-top: 2rem;
-}
-
-@media (max-width: 768px) {
-    header {
-        padding: 1rem;
-    }
-
-    .tabs {
-        padding: 0 1rem;
-        overflow-x: auto;
-    }
-
-    main {
-        padding: 1rem;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .stat-value {
-        font-size: 1.5rem;
-    }
-}
-
-/* Graded Test Table Styles */
-.entity-test-section {
-    margin-bottom: 2rem;
     padding: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1.5rem;
+}
+
+/* Entity tabs within substrate view */
+.entity-tabs-container { margin-bottom: 1rem; }
+.entity-tab-content { display: none; }
+.entity-tab-content.active { display: block; }
+
+/* Graded test table - COMPACT */
+.entity-test-section {
     background: var(--bg-secondary);
     border-radius: var(--radius);
     border: 1px solid var(--border-color);
+    padding: 0.75rem;
 }
 
 .entity-test-header {
@@ -1405,71 +1127,80 @@ footer {
     align-items: center;
     margin-bottom: 0.5rem;
 }
-
-.entity-name {
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
+.entity-name { font-size: 1rem; font-weight: 600; }
 .entity-score {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 4px;
     background: var(--bg-tertiary);
 }
 
 .entity-description {
     color: var(--text-secondary);
-    font-size: 0.875rem;
-    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
     font-style: italic;
 }
 
+/* Computed columns - hidden in collapsible */
 .computed-cols-info {
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    background: var(--bg-primary);
-    border-radius: 4px;
-    font-size: 0.875rem;
-}
-
-.computed-cols-info ul {
-    margin: 0.5rem 0 0 1.5rem;
-    padding: 0;
-}
-
-.computed-cols-info li {
-    margin-bottom: 0.25rem;
-}
-
-.computed-cols-info .formula {
-    font-family: monospace;
-    color: var(--master-color);
-    background: var(--bg-tertiary);
-    padding: 0.125rem 0.375rem;
-    border-radius: 3px;
-}
-
-.graded-test-table {
-    width: 100%;
-    border-collapse: collapse;
+    font-size: 0.8rem;
+    padding: 0.5rem;
     background: var(--bg-primary);
     border-radius: var(--radius);
-    overflow: hidden;
+}
+.computed-cols-info ul { margin: 0.5rem 0 0 0; padding: 0; list-style: none; }
+.computed-cols-info li {
+    margin-bottom: 0.35rem;
+    padding: 0.35rem 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    border-left: 2px solid var(--accent-color);
+}
+.computed-cols-info .field-name {
+    font-weight: 600;
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--accent-color);
+}
+.computed-cols-info .formula-row { display: block; margin-top: 0.25rem; }
+.computed-cols-info .formula-label { color: var(--text-secondary); font-size: 0.7rem; text-transform: uppercase; margin-right: 0.35rem; }
+.computed-cols-info .formula {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--master-color);
+    background: var(--bg-tertiary);
+    padding: 0.15rem 0.35rem;
+    border-radius: 3px;
+}
+.computed-cols-info .desc-row { display: block; color: var(--text-secondary); font-size: 0.75rem; font-style: italic; margin-top: 0.15rem; }
+
+/* Graded test table - VERY COMPACT with ellipsis */
+.graded-test-table {
+    border-collapse: collapse;
+    background: var(--bg-primary);
+    font-size: 0.8rem;
 }
 
 .graded-test-table th,
 .graded-test-table td {
-    padding: 0.75rem;
+    padding: 0.3rem 0.5rem;
     text-align: left;
     border: 1px solid var(--border-color);
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .graded-test-table th {
     background: var(--bg-tertiary);
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
+    position: sticky;
+    top: 0;
 }
 
 .graded-test-table .computed-col-header {
@@ -1481,74 +1212,51 @@ footer {
     font-family: monospace;
     font-weight: 500;
     background: var(--bg-secondary);
+    max-width: 180px;
 }
 
 .graded-test-table .cell-passed {
-    background: rgba(25, 135, 84, 0.1);
+    background: rgba(25, 135, 84, 0.08);
 }
-
 .graded-test-table .cell-passed .check-mark {
     color: var(--success-color);
     font-weight: bold;
-    margin-right: 0.5rem;
+    margin-right: 0.25rem;
 }
-
 .graded-test-table .cell-passed code {
     font-family: monospace;
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: var(--text-primary);
 }
 
 .graded-test-table .cell-failed {
     background: rgba(220, 53, 69, 0.1);
-    padding: 0.5rem;
 }
-
-.graded-test-table .expected-actual {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.25rem;
+.graded-test-table .cell-failed .expected-actual {
+    display: block;
+    font-size: 0.7rem;
+    margin-bottom: 0.1rem;
 }
-
-.graded-test-table .expected-actual:last-child {
-    margin-bottom: 0;
-}
-
-.graded-test-table .expected-label,
-.graded-test-table .actual-label {
-    font-size: 0.75rem;
+.graded-test-table .cell-failed .expected-actual:last-child { margin-bottom: 0; }
+.graded-test-table .expected-label, .graded-test-table .actual-label {
     font-weight: 500;
-    min-width: 60px;
     color: var(--text-secondary);
+    margin-right: 0.25rem;
 }
 
-.no-results {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
-}
+/* Tooltip for full text on hover */
+[title] { cursor: help; }
 
 @media print {
-    header, .tabs, footer {
-        display: none;
-    }
-
-    .tab-content {
-        display: block !important;
-        page-break-after: always;
-    }
-
-    body {
-        background: white;
-        color: black;
-    }
+    header, .tabs, footer { display: none; }
+    .tab-content { display: block !important; }
+    body { background: white; color: black; }
 }
 '''
 
 
 def get_javascript() -> str:
-    """Return embedded JavaScript"""
+    """Return embedded JavaScript - Desktop optimized with entity tabs"""
     return '''
 // Theme toggle
 const themeToggle = document.getElementById('theme-toggle');
@@ -1564,28 +1272,65 @@ themeToggle.addEventListener('click', () => {
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
 });
 
-// Storage keys
-const STORAGE_KEYS = {
-    selectedEntity: 'erb-selected-entity',
-    selectedSubstrate: 'erb-selected-substrate'
-};
+// URL-BASED ROUTING
+function parseUrlHash() {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return { tab: 'overview', item: null };
+    const parts = hash.split('/');
+    return { tab: parts[0] || 'overview', item: parts[1] ? decodeURIComponent(parts[1]) : null };
+}
 
-// Main tab navigation with memory
-const mainTabs = document.querySelectorAll('#main-tabs .tab');
-const tabContents = document.querySelectorAll('.tab-content');
+function updateUrlHash(tab, item = null) {
+    const hash = item ? `${tab}/${encodeURIComponent(item)}` : tab;
+    history.replaceState(null, '', `#${hash}`);
+}
 
-function switchToMainTab(tabId) {
+window.addEventListener('hashchange', () => {
+    const state = parseUrlHash();
+    navigateToState(state, false);
+});
+
+function navigateToState(state, updateUrl = true) {
+    const { tab, item } = state;
     mainTabs.forEach(t => t.classList.remove('active'));
     tabContents.forEach(c => c.classList.remove('active'));
 
-    const targetTab = document.querySelector(`#main-tabs .tab[data-tab="${tabId}"]`);
+    const targetTab = document.querySelector(`#main-tabs .tab[data-tab="${tab}"]`);
     if (targetTab) targetTab.classList.add('active');
-    document.getElementById(tabId)?.classList.add('active');
+    document.getElementById(tab)?.classList.add('active');
+
+    if (tab === 'entities' && item) selectEntityTabNoUrl(item);
+    else if (tab === 'substrates' && item) selectSubstrateTabNoUrl(item);
+    else if (tab === 'entities') {
+        const entities = Object.keys(REPORT_DATA.entities).sort();
+        if (entities.length > 0) selectEntityTabNoUrl(entities[0]);
+    } else if (tab === 'substrates') {
+        const substrates = Object.keys(REPORT_DATA.substrates).sort();
+        if (substrates.length > 0) selectSubstrateTabNoUrl(substrates[0]);
+    }
+
+    if (updateUrl) updateUrlHash(tab, item);
 }
+
+const mainTabs = document.querySelectorAll('#main-tabs .tab');
+const tabContents = document.querySelectorAll('.tab-content');
 
 mainTabs.forEach(tab => {
     tab.addEventListener('click', () => {
-        switchToMainTab(tab.dataset.tab);
+        const tabId = tab.dataset.tab;
+        mainTabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tabId)?.classList.add('active');
+        updateUrlHash(tabId);
+
+        if (tabId === 'entities') {
+            const entities = Object.keys(REPORT_DATA.entities).sort();
+            if (entities.length > 0) selectEntityTab(entities[0]);
+        } else if (tabId === 'substrates') {
+            const substrates = Object.keys(REPORT_DATA.substrates).sort();
+            if (substrates.length > 0) selectSubstrateTab(substrates[0]);
+        }
     });
 });
 
@@ -1593,82 +1338,70 @@ mainTabs.forEach(tab => {
 const entityTabs = document.querySelectorAll('#entity-tabs .sub-tab');
 const entityDetails = document.getElementById('entity-details');
 
-function selectEntityTab(entityName) {
-    // Update tab active state
+function selectEntityTabNoUrl(entityName) {
     entityTabs.forEach(t => t.classList.remove('active'));
     const targetTab = document.querySelector(`#entity-tabs .sub-tab[data-entity="${entityName}"]`);
     if (targetTab) targetTab.classList.add('active');
-
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEYS.selectedEntity, entityName);
-
-    // Render details
     renderEntityDetails(entityName);
+}
+
+function selectEntityTab(entityName) {
+    selectEntityTabNoUrl(entityName);
+    updateUrlHash('entities', entityName);
 }
 
 function renderEntityDetails(entityName) {
     const entity = REPORT_DATA.entities[entityName];
-    if (!entity) {
-        entityDetails.innerHTML = '<p>Entity not found</p>';
-        return;
-    }
+    if (!entity) { entityDetails.innerHTML = '<p>Entity not found</p>'; return; }
 
-    // Entity header with description
-    let html = `<div class="entity-header">
-        <h3>${escapeHtml(entityName)}</h3>`;
-    if (entity.description) {
-        html += `<p class="entity-description">${escapeHtml(entity.description)}</p>`;
-    }
+    let html = `<div class="entity-header"><h3>${escapeHtml(entityName)}</h3>`;
+    if (entity.description) html += `<p class="entity-description">${escapeHtml(entity.description)}</p>`;
     html += '</div>';
 
-    html += '<h4>Schema</h4>';
-    html += '<table class="schema-table"><thead><tr>';
-    html += '<th>Field</th><th>Type</th><th>Nullable</th><th>Formula</th><th>Description</th>';
+    // Schema in collapsible
+    html += '<details><summary>Schema (' + entity.schema.length + ' fields)</summary>';
+    html += '<div class="table-scroll"><table class="schema-table"><thead><tr>';
+    html += '<th>Field</th><th>Type</th><th>Formula</th><th>Description</th>';
     html += '</tr></thead><tbody>';
-
     entity.schema.forEach(field => {
         const typeClass = field.type === 'calculated' ? 'type-calculated' : 'type-raw';
-        const formula = field.formula || '&mdash;';
-        const desc = field.Description || field.description || '&mdash;';
+        const formula = field.formula || '';
+        const desc = field.Description || field.description || '';
         html += `<tr>
             <td>${escapeHtml(field.name)}</td>
             <td class="${typeClass}">${escapeHtml(field.type || 'raw')}</td>
-            <td>${field.nullable ? 'Yes' : 'No'}</td>
-            <td class="formula-cell">${escapeHtml(formula)}</td>
-            <td class="desc-cell">${escapeHtml(desc)}</td>
+            <td class="formula-cell" title="${escapeHtml(formula)}">${escapeHtml(formula)}</td>
+            <td class="desc-cell" title="${escapeHtml(desc)}">${escapeHtml(desc)}</td>
         </tr>`;
     });
-    html += '</tbody></table>';
+    html += '</tbody></table></div></details>';
 
-    // Answer key data
-    html += '<h3>Answer Key Data (from PostgreSQL)</h3>';
+    // Answer key in collapsible
+    html += '<details><summary>Answer Key Data (' + (entity.answer_key?.length || 0) + ' records)</summary>';
     if (entity.answer_key && entity.answer_key.length > 0) {
         const computedCols = entity.computed_columns || [];
         const cols = Object.keys(entity.answer_key[0]);
-
-        html += '<table class="data-table"><thead><tr>';
+        html += '<div class="table-scroll"><table class="data-table"><thead><tr>';
         cols.forEach(col => {
             const isComputed = computedCols.includes(col);
             html += `<th class="${isComputed ? 'computed' : ''}">${escapeHtml(col)}</th>`;
         });
         html += '</tr></thead><tbody>';
-
         entity.answer_key.forEach(row => {
             html += '<tr>';
             cols.forEach(col => {
                 const isComputed = computedCols.includes(col);
                 const val = row[col] !== null ? String(row[col]) : 'null';
-                html += `<td class="${isComputed ? 'computed' : ''}">${escapeHtml(val)}</td>`;
+                html += `<td class="${isComputed ? 'computed' : ''}" title="${escapeHtml(val)}">${escapeHtml(val)}</td>`;
             });
             html += '</tr>';
         });
-        html += '</tbody></table>';
-    } else {
-        html += '<p>No data available</p>';
-    }
+        html += '</tbody></table></div>';
+    } else { html += '<p>No data</p>'; }
+    html += '</details>';
 
-    // Substrate tabs for this entity's results
-    html += '<h3>Substrate Results</h3>';
+    // Substrate results tabs
+    html += '<h4>Substrate Results</h4>';
     html += '<nav class="sub-tabs" id="entity-substrate-tabs">';
     Object.keys(REPORT_DATA.substrates).sort().forEach((substrate, i) => {
         const grades = REPORT_DATA.substrates[substrate];
@@ -1682,12 +1415,10 @@ function renderEntityDetails(entityName) {
             html += `<button class="sub-tab ${active} score-${scoreClass}" data-substrate="${escapeHtml(substrate)}" data-entity="${escapeHtml(entityName)}">${escapeHtml(substrate)}: ${score}%</button>`;
         }
     });
-    html += '</nav>';
-    html += '<div id="entity-substrate-details"></div>';
+    html += '</nav><div id="entity-substrate-details"></div>';
 
     entityDetails.innerHTML = html;
 
-    // Attach click handlers to entity substrate tabs
     document.querySelectorAll('#entity-substrate-tabs .sub-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             document.querySelectorAll('#entity-substrate-tabs .sub-tab').forEach(t => t.classList.remove('active'));
@@ -1696,11 +1427,8 @@ function renderEntityDetails(entityName) {
         });
     });
 
-    // Render first substrate details
     const firstSubstrateTab = document.querySelector('#entity-substrate-tabs .sub-tab');
-    if (firstSubstrateTab) {
-        renderEntitySubstrateDetails(entityName, firstSubstrateTab.dataset.substrate);
-    }
+    if (firstSubstrateTab) renderEntitySubstrateDetails(entityName, firstSubstrateTab.dataset.substrate);
 }
 
 function renderEntitySubstrateDetails(entityName, substrateName) {
@@ -1711,76 +1439,46 @@ function renderEntitySubstrateDetails(entityName, substrateName) {
     const entity = REPORT_DATA.entities[entityName];
     const entityGrades = substrate?.entities?.[entityName];
 
-    if (!entityGrades) {
-        container.innerHTML = '<p class="no-results">No results for this substrate.</p>';
-        return;
-    }
+    if (!entityGrades) { container.innerHTML = '<p class="no-results">No results.</p>'; return; }
 
     const computedCols = entity.computed_columns || [];
     const answerKey = entity.answer_key || [];
     const pk = entity.primary_key;
 
-    // Build failure lookup
     const failureLookup = {};
     if (entityGrades.failures) {
-        entityGrades.failures.forEach(f => {
-            failureLookup[`${f.pk}|${f.field}`] = f;
-        });
+        entityGrades.failures.forEach(f => { failureLookup[`${f.pk}|${f.field}`] = f; });
     }
 
-    let html = `<table class="graded-test-table">
-        <thead><tr>
-            <th>Record (${escapeHtml(pk || 'ID')})</th>`;
-    computedCols.forEach(col => {
-        html += `<th class="computed-col-header">${escapeHtml(col)}</th>`;
-    });
+    let html = '<div class="table-scroll"><table class="graded-test-table"><thead><tr>';
+    html += `<th>Record</th>`;
+    computedCols.forEach(col => { html += `<th class="computed-col-header">${escapeHtml(col)}</th>`; });
     html += '</tr></thead><tbody>';
 
     answerKey.forEach(record => {
         const pkVal = record[pk];
-        html += `<tr><td class="record-pk">${escapeHtml(String(pkVal))}</td>`;
-
+        html += `<tr><td class="record-pk" title="${escapeHtml(String(pkVal))}">${escapeHtml(String(pkVal))}</td>`;
         computedCols.forEach(col => {
             const expectedVal = record[col];
             const failKey = `${pkVal}|${col}`;
             const failure = failureLookup[failKey];
-
             if (failure) {
-                html += `<td class="cell-failed">
-                    <div class="expected-actual">
-                        <span class="expected-label">Expected:</span>
-                        <code class="expected">${escapeHtml(String(failure.expected))}</code>
-                    </div>
-                    <div class="expected-actual">
-                        <span class="actual-label">Actual:</span>
-                        <code class="actual">${escapeHtml(String(failure.actual))}</code>
-                    </div>
+                html += `<td class="cell-failed" title="Expected: ${escapeHtml(String(failure.expected))}&#10;Actual: ${escapeHtml(String(failure.actual))}">
+                    <span class="expected-actual"><span class="expected-label">E:</span><code class="expected">${escapeHtml(String(failure.expected))}</code></span>
+                    <span class="expected-actual"><span class="actual-label">A:</span><code class="actual">${escapeHtml(String(failure.actual))}</code></span>
                 </td>`;
             } else {
-                html += `<td class="cell-passed">
-                    <span class="check-mark">&#10003;</span>
-                    <code>${escapeHtml(String(expectedVal))}</code>
-                </td>`;
+                const valStr = String(expectedVal);
+                html += `<td class="cell-passed" title="${escapeHtml(valStr)}"><span class="check-mark">&#10003;</span><code>${escapeHtml(valStr)}</code></td>`;
             }
         });
         html += '</tr>';
     });
-    html += '</tbody></table>';
-
+    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
-// Initialize entity tabs
 if (entityTabs.length > 0 && REPORT_DATA.entities) {
-    // Get saved entity or use first one
-    const savedEntity = localStorage.getItem(STORAGE_KEYS.selectedEntity);
-    const entities = Object.keys(REPORT_DATA.entities).sort();
-    const initialEntity = (savedEntity && entities.includes(savedEntity)) ? savedEntity : entities[0];
-
-    if (initialEntity) {
-        selectEntityTab(initialEntity);
-    }
-
     entityTabs.forEach(tab => {
         tab.addEventListener('click', () => selectEntityTab(tab.dataset.entity));
     });
@@ -1790,17 +1488,16 @@ if (entityTabs.length > 0 && REPORT_DATA.entities) {
 const substrateTabs = document.querySelectorAll('#substrate-tabs .sub-tab');
 const substrateDetails = document.getElementById('substrate-details');
 
-function selectSubstrateTab(substrateName) {
-    // Update tab active state
+function selectSubstrateTabNoUrl(substrateName) {
     substrateTabs.forEach(t => t.classList.remove('active'));
     const targetTab = document.querySelector(`#substrate-tabs .sub-tab[data-substrate="${substrateName}"]`);
     if (targetTab) targetTab.classList.add('active');
-
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEYS.selectedSubstrate, substrateName);
-
-    // Render details
     renderSubstrateDetails(substrateName);
+}
+
+function selectSubstrateTab(substrateName) {
+    selectSubstrateTabNoUrl(substrateName);
+    updateUrlHash('substrates', substrateName);
 }
 
 function getScoreClass(score) {
@@ -1810,12 +1507,12 @@ function getScoreClass(score) {
     return 'danger';
 }
 
+// Track current entity within substrate view
+let currentSubstrateEntity = null;
+
 function renderSubstrateDetails(substrateName) {
     const substrate = REPORT_DATA.substrates[substrateName];
-    if (!substrate) {
-        substrateDetails.innerHTML = '<p>Substrate not found</p>';
-        return;
-    }
+    if (!substrate) { substrateDetails.innerHTML = '<p>Substrate not found</p>'; return; }
 
     const total = substrate.total_fields_tested;
     const passed = substrate.fields_passed;
@@ -1824,218 +1521,183 @@ function renderSubstrateDetails(substrateName) {
     const elapsed = substrate.elapsed_seconds || 0;
     const isMaster = substrate.is_master;
 
-    let statusText = isMaster ? 'MASTER (Answer Key)' : (failed === 0 ? 'PASS' : 'FAIL');
+    let statusText = isMaster ? 'MASTER' : (failed === 0 ? 'PASS' : 'FAIL');
     let statusClass = isMaster ? 'score-perfect' : (failed === 0 ? 'score-good' : 'score-danger');
 
     let html = '<div class="substrate-info">';
     html += `<h3>${escapeHtml(substrateName)}</h3>`;
     html += '<div class="substrate-stats">';
-    html += `<div class="substrate-stat">
-        <span class="substrate-stat-label">Status:</span>
-        <span class="substrate-stat-value ${statusClass}">${statusText}</span>
-    </div>`;
-    html += `<div class="substrate-stat">
-        <span class="substrate-stat-label">Score:</span>
-        <span class="substrate-stat-value">${score}%</span>
-    </div>`;
-    html += `<div class="substrate-stat">
-        <span class="substrate-stat-label">Runtime:</span>
-        <span class="substrate-stat-value">${elapsed.toFixed(2)}s</span>
-    </div>`;
+    html += `<div class="substrate-stat"><span class="substrate-stat-label">Status:</span><span class="substrate-stat-value ${statusClass}">${statusText}</span></div>`;
+    html += `<div class="substrate-stat"><span class="substrate-stat-label">Score:</span><span class="substrate-stat-value">${score}%</span></div>`;
+    html += `<div class="substrate-stat"><span class="substrate-stat-label">Runtime:</span><span class="substrate-stat-value">${elapsed.toFixed(2)}s</span></div>`;
     html += '</div></div>';
 
-    // Show warning if last run failed but showing restored results
+    // Warning banner
     const runMeta = substrate.run_metadata || {};
     const lastRun = runMeta.last_run || {};
     const lastSuccess = runMeta.last_successful_run || {};
     if (lastRun.status === 'failure' && lastSuccess) {
         const errorMsg = lastRun.error_message || 'Unknown error';
-        const failTime = (lastRun.timestamp || '').substring(0, 19).replace('T', ' ');
-        const successTime = (lastSuccess.timestamp || '').substring(0, 19).replace('T', ' ');
-        html += `<div class="warning-banner">
-            <strong>⚠ Warning: Latest Run Failed</strong>
-            <p>The test run at ${escapeHtml(failTime)} failed: <code>${escapeHtml(errorMsg)}</code></p>
-            <p>Showing results from last successful run (${escapeHtml(successTime)}).</p>
-        </div>`;
+        html += `<div class="warning-banner"><strong>⚠ Last run failed:</strong> <code>${escapeHtml(errorMsg)}</code></div>`;
     }
 
     if (substrate.error) {
-        html += `<div class="failure-card">
-            <div class="failure-header">
-                <span class="failure-field">Error</span>
-            </div>
-            <div class="failure-body">
-                <code class="actual">${escapeHtml(substrate.error)}</code>
-            </div>
-        </div>`;
+        html += `<div class="failure-card"><code class="actual">${escapeHtml(substrate.error)}</code></div>`;
     }
 
-    // Detailed Graded Test Results per Entity
-    html += '<h3>Graded Test Results</h3>';
-
-    // For each entity in the report, show the graded test
-    Object.keys(REPORT_DATA.entities).sort().forEach(entityName => {
+    // Get entities with results
+    const entitiesWithResults = Object.keys(REPORT_DATA.entities).sort().filter(entityName => {
         const entity = REPORT_DATA.entities[entityName];
-        const entityGrades = substrate.entities ? substrate.entities[entityName] : null;
-        const answerKey = entity.answer_key || [];
         const computedCols = entity.computed_columns || [];
-        const computedColsInfo = entity.computed_columns_info || [];
-        const pk = entity.primary_key;
-
-        if (computedCols.length === 0 || answerKey.length === 0) return;
-
-        // Entity header with description
-        const entityDesc = entity.description || '';
-        const eTotal = entityGrades ? entityGrades.fields_tested : 0;
-        const ePassed = entityGrades ? entityGrades.fields_passed : 0;
-        const eFailed = entityGrades ? entityGrades.fields_failed : 0;
-        const eScore = eTotal > 0 ? (ePassed / eTotal * 100).toFixed(1) : 0;
-        const eClass = eFailed === 0 ? 'score-good' : 'score-danger';
-
-        html += `<div class="entity-test-section">`;
-        html += `<h4 class="entity-test-header">
-            <span class="entity-name">${escapeHtml(entityName)}</span>
-            <span class="entity-score ${eClass}">${ePassed}/${eTotal} (${eScore}%)</span>
-        </h4>`;
-        if (entityDesc) {
-            html += `<p class="entity-description">${escapeHtml(entityDesc)}</p>`;
-        }
-
-        // Show computed columns being tested with formulas
-        html += `<div class="computed-cols-info">
-            <strong>Computed Columns Being Tested:</strong>
-            <ul>`;
-        computedColsInfo.forEach(col => {
-            const formula = col.formula || 'N/A';
-            const desc = col.description || '';
-            html += `<li><code>${escapeHtml(col.name)}</code>`;
-            if (formula && formula !== 'N/A') {
-                html += ` = <span class="formula">${escapeHtml(formula)}</span>`;
-            }
-            if (desc) {
-                html += ` <em>(${escapeHtml(desc)})</em>`;
-            }
-            html += `</li>`;
-        });
-        html += `</ul></div>`;
-
-        // Build failure lookup for quick access
-        const failureLookup = {};
-        if (entityGrades && entityGrades.failures) {
-            entityGrades.failures.forEach(f => {
-                const key = `${f.pk}|${f.field}`;
-                failureLookup[key] = f;
-            });
-        }
-
-        // Graded test table - show all records with computed fields graded
-        html += `<table class="graded-test-table">
-            <thead><tr>
-                <th>Record (${escapeHtml(pk || 'ID')})</th>`;
-        computedCols.forEach(col => {
-            html += `<th class="computed-col-header">${escapeHtml(col)}</th>`;
-        });
-        html += `</tr></thead><tbody>`;
-
-        answerKey.forEach(record => {
-            const pkVal = record[pk];
-            html += `<tr><td class="record-pk">${escapeHtml(String(pkVal))}</td>`;
-
-            computedCols.forEach(col => {
-                const expectedVal = record[col];
-                const failKey = `${pkVal}|${col}`;
-                const failure = failureLookup[failKey];
-
-                if (failure) {
-                    // FAILED - show expected vs actual
-                    html += `<td class="cell-failed">
-                        <div class="expected-actual">
-                            <span class="expected-label">Expected:</span>
-                            <code class="expected">${escapeHtml(String(failure.expected))}</code>
-                        </div>
-                        <div class="expected-actual">
-                            <span class="actual-label">Actual:</span>
-                            <code class="actual">${escapeHtml(String(failure.actual))}</code>
-                        </div>
-                    </td>`;
-                } else {
-                    // PASSED
-                    html += `<td class="cell-passed">
-                        <span class="check-mark">&#10003;</span>
-                        <code>${escapeHtml(String(expectedVal))}</code>
-                    </td>`;
-                }
-            });
-            html += `</tr>`;
-        });
-
-        html += `</tbody></table></div>`;
+        const answerKey = entity.answer_key || [];
+        return computedCols.length > 0 && answerKey.length > 0;
     });
 
-    if (!substrate.entities || Object.keys(substrate.entities).length === 0) {
-        html += '<p class="no-results">No test results available for this substrate.</p>';
+    if (entitiesWithResults.length === 0) {
+        html += '<p class="no-results">No test results available.</p>';
+        substrateDetails.innerHTML = html;
+        return;
     }
+
+    // Entity tabs within substrate view
+    html += '<h4>Graded Test Results</h4>';
+    html += '<nav class="sub-tabs" id="substrate-entity-tabs">';
+    entitiesWithResults.forEach((entityName, i) => {
+        const entity = REPORT_DATA.entities[entityName];
+        const entityGrades = substrate.entities ? substrate.entities[entityName] : null;
+        const eTotal = entityGrades ? entityGrades.fields_tested : 0;
+        const ePassed = entityGrades ? entityGrades.fields_passed : 0;
+        const eScore = eTotal > 0 ? (ePassed / eTotal * 100).toFixed(0) : 0;
+        const eClass = getScoreClass(eScore);
+        const active = i === 0 ? 'active' : '';
+        html += `<button class="sub-tab ${active} score-${eClass}" data-entity="${escapeHtml(entityName)}">${escapeHtml(entityName)} (${ePassed}/${eTotal})</button>`;
+    });
+    html += '</nav>';
+    html += '<div id="substrate-entity-content"></div>';
 
     substrateDetails.innerHTML = html;
+
+    // Attach handlers to entity tabs
+    document.querySelectorAll('#substrate-entity-tabs .sub-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('#substrate-entity-tabs .sub-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentSubstrateEntity = tab.dataset.entity;
+            renderSubstrateEntityContent(substrateName, tab.dataset.entity);
+        });
+    });
+
+    // Render first entity
+    if (entitiesWithResults.length > 0) {
+        currentSubstrateEntity = entitiesWithResults[0];
+        renderSubstrateEntityContent(substrateName, entitiesWithResults[0]);
+    }
 }
 
-// Initialize substrate tabs
-if (substrateTabs.length > 0 && REPORT_DATA.substrates) {
-    // Get saved substrate or use first one
-    const savedSubstrate = localStorage.getItem(STORAGE_KEYS.selectedSubstrate);
-    const substrates = Object.keys(REPORT_DATA.substrates).sort();
-    const initialSubstrate = (savedSubstrate && substrates.includes(savedSubstrate)) ? savedSubstrate : substrates[0];
+function renderSubstrateEntityContent(substrateName, entityName) {
+    const container = document.getElementById('substrate-entity-content');
+    if (!container) return;
 
-    if (initialSubstrate) {
-        selectSubstrateTab(initialSubstrate);
+    const substrate = REPORT_DATA.substrates[substrateName];
+    const entity = REPORT_DATA.entities[entityName];
+    const entityGrades = substrate.entities ? substrate.entities[entityName] : null;
+    const answerKey = entity.answer_key || [];
+    const computedCols = entity.computed_columns || [];
+    const computedColsInfo = entity.computed_columns_info || [];
+    const pk = entity.primary_key;
+
+    const entityDesc = entity.description || '';
+    const eTotal = entityGrades ? entityGrades.fields_tested : 0;
+    const ePassed = entityGrades ? entityGrades.fields_passed : 0;
+    const eScore = eTotal > 0 ? (ePassed / eTotal * 100).toFixed(1) : 0;
+
+    let html = '<div class="entity-test-section">';
+    if (entityDesc) html += `<p class="entity-description">${escapeHtml(entityDesc)}</p>`;
+
+    // Computed columns in collapsible
+    html += '<details><summary>Computed Columns (' + computedCols.length + ')</summary>';
+    html += '<div class="computed-cols-info"><ul>';
+    computedColsInfo.forEach(col => {
+        const formula = col.formula || '';
+        const desc = col.description || '';
+        html += `<li><span class="field-name">${escapeHtml(col.name)}</span>`;
+        if (formula) html += `<span class="formula-row"><span class="formula-label">Formula:</span><span class="formula">${escapeHtml(formula)}</span></span>`;
+        if (desc) html += `<span class="desc-row">${escapeHtml(desc)}</span>`;
+        html += '</li>';
+    });
+    html += '</ul></div></details>';
+
+    // Build failure lookup
+    const failureLookup = {};
+    if (entityGrades && entityGrades.failures) {
+        entityGrades.failures.forEach(f => { failureLookup[`${f.pk}|${f.field}`] = f; });
     }
 
+    // Graded test table
+    html += '<div class="table-scroll"><table class="graded-test-table"><thead><tr>';
+    html += `<th>Record</th>`;
+    computedCols.forEach(col => { html += `<th class="computed-col-header">${escapeHtml(col)}</th>`; });
+    html += '</tr></thead><tbody>';
+
+    answerKey.forEach(record => {
+        const pkVal = record[pk];
+        html += `<tr><td class="record-pk" title="${escapeHtml(String(pkVal))}">${escapeHtml(String(pkVal))}</td>`;
+        computedCols.forEach(col => {
+            const expectedVal = record[col];
+            const failKey = `${pkVal}|${col}`;
+            const failure = failureLookup[failKey];
+            if (failure) {
+                html += `<td class="cell-failed" title="Expected: ${escapeHtml(String(failure.expected))}&#10;Actual: ${escapeHtml(String(failure.actual))}">
+                    <span class="expected-actual"><span class="expected-label">E:</span><code class="expected">${escapeHtml(String(failure.expected))}</code></span>
+                    <span class="expected-actual"><span class="actual-label">A:</span><code class="actual">${escapeHtml(String(failure.actual))}</code></span>
+                </td>`;
+            } else {
+                const valStr = String(expectedVal);
+                html += `<td class="cell-passed" title="${escapeHtml(valStr)}"><span class="check-mark">&#10003;</span><code>${escapeHtml(valStr)}</code></td>`;
+            }
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table></div></div>';
+    container.innerHTML = html;
+}
+
+if (substrateTabs.length > 0 && REPORT_DATA.substrates) {
     substrateTabs.forEach(tab => {
         tab.addEventListener('click', () => selectSubstrateTab(tab.dataset.substrate));
     });
 }
 
-// Substrate links in overview - click to navigate to substrates tab
+// Initialize from URL
+const initialState = parseUrlHash();
+navigateToState(initialState, false);
+
+// Click handlers for navigation
 document.querySelectorAll('.substrate-link').forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
-        const substrate = link.dataset.substrate;
-        switchToMainTab('substrates');
-        selectSubstrateTab(substrate);
+        navigateToState({ tab: 'substrates', item: link.dataset.substrate });
     });
 });
 
-// Entity column headers in matrix - click to navigate to entities tab
 document.querySelectorAll('.entity-link').forEach(header => {
     header.addEventListener('click', () => {
-        const entity = header.dataset.entity;
-        switchToMainTab('entities');
-        selectEntityTab(entity);
+        navigateToState({ tab: 'entities', item: header.dataset.entity });
     });
 });
 
-// Substrate row names in matrix - click to navigate to substrates tab
 document.querySelectorAll('.substrate-row-link').forEach(cell => {
     cell.addEventListener('click', () => {
-        const substrate = cell.dataset.substrate;
-        switchToMainTab('substrates');
-        selectSubstrateTab(substrate);
+        navigateToState({ tab: 'substrates', item: cell.dataset.substrate });
     });
 });
 
-// Matrix cell click handlers - navigate to substrate view for that entity
 document.querySelectorAll('.cell-fail, .cell-pass').forEach(cell => {
     cell.addEventListener('click', () => {
-        const substrate = cell.dataset.substrate;
-        const entity = cell.dataset.entity;
-
-        // Navigate to substrates tab and select the substrate
-        switchToMainTab('substrates');
-        selectSubstrateTab(substrate);
+        navigateToState({ tab: 'substrates', item: cell.dataset.substrate });
     });
 });
 
-// Utility function
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     const div = document.createElement('div');
@@ -2043,7 +1705,7 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
-console.log('Orchestration Report loaded. Data:', REPORT_DATA);
+console.log('Orchestration Report loaded.');
 '''
 
 
