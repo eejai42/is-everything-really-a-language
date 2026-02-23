@@ -1,14 +1,14 @@
-# Article 5: PostgreSQL — The Canonical Computation Engine
+# Article 5: PostgreSQL — The Most Reliable Mirror
 
-PostgreSQL isn't just another substrate—it's the source of truth for computed values. This article shows how ERB generates DDL tables, `calc_*` functions, materialized views, and Row Level Security policies from the rulebook. We examine how the function composition enforces DAG execution order, and why other substrates are graded against what Postgres computes. If you understand this substrate, you understand how ERB thinks about data.
+PostgreSQL is the default substrate for generating the answer key—not because it's privileged, but because it's well-tested and deterministic. This article shows how ERB generates DDL tables, `calc_*` functions, materialized views, and Row Level Security policies from the rulebook. We examine how the function composition enforces DAG execution order. Any substrate achieving 100% conformance could serve this role; Postgres is simply the practical default.
 
 ---
 
 ## Detailed Table of Contents
 
-### 1. Why PostgreSQL Is Special
-- **Not Just Another Substrate**: PostgreSQL generates the `answer-key.json`
-- **The Reference Implementation**: All other substrates are graded against what Postgres computes
+### 1. Why PostgreSQL Is the Default Answer-Key Substrate
+- **Practical Choice, Not Privilege**: PostgreSQL generates the `answer-key.json` by default
+- **The Reference for Conformance**: Other substrates are graded against what Postgres computes, but any 100%-conformant substrate could serve this role
 - **The ERB Pattern**: Views read, tables write, functions calculate
 - **Database**: `wikidata-language-candidates` on localhost:5432
 

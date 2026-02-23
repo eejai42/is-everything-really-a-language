@@ -8,7 +8,7 @@
 | Passed | 184 |
 | Failed | 0 |
 | Score | 100.0% |
-| Duration | 11.1s |
+| Duration | 11s |
 
 ## Results by Entity
 

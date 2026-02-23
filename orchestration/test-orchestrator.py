@@ -140,6 +140,7 @@ def update_run_metadata(substrate_name: str, grades: dict, success: bool, error_
 
     IMPORTANT: Only updates last_successful_run when score is 100%.
     This preserves previous successful run data including duration.
+    If substrate was skipped, does not update metadata at all.
 
     Args:
         substrate_name: Name of the substrate
@@ -147,6 +148,10 @@ def update_run_metadata(substrate_name: str, grades: dict, success: bool, error_
         success: Whether the take-test.sh returned exit code 0
         error_msg: Error message if run failed
     """
+    # If substrate was skipped by user, don't update metadata
+    if grades.get("skipped"):
+        return
+
     metadata = load_run_metadata(substrate_name)
     timestamp = datetime.now().isoformat()
     elapsed = grades.get("elapsed_seconds", 0.0)
@@ -452,12 +457,12 @@ def prepare_substrate_for_test(substrate_name: str) -> int:
 
 
 def run_substrate_test(substrate_name: str) -> tuple:
-    """Run a substrate's take-test.sh and return (success, error, elapsed)"""
+    """Run a substrate's take-test.sh and return (success, error, elapsed, skipped)"""
     substrate_dir = os.path.join(SUBSTRATES_DIR, substrate_name)
     script_path = os.path.join(substrate_dir, "take-test.sh")
 
     if not os.path.exists(script_path):
-        return False, "No take-test.sh found", 0.0
+        return False, "No take-test.sh found", 0.0, False
 
     start_time = time.time()
     try:
@@ -466,21 +471,25 @@ def run_substrate_test(substrate_name: str) -> tuple:
             cwd=substrate_dir,
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=600  # 10 minutes for LLM substrates like english
         )
         elapsed = time.time() - start_time
 
-        if result.returncode != 0:
-            return False, f"Script failed: {result.stderr[:200]}", elapsed
+        # Check if substrate was skipped by user
+        if "SUBSTRATE_SKIPPED" in result.stdout:
+            return True, None, elapsed, True
 
-        return True, None, elapsed
+        if result.returncode != 0:
+            return False, f"Script failed: {result.stderr[:200]}", elapsed, False
+
+        return True, None, elapsed, False
 
     except subprocess.TimeoutExpired:
         elapsed = time.time() - start_time
-        return False, "Script timed out", elapsed
+        return False, "Script timed out", elapsed, False
     except Exception as e:
         elapsed = time.time() - start_time
-        return False, str(e), elapsed
+        return False, str(e), elapsed, False
 
 
 def get_substrate_answers(substrate_name: str, rulebook: dict) -> dict:
@@ -667,13 +676,24 @@ def run_and_grade_all_substrates(all_answer_keys: dict, rulebook: dict) -> dict:
         print(f"      Prepared {substrate} ({test_count} tests from shared testing/blank-tests/)", flush=True)
 
         # Run the test
-        success, error, elapsed = run_substrate_test(substrate)
+        success, error, elapsed, skipped = run_substrate_test(substrate)
 
         # Grade the results
         grades = grade_substrate(substrate, all_answer_keys, rulebook)
         if error:
             grades["error"] = error
-        grades["elapsed_seconds"] = elapsed
+
+        # If substrate was skipped, use previous timing from metadata
+        if skipped:
+            print(f"      {substrate} was SKIPPED - using previous timing", flush=True)
+            metadata = load_run_metadata(substrate)
+            last_run = metadata.get("last_run", {})
+            prev_elapsed = last_run.get("duration_seconds", 0.0)
+            grades["elapsed_seconds"] = prev_elapsed
+            grades["skipped"] = True
+        else:
+            grades["elapsed_seconds"] = elapsed
+            grades["skipped"] = False
 
         all_grades[substrate] = grades
 
@@ -690,13 +710,18 @@ def run_and_grade_all_substrates(all_answer_keys: dict, rulebook: dict) -> dict:
 # =============================================================================
 
 def format_duration(seconds: float) -> str:
-    """Format duration in human-readable form"""
-    if seconds < 60:
-        return f"{seconds:.1f}s"
+    """Format duration in human-readable form.
+
+    Uses whole seconds with '< 1s' for sub-second times to reduce git diff noise.
+    """
+    if seconds < 1:
+        return "< 1s"
+    elif seconds < 60:
+        return f"{int(round(seconds))}s"
     else:
         mins = int(seconds // 60)
-        secs = seconds % 60
-        return f"{mins}m {secs:.1f}s"
+        secs = int(round(seconds % 60))
+        return f"{mins}m {secs}s"
 
 
 def generate_substrate_report(substrate_name: str, results: dict, rulebook: dict):

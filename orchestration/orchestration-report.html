@@ -17,7 +17,7 @@
     --success-color: #198754;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
-    --master-color: #6f42c1;
+    --answer-key-color: #6f42c1;
     --shadow: 0 2px 8px rgba(0,0,0,0.1);
     --radius: 6px;
 }
@@ -33,7 +33,7 @@
     --success-color: #51cf66;
     --warning-color: #fcc419;
     --danger-color: #ff6b6b;
-    --master-color: #b197fc;
+    --answer-key-color: #b197fc;
     --shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
@@ -176,9 +176,9 @@ h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--tex
 .cell-fail { background: rgba(220, 53, 69, 0.15); color: var(--danger-color); font-weight: 600; cursor: pointer; }
 .cell-fail:hover { background: rgba(220, 53, 69, 0.25); }
 .cell-na { color: var(--text-secondary); }
-.cell-master { background: rgba(111, 66, 193, 0.15); color: var(--master-color); font-weight: 600; }
-.master-row { background: rgba(111, 66, 193, 0.05); }
-.master-row .substrate-name { color: var(--master-color); }
+.cell-answer-key { background: rgba(111, 66, 193, 0.15); color: var(--answer-key-color); font-weight: 600; }
+.answer-key-row { background: rgba(111, 66, 193, 0.05); }
+.answer-key-row .substrate-name { color: var(--answer-key-color); }
 .restored-row { background: rgba(255, 193, 7, 0.08); }
 .warning-badge { color: var(--warning-color); font-size: 0.85rem; cursor: help; margin-left: 0.25rem; }
 .score-cell { font-weight: 600; }
@@ -258,7 +258,7 @@ h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--tex
 .formula-cell {
     font-family: monospace;
     font-size: 0.75rem;
-    color: var(--master-color);
+    color: var(--answer-key-color);
     max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -415,10 +415,13 @@ footer {
 .computed-cols-info .formula {
     font-family: monospace;
     font-size: 0.75rem;
-    color: var(--master-color);
+    color: var(--answer-key-color);
     background: var(--bg-tertiary);
     padding: 0.15rem 0.35rem;
     border-radius: 3px;
+    white-space: pre-wrap;
+    display: block;
+    margin-top: 0.25rem;
 }
 .computed-cols-info .desc-row { display: block; color: var(--text-secondary); font-size: 0.75rem; font-style: italic; margin-top: 0.15rem; }
 
@@ -492,6 +495,17 @@ footer {
 /* Tooltip for full text on hover */
 [title] { cursor: help; }
 
+/* Substrate view tabs and iframe */
+.substrate-view { display: none; }
+.substrate-view.active { display: block; }
+.substrate-report-iframe {
+    width: 100%;
+    min-height: 600px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+}
+
 @media print {
     header, .tabs, footer { display: none; }
     .tab-content { display: block !important; }
@@ -525,19 +539,19 @@ footer {
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="passing-count">
-                        9 / 11
+                        7 / 11
                     </div>
                     <div class="stat-label">Substrates Passing</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value score-good">
-                        96.2%
+                        92.6%
                     </div>
                     <div class="stat-label">Overall Score</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value">
-                        27.6s
+                        31.0s
                     </div>
                     <div class="stat-label">Total Runtime</div>
                 </div>
@@ -551,17 +565,17 @@ footer {
 
             <h2>Substrates</h2>
             <div class="substrate-links">
-                <a href="#" class="substrate-link score-perfect" data-substrate="postgres">postgres (master): 100%</a>
+                <a href="#" class="substrate-link score-perfect" data-substrate="postgres">postgres (answer-key): 100%</a>
                     <a href="#" class="substrate-link score-perfect" data-substrate="uml">uml: 100%</a>
-                    <a href="#" class="substrate-link score-perfect" data-substrate="yaml">yaml: 100%</a>
                     <a href="#" class="substrate-link score-perfect" data-substrate="explain-dag">explain-dag: 100%</a>
-                    <a href="#" class="substrate-link score-perfect" data-substrate="python">python: 100%</a>
-                    <a href="#" class="substrate-link score-perfect" data-substrate="csv">csv: 100%</a>
+                    <a href="#" class="substrate-link score-perfect" data-substrate="yaml">yaml: 100%</a>
                     <a href="#" class="substrate-link score-perfect" data-substrate="golang">golang: 100%</a>
-                    <a href="#" class="substrate-link score-perfect" data-substrate="xlsx">xlsx: 100%</a>
+                    <a href="#" class="substrate-link score-perfect" data-substrate="python">python: 100%</a>
                     <a href="#" class="substrate-link score-perfect" data-substrate="owl">owl: 100%</a>
+                    <a href="#" class="substrate-link score-good" data-substrate="csv">csv: 88%</a>
+                    <a href="#" class="substrate-link score-good" data-substrate="xlsx">xlsx: 88%</a>
                     <a href="#" class="substrate-link score-warning" data-substrate="binary">binary: 80%</a>
-                    <a href="#" class="substrate-link score-warning" data-substrate="english">english: 79%</a>
+                    <a href="#" class="substrate-link score-warning" data-substrate="english">english: 64%</a>
             </div>
 
             <h2>Substrate Health Matrix</h2>
@@ -576,17 +590,17 @@ footer {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="master-row"><td class="substrate-name substrate-row-link" data-substrate="postgres">postgres (master)</td><td class="cell-master" data-substrate="postgres" data-entity="language_candidates" title="184/184">&#9733;</td><td class="score-cell score-perfect">100%</td><td class="time-cell">0.0s</td></tr>
+                        <tr class="answer-key-row"><td class="substrate-name substrate-row-link" data-substrate="postgres">postgres (answer-key)</td><td class="cell-answer-key" data-substrate="postgres" data-entity="language_candidates" title="184/184">&#9733;</td><td class="score-cell score-perfect">100%</td><td class="time-cell">0.0s</td></tr>
                         <tr class=""><td class="substrate-name substrate-row-link" data-substrate="uml">uml</td><td class="cell-pass" data-substrate="uml" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.1s</td></tr>
-                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="yaml">yaml</td><td class="cell-pass" data-substrate="yaml" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.1s</td></tr>
                         <tr class=""><td class="substrate-name substrate-row-link" data-substrate="explain-dag">explain-dag</td><td class="cell-pass" data-substrate="explain-dag" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.1s</td></tr>
+                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="yaml">yaml</td><td class="cell-pass" data-substrate="yaml" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.1s</td></tr>
+                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="golang">golang</td><td class="cell-pass" data-substrate="golang" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.1s</td></tr>
                         <tr class=""><td class="substrate-name substrate-row-link" data-substrate="python">python</td><td class="cell-pass" data-substrate="python" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.1s</td></tr>
-                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="csv">csv</td><td class="cell-pass" data-substrate="csv" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.3s</td></tr>
-                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="golang">golang</td><td class="cell-pass" data-substrate="golang" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.3s</td></tr>
-                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="xlsx">xlsx</td><td class="cell-pass" data-substrate="xlsx" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">0.3s</td></tr>
                         <tr class=""><td class="substrate-name substrate-row-link" data-substrate="owl">owl</td><td class="cell-pass" data-substrate="owl" data-entity="language_candidates" title="184/184">&#10003;</td><td class="score-cell score-perfect">100.0%</td><td class="time-cell">11.1s</td></tr>
+                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="csv">csv</td><td class="cell-fail" data-substrate="csv" data-entity="language_candidates" title="161/184">23</td><td class="score-cell score-good">87.5%</td><td class="time-cell">0.2s</td></tr>
+                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="xlsx">xlsx</td><td class="cell-fail" data-substrate="xlsx" data-entity="language_candidates" title="161/184">23</td><td class="score-cell score-good">87.5%</td><td class="time-cell">0.3s</td></tr>
                         <tr class=""><td class="substrate-name substrate-row-link" data-substrate="binary">binary</td><td class="cell-fail" data-substrate="binary" data-entity="language_candidates" title="147/184">37</td><td class="score-cell score-warning">79.9%</td><td class="time-cell">0.3s</td></tr>
-                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="english">english</td><td class="cell-fail" data-substrate="english" data-entity="language_candidates" title="145/184">39</td><td class="score-cell score-warning">78.8%</td><td class="time-cell">14.9s</td></tr>
+                        <tr class=""><td class="substrate-name substrate-row-link" data-substrate="english">english</td><td class="cell-fail" data-substrate="english" data-entity="language_candidates" title="118/184">66</td><td class="score-cell score-warning">64.1%</td><td class="time-cell">18.5s</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -601,15 +615,15 @@ footer {
 
         <section id="substrates" class="tab-content">
             <nav class="sub-tabs" id="substrate-tabs">
-                <button class="sub-tab active" data-substrate="postgres">postgres (master)</button>
+                <button class="sub-tab active" data-substrate="postgres">postgres (answer-key)</button>
                 <button class="sub-tab " data-substrate="uml">uml</button>
-                <button class="sub-tab " data-substrate="yaml">yaml</button>
                 <button class="sub-tab " data-substrate="explain-dag">explain-dag</button>
-                <button class="sub-tab " data-substrate="python">python</button>
-                <button class="sub-tab " data-substrate="csv">csv</button>
+                <button class="sub-tab " data-substrate="yaml">yaml</button>
                 <button class="sub-tab " data-substrate="golang">golang</button>
-                <button class="sub-tab " data-substrate="xlsx">xlsx</button>
+                <button class="sub-tab " data-substrate="python">python</button>
                 <button class="sub-tab " data-substrate="owl">owl</button>
+                <button class="sub-tab " data-substrate="csv">csv</button>
+                <button class="sub-tab " data-substrate="xlsx">xlsx</button>
                 <button class="sub-tab " data-substrate="binary">binary</button>
                 <button class="sub-tab " data-substrate="english">english</button>
             </nav>
@@ -633,15 +647,15 @@ const REPORT_DATA = {
   },
   "summary": {
     "total_substrates": 11,
-    "passing_substrates": 9,
+    "passing_substrates": 7,
     "total_entities": 1,
     "total_computed_columns": 8,
     "total_records": 23,
-    "overall_score": 96.24505928853755,
-    "total_runtime_seconds": 27.6217303276062,
+    "overall_score": 92.63833992094862,
+    "total_runtime_seconds": 31.043678760528564,
     "total_fields_tested": 2024,
-    "total_passed": 1948,
-    "total_failed": 76
+    "total_passed": 1875,
+    "total_failed": 149
   },
   "entities": {
     "language_candidates": {
@@ -674,7 +688,7 @@ const REPORT_DATA = {
         },
         {
           "name": "prediction_predicates",
-          "formula": "=IF(HasSyntax, \"Has Syntax\", \"No Syntax\") & \", \" & IF(RequiresParsing, \"Requires Parsing\", \"No Parsing Needed\") & \", \" & IF(IsDescriptionOf, \"Describes the thing\", \"Is the Thing\") & \", \" & IF(HasLinearDecodingPressure, \"Has Linear Decoding Pressure\", \"No Decoding Pressure\") & \", \" & IF(ResolvesToAnAST, \"Resolves to AST\", \"No AST\") & \", \" & IF(IsStableOntologyReference, \"Is Stable Ontology\", \"Not 'Ontology'\") & \", \" & IF(CanBeHeld, \"Can Be Held\", \"Can't Be Held\") & \" And \" & IF(HasIdentity, \"Has Identity\", \"Has no Identity\")",
+          "formula": "=IF(HasSyntax, \"Has Syntax\", \"No Syntax\") & \" & \" & IF(RequiresParsing, \"Requires Parsing\", \"No Parsing Neede\") & \" & \" & IF(IsDescriptionOf, \"Describes the thing\", \"Is the Thing\") & \" & \" & IF(HasLinearDecodingPressure, \"Has Linear Decoding Pressure\", \"No Decoding Pressure\") & \" & \" & IF(ResolvesToAnAST, \"Resolves to AST\", \"No AST\") & \", \" & IF(IsStableOntologyReference, \"Is Stable Ontology\", \"Not 'Ontology'\") & \" AND \" & IF(CanBeHeld, \"Can Be Held\", \"Can't Be Held\") & \", \" &IF(HasIdentity, \"Has Identity\", \"Has no Identity\")",
           "description": ""
         },
         {
@@ -763,7 +777,7 @@ const REPORT_DATA = {
           "datatype": "string",
           "type": "calculated",
           "nullable": true,
-          "formula": "=IF({{HasSyntax}}, \"Has Syntax\", \"No Syntax\") & \", \" & IF({{RequiresParsing}}, \"Requires Parsing\", \"No Parsing Needed\") & \", \" & IF({{IsDescriptionOf}}, \"Describes the thing\", \"Is the Thing\") & \", \" & IF({{HasLinearDecodingPressure}}, \"Has Linear Decoding Pressure\", \"No Decoding Pressure\") & \", \" & IF({{ResolvesToAnAST}}, \"Resolves to AST\", \"No AST\") & \", \" & IF({{IsStableOntologyReference}}, \"Is Stable Ontology\", \"Not 'Ontology'\") & \", \" & IF({{CanBeHeld}}, \"Can Be Held\", \"Can't Be Held\") & \" And \" & IF({{HasIdentity}}, \"Has Identity\", \"Has no Identity\")"
+          "formula": "=IF({{HasSyntax}}, \"Has Syntax\", \"No Syntax\") & \" & \" & IF({{RequiresParsing}}, \"Requires Parsing\", \"No Parsing Neede\") & \" & \" & IF({{IsDescriptionOf}}, \"Describes the thing\", \"Is the Thing\") & \" & \" & IF({{HasLinearDecodingPressure}}, \"Has Linear Decoding Pressure\", \"No Decoding Pressure\") & \" & \" & IF({{ResolvesToAnAST}}, \"Resolves to AST\", \"No AST\") & \", \" & IF({{IsStableOntologyReference}}, \"Is Stable Ontology\", \"Not 'Ontology'\") & \" AND \" & IF({{CanBeHeld}}, \"Can Be Held\", \"Can't Be Held\") & \", \" &IF({{HasIdentity}}, \"Has Identity\", \"Has no Identity\")"
         },
         {
           "name": "PredictionFail",
@@ -888,7 +902,7 @@ const REPORT_DATA = {
           "can_be_held": true,
           "question": "Is A Coffee Mug a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, No AST, Not 'Ontology', Can Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, Not 'Ontology' AND Can Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Physical Object",
           "has_identity": true,
@@ -916,7 +930,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is A Game of Fortnite a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, No AST, Not 'Ontology', Can't Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & No AST, Not 'Ontology' AND Can't Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Running Software",
           "has_identity": true,
@@ -944,7 +958,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is A Running App  a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, Has Linear Decoding Pressure, No AST, Not 'Ontology', Can't Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & Has Linear Decoding Pressure & No AST, Not 'Ontology' AND Can't Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Running Software",
           "has_identity": true,
@@ -972,7 +986,7 @@ const REPORT_DATA = {
           "can_be_held": true,
           "question": "Is A Smartphone a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, Has Linear Decoding Pressure, No AST, Not 'Ontology', Can Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & Has Linear Decoding Pressure & No AST, Not 'Ontology' AND Can Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Physical Object",
           "has_identity": true,
@@ -1000,7 +1014,7 @@ const REPORT_DATA = {
           "can_be_held": true,
           "question": "Is A Thunderstorm a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, Resolves to AST, Not 'Ontology', Can Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, Not 'Ontology' AND Can Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Physical event",
           "has_identity": true,
@@ -1028,7 +1042,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is A UML File a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Formal Language",
           "has_identity": false,
@@ -1056,7 +1070,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is An DOCX Doc a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Formal Language",
           "has_identity": false,
@@ -1084,7 +1098,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is An XLSX Doc a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Formal Language",
           "has_identity": false,
@@ -1112,7 +1126,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Binary Code a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Formal Language",
           "has_identity": false,
@@ -1140,7 +1154,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is DOCX - Editing a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, No AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Running Software",
           "has_identity": false,
@@ -1168,7 +1182,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Editing Airtable Base a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, No Parsing Needed, Describes the thing, No Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & No Parsing Neede & Describes the thing & No Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Running Software",
           "has_identity": true,
@@ -1196,7 +1210,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is English a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Natural Language",
           "has_identity": false,
@@ -1224,7 +1238,7 @@ const REPORT_DATA = {
           "can_be_held": true,
           "question": "Is Falsifier A a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, Resolves to AST, Is Stable Ontology, Can Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can Be Held, Has Identity",
           "prediction_fail": "Falsifier A Isn't a Family Feud Language, but Is marked as a 'Language Candidate.'",
           "category": "MISSING: Have you seen this Language?",
           "has_identity": true,
@@ -1252,7 +1266,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Falsifier B a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "Falsifier B Is a Family Feud Language, but Is Not marked as a 'Language Candidate.'",
           "category": "MISSING: Have you seen this Language?",
           "has_identity": false,
@@ -1280,7 +1294,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Math a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Formal Language",
           "has_identity": false,
@@ -1308,7 +1322,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is OWA & CWA Falsifier a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": " - Open World vs. Closed World Conflict.",
           "category": "MISSING: Have you seen this Language?",
           "has_identity": false,
@@ -1336,7 +1350,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is OWL/RDF/GraphQL/... generally a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Natural Language",
           "has_identity": false,
@@ -1364,7 +1378,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Python a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Formal Language",
           "has_identity": false,
@@ -1392,7 +1406,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Running Calculator App a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, Resolves to AST, Not 'Ontology', Can't Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, Not 'Ontology' AND Can't Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Running Software",
           "has_identity": true,
@@ -1420,7 +1434,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Sign Language a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Natural Language",
           "has_identity": false,
@@ -1448,7 +1462,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is Spoken Words a language?",
           "predicted_answer": true,
-          "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+          "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Natural Language",
           "has_identity": false,
@@ -1476,7 +1490,7 @@ const REPORT_DATA = {
           "can_be_held": true,
           "question": "Is The Mona Lisa a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, No AST, Is Stable Ontology, Can Be Held And Has Identity",
+          "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, Is Stable Ontology AND Can Be Held, Has Identity",
           "prediction_fail": "",
           "category": "Physical Object",
           "has_identity": true,
@@ -1504,7 +1518,7 @@ const REPORT_DATA = {
           "can_be_held": false,
           "question": "Is XLSX - Editing a language?",
           "predicted_answer": false,
-          "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, Resolves to AST, Not 'Ontology', Can't Be Held And Has no Identity",
+          "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & Resolves to AST, Not 'Ontology' AND Can't Be Held, Has no Identity",
           "prediction_fail": "",
           "category": "Running Software",
           "has_identity": false,
@@ -1529,7 +1543,7 @@ const REPORT_DATA = {
   "substrates": {
     "postgres": {
       "substrate": "postgres",
-      "is_master": true,
+      "is_answer_key": true,
       "total_fields_tested": 184,
       "fields_passed": 184,
       "fields_failed": 0,
@@ -1563,7 +1577,7 @@ const REPORT_DATA = {
       "total_fields_tested": 184,
       "fields_passed": 147,
       "fields_failed": 37,
-      "elapsed_seconds": 0.27707600593566895,
+      "elapsed_seconds": 0.29395580291748047,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
@@ -1579,8 +1593,8 @@ const REPORT_DATA = {
             {
               "pk": "a-uml-file",
               "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
             },
             {
               "pk": "an-docx-doc",
@@ -1591,8 +1605,8 @@ const REPORT_DATA = {
             {
               "pk": "an-docx-doc",
               "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
             },
             {
               "pk": "an-xlsx-doc",
@@ -1603,8 +1617,8 @@ const REPORT_DATA = {
             {
               "pk": "an-xlsx-doc",
               "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
             },
             {
               "pk": "binary-code",
@@ -1615,14 +1629,14 @@ const REPORT_DATA = {
             {
               "pk": "binary-code",
               "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
             },
             {
               "pk": "editing-airtable-base",
               "field": "prediction_predicates",
-              "expected": "No Syntax, No Parsing Needed,",
-              "actual": "No Syntax, No Parsing Needed,"
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
             },
             {
               "pk": "english",
@@ -1633,8 +1647,8 @@ const REPORT_DATA = {
             {
               "pk": "english",
               "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
             },
             {
               "pk": "falsifier-b",
@@ -1645,8 +1659,8 @@ const REPORT_DATA = {
             {
               "pk": "falsifier-b",
               "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
             },
             {
               "pk": "math",
@@ -1661,12 +1675,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.2622251510620117,
+          "duration_seconds": 0.3249549865722656,
           "exit_code": 0,
           "score": 79.8913043478261
         },
         "last_successful_run": {
-          "duration_seconds": 0.27707600593566895,
+          "duration_seconds": 0.29395580291748047,
           "status": "success",
           "test_results": {
             "total_fields_tested": 3,
@@ -1680,31 +1694,152 @@ const REPORT_DATA = {
     "csv": {
       "substrate": "csv",
       "total_fields_tested": 184,
-      "fields_passed": 184,
-      "fields_failed": 0,
-      "elapsed_seconds": 0.27181005477905273,
+      "fields_passed": 161,
+      "fields_failed": 23,
+      "elapsed_seconds": 0.18868231773376465,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
-          "fields_passed": 184,
-          "fields_failed": 0,
-          "failures": []
+          "fields_passed": 161,
+          "fields_failed": 23,
+          "failures": [
+            {
+              "pk": "a-coffee-mug",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "a-game-of-fortnite",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "a-running-app",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "a-smartphone",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "a-thunderstorm",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "a-uml-file",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "an-docx-doc",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "an-xlsx-doc",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "binary-code",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "docx-editing",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "editing-airtable-base",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "english",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "falsifier-a",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "falsifier-b",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "math",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "owa-cwa-falsifier",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "owl-rdf-graphql-generally",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "python",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "running-calculator-app",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "sign-language",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            }
+          ]
         }
       },
       "error": null,
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.27181005477905273,
+          "duration_seconds": 0.24469399452209473,
           "exit_code": 0,
-          "score": 100.0
+          "score": 87.5
         },
         "last_successful_run": {
-          "duration_seconds": 0.27181005477905273,
+          "duration_seconds": 0.18868231773376465,
           "status": "success",
           "test_results": {
-            "total_fields_tested": 184,
-            "fields_passed": 184,
+            "total_fields_tested": 3,
+            "fields_passed": 3,
             "fields_failed": 0,
             "score": 100.0
           }
@@ -1714,92 +1849,104 @@ const REPORT_DATA = {
     "english": {
       "substrate": "english",
       "total_fields_tested": 184,
-      "fields_passed": 145,
-      "fields_failed": 39,
-      "elapsed_seconds": 14.88267183303833,
+      "fields_passed": 118,
+      "fields_failed": 66,
+      "elapsed_seconds": 18.48710298538208,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
-          "fields_passed": 145,
-          "fields_failed": 39,
+          "fields_passed": 118,
+          "fields_failed": 66,
           "failures": [
             {
               "pk": "a-coffee-mug",
               "field": "prediction_predicates",
-              "expected": "No Syntax, No Parsing Needed,",
-              "actual": "No Syntax, No Parsing Needed,"
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Needed"
+            },
+            {
+              "pk": "a-coffee-mug",
+              "field": "is_description_of",
+              "expected": "False",
+              "actual": "True"
+            },
+            {
+              "pk": "a-coffee-mug",
+              "field": "relationship_to_concept",
+              "expected": "IsMirrorOf",
+              "actual": "IsDescriptionOf"
             },
             {
               "pk": "a-game-of-fortnite",
-              "field": "prediction_predicates",
-              "expected": "No Syntax, Requires Parsing, I",
-              "actual": "No Syntax, Requires Parsing, I"
+              "field": "is_description_of",
+              "expected": "False",
+              "actual": "True"
+            },
+            {
+              "pk": "a-game-of-fortnite",
+              "field": "relationship_to_concept",
+              "expected": "IsMirrorOf",
+              "actual": "IsDescriptionOf"
             },
             {
               "pk": "a-running-app",
-              "field": "prediction_predicates",
-              "expected": "No Syntax, Requires Parsing, I",
-              "actual": "No Syntax, Requires Parsing, I"
+              "field": "is_description_of",
+              "expected": "False",
+              "actual": "True"
+            },
+            {
+              "pk": "a-running-app",
+              "field": "relationship_to_concept",
+              "expected": "IsMirrorOf",
+              "actual": "IsDescriptionOf"
             },
             {
               "pk": "a-smartphone",
               "field": "prediction_predicates",
-              "expected": "No Syntax, No Parsing Needed,",
-              "actual": "No Syntax, No Parsing Needed,"
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Needed"
+            },
+            {
+              "pk": "a-smartphone",
+              "field": "is_description_of",
+              "expected": "False",
+              "actual": "True"
+            },
+            {
+              "pk": "a-smartphone",
+              "field": "relationship_to_concept",
+              "expected": "IsMirrorOf",
+              "actual": "IsDescriptionOf"
             },
             {
               "pk": "a-thunderstorm",
               "field": "prediction_predicates",
-              "expected": "No Syntax, Requires Parsing, I",
-              "actual": "No Syntax, Requires Parsing, I"
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "a-thunderstorm",
+              "field": "is_description_of",
+              "expected": "False",
+              "actual": "True"
+            },
+            {
+              "pk": "a-thunderstorm",
+              "field": "relationship_to_concept",
+              "expected": "IsMirrorOf",
+              "actual": "IsDescriptionOf"
             },
             {
               "pk": "a-uml-file",
               "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
             },
             {
-              "pk": "an-docx-doc",
-              "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
-            },
-            {
-              "pk": "an-xlsx-doc",
-              "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
-            },
-            {
-              "pk": "binary-code",
-              "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
-            },
-            {
-              "pk": "docx-editing",
-              "field": "prediction_predicates",
-              "expected": "No Syntax, No Parsing Needed,",
-              "actual": "No Syntax, No Parsing Needed,"
-            },
-            {
-              "pk": "editing-airtable-base",
-              "field": "prediction_predicates",
-              "expected": "No Syntax, No Parsing Needed,",
-              "actual": "No Syntax, No Parsing Needed,"
-            },
-            {
-              "pk": "editing-airtable-base",
+              "pk": "a-uml-file",
               "field": "is_description_of",
               "expected": "True",
               "actual": "False"
-            },
-            {
-              "pk": "english",
-              "field": "prediction_predicates",
-              "expected": "Has Syntax, Requires Parsing,",
-              "actual": "Has Syntax, Requires Parsing,"
             }
           ]
         }
@@ -1808,12 +1955,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 170.6114640235901,
+          "duration_seconds": 83.50071692466736,
           "exit_code": 0,
-          "score": 78.80434782608695
+          "score": 64.13043478260869
         },
         "last_successful_run": {
-          "duration_seconds": 14.88267183303833,
+          "duration_seconds": 18.48710298538208,
           "status": "success",
           "test_results": {
             "total_fields_tested": 3,
@@ -1829,7 +1976,7 @@ const REPORT_DATA = {
       "total_fields_tested": 184,
       "fields_passed": 184,
       "fields_failed": 0,
-      "elapsed_seconds": 0.10370707511901855,
+      "elapsed_seconds": 0.12694191932678223,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
@@ -1842,12 +1989,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.10370707511901855,
+          "duration_seconds": 0.12694191932678223,
           "exit_code": 0,
           "score": 100.0
         },
         "last_successful_run": {
-          "duration_seconds": 0.10370707511901855,
+          "duration_seconds": 0.12694191932678223,
           "status": "success",
           "test_results": {
             "total_fields_tested": 184,
@@ -1863,7 +2010,7 @@ const REPORT_DATA = {
       "total_fields_tested": 184,
       "fields_passed": 184,
       "fields_failed": 0,
-      "elapsed_seconds": 0.31369519233703613,
+      "elapsed_seconds": 0.1333019733428955,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
@@ -1876,12 +2023,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.31369519233703613,
+          "duration_seconds": 0.1333019733428955,
           "exit_code": 0,
           "score": 100.0
         },
         "last_successful_run": {
-          "duration_seconds": 0.31369519233703613,
+          "duration_seconds": 0.1333019733428955,
           "status": "success",
           "test_results": {
             "total_fields_tested": 184,
@@ -1897,7 +2044,7 @@ const REPORT_DATA = {
       "total_fields_tested": 184,
       "fields_passed": 184,
       "fields_failed": 0,
-      "elapsed_seconds": 11.148155927658081,
+      "elapsed_seconds": 11.139217853546143,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
@@ -1910,12 +2057,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 11.148155927658081,
+          "duration_seconds": 11.139217853546143,
           "exit_code": 0,
           "score": 100.0
         },
         "last_successful_run": {
-          "duration_seconds": 11.148155927658081,
+          "duration_seconds": 11.139217853546143,
           "status": "success",
           "test_results": {
             "total_fields_tested": 184,
@@ -1931,7 +2078,7 @@ const REPORT_DATA = {
       "total_fields_tested": 184,
       "fields_passed": 184,
       "fields_failed": 0,
-      "elapsed_seconds": 0.10846805572509766,
+      "elapsed_seconds": 0.13359594345092773,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
@@ -1944,12 +2091,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.10846805572509766,
+          "duration_seconds": 0.13359594345092773,
           "exit_code": 0,
           "score": 100.0
         },
         "last_successful_run": {
-          "duration_seconds": 0.10846805572509766,
+          "duration_seconds": 0.13359594345092773,
           "status": "success",
           "test_results": {
             "total_fields_tested": 184,
@@ -1965,7 +2112,7 @@ const REPORT_DATA = {
       "total_fields_tested": 184,
       "fields_passed": 184,
       "fields_failed": 0,
-      "elapsed_seconds": 0.08964204788208008,
+      "elapsed_seconds": 0.12159299850463867,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
@@ -1978,12 +2125,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.08964204788208008,
+          "duration_seconds": 0.12159299850463867,
           "exit_code": 0,
           "score": 100.0
         },
         "last_successful_run": {
-          "duration_seconds": 0.08964204788208008,
+          "duration_seconds": 0.12159299850463867,
           "status": "success",
           "test_results": {
             "total_fields_tested": 184,
@@ -1997,31 +2144,152 @@ const REPORT_DATA = {
     "xlsx": {
       "substrate": "xlsx",
       "total_fields_tested": 184,
-      "fields_passed": 184,
-      "fields_failed": 0,
-      "elapsed_seconds": 0.3332982063293457,
+      "fields_passed": 161,
+      "fields_failed": 23,
+      "elapsed_seconds": 0.29137086868286133,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
-          "fields_passed": 184,
-          "fields_failed": 0,
-          "failures": []
+          "fields_passed": 161,
+          "fields_failed": 23,
+          "failures": [
+            {
+              "pk": "a-coffee-mug",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "a-game-of-fortnite",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "a-running-app",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "a-smartphone",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "a-thunderstorm",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "a-uml-file",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "an-docx-doc",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "an-xlsx-doc",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "binary-code",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "docx-editing",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "editing-airtable-base",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & No Parsing Neede &",
+              "actual": "No Syntax & No Parsing Neede &"
+            },
+            {
+              "pk": "english",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "falsifier-a",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "falsifier-b",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "math",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "owa-cwa-falsifier",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "owl-rdf-graphql-generally",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "python",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            },
+            {
+              "pk": "running-calculator-app",
+              "field": "prediction_predicates",
+              "expected": "No Syntax & Requires Parsing &",
+              "actual": "No Syntax & Requires Parsing &"
+            },
+            {
+              "pk": "sign-language",
+              "field": "prediction_predicates",
+              "expected": "Has Syntax & Requires Parsing",
+              "actual": "Has Syntax & Requires Parsing"
+            }
+          ]
         }
       },
       "error": null,
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.3332982063293457,
+          "duration_seconds": 0.3185758590698242,
           "exit_code": 0,
-          "score": 100.0
+          "score": 87.5
         },
         "last_successful_run": {
-          "duration_seconds": 0.3332982063293457,
+          "duration_seconds": 0.29137086868286133,
           "status": "success",
           "test_results": {
-            "total_fields_tested": 184,
-            "fields_passed": 184,
+            "total_fields_tested": 3,
+            "fields_passed": 3,
             "fields_failed": 0,
             "score": 100.0
           }
@@ -2033,7 +2301,7 @@ const REPORT_DATA = {
       "total_fields_tested": 184,
       "fields_passed": 184,
       "fields_failed": 0,
-      "elapsed_seconds": 0.09320592880249023,
+      "elapsed_seconds": 0.1279160976409912,
       "entities": {
         "language_candidates": {
           "fields_tested": 184,
@@ -2046,12 +2314,12 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.09320592880249023,
+          "duration_seconds": 0.1279160976409912,
           "exit_code": 0,
           "score": 100.0
         },
         "last_successful_run": {
-          "duration_seconds": 0.09320592880249023,
+          "duration_seconds": 0.1279160976409912,
           "status": "success",
           "test_results": {
             "total_fields_tested": 184,
@@ -2077,7 +2345,7 @@ const REPORT_DATA = {
         "erb_customization_id": "02b-customize-functions-sql",
         "name": "02b-customize-functions.sql",
         "title": "Customize Functions",
-        "sql_code": "-- Prediction Fail: Returns TRUE when predicted_answer doesn't match is_language\nDROP FUNCTION IF EXISTS calc_language_candidates_prediction_fail_x;\n\nCREATE OR REPLACE FUNCTION calc_language_candidates_prediction_fail_x(p_language_candidate_id TEXT)\nRETURNS TEXT AS $$\n  SELECT NULLIF(\n    COALESCE(\n      CASE\n        WHEN COALESCE(calc_language_candidates_predicted_answer(p_language_candidate_id), FALSE)\n             != COALESCE(is_language, FALSE)\n        THEN name || ' ' ||\n             CASE WHEN calc_language_candidates_predicted_answer(p_language_candidate_id) THEN 'Is' ELSE 'Isn''t' END ||\n             ' a Family Feud Language, but ' ||\n             CASE WHEN is_language THEN 'Is' ELSE 'Is Not' END ||\n             ' marked as a ''Language Candidate.'''\n      END,\n      ''\n    ) ||\n    COALESCE(\n      CASE\n        WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)\n        THEN ' - Open World vs. Closed World Conflict.'\n      END,\n      ''\n    ),\n    ''\n  )\n  FROM language_candidates\n  WHERE language_candidate_id = p_language_candidate_id;\n$$ LANGUAGE SQL STABLE SECURITY DEFINER;\n\nDROP FUNCTION calc_language_candidates_question;\n\nCREATE OR REPLACE FUNCTION public.calc_language_candidates_question(p_language_candidate_id text)\n RETURNS text\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\nAS $function$\nBEGIN\n  RETURN ('Is ' || (SELECT NULLIF(name, '''') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) || ' a language?')::text;\nEND;\n$function$\n",
+        "sql_code": "-- Prediction Fail: Returns TRUE when predicted_answer doesn't match is_language\nDROP FUNCTION calc_language_candidates_question;\n\nCREATE OR REPLACE FUNCTION public.calc_language_candidates_question(p_language_candidate_id text)\n RETURNS text\n LANGUAGE plpgsql\n STABLE SECURITY DEFINER\nAS $function$\nBEGIN\n  RETURN ('Is ' || (SELECT NULLIF(name, '''') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) || ' a language?')::text;\nEND;\n$function$\n",
         "sql_target": "Postgres",
         "customization_type": "Functions"
       },
@@ -2116,7 +2384,7 @@ const REPORT_DATA = {
         "can_be_held": true,
         "question": "Is A Coffee Mug a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, No AST, Not 'Ontology', Can Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, Not 'Ontology' AND Can Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Physical Object",
         "has_identity": true,
@@ -2144,7 +2412,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is A Game of Fortnite a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, No AST, Not 'Ontology', Can't Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & No AST, Not 'Ontology' AND Can't Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Running Software",
         "has_identity": true,
@@ -2172,7 +2440,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is A Running App  a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, Has Linear Decoding Pressure, No AST, Not 'Ontology', Can't Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & Has Linear Decoding Pressure & No AST, Not 'Ontology' AND Can't Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Running Software",
         "has_identity": true,
@@ -2200,7 +2468,7 @@ const REPORT_DATA = {
         "can_be_held": true,
         "question": "Is A Smartphone a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, Has Linear Decoding Pressure, No AST, Not 'Ontology', Can Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & Has Linear Decoding Pressure & No AST, Not 'Ontology' AND Can Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Physical Object",
         "has_identity": true,
@@ -2228,7 +2496,7 @@ const REPORT_DATA = {
         "can_be_held": true,
         "question": "Is A Thunderstorm a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, Resolves to AST, Not 'Ontology', Can Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, Not 'Ontology' AND Can Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Physical event",
         "has_identity": true,
@@ -2256,7 +2524,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is A UML File a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Formal Language",
         "has_identity": false,
@@ -2284,7 +2552,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is An DOCX Doc a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Formal Language",
         "has_identity": false,
@@ -2312,7 +2580,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is An XLSX Doc a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Formal Language",
         "has_identity": false,
@@ -2340,7 +2608,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Binary Code a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Formal Language",
         "has_identity": false,
@@ -2368,7 +2636,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is DOCX - Editing a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, No AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Running Software",
         "has_identity": false,
@@ -2396,7 +2664,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Editing Airtable Base a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, No Parsing Needed, Describes the thing, No Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & No Parsing Neede & Describes the thing & No Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Running Software",
         "has_identity": true,
@@ -2424,7 +2692,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is English a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Natural Language",
         "has_identity": false,
@@ -2452,7 +2720,7 @@ const REPORT_DATA = {
         "can_be_held": true,
         "question": "Is Falsifier A a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, Resolves to AST, Is Stable Ontology, Can Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can Be Held, Has Identity",
         "prediction_fail": "Falsifier A Isn't a Family Feud Language, but Is marked as a 'Language Candidate.'",
         "category": "MISSING: Have you seen this Language?",
         "has_identity": true,
@@ -2480,7 +2748,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Falsifier B a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "Falsifier B Is a Family Feud Language, but Is Not marked as a 'Language Candidate.'",
         "category": "MISSING: Have you seen this Language?",
         "has_identity": false,
@@ -2508,7 +2776,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Math a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Formal Language",
         "has_identity": false,
@@ -2536,7 +2804,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is OWA & CWA Falsifier a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": " - Open World vs. Closed World Conflict.",
         "category": "MISSING: Have you seen this Language?",
         "has_identity": false,
@@ -2564,7 +2832,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is OWL/RDF/GraphQL/... generally a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Natural Language",
         "has_identity": false,
@@ -2592,7 +2860,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Python a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Formal Language",
         "has_identity": false,
@@ -2620,7 +2888,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Running Calculator App a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, Requires Parsing, Is the Thing, No Decoding Pressure, Resolves to AST, Not 'Ontology', Can't Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & Requires Parsing & Is the Thing & No Decoding Pressure & Resolves to AST, Not 'Ontology' AND Can't Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Running Software",
         "has_identity": true,
@@ -2648,7 +2916,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Sign Language a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Natural Language",
         "has_identity": false,
@@ -2676,7 +2944,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is Spoken Words a language?",
         "predicted_answer": true,
-        "prediction_predicates": "Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity",
+        "prediction_predicates": "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Natural Language",
         "has_identity": false,
@@ -2704,7 +2972,7 @@ const REPORT_DATA = {
         "can_be_held": true,
         "question": "Is The Mona Lisa a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, No AST, Is Stable Ontology, Can Be Held And Has Identity",
+        "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & No AST, Is Stable Ontology AND Can Be Held, Has Identity",
         "prediction_fail": "",
         "category": "Physical Object",
         "has_identity": true,
@@ -2732,7 +3000,7 @@ const REPORT_DATA = {
         "can_be_held": false,
         "question": "Is XLSX - Editing a language?",
         "predicted_answer": false,
-        "prediction_predicates": "No Syntax, No Parsing Needed, Is the Thing, No Decoding Pressure, Resolves to AST, Not 'Ontology', Can't Be Held And Has no Identity",
+        "prediction_predicates": "No Syntax & No Parsing Neede & Is the Thing & No Decoding Pressure & Resolves to AST, Not 'Ontology' AND Can't Be Held, Has no Identity",
         "prediction_fail": "",
         "category": "Running Software",
         "has_identity": false,
@@ -3227,10 +3495,10 @@ function renderSubstrateDetails(substrateName) {
     const failed = substrate.fields_failed;
     const score = total > 0 ? (passed / total * 100).toFixed(1) : 0;
     const elapsed = substrate.elapsed_seconds || 0;
-    const isMaster = substrate.is_master;
+    const isAnswerKey = substrate.is_answer_key;
 
-    let statusText = isMaster ? 'MASTER' : (failed === 0 ? 'PASS' : 'FAIL');
-    let statusClass = isMaster ? 'score-perfect' : (failed === 0 ? 'score-good' : 'score-danger');
+    let statusText = isAnswerKey ? 'ANSWER KEY' : (failed === 0 ? 'PASS' : 'FAIL');
+    let statusClass = isAnswerKey ? 'score-perfect' : (failed === 0 ? 'score-good' : 'score-danger');
 
     let html = '<div class="substrate-info">';
     html += `<h3>${escapeHtml(substrateName)}</h3>`;
@@ -3253,6 +3521,28 @@ function renderSubstrateDetails(substrateName) {
         html += `<div class="failure-card"><code class="actual">${escapeHtml(substrate.error)}</code></div>`;
     }
 
+    // Primary tabs: Report, Data, Schema
+    html += '<nav class="sub-tabs" id="substrate-view-tabs">';
+    html += `<button class="sub-tab active" data-view="report">Report</button>`;
+    html += `<button class="sub-tab" data-view="data">Data</button>`;
+    html += `<button class="sub-tab" data-view="schema">Schema</button>`;
+    html += '</nav>';
+
+    // Tab content containers
+    html += '<div id="substrate-view-content">';
+
+    // Report tab - iframe to substrate-report.html
+    html += '<div id="substrate-report-view" class="substrate-view active">';
+    if (!isAnswerKey) {
+        html += `<iframe src="../execution-substrates/${escapeHtml(substrateName)}/substrate-report.html" class="substrate-report-iframe" frameborder="0"></iframe>`;
+    } else {
+        html += '<p class="no-results">Postgres generates the answer key - no separate report needed.</p>';
+    }
+    html += '</div>';
+
+    // Data tab - graded test results
+    html += '<div id="substrate-data-view" class="substrate-view">';
+
     // Get entities with results
     const entitiesWithResults = Object.keys(REPORT_DATA.entities).sort().filter(entityName => {
         const entity = REPORT_DATA.entities[entityName];
@@ -3263,27 +3553,63 @@ function renderSubstrateDetails(substrateName) {
 
     if (entitiesWithResults.length === 0) {
         html += '<p class="no-results">No test results available.</p>';
-        substrateDetails.innerHTML = html;
-        return;
+    } else {
+        // Entity tabs within substrate view
+        html += '<h4>Graded Test Results</h4>';
+        html += '<nav class="sub-tabs" id="substrate-entity-tabs">';
+        entitiesWithResults.forEach((entityName, i) => {
+            const entity = REPORT_DATA.entities[entityName];
+            const entityGrades = substrate.entities ? substrate.entities[entityName] : null;
+            const eTotal = entityGrades ? entityGrades.fields_tested : 0;
+            const ePassed = entityGrades ? entityGrades.fields_passed : 0;
+            const eScore = eTotal > 0 ? (ePassed / eTotal * 100).toFixed(0) : 0;
+            const eClass = getScoreClass(eScore);
+            const active = i === 0 ? 'active' : '';
+            html += `<button class="sub-tab ${active} score-${eClass}" data-entity="${escapeHtml(entityName)}">${escapeHtml(entityName)} (${ePassed}/${eTotal})</button>`;
+        });
+        html += '</nav>';
+        html += '<div id="substrate-entity-content"></div>';
     }
+    html += '</div>';
 
-    // Entity tabs within substrate view
-    html += '<h4>Graded Test Results</h4>';
-    html += '<nav class="sub-tabs" id="substrate-entity-tabs">';
-    entitiesWithResults.forEach((entityName, i) => {
+    // Schema tab
+    html += '<div id="substrate-schema-view" class="substrate-view">';
+    html += '<h4>Entity Schemas</h4>';
+    Object.keys(REPORT_DATA.entities).sort().forEach(entityName => {
         const entity = REPORT_DATA.entities[entityName];
-        const entityGrades = substrate.entities ? substrate.entities[entityName] : null;
-        const eTotal = entityGrades ? entityGrades.fields_tested : 0;
-        const ePassed = entityGrades ? entityGrades.fields_passed : 0;
-        const eScore = eTotal > 0 ? (ePassed / eTotal * 100).toFixed(0) : 0;
-        const eClass = getScoreClass(eScore);
-        const active = i === 0 ? 'active' : '';
-        html += `<button class="sub-tab ${active} score-${eClass}" data-entity="${escapeHtml(entityName)}">${escapeHtml(entityName)} (${ePassed}/${eTotal})</button>`;
+        html += `<details><summary>${escapeHtml(entityName)} (${entity.schema.length} fields)</summary>`;
+        html += '<div class="table-scroll"><table class="schema-table"><thead><tr>';
+        html += '<th>Field</th><th>Type</th><th>Formula</th><th>Description</th>';
+        html += '</tr></thead><tbody>';
+        entity.schema.forEach(field => {
+            const typeClass = field.type === 'calculated' ? 'type-calculated' : 'type-raw';
+            const formula = field.formula || '';
+            const desc = field.Description || field.description || '';
+            html += `<tr>
+                <td>${escapeHtml(field.name)}</td>
+                <td class="${typeClass}">${escapeHtml(field.type || 'raw')}</td>
+                <td class="formula-cell" title="${escapeHtml(formula)}">${escapeHtml(formula)}</td>
+                <td class="desc-cell" title="${escapeHtml(desc)}">${escapeHtml(desc)}</td>
+            </tr>`;
+        });
+        html += '</tbody></table></div></details>';
     });
-    html += '</nav>';
-    html += '<div id="substrate-entity-content"></div>';
+    html += '</div>';
+
+    html += '</div>'; // end substrate-view-content
 
     substrateDetails.innerHTML = html;
+
+    // Attach handlers to view tabs (Report/Data/Schema)
+    document.querySelectorAll('#substrate-view-tabs .sub-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('#substrate-view-tabs .sub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.substrate-view').forEach(v => v.classList.remove('active'));
+            tab.classList.add('active');
+            const view = tab.dataset.view;
+            document.getElementById(`substrate-${view}-view`)?.classList.add('active');
+        });
+    });
 
     // Attach handlers to entity tabs
     document.querySelectorAll('#substrate-entity-tabs .sub-tab').forEach(tab => {
@@ -3295,7 +3621,7 @@ function renderSubstrateDetails(substrateName) {
         });
     });
 
-    // Render first entity
+    // Render first entity in data view
     if (entitiesWithResults.length > 0) {
         currentSubstrateEntity = entitiesWithResults[0];
         renderSubstrateEntityContent(substrateName, entitiesWithResults[0]);

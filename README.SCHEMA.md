@@ -393,7 +393,7 @@ The following entities have been evaluated against the operational definition of
 
 **Formula for `PredictionPredicates`:**
 ```
-=IF({{HasSyntax}}, "Has Syntax", "No Syntax") & ", " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Needed") & ", " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & ", " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & ", " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & ", " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & " And " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")
+=IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Neede") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & " AND " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " &IF({{HasIdentity}}, "Has Identity", "Has no Identity")
 ```
 
 **Formula for `PredictionFail`:**
@@ -442,7 +442,7 @@ The following entities have been evaluated against the operational definition of
 | `IsDescriptionOf` | true |
 | `ResolvesToAnAST` | true |
 | `ModelObjectFacilityLayer` | M1 |
-| `PredictionPredicates` | Has Syntax, Requires Parsing, Describes the thing, Has Linear Decoding Pressure, Resolves to AST, Is Stable Ontology, Can't Be Held And Has no Identity |
+| `PredictionPredicates` | Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity |
 | `CanBeHeld` | false |
 | `PredictionFail` |  |
 | `HasIdentity` | false |

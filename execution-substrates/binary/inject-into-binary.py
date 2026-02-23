@@ -1117,7 +1117,7 @@ def generate_data_section(string_literals: Dict[str, str], result_buffers: List[
     lines.append("")
     lines.append("    ; Static result buffers for string concatenation")
     lines.append("    .bss")
-    for func_name in result_buffers:
+    for func_name in sorted(result_buffers):  # Sort for deterministic output
         buffer_label = f"_result_buf_{func_name}"
         lines.append(f"    .globl {buffer_label}")
         lines.append(f"    .p2align 3")

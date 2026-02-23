@@ -2,7 +2,7 @@
   "schema_version": "erb.explain_spec.v1",
   "rulebook": {
     "name": "PUBLISHED - ERB_semiotics-is-everything-a-language",
-    "rulebook_hash": "sha256:7273aeacfeb85864d2e2d1f0bb0eb81e"
+    "rulebook_hash": "sha256:db70484012faaeac62fad2703f2a94d4"
   },
   "semantics": {
     "profile": "excel",
@@ -166,22 +166,6 @@
           "Question"
         ],
         [
-          "CanBeHeld",
-          "PredictedAnswer"
-        ],
-        [
-          "IsDescriptionOf",
-          "PredictedAnswer"
-        ],
-        [
-          "RequiresParsing",
-          "PredictedAnswer"
-        ],
-        [
-          "IsStableOntologyReference",
-          "PredictedAnswer"
-        ],
-        [
           "HasSyntax",
           "PredictedAnswer"
         ],
@@ -190,28 +174,28 @@
           "PredictedAnswer"
         ],
         [
+          "RequiresParsing",
+          "PredictedAnswer"
+        ],
+        [
+          "CanBeHeld",
+          "PredictedAnswer"
+        ],
+        [
           "ResolvesToAnAST",
+          "PredictedAnswer"
+        ],
+        [
+          "IsDescriptionOf",
+          "PredictedAnswer"
+        ],
+        [
+          "IsStableOntologyReference",
           "PredictedAnswer"
         ],
         [
           "HasIdentity",
           "PredictedAnswer"
-        ],
-        [
-          "CanBeHeld",
-          "PredictionPredicates"
-        ],
-        [
-          "IsDescriptionOf",
-          "PredictionPredicates"
-        ],
-        [
-          "RequiresParsing",
-          "PredictionPredicates"
-        ],
-        [
-          "IsStableOntologyReference",
-          "PredictionPredicates"
         ],
         [
           "HasSyntax",
@@ -222,7 +206,23 @@
           "PredictionPredicates"
         ],
         [
+          "RequiresParsing",
+          "PredictionPredicates"
+        ],
+        [
+          "CanBeHeld",
+          "PredictionPredicates"
+        ],
+        [
           "ResolvesToAnAST",
+          "PredictionPredicates"
+        ],
+        [
+          "IsDescriptionOf",
+          "PredictionPredicates"
+        ],
+        [
+          "IsStableOntologyReference",
           "PredictionPredicates"
         ],
         [
@@ -230,11 +230,11 @@
           "PredictionPredicates"
         ],
         [
-          "IsLanguage",
+          "IsOpenClosedWorldConflicted",
           "PredictionFail"
         ],
         [
-          "Name",
+          "IsLanguage",
           "PredictionFail"
         ],
         [
@@ -242,7 +242,7 @@
           "PredictionFail"
         ],
         [
-          "IsOpenClosedWorldConflicted",
+          "Name",
           "PredictionFail"
         ],
         [
@@ -497,8 +497,8 @@
           ]
         },
         "PredictionPredicates": {
-          "formula_source": "=IF({{HasSyntax}}, \"Has Syntax\", \"No Syntax\") & \", \" & IF({{RequiresParsing}}, \"Requires Parsing\", \"No Parsing Needed\") & \", \" & IF({{IsDescriptionOf}}, \"Describes the thing\", \"Is the Thing\") & \", \" & IF({{HasLinearDecodingPressure}}, \"Has Linear Decoding Pressure\", \"No Decoding Pressure\") & \", \" & IF({{ResolvesToAnAST}}, \"Resolves to AST\", \"No AST\") & \", \" & IF({{IsStableOntologyReference}}, \"Is Stable Ontology\", \"Not 'Ontology'\") & \", \" & IF({{CanBeHeld}}, \"Can Be Held\", \"Can't Be Held\") & \" And \" & IF({{HasIdentity}}, \"Has Identity\", \"Has no Identity\")",
-          "template_hash": "sha256:52a6e96517f85eb4",
+          "formula_source": "=IF({{HasSyntax}}, \"Has Syntax\", \"No Syntax\") & \" & \" & IF({{RequiresParsing}}, \"Requires Parsing\", \"No Parsing Neede\") & \" & \" & IF({{IsDescriptionOf}}, \"Describes the thing\", \"Is the Thing\") & \" & \" & IF({{HasLinearDecodingPressure}}, \"Has Linear Decoding Pressure\", \"No Decoding Pressure\") & \" & \" & IF({{ResolvesToAnAST}}, \"Resolves to AST\", \"No AST\") & \", \" & IF({{IsStableOntologyReference}}, \"Is Stable Ontology\", \"Not 'Ontology'\") & \" AND \" & IF({{CanBeHeld}}, \"Can Be Held\", \"Can't Be Held\") & \", \" &IF({{HasIdentity}}, \"Has Identity\", \"Has no Identity\")",
+          "template_hash": "sha256:d160537ea00ae99e",
           "root_node": "n_result_PredictionPredicates",
           "nodes": {
             "n_ref_1": {
@@ -527,7 +527,7 @@
             },
             "n_const_5": {
               "kind": "const",
-              "value": ", ",
+              "value": " & ",
               "type": "string"
             },
             "n_ref_6": {
@@ -542,7 +542,7 @@
             },
             "n_const_8": {
               "kind": "const",
-              "value": "No Parsing Needed",
+              "value": "No Parsing Neede",
               "type": "string"
             },
             "n_fn_9": {
@@ -556,7 +556,7 @@
             },
             "n_const_10": {
               "kind": "const",
-              "value": ", ",
+              "value": " & ",
               "type": "string"
             },
             "n_ref_11": {
@@ -585,7 +585,7 @@
             },
             "n_const_15": {
               "kind": "const",
-              "value": ", ",
+              "value": " & ",
               "type": "string"
             },
             "n_ref_16": {
@@ -614,7 +614,7 @@
             },
             "n_const_20": {
               "kind": "const",
-              "value": ", ",
+              "value": " & ",
               "type": "string"
             },
             "n_ref_21": {
@@ -672,7 +672,7 @@
             },
             "n_const_30": {
               "kind": "const",
-              "value": ", ",
+              "value": " AND ",
               "type": "string"
             },
             "n_ref_31": {
@@ -701,7 +701,7 @@
             },
             "n_const_35": {
               "kind": "const",
-              "value": " And ",
+              "value": ", ",
               "type": "string"
             },
             "n_ref_36": {

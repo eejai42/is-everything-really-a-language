@@ -1,4 +1,0 @@
-order_id,name,order_number,customer,customer_email_address,customer_full_name
-ord1001,ORD1001,1001,cust0001,jane.smith@email.com,Jane Smith
-ord1002,ORD1002,1002,cust0002,john.doe@email.com,John Doe
-ord1003,ORD1003,1003,cust0001,jane.smith@email.com,Jane Smith

@@ -131,32 +131,35 @@ def fill_null_fields_from_csv(csv_path, answers_path):
 
 
 def find_csv_for_entity(script_dir, entity):
-    """Find CSV file for an entity (try multiple naming patterns)."""
+    """Find CSV file for an entity in test-data/ directory."""
+    test_data_dir = script_dir / 'test-data'
+
     # Try exact match first
-    csv_path = script_dir / f'{entity}.csv'
+    csv_path = test_data_dir / f'{entity}.csv'
     if csv_path.exists():
         return csv_path
 
     # Try with _ to - conversion
-    csv_path = script_dir / f'{entity.replace("_", "-")}.csv'
+    csv_path = test_data_dir / f'{entity.replace("_", "-")}.csv'
     if csv_path.exists():
         return csv_path
 
     # Try all csv files and match by content
-    for csv_file in script_dir.glob('*.csv'):
-        if csv_file.name.startswith('_'):
-            continue
-        # Check if this might be the right CSV by looking at headers
-        try:
-            with open(csv_file, 'r', encoding='utf-8') as f:
-                reader = csv.reader(f)
-                headers = next(reader, [])
-                # If entity pk field exists in headers, this is likely the file
-                pk_field = f'{entity.rstrip("s")}_id'  # Simple singularize
-                if pk_field in headers:
-                    return csv_file
-        except:
-            pass
+    if test_data_dir.exists():
+        for csv_file in test_data_dir.glob('*.csv'):
+            if csv_file.name.startswith('_'):
+                continue
+            # Check if this might be the right CSV by looking at headers
+            try:
+                with open(csv_file, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    headers = next(reader, [])
+                    # If entity pk field exists in headers, this is likely the file
+                    pk_field = f'{entity.rstrip("s")}_id'  # Simple singularize
+                    if pk_field in headers:
+                        return csv_file
+            except:
+                pass
 
     return None
 

@@ -146,36 +146,6 @@ VALUES ('01b-customize-schema-sql', '01b-customize-schema.sql', 'Customize Schem
 
 INSERT INTO erb_customizations (erb_customization_id, name, title, sql_code, sql_target, customization_type)
 VALUES ('02b-customize-functions-sql', '02b-customize-functions.sql', 'Customize Functions', '-- Prediction Fail: Returns TRUE when predicted_answer doesn''t match is_language
-DROP FUNCTION IF EXISTS calc_language_candidates_prediction_fail_x;
-
-CREATE OR REPLACE FUNCTION calc_language_candidates_prediction_fail_x(p_language_candidate_id TEXT)
-RETURNS TEXT AS $$
-  SELECT NULLIF(
-    COALESCE(
-      CASE
-        WHEN COALESCE(calc_language_candidates_predicted_answer(p_language_candidate_id), FALSE)
-             != COALESCE(is_language, FALSE)
-        THEN name || '' '' ||
-             CASE WHEN calc_language_candidates_predicted_answer(p_language_candidate_id) THEN ''Is'' ELSE ''Isn''''t'' END ||
-             '' a Family Feud Language, but '' ||
-             CASE WHEN is_language THEN ''Is'' ELSE ''Is Not'' END ||
-             '' marked as a ''''Language Candidate.''''''
-      END,
-      ''''
-    ) ||
-    COALESCE(
-      CASE
-        WHEN calc_language_candidates_is_open_closed_world_conflicted(p_language_candidate_id)
-        THEN '' - Open World vs. Closed World Conflict.''
-      END,
-      ''''
-    ),
-    ''''
-  )
-  FROM language_candidates
-  WHERE language_candidate_id = p_language_candidate_id;
-$$ LANGUAGE SQL STABLE SECURITY DEFINER;
-
 DROP FUNCTION calc_language_candidates_question;
 
 CREATE OR REPLACE FUNCTION public.calc_language_candidates_question(p_language_candidate_id text)

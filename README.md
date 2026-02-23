@@ -192,7 +192,7 @@ This formula is compiled to Postgres, Python, Go, and any other substrate—not 
 
 **Answer**: Conformance testing against a reference execution.
 
-1. Generate `answer-key.json` from one substrate (the reference execution)
+1. Generate `answer-key.json` from one substrate (Postgres by default, but any 100%-conformant substrate could serve this role)
 2. Run every other substrate against `blank-test.json` (same inputs, computed fields nulled)
 3. Compare outputs field-by-field, row-by-row
 4. Drift is detected automatically, not discovered in production

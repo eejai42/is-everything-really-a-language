@@ -6,12 +6,25 @@
 # Reads from shared testing/blank-tests/ and writes to local test-answers/
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+LOG_FILE="$SCRIPT_DIR/.last-run.log"
 cd "$SCRIPT_DIR"
 
 # Ensure test-answers directory exists
 mkdir -p "$SCRIPT_DIR/test-answers"
 
 # Run Python script (reads from shared testing/blank-tests/)
-python3 take-test.py
+# Capture output for the substrate report
+{
+    echo "=== XLSX (Excel) Substrate Test Run ==="
+    echo "Started: $(date)"
+    echo ""
+    python3 take-test.py
+    echo ""
+    echo "Completed: $(date)"
+} 2>&1 | tee "$LOG_FILE"
 
 echo "xlsx: test completed"
+
+# Generate substrate report
+python3 "$PROJECT_ROOT/orchestration/create-substrate-report.py" xlsx --log "$LOG_FILE"

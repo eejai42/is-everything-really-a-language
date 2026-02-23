@@ -3,7 +3,7 @@
 # GENERATE-REPORT.PY
 # =============================================================================
 # Generates a comprehensive, self-contained HTML report from orchestration data.
-# Includes all 12 substrates (11 generated + postgres as master/answer key).
+# Includes all 12 substrates (11 generated + postgres as default answer-key substrate).
 #
 # Usage: python3 generate-report.py [--output path/to/report.html]
 # =============================================================================
@@ -135,7 +135,7 @@ def load_answer_keys():
 
 def get_substrates():
     """Get list of all substrates (11 generated + postgres)"""
-    substrates = ['postgres']  # postgres is first (master)
+    substrates = ['postgres']  # postgres is first (default answer-key substrate)
     if os.path.isdir(SUBSTRATES_DIR):
         for name in sorted(os.listdir(SUBSTRATES_DIR)):
             path = os.path.join(SUBSTRATES_DIR, name)
@@ -163,10 +163,10 @@ def load_substrate_grades(substrate_name: str) -> dict:
     """Load grades for a substrate from pickle or reconstruct from results"""
     # Try pickle file first (exists during orchestration)
     if substrate_name == 'postgres':
-        # Postgres is the master - always 100%
+        # Postgres generates the answer key - always 100% by definition
         return {
             "substrate": "postgres",
-            "is_master": True,
+            "is_answer_key": True,
             "total_fields_tested": 0,
             "fields_passed": 0,
             "fields_failed": 0,
@@ -579,7 +579,7 @@ def generate_matrix_rows(data: dict) -> str:
 
     for substrate_name in sorted_substrates(data):
         grades = data["substrates"][substrate_name]
-        is_master = grades.get("is_master", False)
+        is_answer_key = grades.get("is_answer_key", False)
 
         total = grades["total_fields_tested"]
         passed = grades["fields_passed"]
@@ -593,13 +593,13 @@ def generate_matrix_rows(data: dict) -> str:
         has_failure = last_run.get("status") == "failure" if last_run else False
         is_restored = has_failure and last_success is not None
 
-        row_class = "master-row" if is_master else ("restored-row" if is_restored else "")
+        row_class = "answer-key-row" if is_answer_key else ("restored-row" if is_restored else "")
         score_class = get_score_class(score)
 
         cells = []
 
         # Substrate name cell with warning badge if last run failed
-        substrate_label = f"{substrate_name} (master)" if is_master else substrate_name
+        substrate_label = f"{substrate_name} (answer-key)" if is_answer_key else substrate_name
         warning_badge = ""
         if is_restored:
             error_msg = last_run.get("error_message", "Unknown error")
@@ -613,8 +613,8 @@ def generate_matrix_rows(data: dict) -> str:
             e_passed = entity_grades.get("fields_passed", 0)
             e_failed = entity_grades.get("fields_failed", 0)
 
-            if is_master:
-                cell_class = "cell-master"
+            if is_answer_key:
+                cell_class = "cell-answer-key"
                 symbol = "&#9733;"  # star
             elif e_total == 0:
                 cell_class = "cell-na"
@@ -634,7 +634,7 @@ def generate_matrix_rows(data: dict) -> str:
             )
 
         # Score cell
-        if is_master:
+        if is_answer_key:
             cells.append('<td class="score-cell score-perfect">100%</td>')
         else:
             cells.append(f'<td class="score-cell score-{score_class}">{score:.1f}%</td>')
@@ -659,8 +659,8 @@ def generate_substrate_options(data: dict) -> str:
     """Generate <option> elements for substrate selector"""
     options = []
     for substrate in sorted_substrates(data):
-        is_master = data["substrates"][substrate].get("is_master", False)
-        label = f"{substrate} (master)" if is_master else substrate
+        is_answer_key = data["substrates"][substrate].get("is_answer_key", False)
+        label = f"{substrate} (answer-key)" if is_answer_key else substrate
         options.append(f'<option value="{escape(substrate)}">{escape(label)}</option>')
     return '\n                    '.join(options)
 
@@ -678,8 +678,8 @@ def generate_substrate_tabs(data: dict) -> str:
     """Generate tab buttons for substrate selector"""
     tabs = []
     for i, substrate in enumerate(sorted_substrates(data)):
-        is_master = data["substrates"][substrate].get("is_master", False)
-        label = f"{substrate} (master)" if is_master else substrate
+        is_answer_key = data["substrates"][substrate].get("is_answer_key", False)
+        label = f"{substrate} (answer-key)" if is_answer_key else substrate
         active = "active" if i == 0 else ""
         tabs.append(f'<button class="sub-tab {active}" data-substrate="{escape(substrate)}">{escape(label)}</button>')
     return '\n                '.join(tabs)
@@ -690,12 +690,12 @@ def generate_substrate_links(data: dict) -> str:
     links = []
     for substrate in sorted_substrates(data):
         grades = data["substrates"][substrate]
-        is_master = grades.get("is_master", False)
+        is_answer_key = grades.get("is_answer_key", False)
         total = grades["total_fields_tested"]
         passed = grades["fields_passed"]
         score = (passed / total * 100) if total > 0 else 0
         score_class = get_score_class(score)
-        label = f"{substrate} (master)" if is_master else substrate
+        label = f"{substrate} (answer-key)" if is_answer_key else substrate
         links.append(f'<a href="#" class="substrate-link score-{score_class}" data-substrate="{escape(substrate)}">{escape(label)}: {score:.0f}%</a>')
     return '\n                    '.join(links)
 
@@ -705,7 +705,7 @@ def generate_failure_details(data: dict) -> str:
     failures = []
 
     for substrate_name, grades in sorted(data["substrates"].items()):
-        if grades.get("is_master"):
+        if grades.get("is_answer_key"):
             continue
 
         for entity_name, entity_grades in grades.get("entities", {}).items():
@@ -772,7 +772,7 @@ def get_css() -> str:
     --success-color: #198754;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
-    --master-color: #6f42c1;
+    --answer-key-color: #6f42c1;
     --shadow: 0 2px 8px rgba(0,0,0,0.1);
     --radius: 6px;
 }
@@ -788,7 +788,7 @@ def get_css() -> str:
     --success-color: #51cf66;
     --warning-color: #fcc419;
     --danger-color: #ff6b6b;
-    --master-color: #b197fc;
+    --answer-key-color: #b197fc;
     --shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
@@ -931,9 +931,9 @@ h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--tex
 .cell-fail { background: rgba(220, 53, 69, 0.15); color: var(--danger-color); font-weight: 600; cursor: pointer; }
 .cell-fail:hover { background: rgba(220, 53, 69, 0.25); }
 .cell-na { color: var(--text-secondary); }
-.cell-master { background: rgba(111, 66, 193, 0.15); color: var(--master-color); font-weight: 600; }
-.master-row { background: rgba(111, 66, 193, 0.05); }
-.master-row .substrate-name { color: var(--master-color); }
+.cell-answer-key { background: rgba(111, 66, 193, 0.15); color: var(--answer-key-color); font-weight: 600; }
+.answer-key-row { background: rgba(111, 66, 193, 0.05); }
+.answer-key-row .substrate-name { color: var(--answer-key-color); }
 .restored-row { background: rgba(255, 193, 7, 0.08); }
 .warning-badge { color: var(--warning-color); font-size: 0.85rem; cursor: help; margin-left: 0.25rem; }
 .score-cell { font-weight: 600; }
@@ -1013,7 +1013,7 @@ h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--tex
 .formula-cell {
     font-family: monospace;
     font-size: 0.75rem;
-    color: var(--master-color);
+    color: var(--answer-key-color);
     max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1170,10 +1170,13 @@ footer {
 .computed-cols-info .formula {
     font-family: monospace;
     font-size: 0.75rem;
-    color: var(--master-color);
+    color: var(--answer-key-color);
     background: var(--bg-tertiary);
     padding: 0.15rem 0.35rem;
     border-radius: 3px;
+    white-space: pre-wrap;
+    display: block;
+    margin-top: 0.25rem;
 }
 .computed-cols-info .desc-row { display: block; color: var(--text-secondary); font-size: 0.75rem; font-style: italic; margin-top: 0.15rem; }
 
@@ -1246,6 +1249,17 @@ footer {
 
 /* Tooltip for full text on hover */
 [title] { cursor: help; }
+
+/* Substrate view tabs and iframe */
+.substrate-view { display: none; }
+.substrate-view.active { display: block; }
+.substrate-report-iframe {
+    width: 100%;
+    min-height: 600px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--bg-primary);
+}
 
 @media print {
     header, .tabs, footer { display: none; }
@@ -1519,10 +1533,10 @@ function renderSubstrateDetails(substrateName) {
     const failed = substrate.fields_failed;
     const score = total > 0 ? (passed / total * 100).toFixed(1) : 0;
     const elapsed = substrate.elapsed_seconds || 0;
-    const isMaster = substrate.is_master;
+    const isAnswerKey = substrate.is_answer_key;
 
-    let statusText = isMaster ? 'MASTER' : (failed === 0 ? 'PASS' : 'FAIL');
-    let statusClass = isMaster ? 'score-perfect' : (failed === 0 ? 'score-good' : 'score-danger');
+    let statusText = isAnswerKey ? 'ANSWER KEY' : (failed === 0 ? 'PASS' : 'FAIL');
+    let statusClass = isAnswerKey ? 'score-perfect' : (failed === 0 ? 'score-good' : 'score-danger');
 
     let html = '<div class="substrate-info">';
     html += `<h3>${escapeHtml(substrateName)}</h3>`;
@@ -1545,6 +1559,28 @@ function renderSubstrateDetails(substrateName) {
         html += `<div class="failure-card"><code class="actual">${escapeHtml(substrate.error)}</code></div>`;
     }
 
+    // Primary tabs: Report, Data, Schema
+    html += '<nav class="sub-tabs" id="substrate-view-tabs">';
+    html += `<button class="sub-tab active" data-view="report">Report</button>`;
+    html += `<button class="sub-tab" data-view="data">Data</button>`;
+    html += `<button class="sub-tab" data-view="schema">Schema</button>`;
+    html += '</nav>';
+
+    // Tab content containers
+    html += '<div id="substrate-view-content">';
+
+    // Report tab - iframe to substrate-report.html
+    html += '<div id="substrate-report-view" class="substrate-view active">';
+    if (!isAnswerKey) {
+        html += `<iframe src="../execution-substrates/${escapeHtml(substrateName)}/substrate-report.html" class="substrate-report-iframe" frameborder="0"></iframe>`;
+    } else {
+        html += '<p class="no-results">Postgres generates the answer key - no separate report needed.</p>';
+    }
+    html += '</div>';
+
+    // Data tab - graded test results
+    html += '<div id="substrate-data-view" class="substrate-view">';
+
     // Get entities with results
     const entitiesWithResults = Object.keys(REPORT_DATA.entities).sort().filter(entityName => {
         const entity = REPORT_DATA.entities[entityName];
@@ -1555,27 +1591,63 @@ function renderSubstrateDetails(substrateName) {
 
     if (entitiesWithResults.length === 0) {
         html += '<p class="no-results">No test results available.</p>';
-        substrateDetails.innerHTML = html;
-        return;
+    } else {
+        // Entity tabs within substrate view
+        html += '<h4>Graded Test Results</h4>';
+        html += '<nav class="sub-tabs" id="substrate-entity-tabs">';
+        entitiesWithResults.forEach((entityName, i) => {
+            const entity = REPORT_DATA.entities[entityName];
+            const entityGrades = substrate.entities ? substrate.entities[entityName] : null;
+            const eTotal = entityGrades ? entityGrades.fields_tested : 0;
+            const ePassed = entityGrades ? entityGrades.fields_passed : 0;
+            const eScore = eTotal > 0 ? (ePassed / eTotal * 100).toFixed(0) : 0;
+            const eClass = getScoreClass(eScore);
+            const active = i === 0 ? 'active' : '';
+            html += `<button class="sub-tab ${active} score-${eClass}" data-entity="${escapeHtml(entityName)}">${escapeHtml(entityName)} (${ePassed}/${eTotal})</button>`;
+        });
+        html += '</nav>';
+        html += '<div id="substrate-entity-content"></div>';
     }
+    html += '</div>';
 
-    // Entity tabs within substrate view
-    html += '<h4>Graded Test Results</h4>';
-    html += '<nav class="sub-tabs" id="substrate-entity-tabs">';
-    entitiesWithResults.forEach((entityName, i) => {
+    // Schema tab
+    html += '<div id="substrate-schema-view" class="substrate-view">';
+    html += '<h4>Entity Schemas</h4>';
+    Object.keys(REPORT_DATA.entities).sort().forEach(entityName => {
         const entity = REPORT_DATA.entities[entityName];
-        const entityGrades = substrate.entities ? substrate.entities[entityName] : null;
-        const eTotal = entityGrades ? entityGrades.fields_tested : 0;
-        const ePassed = entityGrades ? entityGrades.fields_passed : 0;
-        const eScore = eTotal > 0 ? (ePassed / eTotal * 100).toFixed(0) : 0;
-        const eClass = getScoreClass(eScore);
-        const active = i === 0 ? 'active' : '';
-        html += `<button class="sub-tab ${active} score-${eClass}" data-entity="${escapeHtml(entityName)}">${escapeHtml(entityName)} (${ePassed}/${eTotal})</button>`;
+        html += `<details><summary>${escapeHtml(entityName)} (${entity.schema.length} fields)</summary>`;
+        html += '<div class="table-scroll"><table class="schema-table"><thead><tr>';
+        html += '<th>Field</th><th>Type</th><th>Formula</th><th>Description</th>';
+        html += '</tr></thead><tbody>';
+        entity.schema.forEach(field => {
+            const typeClass = field.type === 'calculated' ? 'type-calculated' : 'type-raw';
+            const formula = field.formula || '';
+            const desc = field.Description || field.description || '';
+            html += `<tr>
+                <td>${escapeHtml(field.name)}</td>
+                <td class="${typeClass}">${escapeHtml(field.type || 'raw')}</td>
+                <td class="formula-cell" title="${escapeHtml(formula)}">${escapeHtml(formula)}</td>
+                <td class="desc-cell" title="${escapeHtml(desc)}">${escapeHtml(desc)}</td>
+            </tr>`;
+        });
+        html += '</tbody></table></div></details>';
     });
-    html += '</nav>';
-    html += '<div id="substrate-entity-content"></div>';
+    html += '</div>';
+
+    html += '</div>'; // end substrate-view-content
 
     substrateDetails.innerHTML = html;
+
+    // Attach handlers to view tabs (Report/Data/Schema)
+    document.querySelectorAll('#substrate-view-tabs .sub-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('#substrate-view-tabs .sub-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.substrate-view').forEach(v => v.classList.remove('active'));
+            tab.classList.add('active');
+            const view = tab.dataset.view;
+            document.getElementById(`substrate-${view}-view`)?.classList.add('active');
+        });
+    });
 
     // Attach handlers to entity tabs
     document.querySelectorAll('#substrate-entity-tabs .sub-tab').forEach(tab => {
@@ -1587,7 +1659,7 @@ function renderSubstrateDetails(substrateName) {
         });
     });
 
-    // Render first entity
+    // Render first entity in data view
     if (entitiesWithResults.length > 0) {
         currentSubstrateEntity = entitiesWithResults[0];
         renderSubstrateEntityContent(substrateName, entitiesWithResults[0]);

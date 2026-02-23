@@ -85,7 +85,7 @@ erb:LanguageCandidatesShape a sh:NodeShape ;
     OPTIONAL { $this erb:isStableOntologyReference ?is_stable_ontology_reference . }
     OPTIONAL { $this erb:requiresParsing ?requires_parsing . }
     OPTIONAL { $this erb:resolvesToAnAST ?resolves_to_an_ast . }
-                BIND(CONCAT(IF(?has_syntax, "Has Syntax", "No Syntax"), ", ", IF(?requires_parsing, "Requires Parsing", "No Parsing Needed"), ", ", IF(?is_description_of, "Describes the thing", "Is the Thing"), ", ", IF(?has_linear_decoding_pressure, "Has Linear Decoding Pressure", "No Decoding Pressure"), ", ", IF(?resolves_to_an_ast, "Resolves to AST", "No AST"), ", ", IF(?is_stable_ontology_reference, "Is Stable Ontology", "Not \'Ontology\'"), ", ", IF(?can_be_held, "Can Be Held", "Can\'t Be Held"), " And ", IF(?has_identity, "Has Identity", "Has no Identity")) AS ?_result)
+                BIND(CONCAT(IF(?has_syntax, "Has Syntax", "No Syntax"), " & ", IF(?requires_parsing, "Requires Parsing", "No Parsing Neede"), " & ", IF(?is_description_of, "Describes the thing", "Is the Thing"), " & ", IF(?has_linear_decoding_pressure, "Has Linear Decoding Pressure", "No Decoding Pressure"), " & ", IF(?resolves_to_an_ast, "Resolves to AST", "No AST"), ", ", IF(?is_stable_ontology_reference, "Is Stable Ontology", "Not \'Ontology\'"), " AND ", IF(?can_be_held, "Can Be Held", "Can\'t Be Held"), ", ", IF(?has_identity, "Has Identity", "Has no Identity")) AS ?_result)
             }
         """ ;
     ] ;

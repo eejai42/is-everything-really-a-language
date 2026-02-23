@@ -13,26 +13,41 @@ set -o pipefail  # Catch errors in pipes
 #   - Output cannot be written
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+LOG_FILE="$SCRIPT_DIR/.last-run.log"
 cd "$SCRIPT_DIR"
 
-echo "golang: Starting test..."
+# Capture output for the substrate report
+{
+    echo "=== Go Substrate Test Run ==="
+    echo "Started: $(date)"
+    echo ""
 
-# Verify required source files exist
-if [[ ! -f "erb_sdk.go" ]]; then
-    echo "FATAL: erb_sdk.go not found! Run inject-into-golang.py first." >&2
-    exit 1
-fi
+    echo "golang: Starting test..."
 
-if [[ ! -f "main.go" ]]; then
-    echo "FATAL: main.go not found! Run inject-into-golang.py first." >&2
-    exit 1
-fi
+    # Verify required source files exist
+    if [[ ! -f "erb_sdk.go" ]]; then
+        echo "FATAL: erb_sdk.go not found! Run inject-into-golang.py first." >&2
+        exit 1
+    fi
 
-# Ensure test-answers directory exists
-mkdir -p "$SCRIPT_DIR/test-answers"
+    if [[ ! -f "main.go" ]]; then
+        echo "FATAL: main.go not found! Run inject-into-golang.py first." >&2
+        exit 1
+    fi
 
-# Run Go test runner - compilation errors will cause immediate exit due to set -e
-echo "golang: Compiling and running..."
-go run erb_sdk.go main.go
+    # Ensure test-answers directory exists
+    mkdir -p "$SCRIPT_DIR/test-answers"
+
+    # Run Go test runner - compilation errors will cause immediate exit due to set -e
+    echo "golang: Compiling and running..."
+    go run erb_sdk.go main.go
+
+    echo ""
+    echo "Completed: $(date)"
+} 2>&1 | tee "$LOG_FILE"
 
 echo "golang: test completed successfully"
+
+# Generate substrate report
+python3 "$PROJECT_ROOT/orchestration/create-substrate-report.py" golang --log "$LOG_FILE"

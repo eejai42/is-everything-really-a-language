@@ -3,12 +3,16 @@
 Take test for the English execution substrate.
 
 This substrate uses an LLM to "execute" English language specifications.
-It reads the schema from the rulebook and asks the LLM to compute the
-calculated fields for each record based on the formula descriptions.
+It reads the GENERATED ENGLISH PROSE (glossary.md, specification.md) and asks
+the LLM to compute calculated fields based on those human-readable instructions.
 
 This tests whether natural language specifications can be used to correctly
 compute derived fields - essentially testing if an LLM can "execute" English
 as a programming language.
+
+IMPORTANT: This reads from glossary.md and specification.md, NOT from the raw
+rulebook JSON. The whole point is to test whether English prose is sufficient
+to serve as an "execution substrate."
 
 DOMAIN-AGNOSTIC: Works with any Airtable schema, not hardcoded to any specific domain.
 """
@@ -95,11 +99,51 @@ def call_llm(prompt: str) -> str:
 
 
 # =============================================================================
-# PROMPT BUILDING (Domain-Agnostic)
+# ENGLISH DOCUMENT LOADING
+# =============================================================================
+
+def load_english_documents() -> tuple:
+    """
+    Load the generated English prose documents.
+    Returns (glossary_content, specification_content).
+
+    The specification.md is required - it contains the LLM-generated English
+    specification for computing calculated fields. Glossary is optional.
+    """
+    glossary_path = script_dir / "glossary.md"
+    spec_path = script_dir / "specification.md"
+
+    glossary_content = ""
+    spec_content = ""
+
+    # Glossary is optional - specification.md now contains everything
+    if glossary_path.exists():
+        with open(glossary_path, 'r', encoding='utf-8') as f:
+            glossary_content = f.read()
+        print(f"  Loaded glossary.md ({len(glossary_content)} chars)")
+
+    # Specification is required
+    if spec_path.exists():
+        with open(spec_path, 'r', encoding='utf-8') as f:
+            spec_content = f.read()
+        print(f"  Loaded specification.md ({len(spec_content)} chars)")
+    else:
+        print(f"  ERROR: specification.md not found at {spec_path}")
+        print(f"  Run inject-into-english.py first to generate specification")
+
+    return glossary_content, spec_content
+
+
+# =============================================================================
+# PROMPT BUILDING (Uses English Documents)
 # =============================================================================
 
 def build_schema_description(schema: list) -> str:
-    """Build a human-readable description of the schema for the LLM."""
+    """Build a human-readable description of the schema for the LLM.
+
+    NOTE: This is a FALLBACK only used if English documents don't exist.
+    The preferred path uses glossary.md and specification.md directly.
+    """
     raw_fields = get_raw_fields(schema)
     calc_fields = get_calculated_fields(schema)
 
@@ -141,8 +185,67 @@ def build_computed_columns_list(schema: list) -> list:
     return [to_snake_case(f.get('name', '')) for f in calc_fields]
 
 
+def build_prompt_with_english_docs(glossary: str, specification: str, entity_name: str,
+                                    test_data: list, computed_columns: list) -> str:
+    """
+    Build the prompt using the ENGLISH PROSE documents (specification.md, optionally glossary.md).
+
+    This is the PRIMARY prompt builder - it tests whether the LLM can execute
+    English as a programming language by reading human-readable specifications.
+    """
+    # Build glossary section only if we have one
+    glossary_section = ""
+    if glossary:
+        glossary_section = f"""
+# GLOSSARY (Predicate Definitions)
+
+{glossary}
+
+---
+"""
+
+    prompt = f"""You are taking a test. Your task is to fill in the computed columns for each record based on the English language specification provided below.
+
+IMPORTANT: You must follow the instructions in the specification document EXACTLY. The specification contains human-readable instructions for how to compute each calculated field.
+
+---
+{glossary_section}
+# SPECIFICATION (Calculation Instructions)
+
+{specification}
+
+---
+
+# YOUR TASK
+
+Below is a JSON array of "{entity_name}" records. Each record has raw input fields already filled in, but the following computed columns are null and need to be calculated:
+
+{', '.join(computed_columns)}
+
+## Input Data (with null values for computed fields)
+
+```json
+{json.dumps(test_data, indent=2)}
+```
+
+## Instructions
+
+1. Read the SPECIFICATION above carefully - it tells you exactly how to compute each field
+2. For EACH record in the array, compute the null fields following the specification instructions
+3. Return ONLY the complete JSON array with all computed fields filled in
+4. Use exact field names as shown (snake_case)
+5. Boolean values should be true/false (lowercase, no quotes)
+6. String values should be in quotes
+7. null should remain null (not "null") if the formula cannot be computed
+8. Preserve ALL other fields exactly as they appear in the input
+
+Return ONLY valid JSON - no markdown code blocks, no explanations, just the JSON array."""
+
+    return prompt
+
+
 def build_prompt(schema: list, entity_name: str, test_data: list) -> str:
-    """Build the prompt for the LLM to fill in computed columns."""
+    """FALLBACK: Build the prompt from raw schema if English docs don't exist."""
     schema_description = build_schema_description(schema)
     calc_fields = get_calculated_fields(schema)
     computed_columns = build_computed_columns_list(schema)
@@ -228,9 +331,12 @@ def extract_json_from_response(response_text: str) -> list:
 # =============================================================================
 
 def process_entity(input_path: str, output_path: str, entity_name: str,
-                   schema: list) -> tuple:
+                   schema: list, glossary: str = "", specification: str = "") -> tuple:
     """
     Process a single entity file using the LLM.
+
+    If glossary and specification are provided (the English documents),
+    uses those for the prompt. Otherwise falls back to raw schema.
 
     Returns: (record_count, filled_field_count)
     """
@@ -253,8 +359,16 @@ def process_entity(input_path: str, output_path: str, entity_name: str,
             json.dump(test_data, f, indent=2)
         return (len(test_data), 0)
 
-    # Build and send prompt
-    prompt = build_prompt(schema, entity_name, test_data)
+    # Build prompt - prefer English documents if available
+    if specification:
+        doc_desc = "specification" + (" + glossary" if glossary else "")
+        print(f"    Using English prose documents ({doc_desc})")
+        prompt = build_prompt_with_english_docs(glossary, specification, entity_name,
+                                                 test_data, computed_columns)
+    else:
+        print(f"    WARNING: English documents not available, using raw schema fallback")
+        prompt = build_prompt(schema, entity_name, test_data)
+
     response = call_llm(prompt)
 
     # Parse response
@@ -301,12 +415,27 @@ def run_multi_entity():
     test_answers_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 70)
-    print("English Execution Substrate - LLM Test Execution (Domain-Agnostic)")
+    print("English Execution Substrate - LLM Test Execution")
+    print("Using ENGLISH PROSE documents (glossary.md, specification.md)")
     print("=" * 70)
     print()
 
-    # Load rulebook to get schemas
-    print("Loading rulebook...")
+    # Load English documents FIRST - this is what makes this the "English" substrate
+    print("Loading English specification documents...")
+    glossary, specification = load_english_documents()
+
+    if not specification:
+        print()
+        print("ERROR: specification.md not found!")
+        print("The English substrate requires specification.md")
+        print("Run: python inject-into-english.py")
+        print()
+        sys.exit(1)
+
+    print()
+
+    # Load rulebook to get schemas (for field names and types)
+    print("Loading rulebook for schema metadata...")
     try:
         rulebook = load_rulebook()
     except FileNotFoundError as e:
@@ -354,9 +483,10 @@ def run_multi_entity():
         print(f"\nProcessing {entity_snake}...")
         print(f"  Schema: {len(schema)} fields, {len(calc_fields)} calculated")
 
-        # Process the entity
+        # Process the entity using English documents
         record_count, filled_count = process_entity(
-            input_path, output_path, entity_snake, schema
+            input_path, output_path, entity_snake, schema,
+            glossary=glossary, specification=specification
         )
 
         total_records += record_count

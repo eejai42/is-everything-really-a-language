@@ -1,172 +1,98 @@
-# ERB Specification - Language Classification Rulebook
-
----
+# Specification Document for Rulebook: PUBLISHED - ERB_semiotics-is-everything-a-language
 
 ## Overview
+This rulebook defines a set of criteria and calculated fields to classify various entities as language candidates based on specific properties. It is derived from an Airtable base and includes various entities with attributes that help determine whether something qualifies as a language. The calculated fields derive their values from raw input fields, allowing for automated assessments based on defined logical conditions.
 
-The primary goal of this formal rulebook system is to challenge the prevailing notion that "everything is a language," while simultaneously providing a clear and structured definition of what constitutes a language. By treating language as a typed construct defined by specific, testable properties, the system aims to establish a logical framework that delineates true languages from entities that may merely be interpreted as communicative or meaningful. This formalization not only clarifies the concept of language but also provides a basis for rigorous analysis and classification.
+## LanguageCandidates
 
-At the heart of this system lies the operational definition of language, which asserts that an item qualifies as a language if it possesses syntax, requires parsing, serializes meaning, and functions as an ontology or descriptor system. This definition is essential in filtering out various forms of communication that do not meet the established criteria. The formalization relies on a set of predicates—such as HasSyntax, RequiresParsing, and HasLinearDecodingPressure—that collectively determine whether something can be classified as a language. By applying these predicates, we can systematically evaluate candidates and establish a clear boundary for what constitutes a language.
+### Input Fields
+1. **LanguageCandidateId**
+   - **Type:** string
+   - **Description:** Unique identifier for the language candidate.
 
-The model structure operates by taking raw input properties and transforming them into calculated outputs that facilitate classification. Each candidate is assessed against the defined predicates, leading to calculated fields that predict whether the candidate meets the criteria for being a language. The resulting outputs indicate whether a candidate is classified as a language or not, allowing for a comprehensive evaluation of various entities. Through this structured approach, the system has successfully classified 23 candidates as not being languages, reinforcing the validity of the operational definition.
+2. **Name**
+   - **Type:** string
+   - **Description:** Name of the language candidate being classified.
 
-The key insight of this formalization is the importance of distinguishing between language systems, sign vehicles, and semiotic processes. Not everything that conveys meaning qualifies as a language; some entities, like objects or phenomena, may serve as sign vehicles or contribute to semiotic processes without possessing the structural elements that define a true language. Understanding these distinctions enables a more nuanced view of communication and meaning, and it highlights the role of running applications as a complex area that embodies both language systems and dynamic interactions. This clarity is crucial for fields ranging from linguistics to computer science, where precise definitions can significantly impact theoretical and practical applications.
+3. **HasSyntax**
+   - **Type:** boolean
+   - **Description:** Indicates whether the language candidate has syntax and/or grammar.
 
----
+4. **CanBeHeld**
+   - **Type:** boolean
+   - **Description:** Indicates if the candidate is physical/material and could theoretically be held.
 
-## Model Structure
+5. **DistanceFromConcept**
+   - **Type:** integer
+   - **Description:** Numeric representation of how far the candidate is from the core concept of a language.
 
-The model operates on a set of raw predicates (input properties) that are evaluated for each candidate,
-which then feed into calculated fields that derive the final classification.
+6. **IsLanguage**
+   - **Type:** boolean
+   - **Description:** Indicates if the candidate is classified as a language.
 
-### Raw Predicates (Inputs)
+### Calculated Fields
 
-These are the fundamental properties evaluated for each candidate:
+1. **HasGrammar**
+   - **Description:** Indicates if the candidate has grammar, generally inferred from the presence of syntax.
+   - **Calculation:** This field is true if `HasSyntax` is true.
+   - **Formula:** `={{HasSyntax}} = TRUE()`
+   - **Example:** If `HasSyntax` is true, then `HasGrammar` will also be true.
 
-- **IsLanguage** (boolean)
-- **HasSyntax** (boolean)
-- **CanBeHeld** (boolean)
-- **HasIdentity** (boolean)
-- **RequiresParsing** (boolean)
-- **ResolvesToAnAST** (boolean)
-- **HasLinearDecodingPressure** (boolean)
-- **IsStableOntologyReference** (boolean)
-- **IsLiveOntologyEditor** (boolean)
-- **IsOpenWorld** (boolean)
-- **IsClosedWorld** (boolean)
-- **DistanceFromConcept** (integer)
-- **DimensionalityWhileEditing** (string)
-- **ModelObjectFacilityLayer** (string)
+2. **Question**
+   - **Description:** A question formatted for a Family Feud style poll.
+   - **Calculation:** The question is constructed by concatenating "Is " with the `Name` of the candidate and appending " a language?".
+   - **Formula:** `="Is " & {{Name}} & " a language?"`
+   - **Example:** For a candidate named "English", the question would be "Is English a language?".
 
-### Calculated Fields (Derived)
+3. **PredictedAnswer**
+   - **Description:** The predicted answer based on a combination of properties that suggest whether the candidate is a language.
+   - **Calculation:** This field is true if all of the following conditions are met:
+     - `HasSyntax` is true
+     - `RequiresParsing` is true
+     - `IsDescriptionOf` is true
+     - `HasLinearDecodingPressure` is true
+     - `ResolvesToAnAST` is true
+     - `IsStableOntologyReference` is true
+     - `CanBeHeld` is false
+     - `HasIdentity` is false
+   - **Formula:** `=AND({{HasSyntax}}, {{RequiresParsing}}, {{IsDescriptionOf}}, {{HasLinearDecodingPressure}}, {{ResolvesToAnAST}}, {{IsStableOntologyReference}}, NOT({{CanBeHeld}}), NOT({{HasIdentity}}))`
+   - **Example:** For "English", if all conditions are met, `PredictedAnswer` would be true.
 
-These fields are computed from the raw predicates:
+4. **PredictionPredicates**
+   - **Description:** A string summarizing the predicates that led to the predicted answer.
+   - **Calculation:** This field concatenates multiple conditions into a descriptive string.
+   - **Formula:** 
+     ```
+     =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Needed") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & " AND " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")
+     ```
+   - **Example:** For "English", the output might be "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity".
 
-- **HasGrammar**
-- **Question**
-- **PredictedAnswer**
-- **PredictionPredicates**
-- **PredictionFail**
-- **IsDescriptionOf**
-- **IsOpenClosedWorldConflicted**
-- **RelationshipToConcept**
+5. **PredictionFail**
+   - **Description:** Provides an explanation if the predicted answer does not match the candidate's status.
+   - **Calculation:** If `PredictedAnswer` does not equal `IsLanguage`, it constructs a message indicating the mismatch and flags any open/closed world conflicts.
+   - **Formula:** 
+     ```
+     =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}), {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'", "") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.", "")
+     ```
+   - **Example:** For "A Coffee Mug", if `PredictedAnswer` is false and `IsLanguage` is true, the output would be "A Coffee Mug Is not a Family Feud Language, but Is marked as a 'Language Candidate.'".
 
----
+6. **IsDescriptionOf**
+   - **Description:** Indicates if the candidate describes the concept based on its distance from the core concept.
+   - **Calculation:** This field is true if `DistanceFromConcept` is greater than 1.
+   - **Formula:** `={{DistanceFromConcept}} > 1`
+   - **Example:** If `DistanceFromConcept` is 2, `IsDescriptionOf` would be true.
 
-## Core Language Definition
+7. **IsOpenClosedWorldConflicted**
+   - **Description:** Indicates if there is a conflict between being classified as both open and closed world.
+   - **Calculation:** This field is true if both `IsOpenWorld` and `IsClosedWorld` are true.
+   - **Formula:** `=AND({{IsOpenWorld}}, {{IsClosedWorld}})`
+   - **Example:** If both `IsOpenWorld` and `IsClosedWorld` are true, then `IsOpenClosedWorldConflicted` will be true.
 
-An item qualifies as a **Language** if and only if ALL of these are true:
+8. **RelationshipToConcept**
+   - **Description:** Indicates the relationship of the candidate to the core concept.
+   - **Calculation:** If `DistanceFromConcept` equals 1, it outputs "IsMirrorOf"; otherwise, it outputs "IsDescriptionOf".
+   - **Formula:** `=IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")`
+   - **Example:** If `DistanceFromConcept` is 1 for "A Coffee Mug", the output would be "IsMirrorOf".
 
-1. HasSyntax = true
-2. RequiresParsing = true
-3. HasLinearDecodingPressure = true
-4. StableOntologyReference = true
-5. CanBeHeld = false
-6. HasIdentity = false
-7. DistanceFromConcept = 2
-
----
-
-## Calculated Field Instructions
-
-### HasGrammar
-
-**Formula:** `={{HasSyntax}} = TRUE()`
-
-**How to compute:**
-
-1. Check the value of HasSyntax.
-2. If HasSyntax is true, then HasGrammar is true. Otherwise, it is false.
-
----
-
-### Question
-
-**Formula:** `="Is " & {{Name}} & " a language?"`
-
-**How to compute:**
-
-1. Take the value of Name.
-2. Combine it with the phrase 'Is ' and the phrase ' a language?'.
-3. The result is the value of Question.
-
----
-
-### PredictedAnswer
-
-**Formula:** `=AND(
-  {{HasSyntax}},
-  {{RequiresParsing}},
-  {{IsDescriptionOf}},
-  {{HasLinearDecodingPressure}},
-  {{ResolvesToAnAST}},
-  {{IsStableOntologyReference}},
-  NOT({{CanBeHeld}}),
-  NOT({{HasIdentity}})
-)`
-
-**How to compute:**
-
-1. Check the values of HasSyntax, RequiresParsing, IsDescriptionOf, HasLinearDecodingPressure, ResolvesToAnAST, IsStableOntologyReference, CanBeHeld, and HasIdentity.
-2. If all the first six are true and the last two are false, then PredictedAnswer is true. Otherwise, it is false.
-
----
-
-### PredictionPredicates
-
-**Formula:** `=IF({{HasSyntax}}, "Has Syntax", "No Syntax") & ", " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Needed") & ", " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & ", " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & ", " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & ", " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & " And " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")`
-
-**How to compute:**
-
-1. Check the values of HasSyntax, RequiresParsing, IsDescriptionOf, HasLinearDecodingPressure, ResolvesToAnAST, IsStableOntologyReference, CanBeHeld, and HasIdentity.
-2. For each field, append the corresponding phrase based on its value.
-3. Combine all phrases with commas and 'And' for the last two to form PredictionPredicates.
-
----
-
-### PredictionFail
-
-**Formula:** `=IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),
-  {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
-  IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'", "") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.", "")`
-
-**How to compute:**
-
-1. Check if PredictedAnswer is not equal to IsLanguage.
-2. If they are not equal, create a message indicating the status of Name as a language candidate.
-3. Append a note if IsOpenClosedWorldConflicted is true.
-
----
-
-### IsDescriptionOf
-
-**Formula:** `={{DistanceFromConcept}} > 1`
-
-**How to compute:**
-
-1. Look at the value of DistanceFromConcept.
-2. If it is greater than 1, then IsDescriptionOf is true. Otherwise, it is false.
-
----
-
-### IsOpenClosedWorldConflicted
-
-**Formula:** `=AND({{IsOpenWorld}}, {{IsClosedWorld}})`
-
-**How to compute:**
-
-1. Check the values of IsOpenWorld and IsClosedWorld.
-2. If both are true, then IsOpenClosedWorldConflicted is true. Otherwise, it is false.
-
----
-
-### RelationshipToConcept
-
-**Formula:** `=IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")`
-
-**How to compute:**
-
-1. Check the value of DistanceFromConcept.
-2. If it equals 1, then RelationshipToConcept is 'IsMirrorOf'. If it is not 1, then it is 'IsDescriptionOf'.
-
----
+## Conclusion
+This specification document provides a comprehensive guide to understanding how to compute the calculated fields for the language candidates defined in the rulebook. By following the outlined steps and formulas, one can accurately derive the necessary values from the raw input fields.

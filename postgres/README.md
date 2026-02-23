@@ -1,10 +1,20 @@
-# PostgreSQL - Source of Truth
+# PostgreSQL - Most Reliable Mirror
 
-PostgreSQL serves as the **canonical computation engine** for the ERB system. All other substrates are graded against its output.
+PostgreSQL serves as the **default answer-key substrate** for the ERB system. It is not privileged or canonical—it's simply the substrate used by default to generate the `answer-key.json` that other substrates are tested against.
+
+## Why Postgres is the Default (Not Master)
+
+PostgreSQL is **not** a source of truth—the `effortless-rulebook.json` is. Postgres is one of many mirrors that can reflect the rulebook's semantics. It happens to be:
+
+- **Well-tested**: Mature SQL semantics with predictable behavior
+- **Deterministic**: No floating-point drift, consistent ordering
+- **Convenient**: Easy to query during development
+
+But any substrate achieving 100% conformance could serve as the answer-key generator. Postgres has no philosophical privilege—only practical convenience.
 
 ## Role in Three-Phase Contract
 
-PostgreSQL is unique: it **defines** the answer key rather than being tested against it.
+PostgreSQL generates the answer key by default, but this is a pragmatic choice, not an architectural constraint.
 
 ### Phase 1: Inject
 
@@ -33,14 +43,14 @@ Export the computed results as the test baseline:
 
 | Output | Purpose |
 |--------|---------|
-| `answer-key.json` | Complete view output — the ground truth |
+| `answer-key.json` | Complete view output — the reference for conformance testing |
 | `blank-test.json` | Same rows but computed fields nulled — test input |
 
 These files go into `testing/` and are used by all other substrates.
 
 ### Grade
 
-PostgreSQL is the baseline — other substrates compare their results to it.
+Other substrates compare their results to what Postgres computed. This makes Postgres the *default reference*, not the *source of truth*. Any 100%-conformant substrate could theoretically generate the answer key.
 
 ## Technology
 

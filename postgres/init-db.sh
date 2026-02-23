@@ -7,6 +7,51 @@
 
 set -e  # Exit on error
 
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
+
+# Track which file failed
+FAILED_FILE=""
+FAILED_ERROR=""
+
+# Error handler - shows BIG RED ERROR when something fails
+error_handler() {
+    local exit_code=$?
+    echo ""
+    echo -e "${RED}${BOLD}╔══════════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}${BOLD}║                                                                              ║${NC}"
+    echo -e "${RED}${BOLD}║   ██████╗  █████╗ ████████╗ █████╗ ██████╗  █████╗ ███████╗███████╗          ║${NC}"
+    echo -e "${RED}${BOLD}║   ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗██╔════╝██╔════╝          ║${NC}"
+    echo -e "${RED}${BOLD}║   ██║  ██║███████║   ██║   ███████║██████╔╝███████║███████╗█████╗            ║${NC}"
+    echo -e "${RED}${BOLD}║   ██║  ██║██╔══██║   ██║   ██╔══██║██╔══██╗██╔══██║╚════██║██╔══╝            ║${NC}"
+    echo -e "${RED}${BOLD}║   ██████╔╝██║  ██║   ██║   ██║  ██║██████╔╝██║  ██║███████║███████╗          ║${NC}"
+    echo -e "${RED}${BOLD}║   ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚══════╝╚══════╝          ║${NC}"
+    echo -e "${RED}${BOLD}║                                                                              ║${NC}"
+    echo -e "${RED}${BOLD}║   ██╗███╗   ██╗██╗████████╗    ███████╗ █████╗ ██╗██╗     ███████╗██████╗    ║${NC}"
+    echo -e "${RED}${BOLD}║   ██║████╗  ██║██║╚══██╔══╝    ██╔════╝██╔══██╗██║██║     ██╔════╝██╔══██╗   ║${NC}"
+    echo -e "${RED}${BOLD}║   ██║██╔██╗ ██║██║   ██║       █████╗  ███████║██║██║     █████╗  ██║  ██║   ║${NC}"
+    echo -e "${RED}${BOLD}║   ██║██║╚██╗██║██║   ██║       ██╔══╝  ██╔══██║██║██║     ██╔══╝  ██║  ██║   ║${NC}"
+    echo -e "${RED}${BOLD}║   ██║██║ ╚████║██║   ██║       ██║     ██║  ██║██║███████╗███████╗██████╔╝   ║${NC}"
+    echo -e "${RED}${BOLD}║   ╚═╝╚═╝  ╚═══╝╚═╝   ╚═╝       ╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝    ║${NC}"
+    echo -e "${RED}${BOLD}║                                                                              ║${NC}"
+    echo -e "${RED}${BOLD}╚══════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    echo -e "${RED}${BOLD}    FAILED FILE: ${FAILED_FILE}${NC}"
+    echo -e "${RED}${BOLD}    EXIT CODE:   ${exit_code}${NC}"
+    echo ""
+    echo -e "${YELLOW}${BOLD}    The database init STOPPED due to the error above.${NC}"
+    echo -e "${YELLOW}${BOLD}    Fix the SQL error and re-run the Pull/build.${NC}"
+    echo ""
+    exit $exit_code
+}
+
+# Set trap to catch errors
+trap error_handler ERR
+
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -37,10 +82,15 @@ echo ""
 # Execute each SQL file
 for sql_file in "${SQL_FILES[@]}"; do
     filename=$(basename "$sql_file")
+    FAILED_FILE="$filename"  # Track current file for error handler
     echo "Executing: $filename"
     psql "$CONNECTION_STRING" -f "$sql_file" -v ON_ERROR_STOP=1
-    echo "✓ $filename completed"
+    echo -e "${GREEN}✓ $filename completed${NC}"
     echo ""
 done
 
-echo "Database initialization complete!"
+echo ""
+echo -e "${GREEN}${BOLD}════════════════════════════════════════════════════════════════════════════════${NC}"
+echo -e "${GREEN}${BOLD}    DATABASE INITIALIZATION COMPLETE!${NC}"
+echo -e "${GREEN}${BOLD}════════════════════════════════════════════════════════════════════════════════${NC}"
+echo ""

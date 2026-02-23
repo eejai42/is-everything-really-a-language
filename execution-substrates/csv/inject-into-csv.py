@@ -442,21 +442,43 @@ def export_column_formulas_csv(rulebook, output_path):
     print(f"Exported {len(rows)} field definitions to {output_path}")
 
 
+def clean_test_data_dir(test_data_dir):
+    """Remove all CSV files from the test-data directory."""
+    if test_data_dir.exists():
+        csv_files = list(test_data_dir.glob('*.csv'))
+        if csv_files:
+            print(f"Cleaning {len(csv_files)} CSV files from {test_data_dir}/")
+            for f in csv_files:
+                f.unlink()
+    else:
+        test_data_dir.mkdir(parents=True)
+        print(f"Created {test_data_dir}/")
+
+
 def main():
     # Define generated files for this substrate
-    # Note: Entity CSV files (e.g., customers.csv) are generated dynamically
+    # Note: Entity CSV files are now generated in test-data/ directory
     GENERATED_FILES = [
         'rulebook.xlsx',
-        'column_formulas.csv',
         'test-results.md',
     ]
 
     # Handle --clean argument
     if handle_clean_arg(GENERATED_FILES, "CSV substrate: Removes generated CSV files and test outputs"):
+        # Also clean the test-data directory
+        test_data_dir = Path('test-data')
+        if test_data_dir.exists():
+            for f in test_data_dir.glob('*.csv'):
+                f.unlink()
+            print(f"Cleaned test-data/ directory")
         return
 
     candidate_name = get_candidate_name_from_cwd()
     print(f"Generating {candidate_name} from rulebook...")
+
+    # Clean and prepare test-data directory
+    test_data_dir = Path('test-data')
+    clean_test_data_dir(test_data_dir)
 
     # Load the rulebook
     try:
@@ -464,9 +486,6 @@ def main():
     except FileNotFoundError as e:
         print(f"Error: {e}")
         sys.exit(1)
-
-    # Working directory as Path
-    output_dir = Path('.')
 
     # Create workbook
     wb = Workbook()
@@ -515,12 +534,12 @@ def main():
     print(f"\nGenerated: {xlsx_path}")
     print(f"  - {len(wb.sheetnames)} worksheets")
 
-    # Export all entities as separate CSV files
-    print(f"\nExporting entities as CSV:")
-    export_all_entities_csv(rulebook, output_dir)
+    # Export all entities as separate CSV files to test-data/
+    print(f"\nExporting entities as CSV to test-data/:")
+    export_all_entities_csv(rulebook, test_data_dir)
 
-    # Export column formulas as CSV
-    formulas_path = Path('column_formulas.csv')
+    # Export column formulas as CSV to test-data/
+    formulas_path = test_data_dir / 'column_formulas.csv'
     export_column_formulas_csv(rulebook, formulas_path)
 
     print(f"\nDone generating {candidate_name}.")

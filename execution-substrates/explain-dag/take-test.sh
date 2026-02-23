@@ -8,12 +8,25 @@
 #   - test-explanations/ (derivation DAGs)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+LOG_FILE="$SCRIPT_DIR/.last-run.log"
 
 # Ensure output directories exist
 mkdir -p "$SCRIPT_DIR/test-answers"
 mkdir -p "$SCRIPT_DIR/test-explanations"
 
 # Run ExplainDAG substrate
-python3 "$SCRIPT_DIR/take-test.py"
+# Capture output for the substrate report
+{
+    echo "=== ExplainDAG Substrate Test Run ==="
+    echo "Started: $(date)"
+    echo ""
+    python3 "$SCRIPT_DIR/take-test.py"
+    echo ""
+    echo "Completed: $(date)"
+} 2>&1 | tee "$LOG_FILE"
 
 echo "explain-dag: test completed"
+
+# Generate substrate report
+python3 "$PROJECT_ROOT/orchestration/create-substrate-report.py" explain-dag --log "$LOG_FILE"

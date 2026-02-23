@@ -17,3 +17,6 @@ execution-substrates/binary/erb_calc.dylib
 execution-substrates/binary/erb_calc.o
 execution-substrates/**/_run_metadata.json
 execution-substrates/**/test-answers.bak
+execution-substrates/**/.last-run.log
+execution-substrates/**/.grades.pkl
+execution-substrates/csv/test-data/

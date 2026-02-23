@@ -109,6 +109,50 @@ print(config.get('Name', 'Unknown'))
     fi
 }
 
+get_bases_list() {
+    # Read from separate bases.json file (primary) or fallback to ssotme.json
+    BASES_FILE="$SCRIPT_DIR/bases.json"
+    python3 -c "
+import json
+import os
+import sys
+
+bases_file = '$BASES_FILE'
+ssotme_file = '$SSOTME_JSON'
+
+# Try bases.json first
+if os.path.exists(bases_file):
+    try:
+        with open(bases_file, 'r') as f:
+            bases = json.load(f)
+            for base in bases:
+                print(base['id'] + '|' + base['name'])
+        sys.exit(0)
+    except SystemExit:
+        raise
+    except Exception:
+        pass
+
+# Fallback to ssotme.json
+if os.path.exists(ssotme_file):
+    try:
+        with open(ssotme_file, 'r') as f:
+            config = json.load(f)
+        for setting in config.get('ProjectSettings', []):
+            if setting.get('Name') == 'bases':
+                bases = json.loads(setting.get('Value', '[]'))
+                for base in bases:
+                    print(base['id'] + '|' + base['name'])
+                break
+    except Exception:
+        pass
+"
+}
+
+get_bases_count() {
+    get_bases_list | wc -l | tr -d ' '
+}
+
 # =============================================================================
 # MENU DISPLAY
 # =============================================================================
@@ -134,24 +178,6 @@ show_menu() {
     echo ""
     echo -e "  ${GREEN}[A]${NC} Run ${BOLD}ALL${NC} substrates ($TOTAL_SUBSTRATES total) ${DIM}(default)${NC}"
     echo -e "  ${MAGENTA}[V]${NC} ${BOLD}VIEW RESULTS${NC} - Generate and open HTML report"
-    echo -e "  ${RED}[C]${NC} ${BOLD}CLEAN${NC} all generated files"
-    echo ""
-
-    # Airtable/Sync options
-    echo -e "  ${DIM}────────────────────────────────────────${NC}"
-    echo -e "  ${BOLD}Sync:${NC}"
-    if [ "$SSOTME_AVAILABLE" = true ]; then
-        echo -e "  ${CYAN}[P]${NC} ${BOLD}PULL${NC} & Inject (Airtable → Postgres → Substrates)"
-        echo -e "  ${CYAN}[B]${NC} ${BOLD}CHANGE BASE ID${NC} and pull"
-    else
-        echo -e "  ${DIM}[P] Pull & Inject (requires SSoTME)${NC}"
-        echo -e "  ${DIM}[B] Change Base ID (requires SSoTME)${NC}"
-    fi
-    echo ""
-
-    # Dev-Ops
-    echo -e "  ${DIM}────────────────────────────────────────${NC}"
-    echo -e "  ${YELLOW}[D]${NC} ${BOLD}DEV-OPS${NC} menu (PostgreSQL init, SSoTME setup)"
     echo ""
 
     echo -e "  ${DIM}────────────────────────────────────────${NC}"
@@ -164,13 +190,33 @@ show_menu() {
         substrate_dir="$SUBSTRATES_DIR/$substrate"
         inject_script="$substrate_dir/inject-substrate.sh"
         if [ -f "$inject_script" ]; then
-            echo -e "  ${CYAN}[$INDEX]${NC} $substrate"
+            if [ $INDEX -lt 10 ]; then
+                echo -e "  ${CYAN}[0$INDEX]${NC} $substrate"
+            else
+                echo -e "  ${CYAN}[$INDEX]${NC} $substrate"
+            fi
         fi
         INDEX=$((INDEX + 1))
     done
+
+    # Airtable/Sync options
+    echo -e "  ${DIM}────────────────────────────────────────${NC}"
+    # Dev-Ops
+    echo -e "  ${RED}[C]${NC} ${BOLD}CLEAN${NC} all generated files"
+    echo -e "  ${YELLOW}[D]${NC} ${BOLD}DEV-OPS${NC} menu (PostgreSQL init, SSoTME setup)"
+    if [ "$SSOTME_AVAILABLE" = true ]; then
+        echo -e "  ${CYAN}[P]${NC} ${BOLD}PULL${NC} & Inject (Airtable → Postgres → Substrates)"
+        echo -e "  ${CYAN}[B]${NC} ${BOLD}CHANGE BASE ID${NC} and pull"
+    else
+        echo -e "  ${DIM}[P] Pull & Inject (requires SSoTME)${NC}"
+        echo -e "  ${DIM}[B] Change Base ID (requires SSoTME)${NC}"
+    fi
+
     echo ""
+
     echo -e "  [${RED}Q${NC}] Quit"
     echo ""
+
 }
 
 # =============================================================================
@@ -273,6 +319,7 @@ print('Answer keys and blank tests generated.')
 
 action_change_base_id() {
     CURRENT_BASE=$(get_current_base_id)
+    PROJECT_NAME=$(get_project_name)
 
     if [ "$SSOTME_AVAILABLE" != true ]; then
         echo ""
@@ -285,64 +332,180 @@ action_change_base_id() {
 
     echo ""
     echo -e "${BOLD}${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${BOLD}${CYAN}║${NC}              ${BOLD}${WHITE}CHANGE AIRTABLE BASE ID${NC}                      ${BOLD}${CYAN}║${NC}"
+    echo -e "${BOLD}${CYAN}║${NC}              ${BOLD}${WHITE}SELECT AIRTABLE BASE${NC}                          ${BOLD}${CYAN}║${NC}"
     echo -e "${BOLD}${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
-    echo -e "  Current Base ID: ${YELLOW}${CURRENT_BASE}${NC}"
+    echo -e "  Current: ${GREEN}${PROJECT_NAME}${NC} ${DIM}(${CURRENT_BASE})${NC}"
     echo ""
-    read -p "  Enter new Airtable base ID (or press Enter to cancel): " NEW_BASE_ID
+    echo -e "  ${DIM}────────────────────────────────────────${NC}"
+    echo -e "  ${BOLD}${WHITE}Known bases:${NC}"
+    echo ""
 
-    if [ -z "$NEW_BASE_ID" ]; then
-        echo ""
-        echo -e "  ${DIM}Cancelled - no changes made${NC}"
-        echo ""
-        return
-    fi
+    # Sync bases list to ensure current base is included (ignore errors)
+    python3 "$SCRIPT_DIR/base-manager.py" sync >/dev/null 2>&1 || true
 
-    # Validate format (Airtable base IDs start with 'app')
-    if [[ ! "$NEW_BASE_ID" =~ ^app[A-Za-z0-9]+ ]]; then
-        echo ""
-        echo -e "${RED}Invalid Base ID format.${NC}"
-        echo -e "Airtable Base IDs typically start with 'app' followed by alphanumeric characters."
-        echo -e "Example: appC8XTj95lubn6hz"
-        echo ""
-        read -p "Press Enter to continue..."
-        return
-    fi
+    # Get bases list and display with numbers
+    BASES_LIST=$(get_bases_list)
+    BASES_ARRAY=()
+    INDEX=1
+    while IFS= read -r line; do
+        if [ -n "$line" ]; then
+            BASE_ID=$(echo "$line" | cut -d'|' -f1)
+            BASE_NAME=$(echo "$line" | cut -d'|' -f2)
+            BASES_ARRAY+=("$line")
+            if [ "$BASE_ID" = "$CURRENT_BASE" ]; then
+                echo -e "  ${GREEN}[$INDEX]${NC} ${GREEN}${BASE_NAME}${NC} ${DIM}(active)${NC}"
+            else
+                echo -e "  ${CYAN}[$INDEX]${NC} ${BASE_NAME}"
+            fi
+            echo -e "      ${DIM}${BASE_ID}${NC}"
+            INDEX=$((INDEX + 1))
+        fi
+    done <<< "$BASES_LIST"
 
-    # Update ssotme.json
-    python3 -c "
-import json
+    BASES_COUNT=${#BASES_ARRAY[@]}
 
-with open('$SSOTME_JSON', 'r') as f:
-    config = json.load(f)
+    echo ""
+    echo -e "  ${DIM}────────────────────────────────────────${NC}"
+    echo -e "  ${YELLOW}[N]${NC} Add ${BOLD}NEW${NC} base by ID"
+    echo -e "  ${RED}[Q]${NC} Cancel"
+    echo ""
 
-for setting in config.get('ProjectSettings', []):
-    if setting.get('Name') == 'baseId':
-        setting['Value'] = '$NEW_BASE_ID'
-        break
+    read -p "  Select base [1-$BASES_COUNT, N, Q]: " BASE_CHOICE
 
-with open('$SSOTME_JSON', 'w') as f:
-    json.dump(config, f, indent=2)
+    case $BASE_CHOICE in
+        [Qq]|"")
+            echo ""
+            echo -e "  ${DIM}Cancelled - no changes made${NC}"
+            echo ""
+            return
+            ;;
+        [Nn])
+            # Add new base
+            echo ""
+            read -p "  Enter new Airtable base ID (e.g., appXXXXX): " NEW_BASE_ID
 
-print('Base ID updated to: $NEW_BASE_ID')
-"
+            if [ -z "$NEW_BASE_ID" ]; then
+                echo ""
+                echo -e "  ${DIM}Cancelled - no changes made${NC}"
+                echo ""
+                return
+            fi
 
+            # Validate format
+            if [[ ! "$NEW_BASE_ID" =~ ^app[A-Za-z0-9]+ ]]; then
+                echo ""
+                echo -e "${RED}Invalid Base ID format.${NC}"
+                echo -e "Airtable Base IDs start with 'app' followed by alphanumeric characters."
+                echo ""
+                read -p "Press Enter to continue..."
+                return
+            fi
+
+            echo ""
+            echo -e "${YELLOW}Fetching base name from Airtable...${NC}"
+
+            # Try to fetch base name from API (|| true prevents set -e from killing script if grep fails)
+            FETCHED_NAME=$(python3 "$SCRIPT_DIR/base-manager.py" fetch-name "$NEW_BASE_ID" 2>/dev/null | grep "Base name:" | cut -d':' -f2 | xargs || true)
+
+            if [ -z "$FETCHED_NAME" ]; then
+                # API fetch failed, prompt for name
+                echo -e "${DIM}Could not fetch name from Airtable API${NC}"
+                read -p "  Enter base name: " NEW_BASE_NAME
+
+                if [ -z "$NEW_BASE_NAME" ]; then
+                    echo ""
+                    echo -e "  ${DIM}Cancelled - base name is required${NC}"
+                    echo ""
+                    return
+                fi
+            else
+                NEW_BASE_NAME="$FETCHED_NAME"
+                echo -e "  Fetched name: ${WHITE}$NEW_BASE_NAME${NC}"
+            fi
+
+            # Add the base with the name
+            if ! python3 "$SCRIPT_DIR/base-manager.py" add "$NEW_BASE_ID" --name "$NEW_BASE_NAME"; then
+                echo ""
+                echo -e "${RED}Failed to add base${NC}"
+                echo ""
+                read -p "Press Enter to continue..."
+                return
+            fi
+
+            if ! python3 "$SCRIPT_DIR/base-manager.py" select "$NEW_BASE_ID"; then
+                echo ""
+                echo -e "${RED}Failed to select base${NC}"
+                echo ""
+                read -p "Press Enter to continue..."
+                return
+            fi
+            ;;
+        [0-9]|[0-9][0-9])
+            # Select existing base by number
+            if [ "$BASE_CHOICE" -ge 1 ] && [ "$BASE_CHOICE" -le "$BASES_COUNT" ]; then
+                SELECTED_LINE="${BASES_ARRAY[$((BASE_CHOICE - 1))]}"
+                NEW_BASE_ID=$(echo "$SELECTED_LINE" | cut -d'|' -f1)
+                NEW_BASE_NAME=$(echo "$SELECTED_LINE" | cut -d'|' -f2)
+
+                if [ "$NEW_BASE_ID" = "$CURRENT_BASE" ]; then
+                    echo ""
+                    echo -e "  ${DIM}Already using this base${NC}"
+                    echo ""
+                    read -p "Press Enter to continue..."
+                    return
+                fi
+
+                echo ""
+                echo -e "Switching to: ${WHITE}${NEW_BASE_NAME}${NC}"
+                if ! python3 "$SCRIPT_DIR/base-manager.py" select "$NEW_BASE_ID"; then
+                    echo ""
+                    echo -e "${RED}Failed to select base${NC}"
+                    echo ""
+                    read -p "Press Enter to continue..."
+                    return
+                fi
+            else
+                echo ""
+                echo -e "${RED}Invalid selection: $BASE_CHOICE${NC}"
+                echo ""
+                read -p "Press Enter to continue..."
+                return
+            fi
+            ;;
+        *)
+            echo ""
+            echo -e "${RED}Invalid option: $BASE_CHOICE${NC}"
+            echo ""
+            read -p "Press Enter to continue..."
+            return
+            ;;
+    esac
+
+    # Regenerate from new base
     echo ""
     echo -e "${YELLOW}Regenerating from new base...${NC}"
     echo ""
 
     cd "$PROJECT_ROOT"
-    ssotme -buildall
+    # Use || to prevent set -e from killing the script on failure
+    BUILDALL_FAILED=""
+    ssotme -buildall || BUILDALL_FAILED="true"
 
-    if [ $? -eq 0 ]; then
+    if [ -z "$BUILDALL_FAILED" ]; then
+        NEW_PROJECT_NAME=$(get_project_name)
+        NEW_BASE=$(get_current_base_id)
         echo ""
-        echo -e "${GREEN}Base swap complete!${NC}"
-        echo -e "New Base ID: ${WHITE}$NEW_BASE_ID${NC}"
+        echo -e "${BOLD}${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${BOLD}${GREEN}║${NC}              ${BOLD}${WHITE}BASE SWITCH COMPLETE${NC}                         ${BOLD}${GREEN}║${NC}"
+        echo -e "${BOLD}${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
+        echo ""
+        echo -e "  Project: ${WHITE}$NEW_PROJECT_NAME${NC}"
+        echo -e "  Base ID: ${WHITE}$NEW_BASE${NC}"
     else
         echo ""
         echo -e "${RED}Regeneration failed.${NC}"
-        echo -e "You may need to restore the previous base ID: ${WHITE}$CURRENT_BASE${NC}"
+        echo -e "You may need to restore the previous base: ${WHITE}$PROJECT_NAME${NC} (${CURRENT_BASE})"
     fi
     echo ""
     read -p "Press Enter to continue..."
@@ -354,6 +517,19 @@ action_view_results() {
     echo -e "${BOLD}${MAGENTA}║${NC}              ${BOLD}${WHITE}GENERATING HTML REPORT${NC}                       ${BOLD}${MAGENTA}║${NC}"
     echo -e "${BOLD}${MAGENTA}╚════════════════════════════════════════════════════════════╝${NC}"
     echo ""
+
+    # Regenerate individual substrate reports using per-substrate scripts
+    SUBSTRATES=$(ls -d "$SUBSTRATES_DIR"/*/ 2>/dev/null | xargs -n1 basename)
+    for substrate in $SUBSTRATES; do
+        substrate_dir="$SUBSTRATES_DIR/$substrate"
+        custom_script="$substrate_dir/create-substrate-report.sh"
+        if [ -f "$custom_script" ]; then
+            # Use the substrate's custom report generator
+            (cd "$substrate_dir" && bash create-substrate-report.sh 2>/dev/null) || true
+        fi
+    done
+
+    # Generate main orchestration report
     python3 "$SCRIPT_DIR/generate-report.py"
     echo ""
     echo -e "${BOLD}${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -748,6 +924,13 @@ test_orch.update_run_metadata(substrate, grades, success, error_msg)
 test_orch.generate_substrate_report(substrate, grades, rulebook)
 test_orch.print_substrate_test_summary(substrate, grades, rulebook)
 
+# Generate per-substrate HTML report using the substrate's custom script
+import subprocess
+substrate_dir = os.path.join(test_orch.SUBSTRATES_DIR, substrate)
+custom_script = os.path.join(substrate_dir, 'create-substrate-report.sh')
+if os.path.exists(custom_script):
+    subprocess.run(['bash', 'create-substrate-report.sh'], cwd=substrate_dir, capture_output=True)
+
 # Save grades to temp file for final summary
 import pickle
 grades_file = os.path.join(test_orch.SUBSTRATES_DIR, substrate, '.grades.pkl')
@@ -932,8 +1115,6 @@ while true; do
             echo ""
             echo -e "${GREEN}Running ALL substrates...${NC}"
             run_substrates ""
-            echo ""
-            read -p "Press Enter to continue..."
             ;;
         [Vv])
             action_view_results
@@ -960,8 +1141,6 @@ while true; do
                 echo ""
                 echo -e "${GREEN}Running single substrate: ${BOLD}$RUN_SINGLE${NC}"
                 run_substrates "$RUN_SINGLE"
-                echo ""
-                read -p "Press Enter to continue..."
             else
                 echo ""
                 echo -e "${RED}Invalid substrate number: $USER_CHOICE${NC}"
