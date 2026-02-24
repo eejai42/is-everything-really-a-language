@@ -49,9 +49,34 @@ def evaluate_excel_formula_recursive(formula, cell_data, col_to_header, get_cell
         """Get field value from column letter, evaluating formulas if needed."""
         return get_cell_value_fn(col_letter)
 
+    def normalize_ampersands(s):
+        """Normalize & operators to have consistent spacing, respecting strings."""
+        result = []
+        in_string = False
+        i = 0
+        while i < len(s):
+            c = s[i]
+            if c == '"':
+                in_string = not in_string
+                result.append(c)
+            elif c == '&' and not in_string:
+                if result and result[-1] not in (' ', ''):
+                    result.append(' ')
+                result.append('&')
+                i += 1
+                while i < len(s) and s[i] == ' ':
+                    i += 1
+                result.append(' ')
+                continue
+            else:
+                result.append(c)
+            i += 1
+        return ''.join(result)
+
     def eval_expr(expr):
         """Recursively evaluate an expression."""
         expr = expr.strip()
+        expr = normalize_ampersands(expr)
 
         # Handle string concatenation
         parts = split_by_operator(expr, ' & ')
@@ -228,9 +253,34 @@ def evaluate_excel_formula(formula, row_data, headers, col_to_header):
             return row_data[header]
         return None
 
+    def normalize_ampersands2(s):
+        """Normalize & operators to have consistent spacing, respecting strings."""
+        result = []
+        in_string = False
+        i = 0
+        while i < len(s):
+            c = s[i]
+            if c == '"':
+                in_string = not in_string
+                result.append(c)
+            elif c == '&' and not in_string:
+                if result and result[-1] not in (' ', ''):
+                    result.append(' ')
+                result.append('&')
+                i += 1
+                while i < len(s) and s[i] == ' ':
+                    i += 1
+                result.append(' ')
+                continue
+            else:
+                result.append(c)
+            i += 1
+        return ''.join(result)
+
     def eval_expr(expr):
         """Recursively evaluate an expression."""
         expr = expr.strip()
+        expr = normalize_ampersands2(expr)
 
         # Handle string concatenation
         parts = split_by_operator(expr, ' & ')

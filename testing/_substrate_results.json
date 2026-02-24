@@ -74,16 +74,16 @@
   "xlsx": {
     "last_run": {
       "status": "success",
-      "duration_seconds": 0.3185758590698242,
+      "duration_seconds": 0.33286094665527344,
       "exit_code": 0,
-      "score": 87.5
+      "score": 100.0
     },
     "last_successful_run": {
-      "duration_seconds": 0.29137086868286133,
+      "duration_seconds": 0.33286094665527344,
       "status": "success",
       "test_results": {
-        "total_fields_tested": 3,
-        "fields_passed": 3,
+        "total_fields_tested": 184,
+        "fields_passed": 184,
         "fields_failed": 0,
         "score": 100.0
       }
@@ -130,16 +130,16 @@
   "csv": {
     "last_run": {
       "status": "success",
-      "duration_seconds": 0.24469399452209473,
+      "duration_seconds": 0.2420790195465088,
       "exit_code": 0,
-      "score": 87.5
+      "score": 100.0
     },
     "last_successful_run": {
-      "duration_seconds": 0.18868231773376465,
+      "duration_seconds": 0.2420790195465088,
       "status": "success",
       "test_results": {
-        "total_fields_tested": 3,
-        "fields_passed": 3,
+        "total_fields_tested": 184,
+        "fields_passed": 184,
         "fields_failed": 0,
         "score": 100.0
       }

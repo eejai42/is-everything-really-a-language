@@ -115,9 +115,39 @@ def evaluate_formula(formula, row_data):
         """Get field value from row_data."""
         return row_data.get(name)
 
+    def normalize_ampersands(s):
+        """Normalize & operators to have consistent spacing, respecting strings."""
+        result = []
+        in_string = False
+        i = 0
+        while i < len(s):
+            c = s[i]
+            if c == '"':
+                in_string = not in_string
+                result.append(c)
+            elif c == '&' and not in_string:
+                # Ensure space before & (if not already there)
+                if result and result[-1] not in (' ', ''):
+                    result.append(' ')
+                result.append('&')
+                # Skip any existing whitespace after &
+                i += 1
+                while i < len(s) and s[i] == ' ':
+                    i += 1
+                # Add single space after &
+                result.append(' ')
+                continue  # i already incremented past whitespace
+            else:
+                result.append(c)
+            i += 1
+        return ''.join(result)
+
     def eval_expr(expr):
         """Recursively evaluate an expression."""
         expr = expr.strip()
+
+        # Normalize & spacing to handle variations like &IF vs & IF
+        expr = normalize_ampersands(expr)
 
         # Handle string concatenation (only if & is at top level)
         parts = split_by_operator(expr, ' & ')

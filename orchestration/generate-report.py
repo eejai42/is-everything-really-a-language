@@ -1272,25 +1272,13 @@ footer {
 def get_javascript() -> str:
     """Return embedded JavaScript - Desktop optimized with entity tabs"""
     return '''
-// GitHub HTML Preview Detection
-// When viewed through htmlpreview.github.io, iframes need to also use the preview service
+// Substrate report URL - hardcoded for htmlpreview.github.io
 function getSubstrateReportUrl(substrateName) {
-    const relativePath = `../execution-substrates/${substrateName}/substrate-report.html`;
+    const localPath = `../execution-substrates/${substrateName}/substrate-report.html`;
+    const onlinePath = `https://htmlpreview.github.io?https://github.com/eejai42/is-everything-really-a-language/execution-substrates/${substrateName}/substrate-report.html`;
 
-    // Check if we're on htmlpreview.github.io
-    if (window.location.hostname === 'htmlpreview.github.io') {
-        // The current URL format is: https://htmlpreview.github.io?https://github.com/user/repo/path/orchestration/orchestration-report.html
-        // We need to construct: https://htmlpreview.github.io?https://github.com/user/repo/path/execution-substrates/{name}/substrate-report.html
-        const currentGithubUrl = window.location.search.slice(1); // Remove leading '?'
-        if (currentGithubUrl) {
-            // Replace 'orchestration/orchestration-report.html' with the substrate path
-            const baseUrl = currentGithubUrl.replace(/orchestration\\/orchestration-report\\.html.*$/, '');
-            return `https://htmlpreview.github.io?${baseUrl}execution-substrates/${substrateName}/substrate-report.html`;
-        }
-    }
-
-    // For local file:// or localhost, use the relative path
-    return relativePath;
+    // Use local path for file:// protocol, online path otherwise
+    return window.location.protocol === 'file:' ? localPath : onlinePath;
 }
 
 // Theme toggle
