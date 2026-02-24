@@ -1675,7 +1675,7 @@ const REPORT_DATA = {
       "run_metadata": {
         "last_run": {
           "status": "success",
-          "duration_seconds": 0.3249549865722656,
+          "duration_seconds": 0.3194458484649658,
           "exit_code": 0,
           "score": 79.8913043478261
         },
@@ -3234,6 +3234,27 @@ const REPORT_DATA = {
 };
 
 
+// GitHub HTML Preview Detection
+// When viewed through htmlpreview.github.io, iframes need to also use the preview service
+function getSubstrateReportUrl(substrateName) {
+    const relativePath = `../execution-substrates/${substrateName}/substrate-report.html`;
+
+    // Check if we're on htmlpreview.github.io
+    if (window.location.hostname === 'htmlpreview.github.io') {
+        // The current URL format is: https://htmlpreview.github.io?https://github.com/user/repo/path/orchestration/orchestration-report.html
+        // We need to construct: https://htmlpreview.github.io?https://github.com/user/repo/path/execution-substrates/{name}/substrate-report.html
+        const currentGithubUrl = window.location.search.slice(1); // Remove leading '?'
+        if (currentGithubUrl) {
+            // Replace 'orchestration/orchestration-report.html' with the substrate path
+            const baseUrl = currentGithubUrl.replace(/orchestration\/orchestration-report\.html.*$/, '');
+            return `https://htmlpreview.github.io?${baseUrl}execution-substrates/${substrateName}/substrate-report.html`;
+        }
+    }
+
+    // For local file:// or localhost, use the relative path
+    return relativePath;
+}
+
 // Theme toggle
 const themeToggle = document.getElementById('theme-toggle');
 const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -3534,7 +3555,7 @@ function renderSubstrateDetails(substrateName) {
     // Report tab - iframe to substrate-report.html
     html += '<div id="substrate-report-view" class="substrate-view active">';
     if (!isAnswerKey) {
-        html += `<iframe src="../execution-substrates/${escapeHtml(substrateName)}/substrate-report.html" class="substrate-report-iframe" frameborder="0"></iframe>`;
+        html += `<iframe src="${getSubstrateReportUrl(escapeHtml(substrateName))}" class="substrate-report-iframe" frameborder="0"></iframe>`;
     } else {
         html += '<p class="no-results">Postgres generates the answer key - no separate report needed.</p>';
     }
