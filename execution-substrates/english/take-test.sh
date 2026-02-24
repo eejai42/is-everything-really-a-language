@@ -23,8 +23,9 @@ LAST_RUN_ANSWERS="$SCRIPT_DIR/.last-run-answers"
 # If running interactively (stdin is a tty), ask user before running
 if [[ -t 0 ]]; then
     echo ""
-    echo "english: This substrate uses LLM (OpenAI) and may take 3+ minutes."
-    read -p "english: Run English substrate? [y/N] " response
+    echo "english: This substrate uses LLM (OpenAI) to execute tests."
+    echo "english: Running the test requires an LLM API call (2-5 minutes)."
+    read -p "english: Run English substrate (LLM)? [y/N] " response
 
     if [[ ! "$response" =~ ^[Yy]$ ]]; then
         echo "english: SKIPPED by user"
@@ -49,35 +50,48 @@ fi
 # Ensure test-answers directory exists
 mkdir -p "$SCRIPT_DIR/test-answers"
 
+# Check if English documents exist - if not, ask before running injection
+# (Must be OUTSIDE the tee block to allow interactive prompts)
+if [[ ! -f "$SCRIPT_DIR/specification.md" ]]; then
+    echo "english: specification.md not found."
+    echo "english: Generation requires an LLM call and may take 1-2 minutes."
+
+    # Ask before making LLM call
+    if [[ -t 0 ]]; then
+        read -p "english: Generate specification.md via LLM? [y/N] " gen_response
+        if [[ ! "$gen_response" =~ ^[Yy]$ ]]; then
+            echo "english: Generation SKIPPED by user"
+            echo "english: Cannot run test without specification.md"
+            echo "SUBSTRATE_SKIPPED"
+            exit 0
+        fi
+    fi
+
+    echo ""
+    INJECT_START=$(date +%s)
+    echo "english: Generating specification via LLM..."
+    python3 "$SCRIPT_DIR/inject-into-english.py" --regenerate
+    INJECT_STATUS=$?
+    INJECT_END=$(date +%s)
+    INJECT_DURATION=$((INJECT_END - INJECT_START))
+
+    if [[ $INJECT_STATUS -ne 0 ]]; then
+        echo "english: ERROR - injection failed"
+        exit 1
+    fi
+    echo ""
+    echo "english: Injection complete (${INJECT_DURATION}s), now running test..."
+fi
+
 # Capture output for the substrate report
 {
     echo "=== English (LLM) Substrate Test Run ==="
-    echo "Started: $(date)"
     echo ""
-
-    # Check if English documents exist - if not, run injection first
-    if [[ ! -f "$SCRIPT_DIR/glossary.md" ]] || [[ ! -f "$SCRIPT_DIR/specification.md" ]]; then
-        echo "english: English documents not found, running injection first..."
-        echo "english: This will generate glossary.md and specification.md via LLM"
-        echo ""
-
-        # Run injection with --regenerate to force generation
-        python3 "$SCRIPT_DIR/inject-into-english.py" --regenerate
-
-        if [[ $? -ne 0 ]]; then
-            echo "english: ERROR - injection failed"
-            exit 1
-        fi
-        echo ""
-        echo "english: Injection complete, now running test..."
-        echo ""
-    fi
 
     # Run English substrate test (reads English docs, computes answers via LLM)
     python3 "$SCRIPT_DIR/take-test.py"
 
     echo ""
-    echo "Completed: $(date)"
 } 2>&1 | tee "$LOG_FILE"
 
 # Save successful answers for future skip/restore

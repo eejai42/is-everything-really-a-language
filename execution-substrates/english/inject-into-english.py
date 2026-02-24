@@ -216,6 +216,21 @@ def main():
 
     # Generate specification via LLM
     print("\n=== Generating Specification (LLM-driven) ===")
+    print(f"  Generating specification via LLM...")
+
+    # ALWAYS ask before making LLM call (unless --no-prompt or non-interactive)
+    if not args.no_prompt and sys.stdin.isatty():
+        model = get_model_for_tier(args.tier, args.provider)
+        print(f"\n  This will call {args.provider.upper()} ({model}) to generate the specification.")
+        try:
+            response = input("  Proceed with LLM call? [y/N]: ").strip().lower()
+            if response not in ('y', 'yes'):
+                print("  Skipping LLM call.")
+                return 2
+        except (EOFError, KeyboardInterrupt):
+            print("\n  Skipping LLM call.")
+            return 2
+
     spec_content = generate_specification(rulebook, args.provider, args.tier)
     with open("specification.md", 'w', encoding='utf-8') as f:
         f.write(spec_content)

@@ -69,8 +69,8 @@ pre { background: var(--code-bg); border: 1px solid var(--border-color); border-
             <h1>English (NLG) Execution Substrate</h1>
         </div>
         <div class="header-stats">
-            <div class="stat"><span>Score:</span><span class="stat-value score-warning">64.1%</span></div>
-            <div class="stat"><span>118/184 passed</span></div>
+            <div class="stat"><span>Score:</span><span class="stat-value score-perfect">100.0%</span></div>
+            <div class="stat"><span>3/3 passed</span></div>
         </div>
         <button id="theme-toggle" title="Toggle theme"><span class="sun">☀️</span><span class="moon">🌙</span></button>
     </header>
@@ -107,24 +107,8 @@ pre { background: var(--code-bg); border: 1px solid var(--border-color); border-
         <div id="log" class="tab-content">
             <div class="card">
                 <h2>Execution Log</h2>
-                <div class="code-info">Last run: Tue Feb 24 02:16:00 CST 2026</div>
                 <pre>=== English (LLM) Substrate Test Run ===
-Started: Tue Feb 24 02:16:00 CST 2026
-
-english: English documents not found, running injection first...
-english: This will generate glossary.md and specification.md via LLM
-
-Generating english substrate...
-  Loaded rulebook: PUBLISHED - ERB_semiotics-is-everything-a-language
-
-=== Generating Specification (LLM-driven) ===
-  Generating specification via LLM...
-  Calling OPENAI (gpt-4o-mini)...
-  Created specification.md
-
-Done generating english substrate.
-
-english: Injection complete, now running test...
+Started: Tue Feb 24 12:49:29 CST 2026
 
 ======================================================================
 English Execution Substrate - LLM Test Execution
@@ -132,35 +116,35 @@ Using ENGLISH PROSE documents (glossary.md, specification.md)
 ======================================================================
 
 Loading English specification documents...
-  Loaded specification.md (6533 chars)
+  Loaded specification.md (2901 chars)
 
 Loading rulebook for schema metadata...
-Discovered 3 entities: LanguageCandidates, IsEverythingALanguage, ERBCustomizations
+Discovered 1 entities: Customers
 
-Processing language_candidates...
-  Schema: 26 fields, 8 calculated
+Processing customers...
+  Schema: 8 fields, 2 calculated
     Using English prose documents (specification)
 ============================================================
 PROMPT (first 2 lines):
   You are taking a test. Your task is to fill in the computed columns for each record based on the Eng
   
-  ... (790 total lines, 28078 chars)
+  ... (152 total lines, 4899 chars)
 ============================================================
 Calling OpenAI (gpt-4o-mini)... please wait...
 ============================================================
 RESPONSE (first 2 lines):
-  ```json
   [
-  ... (648 total lines, 25064 chars)
+    {
+  ... (32 total lines, 721 chars)
 ============================================================
-  -&gt; language_candidates: 23 records, 184 computed fields filled
+  -&gt; customers: 3 records, 6 computed fields filled
 
 ======================================================================
-English substrate: Processed 1 entities, 23 total records
-Filled 184 computed fields total
+English substrate: Processed 1 entities, 3 total records
+Filled 6 computed fields total
 ======================================================================
 
-Completed: Tue Feb 24 02:20:24 CST 2026
+Completed: Tue Feb 24 12:49:36 CST 2026
 </pre>
             </div>
         </div>
@@ -168,96 +152,99 @@ Completed: Tue Feb 24 02:20:24 CST 2026
             <div class="card">
                 <h2>Test Summary</h2>
                 <div class="results-summary">
-                    <div class="result-item"><div class="result-value score-warning">64.1%</div><div class="result-label">Score</div></div>
-                    <div class="result-item"><div class="result-value score-perfect">118</div><div class="result-label">Passed</div></div>
-                    <div class="result-item"><div class="result-value">66</div><div class="result-label">Failed</div></div>
-                    <div class="result-item"><div class="result-value">184</div><div class="result-label">Total</div></div>
+                    <div class="result-item"><div class="result-value score-perfect">100.0%</div><div class="result-label">Score</div></div>
+                    <div class="result-item"><div class="result-value score-perfect">3</div><div class="result-label">Passed</div></div>
+                    <div class="result-item"><div class="result-value">0</div><div class="result-label">Failed</div></div>
+                    <div class="result-item"><div class="result-value">3</div><div class="result-label">Total</div></div>
                 </div>
             </div>
         </div>
         <div id="specification" class="tab-content">
             <div class="card">
                 <h2>specification.md (LLM-Generated)</h2>
-                <div class="prose-container markdown-content"><h2>Specification Document for Rulebook: PUBLISHED - ERB_semiotics-is-everything-a-language</h2>
+                <div class="prose-container markdown-content"><h2>Specification Document for DEMO: Customer FullName Rulebook</h2>
 <h3>Overview</h3>
-<p>This rulebook defines a set of criteria and calculated fields to classify various entities as language candidates based on specific properties. It is derived from an Airtable base and includes various entities with attributes that help determine whether something qualifies as a language. The calculated fields derive their values from raw input fields, allowing for automated assessments based on defined logical conditions.</p>
-<h3>LanguageCandidates</h3>
+<p>This rulebook defines the structure and computation methods for customer data within the "DEMO: Customer FullName" dataset. It includes details on how to derive the full name of a customer and determine their VIP status based on total sales. The rulebook is structured to facilitate easy understanding and implementation of the calculations required.</p>
+<h3>Customers Entity</h3>
 <h4>Input Fields</h4>
-<p>1. <strong>LanguageCandidateId</strong></p>
-<p>   - <strong>Type:</strong> string</p>
-<p>   - <strong>Description:</strong> Unique identifier for the language candidate.</p>
-<p>2. <strong>Name</strong></p>
-<p>   - <strong>Type:</strong> string</p>
-<p>   - <strong>Description:</strong> Name of the language candidate being classified.</p>
-<p>3. <strong>HasSyntax</strong></p>
-<p>   - <strong>Type:</strong> boolean</p>
-<p>   - <strong>Description:</strong> Indicates whether the language candidate has syntax and/or grammar.</p>
-<p>4. <strong>CanBeHeld</strong></p>
-<p>   - <strong>Type:</strong> boolean</p>
-<p>   - <strong>Description:</strong> Indicates if the candidate is physical/material and could theoretically be held.</p>
-<p>5. <strong>DistanceFromConcept</strong></p>
-<p>   - <strong>Type:</strong> integer</p>
-<p>   - <strong>Description:</strong> Numeric representation of how far the candidate is from the core concept of a language.</p>
-<p>6. <strong>IsLanguage</strong></p>
-<p>   - <strong>Type:</strong> boolean</p>
-<p>   - <strong>Description:</strong> Indicates if the candidate is classified as a language.</p>
+<p>The following input fields are required to compute the calculated fields:</p>
+<p>1. <strong>FirstName</strong></p>
+<p>   - <strong>Type:</strong> String (raw)</p>
+<p>   - <strong>Description:</strong> The first name of the customer, used to construct the full name.</p>
+<p>2. <strong>LastName</strong></p>
+<p>   - <strong>Type:</strong> String (raw)</p>
+<p>   - <strong>Description:</strong> The last name of the customer, used to construct the full name.</p>
+<p>3. <strong>TotalSales</strong></p>
+<p>   - <strong>Type:</strong> Number (raw)</p>
+<p>   - <strong>Description:</strong> The total sales amount associated with the customer, used to determine VIP status.</p>
 <h4>Calculated Fields</h4>
-<p>1. <strong>HasGrammar</strong></p>
-<p>   - <strong>Description:</strong> Indicates if the candidate has grammar, generally inferred from the presence of syntax.</p>
-<p>   - <strong>Calculation:</strong> This field is true if `HasSyntax` is true.</p>
-<p>   - <strong>Formula:</strong> `={{HasSyntax}} = TRUE()`</p>
-<p>   - <strong>Example:</strong> If `HasSyntax` is true, then `HasGrammar` will also be true.</p>
-<p>2. <strong>Question</strong></p>
-<p>   - <strong>Description:</strong> A question formatted for a Family Feud style poll.</p>
-<p>   - <strong>Calculation:</strong> The question is constructed by concatenating "Is " with the `Name` of the candidate and appending " a language?".</p>
-<p>   - <strong>Formula:</strong> `="Is " & {{Name}} & " a language?"`</p>
-<p>   - <strong>Example:</strong> For a candidate named "English", the question would be "Is English a language?".</p>
-<p>3. <strong>PredictedAnswer</strong></p>
-<p>   - <strong>Description:</strong> The predicted answer based on a combination of properties that suggest whether the candidate is a language.</p>
-<p>   - <strong>Calculation:</strong> This field is true if all of the following conditions are met:</p>
-<p>     - `HasSyntax` is true</p>
-<p>     - `RequiresParsing` is true</p>
-<p>     - `IsDescriptionOf` is true</p>
-<p>     - `HasLinearDecodingPressure` is true</p>
-<p>     - `ResolvesToAnAST` is true</p>
-<p>     - `IsStableOntologyReference` is true</p>
-<p>     - `CanBeHeld` is false</p>
-<p>     - `HasIdentity` is false</p>
-<p>   - <strong>Formula:</strong> `=AND({{HasSyntax}}, {{RequiresParsing}}, {{IsDescriptionOf}}, {{HasLinearDecodingPressure}}, {{ResolvesToAnAST}}, {{IsStableOntologyReference}}, NOT({{CanBeHeld}}), NOT({{HasIdentity}}))`</p>
-<p>   - <strong>Example:</strong> For "English", if all conditions are met, `PredictedAnswer` would be true.</p>
-<p>4. <strong>PredictionPredicates</strong></p>
-<p>   - <strong>Description:</strong> A string summarizing the predicates that led to the predicted answer.</p>
-<p>   - <strong>Calculation:</strong> This field concatenates multiple conditions into a descriptive string.</p>
-<p>   - <strong>Formula:</strong> </p>
-<p>     ```</p>
-<p>     =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Needed") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & " AND " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")</p>
-<p>     ```</p>
-<p>   - <strong>Example:</strong> For "English", the output might be "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity".</p>
-<p>5. <strong>PredictionFail</strong></p>
-<p>   - <strong>Description:</strong> Provides an explanation if the predicted answer does not match the candidate's status.</p>
-<p>   - <strong>Calculation:</strong> If `PredictedAnswer` does not equal `IsLanguage`, it constructs a message indicating the mismatch and flags any open/closed world conflicts.</p>
-<p>   - <strong>Formula:</strong> </p>
-<p>     ```</p>
-<p>     =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}), {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'", "") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.", "")</p>
-<p>     ```</p>
-<p>   - <strong>Example:</strong> For "A Coffee Mug", if `PredictedAnswer` is false and `IsLanguage` is true, the output would be "A Coffee Mug Is not a Family Feud Language, but Is marked as a 'Language Candidate.'".</p>
-<p>6. <strong>IsDescriptionOf</strong></p>
-<p>   - <strong>Description:</strong> Indicates if the candidate describes the concept based on its distance from the core concept.</p>
-<p>   - <strong>Calculation:</strong> This field is true if `DistanceFromConcept` is greater than 1.</p>
-<p>   - <strong>Formula:</strong> `={{DistanceFromConcept}} > 1`</p>
-<p>   - <strong>Example:</strong> If `DistanceFromConcept` is 2, `IsDescriptionOf` would be true.</p>
-<p>7. <strong>IsOpenClosedWorldConflicted</strong></p>
-<p>   - <strong>Description:</strong> Indicates if there is a conflict between being classified as both open and closed world.</p>
-<p>   - <strong>Calculation:</strong> This field is true if both `IsOpenWorld` and `IsClosedWorld` are true.</p>
-<p>   - <strong>Formula:</strong> `=AND({{IsOpenWorld}}, {{IsClosedWorld}})`</p>
-<p>   - <strong>Example:</strong> If both `IsOpenWorld` and `IsClosedWorld` are true, then `IsOpenClosedWorldConflicted` will be true.</p>
-<p>8. <strong>RelationshipToConcept</strong></p>
-<p>   - <strong>Description:</strong> Indicates the relationship of the candidate to the core concept.</p>
-<p>   - <strong>Calculation:</strong> If `DistanceFromConcept` equals 1, it outputs "IsMirrorOf"; otherwise, it outputs "IsDescriptionOf".</p>
-<p>   - <strong>Formula:</strong> `=IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")`</p>
-<p>   - <strong>Example:</strong> If `DistanceFromConcept` is 1 for "A Coffee Mug", the output would be "IsMirrorOf".</p>
-<h3>Conclusion</h3>
-<p>This specification document provides a comprehensive guide to understanding how to compute the calculated fields for the language candidates defined in the rulebook. By following the outlined steps and formulas, one can accurately derive the necessary values from the raw input fields.</p></div>
+<p>#### 1. FullName</p>
+<ul>
+<li>**Description:** The full name of the customer is computed by combining the last name and first name.</li>
+<li>**Computation Method:** </li>
+<p>  - To compute the `FullName`, concatenate the `LastName` and `FirstName` fields with a comma and a space in between. </p>
+<p>  - The formula for this computation is:</p>
+<p>    ```</p>
+<p>    FullName = LastName + ", " + FirstName</p>
+<p>    ```</p>
+<li>**Example:**</li>
+<p>  - For a customer with:</p>
+<p>    - `FirstName`: "Jane"</p>
+<p>    - `LastName`: "Smith"</p>
+<p>  - The computed `FullName` would be:</p>
+<p>    ```</p>
+<p>    FullName = "Smith, Jane"</p>
+<p>    ```</p>
+</ul>
+<p>#### 2. IsVIP</p>
+<ul>
+<li>**Description:** This field indicates whether the customer is considered a VIP based on their total sales.</li>
+<li>**Computation Method:** </li>
+<p>  - To determine if a customer is a VIP, check if the `TotalSales` amount exceeds 500. </p>
+<p>  - The formula for this computation is:</p>
+<p>    ```</p>
+<p>    IsVIP = TotalSales > 500</p>
+<p>    ```</p>
+<li>**Example:**</li>
+<p>  - For a customer with:</p>
+<p>    - `TotalSales`: 811</p>
+<p>  - The computed `IsVIP` value would be:</p>
+<p>    ```</p>
+<p>    IsVIP = 811 > 500 → true</p>
+<p>    ```</p>
+<p>  - Conversely, for a customer with:</p>
+<p>    - `TotalSales`: 125</p>
+<p>  - The computed `IsVIP` value would be:</p>
+<p>    ```</p>
+<p>    IsVIP = 125 > 500 → false</p>
+<p>    ```</p>
+</ul>
+<h4>Summary of Examples</h4>
+<ul>
+<li>**Customer 1:**</li>
+<p>  - `FirstName`: "Jane"</p>
+<p>  - `LastName`: "Smith"</p>
+<p>  - <strong>Computed FullName:</strong> "Smith, Jane"</p>
+<p>  - `TotalSales`: 500</p>
+<p>  - <strong>Computed IsVIP:</strong> false</p>
+</ul>
+<ul>
+<li>**Customer 2:**</li>
+<p>  - `FirstName`: "John"</p>
+<p>  - `LastName`: "Doe"</p>
+<p>  - <strong>Computed FullName:</strong> "Doe, John"</p>
+<p>  - `TotalSales`: 125</p>
+<p>  - <strong>Computed IsVIP:</strong> false</p>
+</ul>
+<ul>
+<li>**Customer 3:**</li>
+<p>  - `FirstName`: "Emily"</p>
+<p>  - `LastName`: "Jones"</p>
+<p>  - <strong>Computed FullName:</strong> "Jones, Emily"</p>
+<p>  - `TotalSales`: 811</p>
+<p>  - <strong>Computed IsVIP:</strong> true</p>
+</ul>
+<p>This specification provides a clear understanding of how to compute the `FullName` and `IsVIP` fields based on the defined input fields. By following the outlined methods and examples, one can accurately derive the necessary values from the customer data.</p></div>
             </div>
         </div>
     </main>

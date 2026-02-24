@@ -68,7 +68,7 @@ pre { background: var(--code-bg); border: 1px solid var(--border-color); border-
         </div>
         <div class="header-stats">
             <div class="stat"><span>Score:</span><span class="stat-value score-perfect">100.0%</span></div>
-            <div class="stat"><span>184/184 passed</span></div>
+            <div class="stat"><span>3/3 passed</span></div>
         </div>
         <button id="theme-toggle" title="Toggle theme"><span class="sun">☀️</span><span class="moon">🌙</span></button>
     </header>
@@ -107,23 +107,20 @@ pre { background: var(--code-bg); border: 1px solid var(--border-color); border-
         <div id="log" class="tab-content">
             <div class="card">
                 <h2>Execution Log</h2>
-                <div class="code-info">Last run: Tue Feb 24 02:25:22 CST 2026</div>
                 <pre>=== Go Substrate Test Run ===
-Started: Tue Feb 24 02:25:22 CST 2026
 
 golang: Starting test...
 golang: Compiling and running...
 Golang substrate: Processing 1 tables with calculated fields...
-  Expected tables: LanguageCandidates
+  Expected tables: Customers
 
-Processing LanguageCandidates...
-  ✓ language_candidates: 23 records processed
+Processing Customers...
+  ✓ customers: 3 records processed
 
 ════════════════════════════════════════════════════════════════
-Golang substrate: ALL 1 tables processed successfully (23 total records)
+Golang substrate: ALL 1 tables processed successfully (3 total records)
 ════════════════════════════════════════════════════════════════
 
-Completed: Tue Feb 24 02:25:22 CST 2026
 </pre>
             </div>
         </div>
@@ -132,9 +129,9 @@ Completed: Tue Feb 24 02:25:22 CST 2026
                 <h2>Test Summary</h2>
                 <div class="results-summary">
                     <div class="result-item"><div class="result-value score-perfect">100.0%</div><div class="result-label">Score</div></div>
-                    <div class="result-item"><div class="result-value score-perfect">184</div><div class="result-label">Passed</div></div>
+                    <div class="result-item"><div class="result-value score-perfect">3</div><div class="result-label">Passed</div></div>
                     <div class="result-item"><div class="result-value">0</div><div class="result-label">Failed</div></div>
-                    <div class="result-item"><div class="result-value">184</div><div class="result-label">Total</div></div>
+                    <div class="result-item"><div class="result-value">3</div><div class="result-label">Total</div></div>
                 </div>
             </div>
         </div>
@@ -142,7 +139,7 @@ Completed: Tue Feb 24 02:25:22 CST 2026
             <div class="card">
                 <div class="code-header">
                     <h2>erb_sdk.go</h2>
-                    <div><span class="code-info">258 lines</span><button class="copy-btn" onclick="copyCode('sdk-code')">Copy</button></div>
+                    <div><span class="code-info">132 lines</span><button class="copy-btn" onclick="copyCode('sdk-code')">Copy</button></div>
                 </div>
                 <pre id="sdk-code">// ERB SDK - Go Implementation (GENERATED - DO NOT EDIT)
 // ======================================================
@@ -205,182 +202,56 @@ func boolToString(b bool) string {
 }
 
 // =============================================================================
-// LANGUAGECANDIDATES TABLE
+// CUSTOMERS TABLE
 // =============================================================================
 
-// LanguageCandidate represents a row in the LanguageCandidates table
-type LanguageCandidate struct {
-	LanguageCandidateId string `json:&quot;language_candidate_id&quot;`
-	Name *string `json:&quot;name&quot;`
-	IsLanguage *bool `json:&quot;is_language&quot;`
-	HasSyntax *bool `json:&quot;has_syntax&quot;`
-	CanBeHeld *bool `json:&quot;can_be_held&quot;`
-	Category *string `json:&quot;category&quot;`
-	HasIdentity *bool `json:&quot;has_identity&quot;`
-	RequiresParsing *bool `json:&quot;requires_parsing&quot;`
-	ResolvesToAnAST *bool `json:&quot;resolves_to_an_ast&quot;`
-	HasLinearDecodingPressure *bool `json:&quot;has_linear_decoding_pressure&quot;`
-	IsStableOntologyReference *bool `json:&quot;is_stable_ontology_reference&quot;`
-	IsLiveOntologyEditor *bool `json:&quot;is_live_ontology_editor&quot;`
-	IsOpenWorld *bool `json:&quot;is_open_world&quot;`
-	IsClosedWorld *bool `json:&quot;is_closed_world&quot;`
-	DistanceFromConcept *int `json:&quot;distance_from_concept&quot;`
-	DimensionalityWhileEditing *string `json:&quot;dimensionality_while_editing&quot;`
-	ModelObjectFacilityLayer *string `json:&quot;model_object_facility_layer&quot;`
-	SortOrder *int `json:&quot;sort_order&quot;`
-	HasGrammar *bool `json:&quot;has_grammar&quot;`
-	Question *string `json:&quot;question&quot;`
-	PredictedAnswer *bool `json:&quot;predicted_answer&quot;`
-	PredictionPredicates *string `json:&quot;prediction_predicates&quot;`
-	PredictionFail *string `json:&quot;prediction_fail&quot;`
-	IsDescriptionOf *bool `json:&quot;is_description_of&quot;`
-	IsOpenClosedWorldConflicted *bool `json:&quot;is_open_closed_world_conflicted&quot;`
-	RelationshipToConcept *string `json:&quot;relationship_to_concept&quot;`
+// Customer represents a row in the Customers table
+type Customer struct {
+	CustomerId string `json:&quot;customer_id&quot;`
+	Customer *string `json:&quot;customer&quot;`
+	EmailAddress *string `json:&quot;email_address&quot;`
+	FirstName *string `json:&quot;first_name&quot;`
+	LastName *string `json:&quot;last_name&quot;`
+	FullName *string `json:&quot;full_name&quot;`
 }
 
 // --- Individual Calculation Functions ---
 
-// CalcHasGrammar computes the HasGrammar calculated field
-// Formula: ={{HasSyntax}} = TRUE()
-func (tc *LanguageCandidate) CalcHasGrammar() bool {
-	return (boolVal(tc.HasSyntax) == true)
-}
-
-// CalcQuestion computes the Question calculated field
-// Formula: =&quot;Is &quot; &amp; {{Name}} &amp; &quot; a language?&quot;
-func (tc *LanguageCandidate) CalcQuestion() string {
-	return &quot;Is &quot; + stringVal(tc.Name) + &quot; a language?&quot;
-}
-
-// CalcPredictedAnswer computes the PredictedAnswer calculated field
-// Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescriptionOf}},   {{HasLinearDecodingPressure}},   {{ResolvesToAnAST}},   {{IsStableOntologyReference}},   NOT({{CanBeHeld}}),   NOT({{HasIdentity}}) )
-func (tc *LanguageCandidate) CalcPredictedAnswer() bool {
-	return (boolVal(tc.HasSyntax) &amp;&amp; boolVal(tc.RequiresParsing) &amp;&amp; boolVal(tc.IsDescriptionOf) &amp;&amp; boolVal(tc.HasLinearDecodingPressure) &amp;&amp; boolVal(tc.ResolvesToAnAST) &amp;&amp; boolVal(tc.IsStableOntologyReference) &amp;&amp; !boolVal(tc.CanBeHeld) &amp;&amp; !boolVal(tc.HasIdentity))
-}
-
-// CalcPredictionPredicates computes the PredictionPredicates calculated field
-// Formula: =IF({{HasSyntax}}, &quot;Has Syntax&quot;, &quot;No Syntax&quot;) &amp; &quot; &amp; &quot; &amp; IF({{RequiresParsing}}, &quot;Requires Parsing&quot;, &quot;No Parsing Neede&quot;) &amp; &quot; &amp; &quot; &amp; IF({{IsDescriptionOf}}, &quot;Describes the thing&quot;, &quot;Is the Thing&quot;) &amp; &quot; &amp; &quot; &amp; IF({{HasLinearDecodingPressure}}, &quot;Has Linear Decoding Pressure&quot;, &quot;No Decoding Pressure&quot;) &amp; &quot; &amp; &quot; &amp; IF({{ResolvesToAnAST}}, &quot;Resolves to AST&quot;, &quot;No AST&quot;) &amp; &quot;, &quot; &amp; IF({{IsStableOntologyReference}}, &quot;Is Stable Ontology&quot;, &quot;Not &#x27;Ontology&#x27;&quot;) &amp; &quot; AND &quot; &amp; IF({{CanBeHeld}}, &quot;Can Be Held&quot;, &quot;Can&#x27;t Be Held&quot;) &amp; &quot;, &quot; &amp;IF({{HasIdentity}}, &quot;Has Identity&quot;, &quot;Has no Identity&quot;)
-func (tc *LanguageCandidate) CalcPredictionPredicates() string {
-	return func() string { if boolVal(tc.HasSyntax) { return &quot;Has Syntax&quot; }; return &quot;No Syntax&quot; }() + &quot; &amp; &quot; + func() string { if boolVal(tc.RequiresParsing) { return &quot;Requires Parsing&quot; }; return &quot;No Parsing Neede&quot; }() + &quot; &amp; &quot; + func() string { if boolVal(tc.IsDescriptionOf) { return &quot;Describes the thing&quot; }; return &quot;Is the Thing&quot; }() + &quot; &amp; &quot; + func() string { if boolVal(tc.HasLinearDecodingPressure) { return &quot;Has Linear Decoding Pressure&quot; }; return &quot;No Decoding Pressure&quot; }() + &quot; &amp; &quot; + func() string { if boolVal(tc.ResolvesToAnAST) { return &quot;Resolves to AST&quot; }; return &quot;No AST&quot; }() + &quot;, &quot; + func() string { if boolVal(tc.IsStableOntologyReference) { return &quot;Is Stable Ontology&quot; }; return &quot;Not &#x27;Ontology&#x27;&quot; }() + &quot; AND &quot; + func() string { if boolVal(tc.CanBeHeld) { return &quot;Can Be Held&quot; }; return &quot;Can&#x27;t Be Held&quot; }() + &quot;, &quot; + func() string { if boolVal(tc.HasIdentity) { return &quot;Has Identity&quot; }; return &quot;Has no Identity&quot; }()
-}
-
-// CalcPredictionFail computes the PredictionFail calculated field
-// Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} &amp; &quot; &quot; &amp; IF({{PredictedAnswer}}, &quot;Is&quot;, &quot;Isn&#x27;t&quot;) &amp; &quot; a Family Feud Language, but &quot; &amp;    IF({{IsLanguage}}, &quot;Is&quot;, &quot;Is Not&quot;) &amp; &quot; marked as a &#x27;Language Candidate.&#x27;&quot;, &quot;&quot;) &amp; IF({{IsOpenClosedWorldConflicted}}, &quot; - Open World vs. Closed World Conflict.&quot;, &quot;&quot;)
-func (tc *LanguageCandidate) CalcPredictionFail() string {
-	return func() string { if !((boolVal(tc.PredictedAnswer) == boolVal(tc.IsLanguage))) { return stringVal(tc.Name) + &quot; &quot; + func() string { if boolVal(tc.PredictedAnswer) { return &quot;Is&quot; }; return &quot;Isn&#x27;t&quot; }() + &quot; a Family Feud Language, but &quot; + func() string { if boolVal(tc.IsLanguage) { return &quot;Is&quot; }; return &quot;Is Not&quot; }() + &quot; marked as a &#x27;Language Candidate.&#x27;&quot; }; return &quot;&quot; }() + func() string { if boolVal(tc.IsOpenClosedWorldConflicted) { return &quot; - Open World vs. Closed World Conflict.&quot; }; return &quot;&quot; }()
-}
-
-// CalcIsDescriptionOf computes the IsDescriptionOf calculated field
-// Formula: ={{DistanceFromConcept}} &gt; 1
-func (tc *LanguageCandidate) CalcIsDescriptionOf() bool {
-	return (tc.DistanceFromConcept != nil &amp;&amp; *tc.DistanceFromConcept &gt; 1)
-}
-
-// CalcIsOpenClosedWorldConflicted computes the IsOpenClosedWorldConflicted calculated field
-// Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
-func (tc *LanguageCandidate) CalcIsOpenClosedWorldConflicted() bool {
-	return (boolVal(tc.IsOpenWorld) &amp;&amp; boolVal(tc.IsClosedWorld))
-}
-
-// CalcRelationshipToConcept computes the RelationshipToConcept calculated field
-// Formula: =IF({{DistanceFromConcept}} = 1, &quot;IsMirrorOf&quot;, &quot;IsDescriptionOf&quot;)
-func (tc *LanguageCandidate) CalcRelationshipToConcept() string {
-	return func() string { if (tc.DistanceFromConcept != nil &amp;&amp; *tc.DistanceFromConcept == 1) { return &quot;IsMirrorOf&quot; }; return &quot;IsDescriptionOf&quot; }()
+// CalcFullName computes the FullName calculated field
+// Formula: ={{LastName}} &amp; &quot;, &quot; &amp; {{FirstName}}
+func (tc *Customer) CalcFullName() string {
+	return stringVal(tc.LastName) + &quot;, &quot; + stringVal(tc.FirstName)
 }
 
 // --- Compute All Calculated Fields ---
 
 // ComputeAll computes all calculated fields and returns an updated struct
-func (tc *LanguageCandidate) ComputeAll() *LanguageCandidate {
+func (tc *Customer) ComputeAll() *Customer {
 	// Level 1 calculations
-	hasGrammar := (boolVal(tc.HasSyntax) == true)
-	question := &quot;Is &quot; + stringVal(tc.Name) + &quot; a language?&quot;
-	isDescriptionOf := (tc.DistanceFromConcept != nil &amp;&amp; *tc.DistanceFromConcept &gt; 1)
-	isOpenClosedWorldConflicted := (boolVal(tc.IsOpenWorld) &amp;&amp; boolVal(tc.IsClosedWorld))
-	relationshipToConcept := func() string { if (tc.DistanceFromConcept != nil &amp;&amp; *tc.DistanceFromConcept == 1) { return &quot;IsMirrorOf&quot; }; return &quot;IsDescriptionOf&quot; }()
+	fullName := stringVal(tc.LastName) + &quot;, &quot; + stringVal(tc.FirstName)
 
-	// Level 2 calculations
-	predictedAnswer := (boolVal(tc.HasSyntax) &amp;&amp; boolVal(tc.RequiresParsing) &amp;&amp; isDescriptionOf &amp;&amp; boolVal(tc.HasLinearDecodingPressure) &amp;&amp; boolVal(tc.ResolvesToAnAST) &amp;&amp; boolVal(tc.IsStableOntologyReference) &amp;&amp; !boolVal(tc.CanBeHeld) &amp;&amp; !boolVal(tc.HasIdentity))
-	predictionPredicates := func() string { if boolVal(tc.HasSyntax) { return &quot;Has Syntax&quot; }; return &quot;No Syntax&quot; }() + &quot; &amp; &quot; + func() string { if boolVal(tc.RequiresParsing) { return &quot;Requires Parsing&quot; }; return &quot;No Parsing Neede&quot; }() + &quot; &amp; &quot; + func() string { if isDescriptionOf { return &quot;Describes the thing&quot; }; return &quot;Is the Thing&quot; }() + &quot; &amp; &quot; + func() string { if boolVal(tc.HasLinearDecodingPressure) { return &quot;Has Linear Decoding Pressure&quot; }; return &quot;No Decoding Pressure&quot; }() + &quot; &amp; &quot; + func() string { if boolVal(tc.ResolvesToAnAST) { return &quot;Resolves to AST&quot; }; return &quot;No AST&quot; }() + &quot;, &quot; + func() string { if boolVal(tc.IsStableOntologyReference) { return &quot;Is Stable Ontology&quot; }; return &quot;Not &#x27;Ontology&#x27;&quot; }() + &quot; AND &quot; + func() string { if boolVal(tc.CanBeHeld) { return &quot;Can Be Held&quot; }; return &quot;Can&#x27;t Be Held&quot; }() + &quot;, &quot; + func() string { if boolVal(tc.HasIdentity) { return &quot;Has Identity&quot; }; return &quot;Has no Identity&quot; }()
-
-	// Level 3 calculations
-	predictionFail := func() string { if !((predictedAnswer == boolVal(tc.IsLanguage))) { return stringVal(tc.Name) + &quot; &quot; + func() string { if predictedAnswer { return &quot;Is&quot; }; return &quot;Isn&#x27;t&quot; }() + &quot; a Family Feud Language, but &quot; + func() string { if boolVal(tc.IsLanguage) { return &quot;Is&quot; }; return &quot;Is Not&quot; }() + &quot; marked as a &#x27;Language Candidate.&#x27;&quot; }; return &quot;&quot; }() + func() string { if isOpenClosedWorldConflicted { return &quot; - Open World vs. Closed World Conflict.&quot; }; return &quot;&quot; }()
-
-	return &amp;LanguageCandidate{
-		LanguageCandidateId: tc.LanguageCandidateId,
-		Name: tc.Name,
-		IsLanguage: tc.IsLanguage,
-		HasSyntax: tc.HasSyntax,
-		CanBeHeld: tc.CanBeHeld,
-		Category: tc.Category,
-		HasIdentity: tc.HasIdentity,
-		RequiresParsing: tc.RequiresParsing,
-		ResolvesToAnAST: tc.ResolvesToAnAST,
-		HasLinearDecodingPressure: tc.HasLinearDecodingPressure,
-		IsStableOntologyReference: tc.IsStableOntologyReference,
-		IsLiveOntologyEditor: tc.IsLiveOntologyEditor,
-		IsOpenWorld: tc.IsOpenWorld,
-		IsClosedWorld: tc.IsClosedWorld,
-		DistanceFromConcept: tc.DistanceFromConcept,
-		DimensionalityWhileEditing: tc.DimensionalityWhileEditing,
-		ModelObjectFacilityLayer: tc.ModelObjectFacilityLayer,
-		SortOrder: tc.SortOrder,
-		HasGrammar: &amp;hasGrammar,
-		Question: nilIfEmpty(question),
-		PredictedAnswer: &amp;predictedAnswer,
-		PredictionPredicates: nilIfEmpty(predictionPredicates),
-		PredictionFail: nilIfEmpty(predictionFail),
-		IsDescriptionOf: &amp;isDescriptionOf,
-		IsOpenClosedWorldConflicted: &amp;isOpenClosedWorldConflicted,
-		RelationshipToConcept: nilIfEmpty(relationshipToConcept),
+	return &amp;Customer{
+		CustomerId: tc.CustomerId,
+		Customer: tc.Customer,
+		EmailAddress: tc.EmailAddress,
+		FirstName: tc.FirstName,
+		LastName: tc.LastName,
+		FullName: nilIfEmpty(fullName),
 	}
-}
-
-// =============================================================================
-// ISEVERYTHINGALANGUAGE TABLE
-// =============================================================================
-
-// IsEverythingALanguage represents a row in the IsEverythingALanguage table
-type IsEverythingALanguage struct {
-	IsEverythingALanguageId string `json:&quot;is_everything_a_language_id&quot;`
-	Name *string `json:&quot;name&quot;`
-	ArgumentName *string `json:&quot;argument_name&quot;`
-	ArgumentCategory *string `json:&quot;argument_category&quot;`
-	StepType *string `json:&quot;step_type&quot;`
-	Statement *string `json:&quot;statement&quot;`
-	Formalization *string `json:&quot;formalization&quot;`
-	RelatedCandidateName *string `json:&quot;related_candidate_name&quot;`
-	RelatedCandidateId *string `json:&quot;related_candidate_id&quot;`
-	EvidenceFromRulebook *string `json:&quot;evidence_from_rulebook&quot;`
-	Notes *string `json:&quot;notes&quot;`
-}
-
-// =============================================================================
-// ERBCUSTOMIZATIONS TABLE
-// =============================================================================
-
-// ERBCustomization represents a row in the ERBCustomizations table
-type ERBCustomization struct {
-	ERBCustomizationId string `json:&quot;erb_customization_id&quot;`
-	Name *string `json:&quot;name&quot;`
-	Title *string `json:&quot;title&quot;`
-	SQLCode *string `json:&quot;sql_code&quot;`
-	SQLTarget *string `json:&quot;sql_target&quot;`
-	CustomizationType *string `json:&quot;customization_type&quot;`
 }
 
 // =============================================================================
 // FILE I/O FUNCTIONS (for all tables with calculated fields)
 // =============================================================================
 
-// LoadLanguageCandidateRecords loads LanguageCandidates records from a JSON file
-func LoadLanguageCandidateRecords(path string) ([]LanguageCandidate, error) {
+// LoadCustomerRecords loads Customers records from a JSON file
+func LoadCustomerRecords(path string) ([]Customer, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf(&quot;failed to read file: %w&quot;, err)
 	}
 
-	var records []LanguageCandidate
+	var records []Customer
 	if err := json.Unmarshal(data, &amp;records); err != nil {
 		return nil, fmt.Errorf(&quot;failed to parse file: %w&quot;, err)
 	}
@@ -388,8 +259,8 @@ func LoadLanguageCandidateRecords(path string) ([]LanguageCandidate, error) {
 	return records, nil
 }
 
-// SaveLanguageCandidateRecords saves computed LanguageCandidates records to a JSON file
-func SaveLanguageCandidateRecords(path string, records []LanguageCandidate) error {
+// SaveCustomerRecords saves computed Customers records to a JSON file
+func SaveCustomerRecords(path string, records []Customer) error {
 	data, err := json.MarshalIndent(records, &quot;&quot;, &quot;  &quot;)
 	if err != nil {
 		return fmt.Errorf(&quot;failed to marshal records: %w&quot;, err)
@@ -415,7 +286,7 @@ func SaveLanguageCandidateRecords(path string, records []LanguageCandidate) erro
 // This file is REGENERATED every time inject-into-golang.py runs.
 // It must stay in sync with erb_sdk.go and the rulebook.
 //
-// Tables with calculated fields: LanguageCandidates
+// Tables with calculated fields: Customers
 //
 // IMPORTANT: This runner processes ALL tables, not just a &quot;primary&quot; one.
 // If ANY table fails to process, the entire run fails with exit code 1.
@@ -446,7 +317,7 @@ func main() {
 	}
 
 	fmt.Println(&quot;Golang substrate: Processing 1 tables with calculated fields...&quot;)
-	fmt.Println(&quot;  Expected tables: LanguageCandidates&quot;)
+	fmt.Println(&quot;  Expected tables: Customers&quot;)
 	fmt.Println(&quot;&quot;)
 
 	// Track success/failure for ALL tables
@@ -454,30 +325,30 @@ func main() {
 	var totalRecords int
 
 	// ─────────────────────────────────────────────────────────────────
-	// Process LanguageCandidates
+	// Process Customers
 	// ─────────────────────────────────────────────────────────────────
-	fmt.Println(&quot;Processing LanguageCandidates...&quot;)
-	language_candidatesInput := filepath.Join(blankTestsDir, &quot;language_candidates.json&quot;)
-	language_candidatesOutput := filepath.Join(testAnswersDir, &quot;language_candidates.json&quot;)
+	fmt.Println(&quot;Processing Customers...&quot;)
+	customersInput := filepath.Join(blankTestsDir, &quot;customers.json&quot;)
+	customersOutput := filepath.Join(testAnswersDir, &quot;customers.json&quot;)
 
-	language_candidatesRecords, err := LoadLanguageCandidateRecords(language_candidatesInput)
+	customersRecords, err := LoadCustomerRecords(customersInput)
 	if err != nil {
-		errMsg := fmt.Sprintf(&quot;LanguageCandidates: failed to load - %v&quot;, err)
+		errMsg := fmt.Sprintf(&quot;Customers: failed to load - %v&quot;, err)
 		fmt.Fprintf(os.Stderr, &quot;ERROR: %s\n&quot;, errMsg)
 		errors = append(errors, errMsg)
 	} else {
-		var computedLanguageCandidate []LanguageCandidate
-		for _, r := range language_candidatesRecords {
-			computedLanguageCandidate = append(computedLanguageCandidate, *r.ComputeAll())
+		var computedCustomer []Customer
+		for _, r := range customersRecords {
+			computedCustomer = append(computedCustomer, *r.ComputeAll())
 		}
 
-		if err := SaveLanguageCandidateRecords(language_candidatesOutput, computedLanguageCandidate); err != nil {
-			errMsg := fmt.Sprintf(&quot;LanguageCandidates: failed to save - %v&quot;, err)
+		if err := SaveCustomerRecords(customersOutput, computedCustomer); err != nil {
+			errMsg := fmt.Sprintf(&quot;Customers: failed to save - %v&quot;, err)
 			fmt.Fprintf(os.Stderr, &quot;ERROR: %s\n&quot;, errMsg)
 			errors = append(errors, errMsg)
 		} else {
-			fmt.Printf(&quot;  ✓ language_candidates: %d records processed\n&quot;, len(computedLanguageCandidate))
-			totalRecords += len(computedLanguageCandidate)
+			fmt.Printf(&quot;  ✓ customers: %d records processed\n&quot;, len(computedCustomer))
+			totalRecords += len(computedCustomer)
 		}
 	}
 	fmt.Println(&quot;&quot;)

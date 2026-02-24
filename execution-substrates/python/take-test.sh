@@ -16,11 +16,9 @@ mkdir -p "$SCRIPT_DIR/test-answers"
 # Capture output for the substrate report
 {
     echo "=== Python Substrate Test Run ==="
-    echo "Started: $(date)"
     echo ""
     python3 "$SCRIPT_DIR/take-test.py"
     echo ""
-    echo "Completed: $(date)"
 } 2>&1 | tee "$LOG_FILE"
 
 echo "python: test completed"

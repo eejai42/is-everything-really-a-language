@@ -1,28 +1,7 @@
 -- OCL Constraints for ERB
 -- Generated from effortless-rulebook.json
 
-context LanguageCandidates
+context Customers
 
--- Formula: ={{HasSyntax}} = TRUE()
-derive HasGrammar: (self.hasSyntax = true)
-
--- Formula: ="Is " & {{Name}} & " a language?"
-derive Question: 'Is ' + self.name + ' a language?'
-
--- Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescriptionOf}},   {{HasLinearDecodingPressure}},   {{ResolvesToAnAST}},   {{IsStableOntologyReference}},   NOT({{CanBeHeld}}),   NOT({{HasIdentity}}) )
-derive PredictedAnswer: (self.hasSyntax and self.requiresParsing and self.isDescriptionOf and self.hasLinearDecodingPressure and self.resolvesToAnAST and self.isStableOntologyReference and not (self.canBeHeld) and not (self.hasIdentity))
-
--- Formula: =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Neede") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & " AND " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " &IF({{HasIdentity}}, "Has Identity", "Has no Identity")
-derive PredictionPredicates: if self.hasSyntax then 'Has Syntax' else 'No Syntax' endif + ' & ' + if self.requiresParsing then 'Requires Parsing' else 'No Parsing Neede' endif + ' & ' + if self.isDescriptionOf then 'Describes the thing' else 'Is the Thing' endif + ' & ' + if self.hasLinearDecodingPressure then 'Has Linear Decoding Pressure' else 'No Decoding Pressure' endif + ' & ' + if self.resolvesToAnAST then 'Resolves to AST' else 'No AST' endif + ', ' + if self.isStableOntologyReference then 'Is Stable Ontology' else 'Not \'Ontology\'' endif + ' AND ' + if self.canBeHeld then 'Can Be Held' else 'Can\'t Be Held' endif + ', ' + if self.hasIdentity then 'Has Identity' else 'Has no Identity' endif
-
--- Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " &    IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'", "") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.", "")
-derive PredictionFail: if not ((self.predictedAnswer = self.isLanguage)) then self.name + ' ' + if self.predictedAnswer then 'Is' else 'Isn\'t' endif + ' a Family Feud Language, but ' + if self.isLanguage then 'Is' else 'Is Not' endif + ' marked as a \'Language Candidate.\'' else '' endif + if self.isOpenClosedWorldConflicted then ' - Open World vs. Closed World Conflict.' else '' endif
-
--- Formula: ={{DistanceFromConcept}} > 1
-derive IsDescriptionOf: (self.distanceFromConcept > 1)
-
--- Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
-derive IsOpenClosedWorldConflicted: (self.isOpenWorld and self.isClosedWorld)
-
--- Formula: =IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")
-derive RelationshipToConcept: if (self.distanceFromConcept = 1) then 'IsMirrorOf' else 'IsDescriptionOf' endif
+-- Formula: ={{LastName}} & ", " & {{FirstName}}
+derive FullName: self.lastName + ', ' + self.firstName

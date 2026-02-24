@@ -48,8 +48,12 @@ DEFAULT_PROVIDER = os.environ.get("LLM_PROVIDER", "openai")
 DEFAULT_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
 
 
-def call_llm(prompt: str) -> str:
-    """Call the OpenAI API to get computed values."""
+def call_llm(prompt: str, skip_confirmation: bool = False) -> str:
+    """Call the OpenAI API to get computed values.
+
+    ALWAYS asks for user confirmation before making the API call,
+    unless skip_confirmation=True or running non-interactively.
+    """
     try:
         import openai
     except ImportError:
@@ -73,6 +77,19 @@ def call_llm(prompt: str) -> str:
         print(f"  {line[:100]}")
     print(f"  ... ({len(prompt_lines)} total lines, {len(prompt)} chars)")
     print("=" * 60)
+
+    # ALWAYS ask before making LLM call (unless skip_confirmation or non-interactive)
+    if not skip_confirmation and sys.stdin.isatty():
+        print(f"\n  This will call OpenAI ({model}).")
+        try:
+            response = input("  Proceed with LLM call? [y/N]: ").strip().lower()
+            if response not in ('y', 'yes'):
+                print("  Skipping LLM call.")
+                return '[]'  # Return empty JSON array
+        except (EOFError, KeyboardInterrupt):
+            print("\n  Skipping LLM call.")
+            return '[]'
+
     print(f"Calling OpenAI ({model})... please wait...")
     sys.stdout.flush()
 

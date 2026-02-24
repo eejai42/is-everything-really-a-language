@@ -95,6 +95,12 @@ def set_setting(config, name, value):
     })
 
 
+def remove_setting(config, name):
+    """Remove a project setting if it exists."""
+    settings = config.get("ProjectSettings", [])
+    config["ProjectSettings"] = [s for s in settings if s.get("Name") != name]
+
+
 def get_bases_list(config=None):
     """Get the list of bases from separate bases.json file (or migrate from ssotme.json)."""
     # Primary: read from separate bases.json file
@@ -124,48 +130,38 @@ def get_bases_list(config=None):
 
 
 def set_bases_list(config, bases):
-    """Save bases to separate bases.json file (ssotme won't overwrite this)."""
+    """Save bases to separate bases.json file ONLY. ssotme.json should NOT contain bases list."""
     with open(BASES_FILE, "w") as f:
         json.dump(bases, f, indent=2)
-    # Also update ssotme.json for backward compatibility (if config provided)
+    # Remove any legacy 'bases' entry from ssotme.json if present
     if config is not None:
-        set_setting(config, "bases", json.dumps(bases))
+        remove_setting(config, "bases")
 
 
 def ensure_current_base_in_list(config=None):
-    """Ensure the current active base is in the bases list with correct name."""
+    """Ensure the current active base is in the bases list.
+
+    IMPORTANT: Names in bases.json ONLY come from Airtable API.
+    This function NEVER updates names - it only adds missing bases by fetching from Airtable.
+    """
     if config is None:
         config = load_ssotme_config()
-        should_save = True
-    else:
-        should_save = False
 
     current_base_id = get_setting(config, "baseId")
-    project_name = config.get("Name", "Unknown")
-
     if not current_base_id:
         return config
 
     bases = get_bases_list(config)
 
-    # Find if current base exists in list
-    found = False
+    # Check if current base exists in list
     for base in bases:
         if base["id"] == current_base_id:
-            # Update name to match current project name
-            if base["name"] != project_name:
-                base["name"] = project_name
-                set_bases_list(config, bases)
-            found = True
-            break
+            return config  # Already exists, don't touch the name
 
-    # Add current base if not in list
-    if not found:
-        bases.append({"id": current_base_id, "name": project_name})
-        set_bases_list(config, bases)
-
-    if should_save:
-        save_ssotme_config(config)
+    # Base not in list - fetch name from Airtable and add it (NO FALLBACKS)
+    base_name = fetch_base_name_or_fail(current_base_id)
+    bases.append({"id": current_base_id, "name": base_name})
+    set_bases_list(config, bases)
 
     return config
 
@@ -201,16 +197,12 @@ def add_or_update_base(base_id: str, base_name: str) -> dict:
     return new_base
 
 
-def try_fetch_base_name(base_id: str) -> str:
-    """Try to fetch base name from Airtable. Returns None if failed."""
+def fetch_base_name_or_fail(base_id: str) -> str:
+    """Fetch base name from Airtable. FAILS if it can't get the name. No fallbacks."""
     api_key = get_airtable_api_key()
     if not api_key:
-        return None
-    try:
-        return fetch_base_name(base_id, api_key)
-    except Exception as e:
-        print(f"Could not fetch base name: {e}", file=sys.stderr)
-        return None
+        raise ValueError("No Airtable API key configured. Run 'ssotme -setAccount airtable <your-pat>'")
+    return fetch_base_name(base_id, api_key)  # Let exceptions propagate
 
 
 def select_base(base_id: str) -> dict:
@@ -286,10 +278,9 @@ def remove_base(base_id: str):
 
 
 def sync_bases():
-    """Sync the bases list to ensure current base is included with correct name."""
+    """Ensure the current base ID is in bases.json (fetches name from Airtable if missing)."""
     config = load_ssotme_config()
     ensure_current_base_in_list(config)
-    save_ssotme_config(config)
     print("Bases list synced.")
 
 
@@ -302,10 +293,9 @@ if __name__ == "__main__":
     # List command
     subparsers.add_parser("list", help="List all known bases")
 
-    # Add command - now requires --name since interactive input doesn't work in subshells
-    add_parser = subparsers.add_parser("add", help="Add or update a base")
+    # Add command - fetches name from Airtable (no manual override)
+    add_parser = subparsers.add_parser("add", help="Add a base (fetches name from Airtable)")
     add_parser.add_argument("base_id", help="Airtable base ID (e.g., appXXXXXX)")
-    add_parser.add_argument("--name", required=False, help="Base name (required if API fetch fails)")
 
     # Select command
     select_parser = subparsers.add_parser("select", help="Select a base as active")
@@ -328,13 +318,7 @@ if __name__ == "__main__":
         if args.command == "list":
             list_bases()
         elif args.command == "add":
-            base_name = args.name
-            if not base_name:
-                # Try to fetch from API
-                base_name = try_fetch_base_name(args.base_id)
-            if not base_name:
-                print("Error: Could not fetch base name. Please provide --name", file=sys.stderr)
-                sys.exit(1)
+            base_name = fetch_base_name_or_fail(args.base_id)
             add_or_update_base(args.base_id, base_name)
         elif args.command == "select":
             if args.base_id.isdigit():
@@ -352,7 +336,7 @@ if __name__ == "__main__":
         elif args.command == "remove":
             remove_base(args.base_id)
         elif args.command == "fetch-name":
-            name = try_fetch_base_name(args.base_id)
+            name = fetch_base_name_or_fail(args.base_id)
             if name:
                 print(f"Base name: {name}")
             else:

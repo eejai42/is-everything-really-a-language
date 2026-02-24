@@ -24,7 +24,6 @@ Writes:
 import argparse
 import os
 import sys
-from datetime import datetime
 from html import escape
 from pathlib import Path
 
@@ -45,8 +44,6 @@ def read_file_safe(filepath: Path) -> str:
 
 def generate_html(substrate_name: str, readme: str, results: str, log: str) -> str:
     """Generate the HTML report content."""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
     # Escape HTML in content
     readme_escaped = escape(readme) if readme else "(No README.md found)"
     results_escaped = escape(results) if results else "(No test-results.md found)"
@@ -205,7 +202,6 @@ def generate_html(substrate_name: str, readme: str, results: str, log: str) -> s
             <div class="meta">Execution Substrate Report</div>
         </div>
         <div>
-            <span class="meta">Generated: {timestamp}</span>
             <button id="theme-toggle" onclick="toggleTheme()">&#127769;</button>
         </div>
     </header>

@@ -1,98 +1,86 @@
-# Specification Document for Rulebook: PUBLISHED - ERB_semiotics-is-everything-a-language
+# Specification Document for DEMO: Customer FullName Rulebook
 
 ## Overview
-This rulebook defines a set of criteria and calculated fields to classify various entities as language candidates based on specific properties. It is derived from an Airtable base and includes various entities with attributes that help determine whether something qualifies as a language. The calculated fields derive their values from raw input fields, allowing for automated assessments based on defined logical conditions.
+This rulebook defines the structure and computation methods for customer data within the "DEMO: Customer FullName" dataset. It includes details on how to derive the full name of a customer and determine their VIP status based on total sales. The rulebook is structured to facilitate easy understanding and implementation of the calculations required.
 
-## LanguageCandidates
+## Customers Entity
 
 ### Input Fields
-1. **LanguageCandidateId**
-   - **Type:** string
-   - **Description:** Unique identifier for the language candidate.
+The following input fields are required to compute the calculated fields:
 
-2. **Name**
-   - **Type:** string
-   - **Description:** Name of the language candidate being classified.
+1. **FirstName**
+   - **Type:** String (raw)
+   - **Description:** The first name of the customer, used to construct the full name.
 
-3. **HasSyntax**
-   - **Type:** boolean
-   - **Description:** Indicates whether the language candidate has syntax and/or grammar.
+2. **LastName**
+   - **Type:** String (raw)
+   - **Description:** The last name of the customer, used to construct the full name.
 
-4. **CanBeHeld**
-   - **Type:** boolean
-   - **Description:** Indicates if the candidate is physical/material and could theoretically be held.
-
-5. **DistanceFromConcept**
-   - **Type:** integer
-   - **Description:** Numeric representation of how far the candidate is from the core concept of a language.
-
-6. **IsLanguage**
-   - **Type:** boolean
-   - **Description:** Indicates if the candidate is classified as a language.
+3. **TotalSales**
+   - **Type:** Number (raw)
+   - **Description:** The total sales amount associated with the customer, used to determine VIP status.
 
 ### Calculated Fields
 
-1. **HasGrammar**
-   - **Description:** Indicates if the candidate has grammar, generally inferred from the presence of syntax.
-   - **Calculation:** This field is true if `HasSyntax` is true.
-   - **Formula:** `={{HasSyntax}} = TRUE()`
-   - **Example:** If `HasSyntax` is true, then `HasGrammar` will also be true.
+#### 1. FullName
+- **Description:** The full name of the customer is computed by combining the last name and first name.
+- **Computation Method:** 
+  - To compute the `FullName`, concatenate the `LastName` and `FirstName` fields with a comma and a space in between. 
+  - The formula for this computation is:
+    ```
+    FullName = LastName + ", " + FirstName
+    ```
+- **Example:**
+  - For a customer with:
+    - `FirstName`: "Jane"
+    - `LastName`: "Smith"
+  - The computed `FullName` would be:
+    ```
+    FullName = "Smith, Jane"
+    ```
 
-2. **Question**
-   - **Description:** A question formatted for a Family Feud style poll.
-   - **Calculation:** The question is constructed by concatenating "Is " with the `Name` of the candidate and appending " a language?".
-   - **Formula:** `="Is " & {{Name}} & " a language?"`
-   - **Example:** For a candidate named "English", the question would be "Is English a language?".
+#### 2. IsVIP
+- **Description:** This field indicates whether the customer is considered a VIP based on their total sales.
+- **Computation Method:** 
+  - To determine if a customer is a VIP, check if the `TotalSales` amount exceeds 500. 
+  - The formula for this computation is:
+    ```
+    IsVIP = TotalSales > 500
+    ```
+- **Example:**
+  - For a customer with:
+    - `TotalSales`: 811
+  - The computed `IsVIP` value would be:
+    ```
+    IsVIP = 811 > 500 → true
+    ```
+  - Conversely, for a customer with:
+    - `TotalSales`: 125
+  - The computed `IsVIP` value would be:
+    ```
+    IsVIP = 125 > 500 → false
+    ```
 
-3. **PredictedAnswer**
-   - **Description:** The predicted answer based on a combination of properties that suggest whether the candidate is a language.
-   - **Calculation:** This field is true if all of the following conditions are met:
-     - `HasSyntax` is true
-     - `RequiresParsing` is true
-     - `IsDescriptionOf` is true
-     - `HasLinearDecodingPressure` is true
-     - `ResolvesToAnAST` is true
-     - `IsStableOntologyReference` is true
-     - `CanBeHeld` is false
-     - `HasIdentity` is false
-   - **Formula:** `=AND({{HasSyntax}}, {{RequiresParsing}}, {{IsDescriptionOf}}, {{HasLinearDecodingPressure}}, {{ResolvesToAnAST}}, {{IsStableOntologyReference}}, NOT({{CanBeHeld}}), NOT({{HasIdentity}}))`
-   - **Example:** For "English", if all conditions are met, `PredictedAnswer` would be true.
+### Summary of Examples
+- **Customer 1:**
+  - `FirstName`: "Jane"
+  - `LastName`: "Smith"
+  - **Computed FullName:** "Smith, Jane"
+  - `TotalSales`: 500
+  - **Computed IsVIP:** false
 
-4. **PredictionPredicates**
-   - **Description:** A string summarizing the predicates that led to the predicted answer.
-   - **Calculation:** This field concatenates multiple conditions into a descriptive string.
-   - **Formula:** 
-     ```
-     =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{RequiresParsing}}, "Requires Parsing", "No Parsing Needed") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & " AND " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")
-     ```
-   - **Example:** For "English", the output might be "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity".
+- **Customer 2:**
+  - `FirstName`: "John"
+  - `LastName`: "Doe"
+  - **Computed FullName:** "Doe, John"
+  - `TotalSales`: 125
+  - **Computed IsVIP:** false
 
-5. **PredictionFail**
-   - **Description:** Provides an explanation if the predicted answer does not match the candidate's status.
-   - **Calculation:** If `PredictedAnswer` does not equal `IsLanguage`, it constructs a message indicating the mismatch and flags any open/closed world conflicts.
-   - **Formula:** 
-     ```
-     =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}), {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'", "") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.", "")
-     ```
-   - **Example:** For "A Coffee Mug", if `PredictedAnswer` is false and `IsLanguage` is true, the output would be "A Coffee Mug Is not a Family Feud Language, but Is marked as a 'Language Candidate.'".
+- **Customer 3:**
+  - `FirstName`: "Emily"
+  - `LastName`: "Jones"
+  - **Computed FullName:** "Jones, Emily"
+  - `TotalSales`: 811
+  - **Computed IsVIP:** true
 
-6. **IsDescriptionOf**
-   - **Description:** Indicates if the candidate describes the concept based on its distance from the core concept.
-   - **Calculation:** This field is true if `DistanceFromConcept` is greater than 1.
-   - **Formula:** `={{DistanceFromConcept}} > 1`
-   - **Example:** If `DistanceFromConcept` is 2, `IsDescriptionOf` would be true.
-
-7. **IsOpenClosedWorldConflicted**
-   - **Description:** Indicates if there is a conflict between being classified as both open and closed world.
-   - **Calculation:** This field is true if both `IsOpenWorld` and `IsClosedWorld` are true.
-   - **Formula:** `=AND({{IsOpenWorld}}, {{IsClosedWorld}})`
-   - **Example:** If both `IsOpenWorld` and `IsClosedWorld` are true, then `IsOpenClosedWorldConflicted` will be true.
-
-8. **RelationshipToConcept**
-   - **Description:** Indicates the relationship of the candidate to the core concept.
-   - **Calculation:** If `DistanceFromConcept` equals 1, it outputs "IsMirrorOf"; otherwise, it outputs "IsDescriptionOf".
-   - **Formula:** `=IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")`
-   - **Example:** If `DistanceFromConcept` is 1 for "A Coffee Mug", the output would be "IsMirrorOf".
-
-## Conclusion
-This specification document provides a comprehensive guide to understanding how to compute the calculated fields for the language candidates defined in the rulebook. By following the outlined steps and formulas, one can accurately derive the necessary values from the raw input fields.
+This specification provides a clear understanding of how to compute the `FullName` and `IsVIP` fields based on the defined input fields. By following the outlined methods and examples, one can accurately derive the necessary values from the customer data.

@@ -40,10 +40,6 @@ failed = failed_match.group(1) if failed_match else "0"
 total_match = re.search(r'\| Total Fields Tested \| (\d+)', test_results)
 total = total_match.group(1) if total_match else "0"
 
-# Get timestamp from log
-lines = log_content.strip().split('\n')
-timestamp = lines[1].replace('Started: ', '') if len(lines) > 1 else 'Unknown'
-
 # Determine score class
 score_num = float(score.replace('%', '')) if '%' in score else 0
 if score_num >= 100:
@@ -350,7 +346,6 @@ pre {{
         <div id="log" class="tab-content">
             <div class="card">
                 <h2>Execution Log</h2>
-                <div class="code-info">Last run: {timestamp}</div>
                 <pre>{log_content}</pre>
             </div>
         </div>
@@ -472,7 +467,6 @@ output = html_template.format(
     passed=passed,
     failed=failed,
     total=total,
-    timestamp=timestamp,
     log_content=log_escaped,
     erb_calc=erb_calc_escaped,
     erb_sdk=erb_sdk_escaped,

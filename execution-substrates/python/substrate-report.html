@@ -209,7 +209,7 @@ pre {
                 <span class="stat-value score-perfect">100.0%</span>
             </div>
             <div class="stat">
-                <span>184/184 passed</span>
+                <span>3/3 passed</span>
             </div>
         </div>
         <button id="theme-toggle" title="Toggle theme">
@@ -284,14 +284,11 @@ pre {
         <div id="log" class="tab-content">
             <div class="card">
                 <h2>Execution Log</h2>
-                <div class="code-info">Last run: Tue Feb 24 02:25:33 CST 2026</div>
                 <pre>=== Python Substrate Test Run ===
-Started: Tue Feb 24 02:25:33 CST 2026
 
-  -&gt; language_candidates: 23 records
-Python substrate: Processed 1 entities, 23 total records
+  -&gt; customers: 3 records
+Python substrate: Processed 1 entities, 3 total records
 
-Completed: Tue Feb 24 02:25:33 CST 2026
 </pre>
             </div>
         </div>
@@ -305,7 +302,7 @@ Completed: Tue Feb 24 02:25:33 CST 2026
                         <div class="result-label">Score</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-value score-perfect">184</div>
+                        <div class="result-value score-perfect">3</div>
                         <div class="result-label">Passed</div>
                     </div>
                     <div class="result-item">
@@ -313,7 +310,7 @@ Completed: Tue Feb 24 02:25:33 CST 2026
                         <div class="result-label">Failed</div>
                     </div>
                     <div class="result-item">
-                        <div class="result-value">184</div>
+                        <div class="result-value">3</div>
                         <div class="result-label">Total</div>
                     </div>
                 </div>
@@ -323,7 +320,7 @@ Completed: Tue Feb 24 02:25:33 CST 2026
                 <div class="markdown-content">
                     <h3>language_candidates</h3>
                     <ul>
-                        <li>Fields: 184/184 (100.0%)</li>
+                        <li>Fields: 3/3 (100.0%)</li>
                         <li>Computed columns: has_grammar, question, predicted_answer, prediction_predicates, prediction_fail, is_description_of, is_open_closed_world_conflicted, relationship_to_concept</li>
                     </ul>
                 </div>
@@ -335,7 +332,7 @@ Completed: Tue Feb 24 02:25:33 CST 2026
                 <div class="code-header">
                     <h2>erb_calc.py</h2>
                     <div>
-                        <span class="code-info">119 lines</span>
+                        <span class="code-info">65 lines</span>
                         <button class="copy-btn" onclick="copyCode('calc-code')">Copy</button>
                     </div>
                 </div>
@@ -352,79 +349,25 @@ from typing import Optional, Any
 
 
 # =============================================================================
-# LANGUAGECANDIDATES CALCULATIONS
+# CUSTOMERS CALCULATIONS
 # =============================================================================
 
 # Level 1
 
-def calc_language_candidates_has_grammar(has_syntax):
-    &quot;&quot;&quot;Formula: ={{HasSyntax}} = TRUE()&quot;&quot;&quot;
-    return (has_syntax == True)
-
-def calc_language_candidates_question(name):
-    &quot;&quot;&quot;Formula: =&quot;Is &quot; &amp; {{Name}} &amp; &quot; a language?&quot; &quot;&quot;&quot;
-    return (&#x27;Is &#x27; + str(name or &quot;&quot;) + &#x27; a language?&#x27;)
-
-def calc_language_candidates_is_description_of(distance_from_concept):
-    &quot;&quot;&quot;Formula: ={{DistanceFromConcept}} &gt; 1&quot;&quot;&quot;
-    return (distance_from_concept &gt; 1)
-
-def calc_language_candidates_is_open_closed_world_conflicted(is_open_world, is_closed_world):
-    &quot;&quot;&quot;Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})&quot;&quot;&quot;
-    return ((is_open_world is True) and (is_closed_world is True))
-
-def calc_language_candidates_relationship_to_concept(distance_from_concept):
-    &quot;&quot;&quot;Formula: =IF({{DistanceFromConcept}} = 1, &quot;IsMirrorOf&quot;, &quot;IsDescriptionOf&quot;)&quot;&quot;&quot;
-    return (&#x27;IsMirrorOf&#x27; if (distance_from_concept == 1) else &#x27;IsDescriptionOf&#x27;)
-
-# Level 2
-
-def calc_language_candidates_predicted_answer(has_syntax, requires_parsing, is_description_of, has_linear_decoding_pressure, resolves_to_an_ast, is_stable_ontology_reference, can_be_held, has_identity):
-    &quot;&quot;&quot;Formula: =AND(
-  {{HasSyntax}},
-  {{RequiresParsing}},
-  {{IsDescriptionOf}},
-  {{HasLinearDecodingPressure}},
-  {{ResolvesToAnAST}},
-  {{IsStableOntologyReference}},
-  NOT({{CanBeHeld}}),
-  NOT({{HasIdentity}})
-)&quot;&quot;&quot;
-    return ((has_syntax is True) and (requires_parsing is True) and (is_description_of is True) and (has_linear_decoding_pressure is True) and (resolves_to_an_ast is True) and (is_stable_ontology_reference is True) and (can_be_held is not True) and (has_identity is not True))
-
-def calc_language_candidates_prediction_predicates(has_syntax, requires_parsing, is_description_of, has_linear_decoding_pressure, resolves_to_an_ast, is_stable_ontology_reference, can_be_held, has_identity):
-    &quot;&quot;&quot;Formula: =IF({{HasSyntax}}, &quot;Has Syntax&quot;, &quot;No Syntax&quot;) &amp; &quot; &amp; &quot; &amp; IF({{RequiresParsing}}, &quot;Requires Parsing&quot;, &quot;No Parsing Neede&quot;) &amp; &quot; &amp; &quot; &amp; IF({{IsDescriptionOf}}, &quot;Describes the thing&quot;, &quot;Is the Thing&quot;) &amp; &quot; &amp; &quot; &amp; IF({{HasLinearDecodingPressure}}, &quot;Has Linear Decoding Pressure&quot;, &quot;No Decoding Pressure&quot;) &amp; &quot; &amp; &quot; &amp; IF({{ResolvesToAnAST}}, &quot;Resolves to AST&quot;, &quot;No AST&quot;) &amp; &quot;, &quot; &amp; IF({{IsStableOntologyReference}}, &quot;Is Stable Ontology&quot;, &quot;Not &#x27;Ontology&#x27;&quot;) &amp; &quot; AND &quot; &amp; IF({{CanBeHeld}}, &quot;Can Be Held&quot;, &quot;Can&#x27;t Be Held&quot;) &amp; &quot;, &quot; &amp;IF({{HasIdentity}}, &quot;Has Identity&quot;, &quot;Has no Identity&quot;)&quot;&quot;&quot;
-    return (str((&#x27;Has Syntax&#x27; if has_syntax else &#x27;No Syntax&#x27;) if (&#x27;Has Syntax&#x27; if has_syntax else &#x27;No Syntax&#x27;) is not None else &quot;&quot;) + &#x27; &amp; &#x27; + str((&#x27;Requires Parsing&#x27; if requires_parsing else &#x27;No Parsing Neede&#x27;) if (&#x27;Requires Parsing&#x27; if requires_parsing else &#x27;No Parsing Neede&#x27;) is not None else &quot;&quot;) + &#x27; &amp; &#x27; + str((&#x27;Describes the thing&#x27; if is_description_of else &#x27;Is the Thing&#x27;) if (&#x27;Describes the thing&#x27; if is_description_of else &#x27;Is the Thing&#x27;) is not None else &quot;&quot;) + &#x27; &amp; &#x27; + str((&#x27;Has Linear Decoding Pressure&#x27; if has_linear_decoding_pressure else &#x27;No Decoding Pressure&#x27;) if (&#x27;Has Linear Decoding Pressure&#x27; if has_linear_decoding_pressure else &#x27;No Decoding Pressure&#x27;) is not None else &quot;&quot;) + &#x27; &amp; &#x27; + str((&#x27;Resolves to AST&#x27; if resolves_to_an_ast else &#x27;No AST&#x27;) if (&#x27;Resolves to AST&#x27; if resolves_to_an_ast else &#x27;No AST&#x27;) is not None else &quot;&quot;) + &#x27;, &#x27; + str((&#x27;Is Stable Ontology&#x27; if is_stable_ontology_reference else &quot;Not &#x27;Ontology&#x27;&quot;) if (&#x27;Is Stable Ontology&#x27; if is_stable_ontology_reference else &quot;Not &#x27;Ontology&#x27;&quot;) is not None else &quot;&quot;) + &#x27; AND &#x27; + str((&#x27;Can Be Held&#x27; if can_be_held else &quot;Can&#x27;t Be Held&quot;) if (&#x27;Can Be Held&#x27; if can_be_held else &quot;Can&#x27;t Be Held&quot;) is not None else &quot;&quot;) + &#x27;, &#x27; + str((&#x27;Has Identity&#x27; if has_identity else &#x27;Has no Identity&#x27;) if (&#x27;Has Identity&#x27; if has_identity else &#x27;Has no Identity&#x27;) is not None else &quot;&quot;))
-
-# Level 3
-
-def calc_language_candidates_prediction_fail(predicted_answer, is_language, name, is_open_closed_world_conflicted):
-    &quot;&quot;&quot;Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),
-  {{Name}} &amp; &quot; &quot; &amp; IF({{PredictedAnswer}}, &quot;Is&quot;, &quot;Isn&#x27;t&quot;) &amp; &quot; a Family Feud Language, but &quot; &amp; 
-  IF({{IsLanguage}}, &quot;Is&quot;, &quot;Is Not&quot;) &amp; &quot; marked as a &#x27;Language Candidate.&#x27;&quot;, &quot;&quot;) &amp; IF({{IsOpenClosedWorldConflicted}}, &quot; - Open World vs. Closed World Conflict.&quot;, &quot;&quot;)&quot;&quot;&quot;
-    return (str(((str(name or &quot;&quot;) + &#x27; &#x27; + str((&#x27;Is&#x27; if predicted_answer else &quot;Isn&#x27;t&quot;) if (&#x27;Is&#x27; if predicted_answer else &quot;Isn&#x27;t&quot;) is not None else &quot;&quot;) + &#x27; a Family Feud Language, but &#x27; + str((&#x27;Is&#x27; if is_language else &#x27;Is Not&#x27;) if (&#x27;Is&#x27; if is_language else &#x27;Is Not&#x27;) is not None else &quot;&quot;) + &quot; marked as a &#x27;Language Candidate.&#x27;&quot;) if (not (predicted_answer == is_language)) else &#x27;&#x27;) if ((str(name or &quot;&quot;) + &#x27; &#x27; + str((&#x27;Is&#x27; if predicted_answer else &quot;Isn&#x27;t&quot;) if (&#x27;Is&#x27; if predicted_answer else &quot;Isn&#x27;t&quot;) is not None else &quot;&quot;) + &#x27; a Family Feud Language, but &#x27; + str((&#x27;Is&#x27; if is_language else &#x27;Is Not&#x27;) if (&#x27;Is&#x27; if is_language else &#x27;Is Not&#x27;) is not None else &quot;&quot;) + &quot; marked as a &#x27;Language Candidate.&#x27;&quot;) if (not (predicted_answer == is_language)) else &#x27;&#x27;) is not None else &quot;&quot;) + str((&#x27; - Open World vs. Closed World Conflict.&#x27; if is_open_closed_world_conflicted else &#x27;&#x27;) if (&#x27; - Open World vs. Closed World Conflict.&#x27; if is_open_closed_world_conflicted else &#x27;&#x27;) is not None else &quot;&quot;))
+def calc_customers_full_name(last_name, first_name):
+    &quot;&quot;&quot;Formula: ={{LastName}} &amp; &quot;, &quot; &amp; {{FirstName}}&quot;&quot;&quot;
+    return (str(last_name or &quot;&quot;) + &#x27;, &#x27; + str(first_name or &quot;&quot;))
 
 
-def compute_language_candidates_fields(record: dict) -&gt; dict:
-    &quot;&quot;&quot;Compute all calculated fields for LanguageCandidates.&quot;&quot;&quot;
+def compute_customers_fields(record: dict) -&gt; dict:
+    &quot;&quot;&quot;Compute all calculated fields for Customers.&quot;&quot;&quot;
     result = dict(record)
 
     # Level 1 calculations
-    result[&#x27;has_grammar&#x27;] = calc_language_candidates_has_grammar(result.get(&#x27;has_syntax&#x27;))
-    result[&#x27;question&#x27;] = calc_language_candidates_question(result.get(&#x27;name&#x27;))
-    result[&#x27;is_description_of&#x27;] = calc_language_candidates_is_description_of(result.get(&#x27;distance_from_concept&#x27;))
-    result[&#x27;is_open_closed_world_conflicted&#x27;] = calc_language_candidates_is_open_closed_world_conflicted(result.get(&#x27;is_open_world&#x27;), result.get(&#x27;is_closed_world&#x27;))
-    result[&#x27;relationship_to_concept&#x27;] = calc_language_candidates_relationship_to_concept(result.get(&#x27;distance_from_concept&#x27;))
-
-    # Level 2 calculations
-    result[&#x27;predicted_answer&#x27;] = calc_language_candidates_predicted_answer(result.get(&#x27;has_syntax&#x27;), result.get(&#x27;requires_parsing&#x27;), result.get(&#x27;is_description_of&#x27;), result.get(&#x27;has_linear_decoding_pressure&#x27;), result.get(&#x27;resolves_to_an_ast&#x27;), result.get(&#x27;is_stable_ontology_reference&#x27;), result.get(&#x27;can_be_held&#x27;), result.get(&#x27;has_identity&#x27;))
-    result[&#x27;prediction_predicates&#x27;] = calc_language_candidates_prediction_predicates(result.get(&#x27;has_syntax&#x27;), result.get(&#x27;requires_parsing&#x27;), result.get(&#x27;is_description_of&#x27;), result.get(&#x27;has_linear_decoding_pressure&#x27;), result.get(&#x27;resolves_to_an_ast&#x27;), result.get(&#x27;is_stable_ontology_reference&#x27;), result.get(&#x27;can_be_held&#x27;), result.get(&#x27;has_identity&#x27;))
-
-    # Level 3 calculations
-    result[&#x27;prediction_fail&#x27;] = calc_language_candidates_prediction_fail(result.get(&#x27;predicted_answer&#x27;), result.get(&#x27;is_language&#x27;), result.get(&#x27;name&#x27;), result.get(&#x27;is_open_closed_world_conflicted&#x27;))
+    result[&#x27;full_name&#x27;] = calc_customers_full_name(result.get(&#x27;last_name&#x27;), result.get(&#x27;first_name&#x27;))
 
     # Convert empty strings to None for string fields
-    for key in [&#x27;question&#x27;, &#x27;prediction_predicates&#x27;, &#x27;prediction_fail&#x27;, &#x27;relationship_to_concept&#x27;]:
+    for key in [&#x27;full_name&#x27;]:
         if result.get(key) == &#x27;&#x27;:
             result[key] = None
 
@@ -453,8 +396,8 @@ def compute_all_calculated_fields(record: dict, entity_name: str = None) -&gt; d
     # Normalize to snake_case
     entity_lower = entity_name.lower().replace(&#x27;-&#x27;, &#x27;_&#x27;)
 
-    if entity_lower == &#x27;language_candidates&#x27;:
-        return compute_language_candidates_fields(record)
+    if entity_lower == &#x27;customers&#x27;:
+        return compute_customers_fields(record)
     else:
         # Unknown entity, return as-is
         return dict(record)</pre>

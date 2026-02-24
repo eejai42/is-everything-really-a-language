@@ -54,9 +54,6 @@ failed = failed_match.group(1) if failed_match else "0"
 total_match = re.search(r'\| Total Fields Tested \| (\d+)', test_results)
 total = total_match.group(1) if total_match else "0"
 
-lines = log_content.strip().split('\n')
-timestamp = lines[1].replace('Started: ', '') if len(lines) > 1 else 'Unknown'
-
 score_num = float(score.replace('%', '')) if '%' in score else 0
 if score_num >= 100: score_class = "score-perfect"
 elif score_num >= 80: score_class = "score-good"
@@ -200,7 +197,6 @@ HasGrammar = true
         <div id="log" class="tab-content">
             <div class="card">
                 <h2>Execution Log</h2>
-                <div class="code-info">Last run: {timestamp}</div>
                 <pre>{log_content}</pre>
             </div>
         </div>
@@ -248,7 +244,7 @@ function copyCode(elementId) {{ navigator.clipboard.writeText(document.getElemen
 output = html_template.format(
     substrate_name=SUBSTRATE_NAME, title=SUBSTRATE_TITLE, icon=SUBSTRATE_ICON,
     score=score, score_class=score_class, passed=passed, failed=failed, total=total,
-    timestamp=timestamp, log_content=log_escaped,
+    log_content=log_escaped,
     explain_spec=spec_escaped, sample_explanations=sample_escaped, spec_lines=spec_lines
 )
 

@@ -1014,18 +1014,31 @@ h2 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; color: var(--tex
     font-family: monospace;
     font-size: 0.75rem;
     color: var(--answer-key-color);
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    min-width: 200px;
+    max-width: 400px;
+    vertical-align: top;
+}
+.formula-pre {
+    margin: 0;
+    padding: 0.25rem 0.4rem;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: monospace;
+    font-size: 0.75rem;
 }
 .desc-cell {
     font-size: 0.75rem;
     color: var(--text-secondary);
-    max-width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    min-width: 150px;
+    max-width: 350px;
+    vertical-align: top;
+}
+.desc-text {
+    display: block;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 .entity-header { margin-bottom: 0.75rem; }
@@ -1172,13 +1185,15 @@ footer {
     font-size: 0.75rem;
     color: var(--answer-key-color);
     background: var(--bg-tertiary);
-    padding: 0.15rem 0.35rem;
+    padding: 0.35rem 0.5rem;
     border-radius: 3px;
     white-space: pre-wrap;
+    word-break: break-word;
     display: block;
     margin-top: 0.25rem;
+    line-height: 1.5;
 }
-.computed-cols-info .desc-row { display: block; color: var(--text-secondary); font-size: 0.75rem; font-style: italic; margin-top: 0.15rem; }
+.computed-cols-info .desc-row { display: block; color: var(--text-secondary); font-size: 0.75rem; font-style: italic; margin-top: 0.25rem; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
 
 /* Graded test table - VERY COMPACT with ellipsis */
 .graded-test-table {
@@ -1259,6 +1274,87 @@ footer {
     border: 1px solid var(--border-color);
     border-radius: var(--radius);
     background: var(--bg-primary);
+}
+
+/* Postgres report section */
+.postgres-report {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+}
+.postgres-report h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: var(--answer-key-color);
+}
+.postgres-intro {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    color: var(--text-primary);
+}
+.postgres-details h5 {
+    font-size: 0.9rem;
+    margin: 1rem 0 0.5rem 0;
+    color: var(--text-primary);
+}
+.postgres-details ul, .postgres-details ol {
+    margin: 0.5rem 0 1rem 1.5rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+.postgres-details li { margin-bottom: 0.4rem; }
+.postgres-details p { font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.75rem; }
+.postgres-conclusion {
+    background: rgba(111, 66, 193, 0.1);
+    border-left: 3px solid var(--answer-key-color);
+    padding: 0.75rem 1rem;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-top: 1rem;
+}
+
+/* Schema entity sections */
+.schema-entity-section {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+.schema-entity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
+}
+.schema-entity-name {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--accent-color);
+}
+.schema-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+}
+.schema-meta-item {
+    color: var(--text-secondary);
+    background: var(--bg-primary);
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+}
+.schema-entity-desc {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
 }
 
 @media print {
@@ -1377,12 +1473,24 @@ function renderEntityDetails(entityName) {
     const entity = REPORT_DATA.entities[entityName];
     if (!entity) { entityDetails.innerHTML = '<p>Entity not found</p>'; return; }
 
-    let html = `<div class="entity-header"><h3>${escapeHtml(entityName)}</h3>`;
-    if (entity.description) html += `<p class="entity-description">${escapeHtml(entity.description)}</p>`;
-    html += '</div>';
+    const computedCount = entity.computed_columns ? entity.computed_columns.length : 0;
+    const rawCount = entity.schema.length - computedCount;
 
-    // Schema in collapsible
-    html += '<details><summary>Schema (' + entity.schema.length + ' fields)</summary>';
+    let html = '<div class="schema-entity-section">';
+    html += `<div class="schema-entity-header">`;
+    html += `<h4 class="schema-entity-name">${escapeHtml(entityName)}</h4>`;
+    html += `<div class="schema-meta">`;
+    html += `<span class="schema-meta-item">${entity.schema.length} fields</span>`;
+    html += `<span class="schema-meta-item">${computedCount} computed</span>`;
+    html += `<span class="schema-meta-item">${rawCount} raw</span>`;
+    html += `<span class="schema-meta-item">${entity.answer_key ? entity.answer_key.length : 0} records</span>`;
+    html += `</div>`;
+    html += `</div>`;
+    if (entity.description) {
+        html += `<p class="schema-entity-desc">${escapeHtml(entity.description)}</p>`;
+    }
+
+    // Schema table - no collapsible
     html += '<div class="table-scroll"><table class="schema-table"><thead><tr>';
     html += '<th>Field</th><th>Type</th><th>Formula</th><th>Description</th>';
     html += '</tr></thead><tbody>';
@@ -1393,11 +1501,11 @@ function renderEntityDetails(entityName) {
         html += `<tr>
             <td>${escapeHtml(field.name)}</td>
             <td class="${typeClass}">${escapeHtml(field.type || 'raw')}</td>
-            <td class="formula-cell" title="${escapeHtml(formula)}">${escapeHtml(formula)}</td>
-            <td class="desc-cell" title="${escapeHtml(desc)}">${escapeHtml(desc)}</td>
+            <td class="formula-cell"><pre class="formula-pre">${escapeHtml(formula)}</pre></td>
+            <td class="desc-cell"><span class="desc-text">${escapeHtml(desc)}</span></td>
         </tr>`;
     });
-    html += '</tbody></table></div></details>';
+    html += '</tbody></table></div></div>';
 
     // Answer key in collapsible
     html += '<details><summary>Answer Key Data (' + (entity.answer_key?.length || 0) + ' records)</summary>';
@@ -1578,12 +1686,32 @@ function renderSubstrateDetails(substrateName) {
     // Tab content containers
     html += '<div id="substrate-view-content">';
 
-    // Report tab - iframe to substrate-report.html
+    // Report tab - iframe to substrate-report.html or postgres explanation
     html += '<div id="substrate-report-view" class="substrate-view active">';
     if (!isAnswerKey) {
         html += `<iframe src="${getSubstrateReportUrl(escapeHtml(substrateName))}" class="substrate-report-iframe" frameborder="0"></iframe>`;
     } else {
-        html += '<p class="no-results">Postgres generates the answer key - no separate report needed.</p>';
+        html += '<div class="postgres-report">';
+        html += '<h4>PostgreSQL Reference Implementation</h4>';
+        html += '<p class="postgres-intro">PostgreSQL serves as the <strong>reference implementation</strong> for this rulebook. It is not privileged or special—it is simply the most reliable and consistent answer key generator due to its mature SQL engine and deterministic calculation behavior.</p>';
+        html += '<div class="postgres-details">';
+        html += '<h5>Why PostgreSQL?</h5>';
+        html += '<ul>';
+        html += '<li><strong>Deterministic calculations</strong> — SQL functions produce consistent, reproducible results</li>';
+        html += '<li><strong>Mature type system</strong> — Handles numeric precision, dates, and text reliably</li>';
+        html += '<li><strong>Declarative formulas</strong> — The rulebook formulas map directly to SQL expressions</li>';
+        html += '<li><strong>Battle-tested</strong> — Decades of production use ensures edge cases are handled correctly</li>';
+        html += '</ul>';
+        html += '<h5>The Point</h5>';
+        html += '<p>All substrates should converge on the same answers. PostgreSQL generates the "answer key" not because it is authoritative, but because it is the most <em>reliable</em> substrate for computing correct values. When other substrates match PostgreSQL, it validates that:</p>';
+        html += '<ol>';
+        html += '<li>The rulebook formulas are unambiguous across execution environments</li>';
+        html += '<li>Each substrate correctly interprets and executes the business logic</li>';
+        html += '<li>The same inputs produce the same outputs—regardless of implementation language</li>';
+        html += '</ol>';
+        html += '<p class="postgres-conclusion"><strong>Everything ends up agreeing—that is the point.</strong> The orchestration tests prove that diverse implementations (JavaScript, Python, Go, spreadsheets, etc.) all compute identical results from the same rulebook specification.</p>';
+        html += '</div>';
+        html += '</div>';
     }
     html += '</div>';
 
@@ -1621,10 +1749,23 @@ function renderSubstrateDetails(substrateName) {
 
     // Schema tab
     html += '<div id="substrate-schema-view" class="substrate-view">';
-    html += '<h4>Entity Schemas</h4>';
     Object.keys(REPORT_DATA.entities).sort().forEach(entityName => {
         const entity = REPORT_DATA.entities[entityName];
-        html += `<details><summary>${escapeHtml(entityName)} (${entity.schema.length} fields)</summary>`;
+        const computedCount = entity.computed_columns ? entity.computed_columns.length : 0;
+        const rawCount = entity.schema.length - computedCount;
+        html += '<div class="schema-entity-section">';
+        html += `<div class="schema-entity-header">`;
+        html += `<h4 class="schema-entity-name">${escapeHtml(entityName)}</h4>`;
+        html += `<div class="schema-meta">`;
+        html += `<span class="schema-meta-item">${entity.schema.length} fields</span>`;
+        html += `<span class="schema-meta-item">${computedCount} computed</span>`;
+        html += `<span class="schema-meta-item">${rawCount} raw</span>`;
+        html += `<span class="schema-meta-item">${entity.answer_key ? entity.answer_key.length : 0} records</span>`;
+        html += `</div>`;
+        html += `</div>`;
+        if (entity.description) {
+            html += `<p class="schema-entity-desc">${escapeHtml(entity.description)}</p>`;
+        }
         html += '<div class="table-scroll"><table class="schema-table"><thead><tr>';
         html += '<th>Field</th><th>Type</th><th>Formula</th><th>Description</th>';
         html += '</tr></thead><tbody>';
@@ -1635,11 +1776,12 @@ function renderSubstrateDetails(substrateName) {
             html += `<tr>
                 <td>${escapeHtml(field.name)}</td>
                 <td class="${typeClass}">${escapeHtml(field.type || 'raw')}</td>
-                <td class="formula-cell" title="${escapeHtml(formula)}">${escapeHtml(formula)}</td>
-                <td class="desc-cell" title="${escapeHtml(desc)}">${escapeHtml(desc)}</td>
+                <td class="formula-cell"><pre class="formula-pre">${escapeHtml(formula)}</pre></td>
+                <td class="desc-cell"><span class="desc-text">${escapeHtml(desc)}</span></td>
             </tr>`;
         });
-        html += '</tbody></table></div></details>';
+        html += '</tbody></table></div>';
+        html += '</div>';
     });
     html += '</div>';
 

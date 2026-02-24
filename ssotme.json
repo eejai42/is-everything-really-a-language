@@ -1,19 +1,15 @@
 {
   "ShowHidden": false,
   "ShowAllFiles": false,
-  "Name": "is-everything-a-language",
+  "Name": "CustomerDemo",
   "ProjectSettings": [
     {
-      "Name": "bases",
-      "Value": "[{\"id\": \"appC8XTj95lubn6hz\", \"name\": \"is-everything-a-language\"}, {\"id\": \"appWrXPvXbkgQGOxt\", \"name\": \"PUBLISHED - ERB_semiotics-is-everything-a-language\"}]"
-    },
-    {
       "Name": "baseId",
-      "Value": "appC8XTj95lubn6hz"
+      "Value": "appWrXPvXbkgQGOxt"
     },
     {
       "Name": "project-name",
-      "Value": "is-everything-a-language"
+      "Value": "CustomerDemo"
     },
     {
       "Name": "_apikey_",

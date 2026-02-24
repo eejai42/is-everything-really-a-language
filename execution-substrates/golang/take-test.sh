@@ -20,7 +20,6 @@ cd "$SCRIPT_DIR"
 # Capture output for the substrate report
 {
     echo "=== Go Substrate Test Run ==="
-    echo "Started: $(date)"
     echo ""
 
     echo "golang: Starting test..."
@@ -44,7 +43,6 @@ cd "$SCRIPT_DIR"
     go run erb_sdk.go main.go
 
     echo ""
-    echo "Completed: $(date)"
 } 2>&1 | tee "$LOG_FILE"
 
 echo "golang: test completed successfully"

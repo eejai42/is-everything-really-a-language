@@ -58,9 +58,6 @@ if [[ -n "$LOG_FILE" && -f "$LOG_FILE" ]]; then
     LOG_CONTENT=$(cat "$LOG_FILE" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g')
 fi
 
-# Get timestamp
-TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-
 # Generate HTML report
 cat > "$OUTPUT_FILE" << 'HTMLEOF'
 <!DOCTYPE html>
@@ -239,7 +236,6 @@ cat > "$OUTPUT_FILE" << 'HTMLEOF'
             <div class="meta">Execution Substrate Report</div>
         </div>
         <div>
-            <span class="meta">Generated: TIMESTAMP_PLACEHOLDER</span>
             <button id="theme-toggle" onclick="toggleTheme()">🌙</button>
         </div>
     </header>
@@ -298,7 +294,6 @@ HTMLEOF
 
 # Replace placeholders
 sed -i '' "s/SUBSTRATE_NAME_PLACEHOLDER/$SUBSTRATE_NAME/g" "$OUTPUT_FILE"
-sed -i '' "s/TIMESTAMP_PLACEHOLDER/$TIMESTAMP/g" "$OUTPUT_FILE"
 
 # Replace content placeholders using Python for proper escaping
 python3 << PYEOF

@@ -405,29 +405,10 @@ action_change_base_id() {
             echo ""
             echo -e "${YELLOW}Fetching base name from Airtable...${NC}"
 
-            # Try to fetch base name from API (|| true prevents set -e from killing script if grep fails)
-            FETCHED_NAME=$(python3 "$SCRIPT_DIR/base-manager.py" fetch-name "$NEW_BASE_ID" 2>/dev/null | grep "Base name:" | cut -d':' -f2 | xargs || true)
-
-            if [ -z "$FETCHED_NAME" ]; then
-                # API fetch failed, prompt for name
-                echo -e "${DIM}Could not fetch name from Airtable API${NC}"
-                read -p "  Enter base name: " NEW_BASE_NAME
-
-                if [ -z "$NEW_BASE_NAME" ]; then
-                    echo ""
-                    echo -e "  ${DIM}Cancelled - base name is required${NC}"
-                    echo ""
-                    return
-                fi
-            else
-                NEW_BASE_NAME="$FETCHED_NAME"
-                echo -e "  Fetched name: ${WHITE}$NEW_BASE_NAME${NC}"
-            fi
-
-            # Add the base with the name
-            if ! python3 "$SCRIPT_DIR/base-manager.py" add "$NEW_BASE_ID" --name "$NEW_BASE_NAME"; then
+            # Add the base - name is fetched from Airtable (NO FALLBACKS)
+            if ! python3 "$SCRIPT_DIR/base-manager.py" add "$NEW_BASE_ID"; then
                 echo ""
-                echo -e "${RED}Failed to add base${NC}"
+                echo -e "${RED}Failed to add base - could not fetch name from Airtable${NC}"
                 echo ""
                 read -p "Press Enter to continue..."
                 return

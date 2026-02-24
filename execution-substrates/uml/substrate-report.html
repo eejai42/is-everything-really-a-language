@@ -68,7 +68,7 @@ pre { background: var(--code-bg); border: 1px solid var(--border-color); border-
         </div>
         <div class="header-stats">
             <div class="stat"><span>Score:</span><span class="stat-value score-perfect">100.0%</span></div>
-            <div class="stat"><span>184/184 passed</span></div>
+            <div class="stat"><span>3/3 passed</span></div>
         </div>
         <button id="theme-toggle" title="Toggle theme"><span class="sun">☀️</span><span class="moon">🌙</span></button>
     </header>
@@ -109,22 +109,19 @@ pre { background: var(--code-bg); border: 1px solid var(--border-color); border-
         <div id="log" class="tab-content">
             <div class="card">
                 <h2>Execution Log</h2>
-                <div class="code-info">Last run: Tue Feb 24 02:25:33 CST 2026</div>
                 <pre>=== UML/OCL Substrate Test Run ===
-Started: Tue Feb 24 02:25:33 CST 2026
 
 ======================================================================
 UML Execution Substrate - Multi-Entity Test Execution (OCL)
 ======================================================================
 
-Loaded 8 OCL constraints from constraints.ocl
+Loaded 1 OCL constraints from constraints.ocl
 
-  -&gt; language_candidates: 23 records (via OCL)
+  -&gt; customers: 3 records (via OCL)
 
-UML substrate: Processed 1 entities, 23 total records
+UML substrate: Processed 1 entities, 3 total records
 ======================================================================
 
-Completed: Tue Feb 24 02:25:33 CST 2026
 </pre>
             </div>
         </div>
@@ -133,9 +130,9 @@ Completed: Tue Feb 24 02:25:33 CST 2026
                 <h2>Test Summary</h2>
                 <div class="results-summary">
                     <div class="result-item"><div class="result-value score-perfect">100.0%</div><div class="result-label">Score</div></div>
-                    <div class="result-item"><div class="result-value score-perfect">184</div><div class="result-label">Passed</div></div>
+                    <div class="result-item"><div class="result-value score-perfect">3</div><div class="result-label">Passed</div></div>
                     <div class="result-item"><div class="result-value">0</div><div class="result-label">Failed</div></div>
-                    <div class="result-item"><div class="result-value">184</div><div class="result-label">Total</div></div>
+                    <div class="result-item"><div class="result-value">3</div><div class="result-label">Total</div></div>
                 </div>
             </div>
         </div>
@@ -143,64 +140,19 @@ Completed: Tue Feb 24 02:25:33 CST 2026
             <div class="card">
                 <div class="code-header">
                     <h2>class-diagram.puml</h2>
-                    <div><span class="code-info">59 lines</span><button class="copy-btn" onclick="copyCode('class-code')">Copy</button></div>
+                    <div><span class="code-info">14 lines</span><button class="copy-btn" onclick="copyCode('class-code')">Copy</button></div>
                 </div>
                 <pre id="class-code">@startuml
 skinparam classAttributeIconSize 0
 
-class ERBCustomizations {
-  +ERBCustomizationId: String
-  +Name: String
-  +Title: String
-  +SQLCode: String
-  +SQLTarget: String
-  +CustomizationType: String
+class Customers {
+  +CustomerId: String
+  +Customer: String
+  +EmailAddress: String
+  +FirstName: String
+  +LastName: String
   --
-}
-
-class IsEverythingALanguage {
-  +IsEverythingALanguageId: String
-  +Name: String
-  +ArgumentName: String
-  +ArgumentCategory: String
-  +StepType: String
-  +Statement: String
-  +Formalization: String
-  +RelatedCandidateName: String
-  +RelatedCandidateId: String
-  +EvidenceFromRulebook: String
-  +Notes: String
-  --
-}
-
-class LanguageCandidates {
-  +LanguageCandidateId: String
-  +Name: String
-  +IsLanguage: Boolean
-  +HasSyntax: Boolean
-  +CanBeHeld: Boolean
-  +Category: String
-  +HasIdentity: Boolean
-  +RequiresParsing: Boolean
-  +ResolvesToAnAST: Boolean
-  +HasLinearDecodingPressure: Boolean
-  +IsStableOntologyReference: Boolean
-  +IsLiveOntologyEditor: Boolean
-  +IsOpenWorld: Boolean
-  +IsClosedWorld: Boolean
-  +DistanceFromConcept: Integer
-  +DimensionalityWhileEditing: String
-  +ModelObjectFacilityLayer: String
-  +SortOrder: Integer
-  --
-  /HasGrammar: Boolean  {derived}
-  /Question: String  {derived}
-  /PredictedAnswer: Boolean  {derived}
-  /PredictionPredicates: String  {derived}
-  /PredictionFail: String  {derived}
-  /IsDescriptionOf: Boolean  {derived}
-  /IsOpenClosedWorldConflicted: Boolean  {derived}
-  /RelationshipToConcept: String  {derived}
+  /FullName: String  {derived}
 }
 
 @enduml</pre>
@@ -210,760 +162,32 @@ class LanguageCandidates {
             <div class="card">
                 <div class="code-header">
                     <h2>objects.puml</h2>
-                    <div><span class="code-info">755 lines</span><button class="copy-btn" onclick="copyCode('objects-code')">Copy</button></div>
+                    <div><span class="code-info">27 lines</span><button class="copy-btn" onclick="copyCode('objects-code')">Copy</button></div>
                 </div>
                 <pre id="objects-code">@startuml
 
-object &quot;01b-customize-schema.sql&quot; as ERBCustomizations_0 {
-  ERBCustomizationId = &quot;01b-customize-schema-sql&quot;
-  Name = &quot;01b-customize-schema.sql&quot;
-  Title = &quot;Customize Schema&quot;
-  SQLCode = &quot;-- ========================...&quot;
-  SQLTarget = &quot;Postgres&quot;
-  CustomizationType = &quot;Schema&quot;
+object &quot;Customers_0&quot; as Customers_0 {
+  CustomerId = &quot;cust0001&quot;
+  Customer = &quot;CUST0001&quot;
+  EmailAddress = &quot;jane.smith@email.com&quot;
+  FirstName = &quot;Jane&quot;
+  LastName = &quot;Smith&quot;
 }
 
-object &quot;02b-customize-functions.sql&quot; as ERBCustomizations_1 {
-  ERBCustomizationId = &quot;02b-customize-functions-sql&quot;
-  Name = &quot;02b-customize-functions.sql&quot;
-  Title = &quot;Customize Functions&quot;
-  SQLCode = &quot;-- Prediction Fail: Returns...&quot;
-  SQLTarget = &quot;Postgres&quot;
-  CustomizationType = &quot;Functions&quot;
+object &quot;Customers_1&quot; as Customers_1 {
+  CustomerId = &quot;cust0002&quot;
+  Customer = &quot;CUST0002&quot;
+  EmailAddress = &quot;john.doe@email.com&quot;
+  FirstName = &quot;John&quot;
+  LastName = &quot;Doe&quot;
 }
 
-object &quot;03b-customize-views.sql&quot; as ERBCustomizations_2 {
-  ERBCustomizationId = &quot;03b-customize-views-sql&quot;
-  Name = &quot;03b-customize-views.sql&quot;
-  Title = &quot;Customize Views&quot;
-  SQLCode = &quot;-- ========================...&quot;
-  SQLTarget = &quot;Postgres&quot;
-  CustomizationType = &quot;Views&quot;
-}
-
-object &quot;04b-customize-rls.sql&quot; as ERBCustomizations_3 {
-  ERBCustomizationId = &quot;04b-customize-rls-sql&quot;
-  Name = &quot;04b-customize-rls.sql&quot;
-  Title = &quot;Customize Policies (RLS)&quot;
-  SQLCode = &quot;-- ========================...&quot;
-  SQLTarget = &quot;Postgres&quot;
-  CustomizationType = &quot;RLS&quot;
-}
-
-object &quot;05b-customize-data.sql&quot; as ERBCustomizations_4 {
-  ERBCustomizationId = &quot;05b-customize-data-sql&quot;
-  Name = &quot;05b-customize-data.sql&quot;
-  Title = &quot;Customize Data (Seeds / Mig...&quot;
-  SQLCode = &quot;-- ========================...&quot;
-  SQLTarget = &quot;Postgres&quot;
-  CustomizationType = &quot;Data&quot;
-}
-
-object &quot;NEIAL-001&quot; as IsEverythingALanguage_0 {
-  IsEverythingALanguageId = &quot;neial-001&quot;
-  Name = &quot;NEIAL-001&quot;
-  ArgumentName = &quot;LanguageCanBeFormalized&quot;
-  ArgumentCategory = &quot;Definition&quot;
-  StepType = &quot;Motivation&quot;
-  Statement = &quot;To avoid the slogan &#x27;Everyt...&quot;
-  Formalization = &quot;&quot;
-  RelatedCandidateName = &quot;&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This keeps &#x27;can be interpre...&quot;
-}
-
-object &quot;NEIAL-002&quot; as IsEverythingALanguage_1 {
-  IsEverythingALanguageId = &quot;neial-002&quot;
-  Name = &quot;NEIAL-002&quot;
-  ArgumentName = &quot;LanguageCanBeFormalized&quot;
-  ArgumentCategory = &quot;Definition&quot;
-  StepType = &quot;PredicateSet&quot;
-  Statement = &quot;Use the repo predicates: Ha...&quot;
-  Formalization = &quot;Predicates: Syntax(x), Pars...&quot;
-  RelatedCandidateName = &quot;&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;We preserve the dataset&#x27;s f...&quot;
-}
-
-object &quot;NEIAL-003&quot; as IsEverythingALanguage_2 {
-  IsEverythingALanguageId = &quot;neial-003&quot;
-  Name = &quot;NEIAL-003&quot;
-  ArgumentName = &quot;LanguageCanBeFormalized&quot;
-  ArgumentCategory = &quot;Definition&quot;
-  StepType = &quot;Definition&quot;
-  Statement = &quot;Operational definition: an ...&quot;
-  Formalization = &quot;Language(x) := HasSyntax(x)...&quot;
-  RelatedCandidateName = &quot;&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This is a deliberately &#x27;str...&quot;
-}
-
-object &quot;NEIAL-004&quot; as IsEverythingALanguage_3 {
-  IsEverythingALanguageId = &quot;neial-004&quot;
-  Name = &quot;NEIAL-004&quot;
-  ArgumentName = &quot;LanguageCanBeFormalized&quot;
-  ArgumentCategory = &quot;Premise&quot;
-  StepType = &quot;Witness&quot;
-  Statement = &quot;There exists at least one c...&quot;
-  Formalization = &quot;∃x (x=English ∧ Language(x))&quot;
-  RelatedCandidateName = &quot;English&quot;
-  RelatedCandidateId = &quot;english&quot;
-  EvidenceFromRulebook = &quot;HasSyntax=True; RequiresPar...&quot;
-  Notes = &quot;If any predicate is false i...&quot;
-}
-
-object &quot;NEIAL-005&quot; as IsEverythingALanguage_4 {
-  IsEverythingALanguageId = &quot;neial-005&quot;
-  Name = &quot;NEIAL-005&quot;
-  ArgumentName = &quot;LanguageCanBeFormalized&quot;
-  ArgumentCategory = &quot;Premise&quot;
-  StepType = &quot;Witness&quot;
-  Statement = &quot;There exists at least one c...&quot;
-  Formalization = &quot;∃x (x=Python ∧ Language(x))&quot;
-  RelatedCandidateName = &quot;Python&quot;
-  RelatedCandidateId = &quot;python&quot;
-  EvidenceFromRulebook = &quot;HasSyntax=True; RequiresPar...&quot;
-  Notes = &quot;If any predicate is false i...&quot;
-}
-
-object &quot;NEIAL-006&quot; as IsEverythingALanguage_5 {
-  IsEverythingALanguageId = &quot;neial-006&quot;
-  Name = &quot;NEIAL-006&quot;
-  ArgumentName = &quot;LanguageCanBeFormalized&quot;
-  ArgumentCategory = &quot;Conclusion&quot;
-  StepType = &quot;Conclusion&quot;
-  Statement = &quot;Therefore, &#x27;language&#x27; can b...&quot;
-  Formalization = &quot;(Definition ∧ Witnesses) ⇒ ...&quot;
-  RelatedCandidateName = &quot;&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This is the concession: lan...&quot;
-}
-
-object &quot;NEIAL-007&quot; as IsEverythingALanguage_6 {
-  IsEverythingALanguageId = &quot;neial-007&quot;
-  Name = &quot;NEIAL-007&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Premise&quot;
-  StepType = &quot;Entailment&quot;
-  Statement = &quot;If Language(x) is defined b...&quot;
-  Formalization = &quot;∀x (¬(HasSyntax(x) ∧ Requir...&quot;
-  RelatedCandidateName = &quot;&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This is the standard move: ...&quot;
-}
-
-object &quot;NEIAL-008&quot; as IsEverythingALanguage_7 {
-  IsEverythingALanguageId = &quot;neial-008&quot;
-  Name = &quot;NEIAL-008&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Example&quot;
-  StepType = &quot;Counterexample&quot;
-  Statement = &quot;Counterexample: a chair can...&quot;
-  Formalization = &quot;¬Language(Chair)&quot;
-  RelatedCandidateName = &quot;A Chair&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This separates semiotic ava...&quot;
-}
-
-object &quot;NEIAL-009&quot; as IsEverythingALanguage_8 {
-  IsEverythingALanguageId = &quot;neial-009&quot;
-  Name = &quot;NEIAL-009&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Example&quot;
-  StepType = &quot;NonLanguageExample&quot;
-  Statement = &quot;Non-language example: A Thu...&quot;
-  Formalization = &quot;¬Language(A Thunderstorm)&quot;
-  RelatedCandidateName = &quot;A Thunderstorm&quot;
-  RelatedCandidateId = &quot;a-thunderstorm&quot;
-  EvidenceFromRulebook = &quot;HasSyntax=False; RequiresPa...&quot;
-  Notes = &quot;These are strong candidates...&quot;
-}
-
-object &quot;NEIAL-010&quot; as IsEverythingALanguage_9 {
-  IsEverythingALanguageId = &quot;neial-010&quot;
-  Name = &quot;NEIAL-010&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Example&quot;
-  StepType = &quot;NonLanguageExample&quot;
-  Statement = &quot;Non-language example: A Cof...&quot;
-  Formalization = &quot;¬Language(A Coffee Mug)&quot;
-  RelatedCandidateName = &quot;A Coffee Mug&quot;
-  RelatedCandidateId = &quot;a-coffee-mug&quot;
-  EvidenceFromRulebook = &quot;HasSyntax=False; RequiresPa...&quot;
-  Notes = &quot;These are strong candidates...&quot;
-}
-
-object &quot;NEIAL-011&quot; as IsEverythingALanguage_10 {
-  IsEverythingALanguageId = &quot;neial-011&quot;
-  Name = &quot;NEIAL-011&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Example&quot;
-  StepType = &quot;NonLanguageExample&quot;
-  Statement = &quot;Non-language example: The M...&quot;
-  Formalization = &quot;¬Language(The Mona Lisa)&quot;
-  RelatedCandidateName = &quot;The Mona Lisa&quot;
-  RelatedCandidateId = &quot;the-mona-lisa&quot;
-  EvidenceFromRulebook = &quot;HasSyntax=False; RequiresPa...&quot;
-  Notes = &quot;These are strong candidates...&quot;
-}
-
-object &quot;NEIAL-012&quot; as IsEverythingALanguage_11 {
-  IsEverythingALanguageId = &quot;neial-012&quot;
-  Name = &quot;NEIAL-012&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Observation&quot;
-  StepType = &quot;FuzzyBoundary&quot;
-  Statement = &quot;Fuzzy case: A Running App o...&quot;
-  Formalization = &quot;Borderline(A Running App): ...&quot;
-  RelatedCandidateName = &quot;A Running App&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This is where traditional s...&quot;
-}
-
-object &quot;NEIAL-013&quot; as IsEverythingALanguage_12 {
-  IsEverythingALanguageId = &quot;neial-013&quot;
-  Name = &quot;NEIAL-013&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Observation&quot;
-  StepType = &quot;FuzzyBoundary&quot;
-  Statement = &quot;Fuzzy case: Running Calcula...&quot;
-  Formalization = &quot;Borderline(Running Calculat...&quot;
-  RelatedCandidateName = &quot;Running Calculator App&quot;
-  RelatedCandidateId = &quot;running-calculator-app&quot;
-  EvidenceFromRulebook = &quot;HasSyntax=False; RequiresPa...&quot;
-  Notes = &quot;This is where traditional s...&quot;
-}
-
-object &quot;NEIAL-014&quot; as IsEverythingALanguage_13 {
-  IsEverythingALanguageId = &quot;neial-014&quot;
-  Name = &quot;NEIAL-014&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Observation&quot;
-  StepType = &quot;FuzzyBoundary&quot;
-  Statement = &quot;Fuzzy case: A Game of Fortn...&quot;
-  Formalization = &quot;Borderline(A Game of Fortni...&quot;
-  RelatedCandidateName = &quot;A Game of Fortnite&quot;
-  RelatedCandidateId = &quot;a-game-of-fortnite&quot;
-  EvidenceFromRulebook = &quot;HasSyntax=False; RequiresPa...&quot;
-  Notes = &quot;This is where traditional s...&quot;
-}
-
-object &quot;NEIAL-015&quot; as IsEverythingALanguage_14 {
-  IsEverythingALanguageId = &quot;neial-015&quot;
-  Name = &quot;NEIAL-015&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Definition&quot;
-  StepType = &quot;Refinement&quot;
-  Statement = &quot;Refinement: distinguish Lan...&quot;
-  Formalization = &quot;Kinds: LanguageSystem(x) | ...&quot;
-  RelatedCandidateName = &quot;&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This gives you a place to p...&quot;
-}
-
-object &quot;NEIAL-016&quot; as IsEverythingALanguage_15 {
-  IsEverythingALanguageId = &quot;neial-016&quot;
-  Name = &quot;NEIAL-016&quot;
-  ArgumentName = &quot;NotEverythingIsALanguage&quot;
-  ArgumentCategory = &quot;Conclusion&quot;
-  StepType = &quot;Conclusion&quot;
-  Statement = &quot;Given a formalizable defini...&quot;
-  Formalization = &quot;Formalizable(Language) ∧ ∃x...&quot;
-  RelatedCandidateName = &quot;&quot;
-  RelatedCandidateId = &quot;&quot;
-  EvidenceFromRulebook = &quot;&quot;
-  Notes = &quot;This is the repo&#x27;s thesis i...&quot;
-}
-
-object &quot;English&quot; as LanguageCandidates_0 {
-  LanguageCandidateId = &quot;english&quot;
-  Name = &quot;English&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Natural Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = true
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 1
-}
-
-object &quot;A Coffee Mug&quot; as LanguageCandidates_1 {
-  LanguageCandidateId = &quot;a-coffee-mug&quot;
-  Name = &quot;A Coffee Mug&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = true
-  Category = &quot;Physical Object&quot;
-  HasIdentity = true
-  RequiresParsing = false
-  ResolvesToAnAST = false
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = false
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = true
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;N/A&quot;
-  ModelObjectFacilityLayer = &quot;NA&quot;
-  SortOrder = 2
-}
-
-object &quot;Spoken Words&quot; as LanguageCandidates_2 {
-  LanguageCandidateId = &quot;spoken-words&quot;
-  Name = &quot;Spoken Words&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Natural Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = true
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 3
-}
-
-object &quot;A Game of Fortnite&quot; as LanguageCandidates_3 {
-  LanguageCandidateId = &quot;a-game-of-fortnite&quot;
-  Name = &quot;A Game of Fortnite&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = false
-  Category = &quot;Running Software&quot;
-  HasIdentity = true
-  RequiresParsing = true
-  ResolvesToAnAST = false
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = false
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = true
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;MultiDimensionalNonSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M4&quot;
-  SortOrder = 4
-}
-
-object &quot;Sign Language&quot; as LanguageCandidates_4 {
-  LanguageCandidateId = &quot;sign-language&quot;
-  Name = &quot;Sign Language&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Natural Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = true
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 5
-}
-
-object &quot;Editing Airtable Base&quot; as LanguageCandidates_5 {
-  LanguageCandidateId = &quot;editing-airtable-base&quot;
-  Name = &quot;Editing Airtable Base&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = false
-  Category = &quot;Running Software&quot;
-  HasIdentity = true
-  RequiresParsing = false
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = true
-  IsOpenWorld = false
-  IsClosedWorld = true
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;MultiDimensionalNonSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M4&quot;
-  SortOrder = 6
-}
-
-object &quot;Math&quot; as LanguageCandidates_6 {
-  LanguageCandidateId = &quot;math&quot;
-  Name = &quot;Math&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Formal Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = true
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 7
-}
-
-object &quot;Falsifier A&quot; as LanguageCandidates_7 {
-  LanguageCandidateId = &quot;falsifier-a&quot;
-  Name = &quot;Falsifier A&quot;
-  IsLanguage = true
-  HasSyntax = false
-  CanBeHeld = true
-  Category = &quot;MISSING: Have you seen this...&quot;
-  HasIdentity = true
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;N/A&quot;
-  ModelObjectFacilityLayer = &quot;NA&quot;
-  SortOrder = 8
-}
-
-object &quot;Falsifier B&quot; as LanguageCandidates_8 {
-  LanguageCandidateId = &quot;falsifier-b&quot;
-  Name = &quot;Falsifier B&quot;
-  IsLanguage = false
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;MISSING: Have you seen this...&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;N/A&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 9
-}
-
-object &quot;A Smartphone&quot; as LanguageCandidates_9 {
-  LanguageCandidateId = &quot;a-smartphone&quot;
-  Name = &quot;A Smartphone&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = true
-  Category = &quot;Physical Object&quot;
-  HasIdentity = true
-  RequiresParsing = false
-  ResolvesToAnAST = false
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = false
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = true
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;N/A&quot;
-  ModelObjectFacilityLayer = &quot;NA&quot;
-  SortOrder = 10
-}
-
-object &quot;Python&quot; as LanguageCandidates_10 {
-  LanguageCandidateId = &quot;python&quot;
-  Name = &quot;Python&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Formal Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = true
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 11
-}
-
-object &quot;A Running App &quot; as LanguageCandidates_11 {
-  LanguageCandidateId = &quot;a-running-app&quot;
-  Name = &quot;A Running App &quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = false
-  Category = &quot;Running Software&quot;
-  HasIdentity = true
-  RequiresParsing = true
-  ResolvesToAnAST = false
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = false
-  IsLiveOntologyEditor = true
-  IsOpenWorld = false
-  IsClosedWorld = true
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;MultiDimensionalNonSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M4&quot;
-  SortOrder = 12
-}
-
-object &quot;An XLSX Doc&quot; as LanguageCandidates_12 {
-  LanguageCandidateId = &quot;an-xlsx-doc&quot;
-  Name = &quot;An XLSX Doc&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Formal Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M2&quot;
-  SortOrder = 13
-}
-
-object &quot;XLSX - Editing&quot; as LanguageCandidates_13 {
-  LanguageCandidateId = &quot;xlsx-editing&quot;
-  Name = &quot;XLSX - Editing&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = false
-  Category = &quot;Running Software&quot;
-  HasIdentity = false
-  RequiresParsing = false
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = false
-  IsLiveOntologyEditor = true
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;MultiDimensionalNonSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M4&quot;
-  SortOrder = 14
-}
-
-object &quot;An DOCX Doc&quot; as LanguageCandidates_14 {
-  LanguageCandidateId = &quot;an-docx-doc&quot;
-  Name = &quot;An DOCX Doc&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Formal Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M2&quot;
-  SortOrder = 15
-}
-
-object &quot;DOCX - Editing&quot; as LanguageCandidates_15 {
-  LanguageCandidateId = &quot;docx-editing&quot;
-  Name = &quot;DOCX - Editing&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = false
-  Category = &quot;Running Software&quot;
-  HasIdentity = false
-  RequiresParsing = false
-  ResolvesToAnAST = false
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = true
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;MultiDimensionalNonSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M4&quot;
-  SortOrder = 16
-}
-
-object &quot;OWL/RDF/GraphQL/... generally&quot; as LanguageCandidates_16 {
-  LanguageCandidateId = &quot;owl-rdf-graphql-generally&quot;
-  Name = &quot;OWL/RDF/GraphQL/... generally&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Natural Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = true
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M2&quot;
-  SortOrder = 17
-}
-
-object &quot;A Thunderstorm&quot; as LanguageCandidates_17 {
-  LanguageCandidateId = &quot;a-thunderstorm&quot;
-  Name = &quot;A Thunderstorm&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = true
-  Category = &quot;Physical event&quot;
-  HasIdentity = true
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = false
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;N/A&quot;
-  ModelObjectFacilityLayer = &quot;NA&quot;
-  SortOrder = 18
-}
-
-object &quot;A UML File&quot; as LanguageCandidates_18 {
-  LanguageCandidateId = &quot;a-uml-file&quot;
-  Name = &quot;A UML File&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Formal Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M2&quot;
-  SortOrder = 23
-}
-
-object &quot;The Mona Lisa&quot; as LanguageCandidates_19 {
-  LanguageCandidateId = &quot;the-mona-lisa&quot;
-  Name = &quot;The Mona Lisa&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = true
-  Category = &quot;Physical Object&quot;
-  HasIdentity = true
-  RequiresParsing = false
-  ResolvesToAnAST = false
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;N/A&quot;
-  ModelObjectFacilityLayer = &quot;NA&quot;
-  SortOrder = 20
-}
-
-object &quot;Binary Code&quot; as LanguageCandidates_20 {
-  LanguageCandidateId = &quot;binary-code&quot;
-  Name = &quot;Binary Code&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;Formal Language&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M2&quot;
-  SortOrder = 21
-}
-
-object &quot;Running Calculator App&quot; as LanguageCandidates_21 {
-  LanguageCandidateId = &quot;running-calculator-app&quot;
-  Name = &quot;Running Calculator App&quot;
-  IsLanguage = false
-  HasSyntax = false
-  CanBeHeld = false
-  Category = &quot;Running Software&quot;
-  HasIdentity = true
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = false
-  IsStableOntologyReference = false
-  IsLiveOntologyEditor = false
-  IsOpenWorld = false
-  IsClosedWorld = false
-  DistanceFromConcept = 1
-  DimensionalityWhileEditing = &quot;MultiDimensionalNonSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 22
-}
-
-object &quot;OWA &amp; CWA Falsifier&quot; as LanguageCandidates_22 {
-  LanguageCandidateId = &quot;owa-cwa-falsifier&quot;
-  Name = &quot;OWA &amp; CWA Falsifier&quot;
-  IsLanguage = true
-  HasSyntax = true
-  CanBeHeld = false
-  Category = &quot;MISSING: Have you seen this...&quot;
-  HasIdentity = false
-  RequiresParsing = true
-  ResolvesToAnAST = true
-  HasLinearDecodingPressure = true
-  IsStableOntologyReference = true
-  IsLiveOntologyEditor = false
-  IsOpenWorld = true
-  IsClosedWorld = true
-  DistanceFromConcept = 2
-  DimensionalityWhileEditing = &quot;OneDimensionalSymbolic&quot;
-  ModelObjectFacilityLayer = &quot;M1&quot;
-  SortOrder = 23
+object &quot;Customers_2&quot; as Customers_2 {
+  CustomerId = &quot;cust0003&quot;
+  Customer = &quot;CUST0003&quot;
+  EmailAddress = &quot;emily.jones@email.com&quot;
+  FirstName = &quot;Emily&quot;
+  LastName = &quot;Jones&quot;
 }
 
 @enduml</pre>
@@ -973,36 +197,15 @@ object &quot;OWA &amp; CWA Falsifier&quot; as LanguageCandidates_22 {
             <div class="card">
                 <div class="code-header">
                     <h2>constraints.ocl</h2>
-                    <div><span class="code-info">29 lines</span><button class="copy-btn" onclick="copyCode('ocl-code')">Copy</button></div>
+                    <div><span class="code-info">8 lines</span><button class="copy-btn" onclick="copyCode('ocl-code')">Copy</button></div>
                 </div>
                 <pre id="ocl-code">-- OCL Constraints for ERB
 -- Generated from effortless-rulebook.json
 
-context LanguageCandidates
+context Customers
 
--- Formula: ={{HasSyntax}} = TRUE()
-derive HasGrammar: (self.hasSyntax = true)
-
--- Formula: =&quot;Is &quot; &amp; {{Name}} &amp; &quot; a language?&quot;
-derive Question: &#x27;Is &#x27; + self.name + &#x27; a language?&#x27;
-
--- Formula: =AND(   {{HasSyntax}},   {{RequiresParsing}},   {{IsDescriptionOf}},   {{HasLinearDecodingPressure}},   {{ResolvesToAnAST}},   {{IsStableOntologyReference}},   NOT({{CanBeHeld}}),   NOT({{HasIdentity}}) )
-derive PredictedAnswer: (self.hasSyntax and self.requiresParsing and self.isDescriptionOf and self.hasLinearDecodingPressure and self.resolvesToAnAST and self.isStableOntologyReference and not (self.canBeHeld) and not (self.hasIdentity))
-
--- Formula: =IF({{HasSyntax}}, &quot;Has Syntax&quot;, &quot;No Syntax&quot;) &amp; &quot; &amp; &quot; &amp; IF({{RequiresParsing}}, &quot;Requires Parsing&quot;, &quot;No Parsing Neede&quot;) &amp; &quot; &amp; &quot; &amp; IF({{IsDescriptionOf}}, &quot;Describes the thing&quot;, &quot;Is the Thing&quot;) &amp; &quot; &amp; &quot; &amp; IF({{HasLinearDecodingPressure}}, &quot;Has Linear Decoding Pressure&quot;, &quot;No Decoding Pressure&quot;) &amp; &quot; &amp; &quot; &amp; IF({{ResolvesToAnAST}}, &quot;Resolves to AST&quot;, &quot;No AST&quot;) &amp; &quot;, &quot; &amp; IF({{IsStableOntologyReference}}, &quot;Is Stable Ontology&quot;, &quot;Not &#x27;Ontology&#x27;&quot;) &amp; &quot; AND &quot; &amp; IF({{CanBeHeld}}, &quot;Can Be Held&quot;, &quot;Can&#x27;t Be Held&quot;) &amp; &quot;, &quot; &amp;IF({{HasIdentity}}, &quot;Has Identity&quot;, &quot;Has no Identity&quot;)
-derive PredictionPredicates: if self.hasSyntax then &#x27;Has Syntax&#x27; else &#x27;No Syntax&#x27; endif + &#x27; &amp; &#x27; + if self.requiresParsing then &#x27;Requires Parsing&#x27; else &#x27;No Parsing Neede&#x27; endif + &#x27; &amp; &#x27; + if self.isDescriptionOf then &#x27;Describes the thing&#x27; else &#x27;Is the Thing&#x27; endif + &#x27; &amp; &#x27; + if self.hasLinearDecodingPressure then &#x27;Has Linear Decoding Pressure&#x27; else &#x27;No Decoding Pressure&#x27; endif + &#x27; &amp; &#x27; + if self.resolvesToAnAST then &#x27;Resolves to AST&#x27; else &#x27;No AST&#x27; endif + &#x27;, &#x27; + if self.isStableOntologyReference then &#x27;Is Stable Ontology&#x27; else &#x27;Not \&#x27;Ontology\&#x27;&#x27; endif + &#x27; AND &#x27; + if self.canBeHeld then &#x27;Can Be Held&#x27; else &#x27;Can\&#x27;t Be Held&#x27; endif + &#x27;, &#x27; + if self.hasIdentity then &#x27;Has Identity&#x27; else &#x27;Has no Identity&#x27; endif
-
--- Formula: =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),   {{Name}} &amp; &quot; &quot; &amp; IF({{PredictedAnswer}}, &quot;Is&quot;, &quot;Isn&#x27;t&quot;) &amp; &quot; a Family Feud Language, but &quot; &amp;    IF({{IsLanguage}}, &quot;Is&quot;, &quot;Is Not&quot;) &amp; &quot; marked as a &#x27;Language Candidate.&#x27;&quot;, &quot;&quot;) &amp; IF({{IsOpenClosedWorldConflicted}}, &quot; - Open World vs. Closed World Conflict.&quot;, &quot;&quot;)
-derive PredictionFail: if not ((self.predictedAnswer = self.isLanguage)) then self.name + &#x27; &#x27; + if self.predictedAnswer then &#x27;Is&#x27; else &#x27;Isn\&#x27;t&#x27; endif + &#x27; a Family Feud Language, but &#x27; + if self.isLanguage then &#x27;Is&#x27; else &#x27;Is Not&#x27; endif + &#x27; marked as a \&#x27;Language Candidate.\&#x27;&#x27; else &#x27;&#x27; endif + if self.isOpenClosedWorldConflicted then &#x27; - Open World vs. Closed World Conflict.&#x27; else &#x27;&#x27; endif
-
--- Formula: ={{DistanceFromConcept}} &gt; 1
-derive IsDescriptionOf: (self.distanceFromConcept &gt; 1)
-
--- Formula: =AND({{IsOpenWorld}}, {{IsClosedWorld}})
-derive IsOpenClosedWorldConflicted: (self.isOpenWorld and self.isClosedWorld)
-
--- Formula: =IF({{DistanceFromConcept}} = 1, &quot;IsMirrorOf&quot;, &quot;IsDescriptionOf&quot;)
-derive RelationshipToConcept: if (self.distanceFromConcept = 1) then &#x27;IsMirrorOf&#x27; else &#x27;IsDescriptionOf&#x27; endif
+-- Formula: ={{LastName}} &amp; &quot;, &quot; &amp; {{FirstName}}
+derive FullName: self.lastName + &#x27;, &#x27; + self.firstName
 </pre>
             </div>
         </div>
