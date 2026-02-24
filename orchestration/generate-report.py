@@ -1275,7 +1275,7 @@ def get_javascript() -> str:
 // Substrate report URL - hardcoded for htmlpreview.github.io
 function getSubstrateReportUrl(substrateName) {
     const localPath = `../execution-substrates/${substrateName}/substrate-report.html`;
-    const onlinePath = `https://htmlpreview.github.io?https://github.com/eejai42/is-everything-really-a-language/execution-substrates/${substrateName}/substrate-report.html`;
+    const onlinePath = `https://htmlpreview.github.io?https://github.com/eejai42/is-everything-really-a-language/blob/main/execution-substrates/${substrateName}/substrate-report.html`;
 
     // Use local path for file:// protocol, online path otherwise
     return window.location.protocol === 'file:' ? localPath : onlinePath;
