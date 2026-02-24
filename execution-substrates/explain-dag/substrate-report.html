@@ -69,7 +69,7 @@ pre { background: var(--code-bg); border: 1px solid var(--border-color); border-
         </div>
         <div class="header-stats">
             <div class="stat"><span>Score:</span><span class="stat-value score-perfect">100.0%</span></div>
-            <div class="stat"><span>3/3 passed</span></div>
+            <div class="stat"><span>184/184 passed</span></div>
         </div>
         <button id="theme-toggle" title="Toggle theme"><span class="sun">☀️</span><span class="moon">🌙</span></button>
     </header>
@@ -124,8 +124,8 @@ HasGrammar = true
                 <h2>Execution Log</h2>
                 <pre>=== ExplainDAG Substrate Test Run ===
 
-  -&gt; customers: 3 records with explanations
-ExplainDAG substrate: Processed 1 entities, 3 total records
+  -&gt; language_candidates: 23 records with explanations
+ExplainDAG substrate: Processed 1 entities, 23 total records
 Explanations written to: /Users/eejai42/effortlessapi-app-root/users/user_ee42ai73-18a9-47d5-8f99-954b00f6c041/my-projects/ERB_effortless-rulebook-starter/execution-substrates/explain-dag/test-explanations
 
 </pre>
@@ -136,9 +136,9 @@ Explanations written to: /Users/eejai42/effortlessapi-app-root/users/user_ee42ai
                 <h2>Test Summary</h2>
                 <div class="results-summary">
                     <div class="result-item"><div class="result-value score-perfect">100.0%</div><div class="result-label">Score</div></div>
-                    <div class="result-item"><div class="result-value score-perfect">3</div><div class="result-label">Passed</div></div>
+                    <div class="result-item"><div class="result-value score-perfect">184</div><div class="result-label">Passed</div></div>
                     <div class="result-item"><div class="result-value">0</div><div class="result-label">Failed</div></div>
-                    <div class="result-item"><div class="result-value">3</div><div class="result-label">Total</div></div>
+                    <div class="result-item"><div class="result-value">184</div><div class="result-label">Total</div></div>
                 </div>
             </div>
         </div>
@@ -146,13 +146,13 @@ Explanations written to: /Users/eejai42/effortlessapi-app-root/users/user_ee42ai
             <div class="card">
                 <div class="code-header">
                     <h2>explain_spec.json</h2>
-                    <div><span class="code-info">123 lines</span><button class="copy-btn" onclick="copyCode('spec-code')">Copy</button></div>
+                    <div><span class="code-info">1363 lines</span><button class="copy-btn" onclick="copyCode('spec-code')">Copy</button></div>
                 </div>
                 <pre id="spec-code">{
   &quot;schema_version&quot;: &quot;erb.explain_spec.v1&quot;,
   &quot;rulebook&quot;: {
-    &quot;name&quot;: &quot;DEMO: Customer FullName&quot;,
-    &quot;rulebook_hash&quot;: &quot;sha256:fc5baec006076835eeecd2be23742af0&quot;
+    &quot;name&quot;: &quot;PUBLISHED - ERB_semiotics-is-everything-a-language&quot;,
+    &quot;rulebook_hash&quot;: &quot;sha256:fd11ecc5684dfe721455f5941c044914&quot;
   },
   &quot;semantics&quot;: {
     &quot;profile&quot;: &quot;excel&quot;,
@@ -161,88 +161,338 @@ Explanations written to: /Users/eejai42/effortlessapi-app-root/users/user_ee42ai
     &quot;boolean_coercion&quot;: &quot;strict&quot;
   },
   &quot;entities&quot;: {
-    &quot;Customers&quot;: {
-      &quot;id_field&quot;: &quot;CustomerId&quot;,
-      &quot;id_field_snake&quot;: &quot;customer_id&quot;,
+    &quot;LanguageCandidates&quot;: {
+      &quot;id_field&quot;: &quot;LanguageCandidateId&quot;,
+      &quot;id_field_snake&quot;: &quot;language_candidate_id&quot;,
       &quot;fields&quot;: {
-        &quot;CustomerId&quot;: {
+        &quot;LanguageCandidateId&quot;: {
           &quot;datatype&quot;: &quot;string&quot;,
           &quot;nullable&quot;: false,
           &quot;type&quot;: &quot;raw&quot;
         },
-        &quot;Customer&quot;: {
+        &quot;Name&quot;: {
           &quot;datatype&quot;: &quot;string&quot;,
           &quot;nullable&quot;: true,
           &quot;type&quot;: &quot;raw&quot;
         },
-        &quot;EmailAddress&quot;: {
-          &quot;datatype&quot;: &quot;string&quot;,
+        &quot;IsLanguage&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
           &quot;nullable&quot;: true,
           &quot;type&quot;: &quot;raw&quot;
         },
-        &quot;FirstName&quot;: {
-          &quot;datatype&quot;: &quot;string&quot;,
+        &quot;HasGrammar&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;HasSyntax&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
           &quot;nullable&quot;: true,
           &quot;type&quot;: &quot;raw&quot;
         },
-        &quot;LastName&quot;: {
-          &quot;datatype&quot;: &quot;string&quot;,
+        &quot;CanBeHeld&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
           &quot;nullable&quot;: true,
           &quot;type&quot;: &quot;raw&quot;
         },
-        &quot;FullName&quot;: {
+        &quot;Question&quot;: {
           &quot;datatype&quot;: &quot;string&quot;,
           &quot;nullable&quot;: true,
           &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;PredictedAnswer&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;PredictionPredicates&quot;: {
+          &quot;datatype&quot;: &quot;string&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;PredictionFail&quot;: {
+          &quot;datatype&quot;: &quot;string&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;Category&quot;: {
+          &quot;datatype&quot;: &quot;string&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;HasIdentity&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;IsParsed&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;ResolvesToAnAST&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;HasLinearDecodingPressure&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;IsStableOntologyReference&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;IsLiveOntologyEditor&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;IsOpenWorld&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;IsClosedWorld&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;IsDescriptionOf&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;DistanceFromConcept&quot;: {
+          &quot;datatype&quot;: &quot;integer&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;IsOpenClosedWorldConflicted&quot;: {
+          &quot;datatype&quot;: &quot;boolean&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;DimensionalityWhileEditing&quot;: {
+          &quot;datatype&quot;: &quot;string&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;RelationshipToConcept&quot;: {
+          &quot;datatype&quot;: &quot;string&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;calculated&quot;
+        },
+        &quot;ModelObjectFacilityLayer&quot;: {
+          &quot;datatype&quot;: &quot;string&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
+        },
+        &quot;SortOrder&quot;: {
+          &quot;datatype&quot;: &quot;integer&quot;,
+          &quot;nullable&quot;: true,
+          &quot;type&quot;: &quot;raw&quot;
         }
       },
       &quot;calc_order&quot;: [
-        &quot;FullName&quot;
+        &quot;HasGrammar&quot;,
+        &quot;IsDescriptionOf&quot;,
+        &quot;IsOpenClosedWorldConflicted&quot;,
+        &quot;Question&quot;,
+        &quot;RelationshipToConcept&quot;,
+        &quot;PredictedAnswer&quot;,
+        &quot;PredictionPredicates&quot;,
+        &quot;PredictionFail&quot;
       ],
       &quot;dep_edges&quot;: [
         [
-          &quot;LastName&quot;,
-          &quot;FullName&quot;
+          &quot;HasSyntax&quot;,
+          &quot;HasGrammar&quot;
         ],
         [
-          &quot;FirstName&quot;,
-          &quot;FullName&quot;
+          &quot;Name&quot;,
+          &quot;Question&quot;
+        ],
+        [
+          &quot;HasSyntax&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;CanBeHeld&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;IsDescriptionOf&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;HasLinearDecodingPressure&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;ResolvesToAnAST&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;HasIdentity&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;IsParsed&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;IsStableOntologyReference&quot;,
+          &quot;PredictedAnswer&quot;
+        ],
+        [
+          &quot;HasSyntax&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;CanBeHeld&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;IsDescriptionOf&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;HasLinearDecodingPressure&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;ResolvesToAnAST&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;HasIdentity&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;IsParsed&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;IsStableOntologyReference&quot;,
+          &quot;PredictionPredicates&quot;
+        ],
+        [
+          &quot;IsOpenClosedWorldConflicted&quot;,
+          &quot;PredictionFail&quot;
+        ],
+        [
+          &quot;IsLanguage&quot;,
+          &quot;PredictionFail&quot;
+        ],
+        [
+          &quot;Name&quot;,
+          &quot;PredictionFail&quot;
+        ],
+        [
+          &quot;PredictedAnswer&quot;,
+          &quot;PredictionFail&quot;
+        ],
+        [
+          &quot;DistanceFromConcept&quot;,
+          &quot;IsDescriptionOf&quot;
+        ],
+        [
+          &quot;IsOpenWorld&quot;,
+          &quot;IsOpenClosedWorldConflicted&quot;
+        ],
+        [
+          &quot;IsClosedWorld&quot;,
+          &quot;IsOpenClosedWorldConflicted&quot;
+        ],
+        [
+          &quot;DistanceFromConcept&quot;,
+          &quot;RelationshipToConcept&quot;
         ]
       ],
       &quot;expr_templates&quot;: {
-        &quot;FullName&quot;: {
-          &quot;formula_source&quot;: &quot;={{LastName}} &amp; \&quot;, \&quot; &amp; {{FirstName}}&quot;,
-          &quot;template_hash&quot;: &quot;sha256:87fca7e8a65752b8&quot;,
-          &quot;root_node&quot;: &quot;n_result_FullName&quot;,
+        &quot;HasGrammar&quot;: {
+          &quot;formula_source&quot;: &quot;={{HasSyntax}} = TRUE()&quot;,
+          &quot;template_hash&quot;: &quot;sha256:adb8760b1799863b&quot;,
+          &quot;root_node&quot;: &quot;n_result_HasGrammar&quot;,
           &quot;nodes&quot;: {
             &quot;n_ref_1&quot;: {
               &quot;kind&quot;: &quot;field_ref&quot;,
-              &quot;field&quot;: &quot;LastName&quot;,
-              &quot;field_snake&quot;: &quot;last_name&quot;
+              &quot;field&quot;: &quot;HasSyntax&quot;,
+              &quot;field_snake&quot;: &quot;has_syntax&quot;
             },
             &quot;n_const_2&quot;: {
               &quot;kind&quot;: &quot;const&quot;,
-              &quot;value&quot;: &quot;, &quot;,
+              &quot;value&quot;: true,
+              &quot;type&quot;: &quot;boolean&quot;
+            },
+            &quot;n_op_3&quot;: {
+              &quot;kind&quot;: &quot;op&quot;,
+              &quot;name&quot;: &quot;=&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_1&quot;,
+                &quot;n_const_2&quot;
+              ]
+            },
+            &quot;n_result_HasGrammar&quot;: {
+              &quot;kind&quot;: &quot;result&quot;,
+              &quot;field&quot;: &quot;HasGrammar&quot;,
+              &quot;field_snake&quot;: &quot;has_grammar&quot;,
+              &quot;in&quot;: [
+                &quot;n_op_3&quot;
+              ]
+            }
+          },
+          &quot;edges&quot;: [
+            [
+              &quot;n_ref_1&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_const_2&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_op_3&quot;,
+              &quot;n_result_HasGrammar&quot;
+            ]
+          ]
+        },
+        &quot;Question&quot;: {
+          &quot;formula_source&quot;: &quot;=\&quot;Is \&quot; &amp; {{Name}} &amp; \&quot; a language?\&quot;&quot;,
+          &quot;template_hash&quot;: &quot;sha256:97c925a474d8cc33&quot;,
+          &quot;root_node&quot;: &quot;n_result_Question&quot;,
+          &quot;nodes&quot;: {
+            &quot;n_const_1&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Is &quot;,
               &quot;type&quot;: &quot;string&quot;
             },
-            &quot;n_ref_3&quot;: {
+            &quot;n_ref_2&quot;: {
               &quot;kind&quot;: &quot;field_ref&quot;,
-              &quot;field&quot;: &quot;FirstName&quot;,
-              &quot;field_snake&quot;: &quot;first_name&quot;
+              &quot;field&quot;: &quot;Name&quot;,
+              &quot;field_snake&quot;: &quot;name&quot;
+            },
+            &quot;n_const_3&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; a language?&quot;,
+              &quot;type&quot;: &quot;string&quot;
             },
             &quot;n_op_4&quot;: {
               &quot;kind&quot;: &quot;op&quot;,
               &quot;name&quot;: &quot;CONCAT&quot;,
               &quot;args&quot;: [
-                &quot;n_ref_1&quot;,
-                &quot;n_const_2&quot;,
-                &quot;n_ref_3&quot;
+                &quot;n_const_1&quot;,
+                &quot;n_ref_2&quot;,
+                &quot;n_const_3&quot;
               ]
             },
-            &quot;n_result_FullName&quot;: {
+            &quot;n_result_Question&quot;: {
               &quot;kind&quot;: &quot;result&quot;,
-              &quot;field&quot;: &quot;FullName&quot;,
-              &quot;field_snake&quot;: &quot;full_name&quot;,
+              &quot;field&quot;: &quot;Question&quot;,
+              &quot;field_snake&quot;: &quot;question&quot;,
               &quot;in&quot;: [
                 &quot;n_op_4&quot;
               ]
@@ -250,20 +500,1010 @@ Explanations written to: /Users/eejai42/effortlessapi-app-root/users/user_ee42ai
           },
           &quot;edges&quot;: [
             [
-              &quot;n_ref_1&quot;,
+              &quot;n_const_1&quot;,
               &quot;n_op_4&quot;
             ],
             [
-              &quot;n_const_2&quot;,
+              &quot;n_ref_2&quot;,
               &quot;n_op_4&quot;
             ],
             [
-              &quot;n_ref_3&quot;,
+              &quot;n_const_3&quot;,
               &quot;n_op_4&quot;
             ],
             [
               &quot;n_op_4&quot;,
-              &quot;n_result_FullName&quot;
+              &quot;n_result_Question&quot;
+            ]
+          ]
+        },
+        &quot;PredictedAnswer&quot;: {
+          &quot;formula_source&quot;: &quot;=AND(\n  {{HasSyntax}},\n  {{IsParsed}},\n  {{IsDescriptionOf}},\n  {{HasLinearDecodingPressure}},\n  {{ResolvesToAnAST}},\n  {{IsStableOntologyReference}},\n  NOT({{CanBeHeld}}),\n  NOT({{HasIdentity}})\n)&quot;,
+          &quot;template_hash&quot;: &quot;sha256:e03882abd16622f0&quot;,
+          &quot;root_node&quot;: &quot;n_result_PredictedAnswer&quot;,
+          &quot;nodes&quot;: {
+            &quot;n_ref_1&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;HasSyntax&quot;,
+              &quot;field_snake&quot;: &quot;has_syntax&quot;
+            },
+            &quot;n_ref_2&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsParsed&quot;,
+              &quot;field_snake&quot;: &quot;is_parsed&quot;
+            },
+            &quot;n_ref_3&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsDescriptionOf&quot;,
+              &quot;field_snake&quot;: &quot;is_description_of&quot;
+            },
+            &quot;n_ref_4&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;HasLinearDecodingPressure&quot;,
+              &quot;field_snake&quot;: &quot;has_linear_decoding_pressure&quot;
+            },
+            &quot;n_ref_5&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;ResolvesToAnAST&quot;,
+              &quot;field_snake&quot;: &quot;resolves_to_an_ast&quot;
+            },
+            &quot;n_ref_6&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsStableOntologyReference&quot;,
+              &quot;field_snake&quot;: &quot;is_stable_ontology_reference&quot;
+            },
+            &quot;n_ref_7&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;CanBeHeld&quot;,
+              &quot;field_snake&quot;: &quot;can_be_held&quot;
+            },
+            &quot;n_fn_8&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;NOT&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_7&quot;
+              ]
+            },
+            &quot;n_ref_9&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;HasIdentity&quot;,
+              &quot;field_snake&quot;: &quot;has_identity&quot;
+            },
+            &quot;n_fn_10&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;NOT&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_9&quot;
+              ]
+            },
+            &quot;n_fn_11&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;AND&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_1&quot;,
+                &quot;n_ref_2&quot;,
+                &quot;n_ref_3&quot;,
+                &quot;n_ref_4&quot;,
+                &quot;n_ref_5&quot;,
+                &quot;n_ref_6&quot;,
+                &quot;n_fn_8&quot;,
+                &quot;n_fn_10&quot;
+              ]
+            },
+            &quot;n_result_PredictedAnswer&quot;: {
+              &quot;kind&quot;: &quot;result&quot;,
+              &quot;field&quot;: &quot;PredictedAnswer&quot;,
+              &quot;field_snake&quot;: &quot;predicted_answer&quot;,
+              &quot;in&quot;: [
+                &quot;n_fn_11&quot;
+              ]
+            }
+          },
+          &quot;edges&quot;: [
+            [
+              &quot;n_ref_7&quot;,
+              &quot;n_fn_8&quot;
+            ],
+            [
+              &quot;n_ref_9&quot;,
+              &quot;n_fn_10&quot;
+            ],
+            [
+              &quot;n_ref_1&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_ref_2&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_ref_3&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_ref_4&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_ref_5&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_ref_6&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_fn_8&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_fn_10&quot;,
+              &quot;n_fn_11&quot;
+            ],
+            [
+              &quot;n_fn_11&quot;,
+              &quot;n_result_PredictedAnswer&quot;
+            ]
+          ]
+        },
+        &quot;PredictionPredicates&quot;: {
+          &quot;formula_source&quot;: &quot;=IF({{HasSyntax}}, \&quot;Has Syntax\&quot;, \&quot;No Syntax\&quot;) &amp; \&quot; &amp; \&quot; &amp; IF({{IsParsed}}, \&quot;Requires Parsing\&quot;, \&quot;No Parsing Neede\&quot;) &amp; \&quot; &amp; \&quot; &amp; IF({{IsDescriptionOf}}, \&quot;Describes the thing\&quot;, \&quot;Is the Thing\&quot;) &amp; \&quot; &amp; \&quot; &amp; IF({{HasLinearDecodingPressure}}, \&quot;Has Linear Decoding Pressure\&quot;, \&quot;No Decoding Pressure\&quot;) &amp; \&quot; &amp; \&quot; &amp; IF({{ResolvesToAnAST}}, \&quot;Resolves to AST\&quot;, \&quot;No AST\&quot;) &amp; \&quot;, \&quot; &amp; IF({{IsStableOntologyReference}}, \&quot;Is Stable Ontology\&quot;, \&quot;Not &#x27;Ontology&#x27;\&quot;) &amp; \&quot; AND \&quot; &amp; IF({{CanBeHeld}}, \&quot;Can Be Held\&quot;, \&quot;Can&#x27;t Be Held\&quot;) &amp; \&quot;, \&quot; &amp;IF({{HasIdentity}}, \&quot;Has Identity\&quot;, \&quot;Has no Identity\&quot;)&quot;,
+          &quot;template_hash&quot;: &quot;sha256:9271037a570a47cb&quot;,
+          &quot;root_node&quot;: &quot;n_result_PredictionPredicates&quot;,
+          &quot;nodes&quot;: {
+            &quot;n_ref_1&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;HasSyntax&quot;,
+              &quot;field_snake&quot;: &quot;has_syntax&quot;
+            },
+            &quot;n_const_2&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Has Syntax&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_3&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;No Syntax&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_4&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_1&quot;,
+                &quot;n_const_2&quot;,
+                &quot;n_const_3&quot;
+              ]
+            },
+            &quot;n_const_5&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; &amp; &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_6&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsParsed&quot;,
+              &quot;field_snake&quot;: &quot;is_parsed&quot;
+            },
+            &quot;n_const_7&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Requires Parsing&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_8&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;No Parsing Neede&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_9&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_6&quot;,
+                &quot;n_const_7&quot;,
+                &quot;n_const_8&quot;
+              ]
+            },
+            &quot;n_const_10&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; &amp; &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_11&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsDescriptionOf&quot;,
+              &quot;field_snake&quot;: &quot;is_description_of&quot;
+            },
+            &quot;n_const_12&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Describes the thing&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_13&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Is the Thing&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_14&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_11&quot;,
+                &quot;n_const_12&quot;,
+                &quot;n_const_13&quot;
+              ]
+            },
+            &quot;n_const_15&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; &amp; &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_16&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;HasLinearDecodingPressure&quot;,
+              &quot;field_snake&quot;: &quot;has_linear_decoding_pressure&quot;
+            },
+            &quot;n_const_17&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Has Linear Decoding Pressure&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_18&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;No Decoding Pressure&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_19&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_16&quot;,
+                &quot;n_const_17&quot;,
+                &quot;n_const_18&quot;
+              ]
+            },
+            &quot;n_const_20&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; &amp; &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_21&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;ResolvesToAnAST&quot;,
+              &quot;field_snake&quot;: &quot;resolves_to_an_ast&quot;
+            },
+            &quot;n_const_22&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Resolves to AST&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_23&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;No AST&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_24&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_21&quot;,
+                &quot;n_const_22&quot;,
+                &quot;n_const_23&quot;
+              ]
+            },
+            &quot;n_const_25&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;, &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_26&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsStableOntologyReference&quot;,
+              &quot;field_snake&quot;: &quot;is_stable_ontology_reference&quot;
+            },
+            &quot;n_const_27&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Is Stable Ontology&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_28&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Not &#x27;Ontology&#x27;&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_29&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_26&quot;,
+                &quot;n_const_27&quot;,
+                &quot;n_const_28&quot;
+              ]
+            },
+            &quot;n_const_30&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; AND &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_31&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;CanBeHeld&quot;,
+              &quot;field_snake&quot;: &quot;can_be_held&quot;
+            },
+            &quot;n_const_32&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Can Be Held&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_33&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Can&#x27;t Be Held&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_34&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_31&quot;,
+                &quot;n_const_32&quot;,
+                &quot;n_const_33&quot;
+              ]
+            },
+            &quot;n_const_35&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;, &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_36&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;HasIdentity&quot;,
+              &quot;field_snake&quot;: &quot;has_identity&quot;
+            },
+            &quot;n_const_37&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Has Identity&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_38&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Has no Identity&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_39&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_36&quot;,
+                &quot;n_const_37&quot;,
+                &quot;n_const_38&quot;
+              ]
+            },
+            &quot;n_op_40&quot;: {
+              &quot;kind&quot;: &quot;op&quot;,
+              &quot;name&quot;: &quot;CONCAT&quot;,
+              &quot;args&quot;: [
+                &quot;n_fn_4&quot;,
+                &quot;n_const_5&quot;,
+                &quot;n_fn_9&quot;,
+                &quot;n_const_10&quot;,
+                &quot;n_fn_14&quot;,
+                &quot;n_const_15&quot;,
+                &quot;n_fn_19&quot;,
+                &quot;n_const_20&quot;,
+                &quot;n_fn_24&quot;,
+                &quot;n_const_25&quot;,
+                &quot;n_fn_29&quot;,
+                &quot;n_const_30&quot;,
+                &quot;n_fn_34&quot;,
+                &quot;n_const_35&quot;,
+                &quot;n_fn_39&quot;
+              ]
+            },
+            &quot;n_result_PredictionPredicates&quot;: {
+              &quot;kind&quot;: &quot;result&quot;,
+              &quot;field&quot;: &quot;PredictionPredicates&quot;,
+              &quot;field_snake&quot;: &quot;prediction_predicates&quot;,
+              &quot;in&quot;: [
+                &quot;n_op_40&quot;
+              ]
+            }
+          },
+          &quot;edges&quot;: [
+            [
+              &quot;n_ref_1&quot;,
+              &quot;n_fn_4&quot;
+            ],
+            [
+              &quot;n_const_2&quot;,
+              &quot;n_fn_4&quot;
+            ],
+            [
+              &quot;n_const_3&quot;,
+              &quot;n_fn_4&quot;
+            ],
+            [
+              &quot;n_ref_6&quot;,
+              &quot;n_fn_9&quot;
+            ],
+            [
+              &quot;n_const_7&quot;,
+              &quot;n_fn_9&quot;
+            ],
+            [
+              &quot;n_const_8&quot;,
+              &quot;n_fn_9&quot;
+            ],
+            [
+              &quot;n_ref_11&quot;,
+              &quot;n_fn_14&quot;
+            ],
+            [
+              &quot;n_const_12&quot;,
+              &quot;n_fn_14&quot;
+            ],
+            [
+              &quot;n_const_13&quot;,
+              &quot;n_fn_14&quot;
+            ],
+            [
+              &quot;n_ref_16&quot;,
+              &quot;n_fn_19&quot;
+            ],
+            [
+              &quot;n_const_17&quot;,
+              &quot;n_fn_19&quot;
+            ],
+            [
+              &quot;n_const_18&quot;,
+              &quot;n_fn_19&quot;
+            ],
+            [
+              &quot;n_ref_21&quot;,
+              &quot;n_fn_24&quot;
+            ],
+            [
+              &quot;n_const_22&quot;,
+              &quot;n_fn_24&quot;
+            ],
+            [
+              &quot;n_const_23&quot;,
+              &quot;n_fn_24&quot;
+            ],
+            [
+              &quot;n_ref_26&quot;,
+              &quot;n_fn_29&quot;
+            ],
+            [
+              &quot;n_const_27&quot;,
+              &quot;n_fn_29&quot;
+            ],
+            [
+              &quot;n_const_28&quot;,
+              &quot;n_fn_29&quot;
+            ],
+            [
+              &quot;n_ref_31&quot;,
+              &quot;n_fn_34&quot;
+            ],
+            [
+              &quot;n_const_32&quot;,
+              &quot;n_fn_34&quot;
+            ],
+            [
+              &quot;n_const_33&quot;,
+              &quot;n_fn_34&quot;
+            ],
+            [
+              &quot;n_ref_36&quot;,
+              &quot;n_fn_39&quot;
+            ],
+            [
+              &quot;n_const_37&quot;,
+              &quot;n_fn_39&quot;
+            ],
+            [
+              &quot;n_const_38&quot;,
+              &quot;n_fn_39&quot;
+            ],
+            [
+              &quot;n_fn_4&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_const_5&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_fn_9&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_const_10&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_fn_14&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_const_15&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_fn_19&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_const_20&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_fn_24&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_const_25&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_fn_29&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_const_30&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_fn_34&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_const_35&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_fn_39&quot;,
+              &quot;n_op_40&quot;
+            ],
+            [
+              &quot;n_op_40&quot;,
+              &quot;n_result_PredictionPredicates&quot;
+            ]
+          ]
+        },
+        &quot;PredictionFail&quot;: {
+          &quot;formula_source&quot;: &quot;=IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),\n  {{Name}} &amp; \&quot; \&quot; &amp; IF({{PredictedAnswer}}, \&quot;Is\&quot;, \&quot;Isn&#x27;t\&quot;) &amp; \&quot; a Family Feud Language, but \&quot; &amp; \n  IF({{IsLanguage}}, \&quot;Is\&quot;, \&quot;Is Not\&quot;) &amp; \&quot; marked as a &#x27;Language Candidate.&#x27;\&quot;, \&quot;\&quot;) &amp; IF({{IsOpenClosedWorldConflicted}}, \&quot; - Open World vs. Closed World Conflict.\&quot;, \&quot;\&quot;)&quot;,
+          &quot;template_hash&quot;: &quot;sha256:adc496d2f38cb951&quot;,
+          &quot;root_node&quot;: &quot;n_result_PredictionFail&quot;,
+          &quot;nodes&quot;: {
+            &quot;n_ref_1&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;PredictedAnswer&quot;,
+              &quot;field_snake&quot;: &quot;predicted_answer&quot;
+            },
+            &quot;n_ref_2&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsLanguage&quot;,
+              &quot;field_snake&quot;: &quot;is_language&quot;
+            },
+            &quot;n_op_3&quot;: {
+              &quot;kind&quot;: &quot;op&quot;,
+              &quot;name&quot;: &quot;=&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_1&quot;,
+                &quot;n_ref_2&quot;
+              ]
+            },
+            &quot;n_fn_4&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;NOT&quot;,
+              &quot;args&quot;: [
+                &quot;n_op_3&quot;
+              ]
+            },
+            &quot;n_ref_5&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;Name&quot;,
+              &quot;field_snake&quot;: &quot;name&quot;
+            },
+            &quot;n_const_6&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_7&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;PredictedAnswer&quot;,
+              &quot;field_snake&quot;: &quot;predicted_answer&quot;
+            },
+            &quot;n_const_8&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Is&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_9&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Isn&#x27;t&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_10&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_7&quot;,
+                &quot;n_const_8&quot;,
+                &quot;n_const_9&quot;
+              ]
+            },
+            &quot;n_const_11&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; a Family Feud Language, but &quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_ref_12&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsLanguage&quot;,
+              &quot;field_snake&quot;: &quot;is_language&quot;
+            },
+            &quot;n_const_13&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Is&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_14&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;Is Not&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_15&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_12&quot;,
+                &quot;n_const_13&quot;,
+                &quot;n_const_14&quot;
+              ]
+            },
+            &quot;n_const_16&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; marked as a &#x27;Language Candidate.&#x27;&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_op_17&quot;: {
+              &quot;kind&quot;: &quot;op&quot;,
+              &quot;name&quot;: &quot;CONCAT&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_5&quot;,
+                &quot;n_const_6&quot;,
+                &quot;n_fn_10&quot;,
+                &quot;n_const_11&quot;,
+                &quot;n_fn_15&quot;,
+                &quot;n_const_16&quot;
+              ]
+            },
+            &quot;n_const_18&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_19&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_fn_4&quot;,
+                &quot;n_op_17&quot;,
+                &quot;n_const_18&quot;
+              ]
+            },
+            &quot;n_ref_20&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsOpenClosedWorldConflicted&quot;,
+              &quot;field_snake&quot;: &quot;is_open_closed_world_conflicted&quot;
+            },
+            &quot;n_const_21&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot; - Open World vs. Closed World Conflict.&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_22&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_23&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_20&quot;,
+                &quot;n_const_21&quot;,
+                &quot;n_const_22&quot;
+              ]
+            },
+            &quot;n_op_24&quot;: {
+              &quot;kind&quot;: &quot;op&quot;,
+              &quot;name&quot;: &quot;CONCAT&quot;,
+              &quot;args&quot;: [
+                &quot;n_fn_19&quot;,
+                &quot;n_fn_23&quot;
+              ]
+            },
+            &quot;n_result_PredictionFail&quot;: {
+              &quot;kind&quot;: &quot;result&quot;,
+              &quot;field&quot;: &quot;PredictionFail&quot;,
+              &quot;field_snake&quot;: &quot;prediction_fail&quot;,
+              &quot;in&quot;: [
+                &quot;n_op_24&quot;
+              ]
+            }
+          },
+          &quot;edges&quot;: [
+            [
+              &quot;n_ref_1&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_ref_2&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_op_3&quot;,
+              &quot;n_fn_4&quot;
+            ],
+            [
+              &quot;n_ref_7&quot;,
+              &quot;n_fn_10&quot;
+            ],
+            [
+              &quot;n_const_8&quot;,
+              &quot;n_fn_10&quot;
+            ],
+            [
+              &quot;n_const_9&quot;,
+              &quot;n_fn_10&quot;
+            ],
+            [
+              &quot;n_ref_12&quot;,
+              &quot;n_fn_15&quot;
+            ],
+            [
+              &quot;n_const_13&quot;,
+              &quot;n_fn_15&quot;
+            ],
+            [
+              &quot;n_const_14&quot;,
+              &quot;n_fn_15&quot;
+            ],
+            [
+              &quot;n_ref_5&quot;,
+              &quot;n_op_17&quot;
+            ],
+            [
+              &quot;n_const_6&quot;,
+              &quot;n_op_17&quot;
+            ],
+            [
+              &quot;n_fn_10&quot;,
+              &quot;n_op_17&quot;
+            ],
+            [
+              &quot;n_const_11&quot;,
+              &quot;n_op_17&quot;
+            ],
+            [
+              &quot;n_fn_15&quot;,
+              &quot;n_op_17&quot;
+            ],
+            [
+              &quot;n_const_16&quot;,
+              &quot;n_op_17&quot;
+            ],
+            [
+              &quot;n_fn_4&quot;,
+              &quot;n_fn_19&quot;
+            ],
+            [
+              &quot;n_op_17&quot;,
+              &quot;n_fn_19&quot;
+            ],
+            [
+              &quot;n_const_18&quot;,
+              &quot;n_fn_19&quot;
+            ],
+            [
+              &quot;n_ref_20&quot;,
+              &quot;n_fn_23&quot;
+            ],
+            [
+              &quot;n_const_21&quot;,
+              &quot;n_fn_23&quot;
+            ],
+            [
+              &quot;n_const_22&quot;,
+              &quot;n_fn_23&quot;
+            ],
+            [
+              &quot;n_fn_19&quot;,
+              &quot;n_op_24&quot;
+            ],
+            [
+              &quot;n_fn_23&quot;,
+              &quot;n_op_24&quot;
+            ],
+            [
+              &quot;n_op_24&quot;,
+              &quot;n_result_PredictionFail&quot;
+            ]
+          ]
+        },
+        &quot;IsDescriptionOf&quot;: {
+          &quot;formula_source&quot;: &quot;={{DistanceFromConcept}} &gt; 1&quot;,
+          &quot;template_hash&quot;: &quot;sha256:ce3581e1d395e8a3&quot;,
+          &quot;root_node&quot;: &quot;n_result_IsDescriptionOf&quot;,
+          &quot;nodes&quot;: {
+            &quot;n_ref_1&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;DistanceFromConcept&quot;,
+              &quot;field_snake&quot;: &quot;distance_from_concept&quot;
+            },
+            &quot;n_const_2&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: 1,
+              &quot;type&quot;: &quot;integer&quot;
+            },
+            &quot;n_op_3&quot;: {
+              &quot;kind&quot;: &quot;op&quot;,
+              &quot;name&quot;: &quot;&gt;&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_1&quot;,
+                &quot;n_const_2&quot;
+              ]
+            },
+            &quot;n_result_IsDescriptionOf&quot;: {
+              &quot;kind&quot;: &quot;result&quot;,
+              &quot;field&quot;: &quot;IsDescriptionOf&quot;,
+              &quot;field_snake&quot;: &quot;is_description_of&quot;,
+              &quot;in&quot;: [
+                &quot;n_op_3&quot;
+              ]
+            }
+          },
+          &quot;edges&quot;: [
+            [
+              &quot;n_ref_1&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_const_2&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_op_3&quot;,
+              &quot;n_result_IsDescriptionOf&quot;
+            ]
+          ]
+        },
+        &quot;IsOpenClosedWorldConflicted&quot;: {
+          &quot;formula_source&quot;: &quot;=AND({{IsOpenWorld}}, {{IsClosedWorld}})&quot;,
+          &quot;template_hash&quot;: &quot;sha256:e27f49b009362a1c&quot;,
+          &quot;root_node&quot;: &quot;n_result_IsOpenClosedWorldConflicted&quot;,
+          &quot;nodes&quot;: {
+            &quot;n_ref_1&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsOpenWorld&quot;,
+              &quot;field_snake&quot;: &quot;is_open_world&quot;
+            },
+            &quot;n_ref_2&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;IsClosedWorld&quot;,
+              &quot;field_snake&quot;: &quot;is_closed_world&quot;
+            },
+            &quot;n_fn_3&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;AND&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_1&quot;,
+                &quot;n_ref_2&quot;
+              ]
+            },
+            &quot;n_result_IsOpenClosedWorldConflicted&quot;: {
+              &quot;kind&quot;: &quot;result&quot;,
+              &quot;field&quot;: &quot;IsOpenClosedWorldConflicted&quot;,
+              &quot;field_snake&quot;: &quot;is_open_closed_world_conflicted&quot;,
+              &quot;in&quot;: [
+                &quot;n_fn_3&quot;
+              ]
+            }
+          },
+          &quot;edges&quot;: [
+            [
+              &quot;n_ref_1&quot;,
+              &quot;n_fn_3&quot;
+            ],
+            [
+              &quot;n_ref_2&quot;,
+              &quot;n_fn_3&quot;
+            ],
+            [
+              &quot;n_fn_3&quot;,
+              &quot;n_result_IsOpenClosedWorldConflicted&quot;
+            ]
+          ]
+        },
+        &quot;RelationshipToConcept&quot;: {
+          &quot;formula_source&quot;: &quot;=IF({{DistanceFromConcept}} = 1, \&quot;IsMirrorOf\&quot;, \&quot;IsDescriptionOf\&quot;)&quot;,
+          &quot;template_hash&quot;: &quot;sha256:5a65e129aa5bbf8e&quot;,
+          &quot;root_node&quot;: &quot;n_result_RelationshipToConcept&quot;,
+          &quot;nodes&quot;: {
+            &quot;n_ref_1&quot;: {
+              &quot;kind&quot;: &quot;field_ref&quot;,
+              &quot;field&quot;: &quot;DistanceFromConcept&quot;,
+              &quot;field_snake&quot;: &quot;distance_from_concept&quot;
+            },
+            &quot;n_const_2&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: 1,
+              &quot;type&quot;: &quot;integer&quot;
+            },
+            &quot;n_op_3&quot;: {
+              &quot;kind&quot;: &quot;op&quot;,
+              &quot;name&quot;: &quot;=&quot;,
+              &quot;args&quot;: [
+                &quot;n_ref_1&quot;,
+                &quot;n_const_2&quot;
+              ]
+            },
+            &quot;n_const_4&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;IsMirrorOf&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_const_5&quot;: {
+              &quot;kind&quot;: &quot;const&quot;,
+              &quot;value&quot;: &quot;IsDescriptionOf&quot;,
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;n_fn_6&quot;: {
+              &quot;kind&quot;: &quot;fn&quot;,
+              &quot;name&quot;: &quot;IF&quot;,
+              &quot;args&quot;: [
+                &quot;n_op_3&quot;,
+                &quot;n_const_4&quot;,
+                &quot;n_const_5&quot;
+              ]
+            },
+            &quot;n_result_RelationshipToConcept&quot;: {
+              &quot;kind&quot;: &quot;result&quot;,
+              &quot;field&quot;: &quot;RelationshipToConcept&quot;,
+              &quot;field_snake&quot;: &quot;relationship_to_concept&quot;,
+              &quot;in&quot;: [
+                &quot;n_fn_6&quot;
+              ]
+            }
+          },
+          &quot;edges&quot;: [
+            [
+              &quot;n_ref_1&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_const_2&quot;,
+              &quot;n_op_3&quot;
+            ],
+            [
+              &quot;n_op_3&quot;,
+              &quot;n_fn_6&quot;
+            ],
+            [
+              &quot;n_const_4&quot;,
+              &quot;n_fn_6&quot;
+            ],
+            [
+              &quot;n_const_5&quot;,
+              &quot;n_fn_6&quot;
+            ],
+            [
+              &quot;n_fn_6&quot;,
+              &quot;n_result_RelationshipToConcept&quot;
             ]
           ]
         }

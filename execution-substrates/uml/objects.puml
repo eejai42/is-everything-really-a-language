@@ -1,27 +1,755 @@
 @startuml
 
-object "Customers_0" as Customers_0 {
-  CustomerId = "cust0001"
-  Customer = "CUST0001"
-  EmailAddress = "jane.smith@email.com"
-  FirstName = "Jane"
-  LastName = "Smith"
+object "01b-customize-schema.sql" as ERBCustomizations_0 {
+  ERBCustomizationId = "01b-customize-schema-sql"
+  Name = "01b-customize-schema.sql"
+  Title = "Customize Schema"
+  SQLCode = "-- ========================..."
+  SQLTarget = "Postgres"
+  CustomizationType = "Schema"
 }
 
-object "Customers_1" as Customers_1 {
-  CustomerId = "cust0002"
-  Customer = "CUST0002"
-  EmailAddress = "john.doe@email.com"
-  FirstName = "John"
-  LastName = "Doe"
+object "02b-customize-functions.sql" as ERBCustomizations_1 {
+  ERBCustomizationId = "02b-customize-functions-sql"
+  Name = "02b-customize-functions.sql"
+  Title = "Customize Functions"
+  SQLCode = "-- Prediction Fail: Returns..."
+  SQLTarget = "Postgres"
+  CustomizationType = "Functions"
 }
 
-object "Customers_2" as Customers_2 {
-  CustomerId = "cust0003"
-  Customer = "CUST0003"
-  EmailAddress = "emily.jones@email.com"
-  FirstName = "Emily"
-  LastName = "Jones"
+object "03b-customize-views.sql" as ERBCustomizations_2 {
+  ERBCustomizationId = "03b-customize-views-sql"
+  Name = "03b-customize-views.sql"
+  Title = "Customize Views"
+  SQLCode = "-- ========================..."
+  SQLTarget = "Postgres"
+  CustomizationType = "Views"
+}
+
+object "04b-customize-rls.sql" as ERBCustomizations_3 {
+  ERBCustomizationId = "04b-customize-rls-sql"
+  Name = "04b-customize-rls.sql"
+  Title = "Customize Policies (RLS)"
+  SQLCode = "-- ========================..."
+  SQLTarget = "Postgres"
+  CustomizationType = "RLS"
+}
+
+object "05b-customize-data.sql" as ERBCustomizations_4 {
+  ERBCustomizationId = "05b-customize-data-sql"
+  Name = "05b-customize-data.sql"
+  Title = "Customize Data (Seeds / Mig..."
+  SQLCode = "-- ========================..."
+  SQLTarget = "Postgres"
+  CustomizationType = "Data"
+}
+
+object "NEIAL-001" as IsEverythingALanguage_0 {
+  IsEverythingALanguageId = "neial-001"
+  Name = "NEIAL-001"
+  ArgumentName = "LanguageCanBeFormalized"
+  ArgumentCategory = "Definition"
+  StepType = "Motivation"
+  Statement = "To avoid the slogan 'Everyt..."
+  Formalization = ""
+  RelatedCandidateName = ""
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This keeps 'can be interpre..."
+}
+
+object "NEIAL-002" as IsEverythingALanguage_1 {
+  IsEverythingALanguageId = "neial-002"
+  Name = "NEIAL-002"
+  ArgumentName = "LanguageCanBeFormalized"
+  ArgumentCategory = "Definition"
+  StepType = "PredicateSet"
+  Statement = "Use the repo predicates: Ha..."
+  Formalization = "Predicates: Syntax(x), Pars..."
+  RelatedCandidateName = ""
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "We preserve the dataset's f..."
+}
+
+object "NEIAL-003" as IsEverythingALanguage_2 {
+  IsEverythingALanguageId = "neial-003"
+  Name = "NEIAL-003"
+  ArgumentName = "LanguageCanBeFormalized"
+  ArgumentCategory = "Definition"
+  StepType = "Definition"
+  Statement = "Operational definition: an ..."
+  Formalization = "Language(x) := HasSyntax(x)..."
+  RelatedCandidateName = ""
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This is a deliberately 'str..."
+}
+
+object "NEIAL-004" as IsEverythingALanguage_3 {
+  IsEverythingALanguageId = "neial-004"
+  Name = "NEIAL-004"
+  ArgumentName = "LanguageCanBeFormalized"
+  ArgumentCategory = "Premise"
+  StepType = "Witness"
+  Statement = "There exists at least one c..."
+  Formalization = "∃x (x=English ∧ Language(x))"
+  RelatedCandidateName = "English"
+  RelatedCandidateId = "english"
+  EvidenceFromRulebook = "HasSyntax=True; RequiresPar..."
+  Notes = "If any predicate is false i..."
+}
+
+object "NEIAL-005" as IsEverythingALanguage_4 {
+  IsEverythingALanguageId = "neial-005"
+  Name = "NEIAL-005"
+  ArgumentName = "LanguageCanBeFormalized"
+  ArgumentCategory = "Premise"
+  StepType = "Witness"
+  Statement = "There exists at least one c..."
+  Formalization = "∃x (x=Python ∧ Language(x))"
+  RelatedCandidateName = "Python"
+  RelatedCandidateId = "python"
+  EvidenceFromRulebook = "HasSyntax=True; RequiresPar..."
+  Notes = "If any predicate is false i..."
+}
+
+object "NEIAL-006" as IsEverythingALanguage_5 {
+  IsEverythingALanguageId = "neial-006"
+  Name = "NEIAL-006"
+  ArgumentName = "LanguageCanBeFormalized"
+  ArgumentCategory = "Conclusion"
+  StepType = "Conclusion"
+  Statement = "Therefore, 'language' can b..."
+  Formalization = "(Definition ∧ Witnesses) ⇒ ..."
+  RelatedCandidateName = ""
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This is the concession: lan..."
+}
+
+object "NEIAL-007" as IsEverythingALanguage_6 {
+  IsEverythingALanguageId = "neial-007"
+  Name = "NEIAL-007"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Premise"
+  StepType = "Entailment"
+  Statement = "If Language(x) is defined b..."
+  Formalization = "∀x (¬(HasSyntax(x) ∧ Requir..."
+  RelatedCandidateName = ""
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This is the standard move: ..."
+}
+
+object "NEIAL-008" as IsEverythingALanguage_7 {
+  IsEverythingALanguageId = "neial-008"
+  Name = "NEIAL-008"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Example"
+  StepType = "Counterexample"
+  Statement = "Counterexample: a chair can..."
+  Formalization = "¬Language(Chair)"
+  RelatedCandidateName = "A Chair"
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This separates semiotic ava..."
+}
+
+object "NEIAL-009" as IsEverythingALanguage_8 {
+  IsEverythingALanguageId = "neial-009"
+  Name = "NEIAL-009"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Example"
+  StepType = "NonLanguageExample"
+  Statement = "Non-language example: A Thu..."
+  Formalization = "¬Language(A Thunderstorm)"
+  RelatedCandidateName = "A Thunderstorm"
+  RelatedCandidateId = "a-thunderstorm"
+  EvidenceFromRulebook = "HasSyntax=False; RequiresPa..."
+  Notes = "These are strong candidates..."
+}
+
+object "NEIAL-010" as IsEverythingALanguage_9 {
+  IsEverythingALanguageId = "neial-010"
+  Name = "NEIAL-010"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Example"
+  StepType = "NonLanguageExample"
+  Statement = "Non-language example: A Cof..."
+  Formalization = "¬Language(A Coffee Mug)"
+  RelatedCandidateName = "A Coffee Mug"
+  RelatedCandidateId = "a-coffee-mug"
+  EvidenceFromRulebook = "HasSyntax=False; RequiresPa..."
+  Notes = "These are strong candidates..."
+}
+
+object "NEIAL-011" as IsEverythingALanguage_10 {
+  IsEverythingALanguageId = "neial-011"
+  Name = "NEIAL-011"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Example"
+  StepType = "NonLanguageExample"
+  Statement = "Non-language example: The M..."
+  Formalization = "¬Language(The Mona Lisa)"
+  RelatedCandidateName = "The Mona Lisa"
+  RelatedCandidateId = "the-mona-lisa"
+  EvidenceFromRulebook = "HasSyntax=False; RequiresPa..."
+  Notes = "These are strong candidates..."
+}
+
+object "NEIAL-012" as IsEverythingALanguage_11 {
+  IsEverythingALanguageId = "neial-012"
+  Name = "NEIAL-012"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Observation"
+  StepType = "FuzzyBoundary"
+  Statement = "Fuzzy case: A Running App o..."
+  Formalization = "Borderline(A Running App): ..."
+  RelatedCandidateName = "A Running App"
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This is where traditional s..."
+}
+
+object "NEIAL-013" as IsEverythingALanguage_12 {
+  IsEverythingALanguageId = "neial-013"
+  Name = "NEIAL-013"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Observation"
+  StepType = "FuzzyBoundary"
+  Statement = "Fuzzy case: Running Calcula..."
+  Formalization = "Borderline(Running Calculat..."
+  RelatedCandidateName = "Running Calculator App"
+  RelatedCandidateId = "running-calculator-app"
+  EvidenceFromRulebook = "HasSyntax=False; RequiresPa..."
+  Notes = "This is where traditional s..."
+}
+
+object "NEIAL-014" as IsEverythingALanguage_13 {
+  IsEverythingALanguageId = "neial-014"
+  Name = "NEIAL-014"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Observation"
+  StepType = "FuzzyBoundary"
+  Statement = "Fuzzy case: A Game of Fortn..."
+  Formalization = "Borderline(A Game of Fortni..."
+  RelatedCandidateName = "A Game of Fortnite"
+  RelatedCandidateId = "a-game-of-fortnite"
+  EvidenceFromRulebook = "HasSyntax=False; RequiresPa..."
+  Notes = "This is where traditional s..."
+}
+
+object "NEIAL-015" as IsEverythingALanguage_14 {
+  IsEverythingALanguageId = "neial-015"
+  Name = "NEIAL-015"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Definition"
+  StepType = "Refinement"
+  Statement = "Refinement: distinguish Lan..."
+  Formalization = "Kinds: LanguageSystem(x) | ..."
+  RelatedCandidateName = ""
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This gives you a place to p..."
+}
+
+object "NEIAL-016" as IsEverythingALanguage_15 {
+  IsEverythingALanguageId = "neial-016"
+  Name = "NEIAL-016"
+  ArgumentName = "NotEverythingIsALanguage"
+  ArgumentCategory = "Conclusion"
+  StepType = "Conclusion"
+  Statement = "Given a formalizable defini..."
+  Formalization = "Formalizable(Language) ∧ ∃x..."
+  RelatedCandidateName = ""
+  RelatedCandidateId = ""
+  EvidenceFromRulebook = ""
+  Notes = "This is the repo's thesis i..."
+}
+
+object "English" as LanguageCandidates_0 {
+  LanguageCandidateId = "english"
+  Name = "English"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Natural Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = true
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 1
+}
+
+object "A Coffee Mug" as LanguageCandidates_1 {
+  LanguageCandidateId = "a-coffee-mug"
+  Name = "A Coffee Mug"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = true
+  Category = "Physical Object"
+  HasIdentity = true
+  IsParsed = false
+  ResolvesToAnAST = false
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = false
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = true
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
+  ModelObjectFacilityLayer = "NA"
+  SortOrder = 2
+}
+
+object "Spoken Words" as LanguageCandidates_2 {
+  LanguageCandidateId = "spoken-words"
+  Name = "Spoken Words"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Natural Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = true
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 3
+}
+
+object "A Game of Fortnite" as LanguageCandidates_3 {
+  LanguageCandidateId = "a-game-of-fortnite"
+  Name = "A Game of Fortnite"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = false
+  Category = "Running Software"
+  HasIdentity = true
+  IsParsed = true
+  ResolvesToAnAST = false
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = false
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = true
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
+  ModelObjectFacilityLayer = "M4"
+  SortOrder = 4
+}
+
+object "Sign Language" as LanguageCandidates_4 {
+  LanguageCandidateId = "sign-language"
+  Name = "Sign Language"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Natural Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = true
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 5
+}
+
+object "Editing Airtable Base" as LanguageCandidates_5 {
+  LanguageCandidateId = "editing-airtable-base"
+  Name = "Editing Airtable Base"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = false
+  Category = "Running Software"
+  HasIdentity = true
+  IsParsed = false
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = true
+  IsOpenWorld = false
+  IsClosedWorld = true
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
+  ModelObjectFacilityLayer = "M4"
+  SortOrder = 6
+}
+
+object "Math" as LanguageCandidates_6 {
+  LanguageCandidateId = "math"
+  Name = "Math"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Formal Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = true
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 7
+}
+
+object "Falsifier A" as LanguageCandidates_7 {
+  LanguageCandidateId = "falsifier-a"
+  Name = "Falsifier A"
+  IsLanguage = true
+  HasSyntax = false
+  CanBeHeld = true
+  Category = "MISSING: Have you seen this..."
+  HasIdentity = true
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
+  ModelObjectFacilityLayer = "NA"
+  SortOrder = 8
+}
+
+object "Falsifier B" as LanguageCandidates_8 {
+  LanguageCandidateId = "falsifier-b"
+  Name = "Falsifier B"
+  IsLanguage = false
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "MISSING: Have you seen this..."
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "N/A"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 9
+}
+
+object "A Smartphone" as LanguageCandidates_9 {
+  LanguageCandidateId = "a-smartphone"
+  Name = "A Smartphone"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = true
+  Category = "Physical Object"
+  HasIdentity = true
+  IsParsed = false
+  ResolvesToAnAST = false
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = false
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = true
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
+  ModelObjectFacilityLayer = "NA"
+  SortOrder = 10
+}
+
+object "Python" as LanguageCandidates_10 {
+  LanguageCandidateId = "python"
+  Name = "Python"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Formal Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = true
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 11
+}
+
+object "A Running App " as LanguageCandidates_11 {
+  LanguageCandidateId = "a-running-app"
+  Name = "A Running App "
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = false
+  Category = "Running Software"
+  HasIdentity = true
+  IsParsed = true
+  ResolvesToAnAST = false
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = false
+  IsLiveOntologyEditor = true
+  IsOpenWorld = false
+  IsClosedWorld = true
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
+  ModelObjectFacilityLayer = "M4"
+  SortOrder = 12
+}
+
+object "An XLSX Doc" as LanguageCandidates_12 {
+  LanguageCandidateId = "an-xlsx-doc"
+  Name = "An XLSX Doc"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Formal Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M2"
+  SortOrder = 13
+}
+
+object "XLSX - Editing" as LanguageCandidates_13 {
+  LanguageCandidateId = "xlsx-editing"
+  Name = "XLSX - Editing"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = false
+  Category = "Running Software"
+  HasIdentity = false
+  IsParsed = false
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = false
+  IsLiveOntologyEditor = true
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
+  ModelObjectFacilityLayer = "M4"
+  SortOrder = 14
+}
+
+object "An DOCX Doc" as LanguageCandidates_14 {
+  LanguageCandidateId = "an-docx-doc"
+  Name = "An DOCX Doc"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Formal Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M2"
+  SortOrder = 15
+}
+
+object "DOCX - Editing" as LanguageCandidates_15 {
+  LanguageCandidateId = "docx-editing"
+  Name = "DOCX - Editing"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = false
+  Category = "Running Software"
+  HasIdentity = false
+  IsParsed = false
+  ResolvesToAnAST = false
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = true
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
+  ModelObjectFacilityLayer = "M4"
+  SortOrder = 16
+}
+
+object "OWL/RDF/GraphQL/... generally" as LanguageCandidates_16 {
+  LanguageCandidateId = "owl-rdf-graphql-generally"
+  Name = "OWL/RDF/GraphQL/... generally"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Natural Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = true
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M2"
+  SortOrder = 17
+}
+
+object "A Thunderstorm" as LanguageCandidates_17 {
+  LanguageCandidateId = "a-thunderstorm"
+  Name = "A Thunderstorm"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = true
+  Category = "Physical event"
+  HasIdentity = true
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = false
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
+  ModelObjectFacilityLayer = "NA"
+  SortOrder = 18
+}
+
+object "A UML File" as LanguageCandidates_18 {
+  LanguageCandidateId = "a-uml-file"
+  Name = "A UML File"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Formal Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M2"
+  SortOrder = 23
+}
+
+object "The Mona Lisa" as LanguageCandidates_19 {
+  LanguageCandidateId = "the-mona-lisa"
+  Name = "The Mona Lisa"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = true
+  Category = "Physical Object"
+  HasIdentity = true
+  IsParsed = false
+  ResolvesToAnAST = false
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "N/A"
+  ModelObjectFacilityLayer = "NA"
+  SortOrder = 20
+}
+
+object "Binary Code" as LanguageCandidates_20 {
+  LanguageCandidateId = "binary-code"
+  Name = "Binary Code"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "Formal Language"
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M2"
+  SortOrder = 21
+}
+
+object "Running Calculator App" as LanguageCandidates_21 {
+  LanguageCandidateId = "running-calculator-app"
+  Name = "Running Calculator App"
+  IsLanguage = false
+  HasSyntax = false
+  CanBeHeld = false
+  Category = "Running Software"
+  HasIdentity = true
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = false
+  IsStableOntologyReference = false
+  IsLiveOntologyEditor = false
+  IsOpenWorld = false
+  IsClosedWorld = false
+  DistanceFromConcept = 1
+  DimensionalityWhileEditing = "MultiDimensionalNonSymbolic"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 22
+}
+
+object "OWA & CWA Falsifier" as LanguageCandidates_22 {
+  LanguageCandidateId = "owa-cwa-falsifier"
+  Name = "OWA & CWA Falsifier"
+  IsLanguage = true
+  HasSyntax = true
+  CanBeHeld = false
+  Category = "MISSING: Have you seen this..."
+  HasIdentity = false
+  IsParsed = true
+  ResolvesToAnAST = true
+  HasLinearDecodingPressure = true
+  IsStableOntologyReference = true
+  IsLiveOntologyEditor = false
+  IsOpenWorld = true
+  IsClosedWorld = true
+  DistanceFromConcept = 2
+  DimensionalityWhileEditing = "OneDimensionalSymbolic"
+  ModelObjectFacilityLayer = "M1"
+  SortOrder = 23
 }
 
 @enduml

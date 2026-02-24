@@ -4,15 +4,15 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Fields Tested | 3 |
-| Passed | 3 |
+| Total Fields Tested | 184 |
+| Passed | 184 |
 | Failed | 0 |
 | Score | 100.0% |
 | Duration | < 1s |
 
 ## Results by Entity
 
-### customers
+### language_candidates
 
-- Fields: 3/3 (100.0%)
-- Computed columns: full_name
+- Fields: 184/184 (100.0%)
+- Computed columns: has_grammar, question, predicted_answer, prediction_predicates, prediction_fail, is_description_of, is_open_closed_world_conflicted, relationship_to_concept

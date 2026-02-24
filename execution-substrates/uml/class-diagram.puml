@@ -1,14 +1,59 @@
 @startuml
 skinparam classAttributeIconSize 0
 
-class Customers {
-  +CustomerId: String
-  +Customer: String
-  +EmailAddress: String
-  +FirstName: String
-  +LastName: String
+class ERBCustomizations {
+  +ERBCustomizationId: String
+  +Name: String
+  +Title: String
+  +SQLCode: String
+  +SQLTarget: String
+  +CustomizationType: String
   --
-  /FullName: String  {derived}
+}
+
+class IsEverythingALanguage {
+  +IsEverythingALanguageId: String
+  +Name: String
+  +ArgumentName: String
+  +ArgumentCategory: String
+  +StepType: String
+  +Statement: String
+  +Formalization: String
+  +RelatedCandidateName: String
+  +RelatedCandidateId: String
+  +EvidenceFromRulebook: String
+  +Notes: String
+  --
+}
+
+class LanguageCandidates {
+  +LanguageCandidateId: String
+  +Name: String
+  +IsLanguage: Boolean
+  +HasSyntax: Boolean
+  +CanBeHeld: Boolean
+  +Category: String
+  +HasIdentity: Boolean
+  +IsParsed: Boolean
+  +ResolvesToAnAST: Boolean
+  +HasLinearDecodingPressure: Boolean
+  +IsStableOntologyReference: Boolean
+  +IsLiveOntologyEditor: Boolean
+  +IsOpenWorld: Boolean
+  +IsClosedWorld: Boolean
+  +DistanceFromConcept: Integer
+  +DimensionalityWhileEditing: String
+  +ModelObjectFacilityLayer: String
+  +SortOrder: Integer
+  --
+  /HasGrammar: Boolean  {derived}
+  /Question: String  {derived}
+  /PredictedAnswer: Boolean  {derived}
+  /PredictionPredicates: String  {derived}
+  /PredictionFail: String  {derived}
+  /IsDescriptionOf: Boolean  {derived}
+  /IsOpenClosedWorldConflicted: Boolean  {derived}
+  /RelationshipToConcept: String  {derived}
 }
 
 @enduml
