@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERB v2.2 — Two-Phase Story (Generate → Grade)</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#101a26;
+      --panel2:#0e1621;
+      --ink:#e6edf3;
+      --muted:#9aa7b2;
+      --line:#2a3a4a;
+      --blue:#58a6ff;
+      --green:#2b8a3e;
+      --yellow:#f2cc60;
+      --purple:#8957e5;
+      --red:#ff7b72;
+      --stroke:#223247;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    .app{height:100%;display:grid;grid-template-rows:56px 1fr;}
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 12px;border-bottom:1px solid #182232;
+      background:linear-gradient(180deg,#0c121a,#0b0f14);
+    }
+    header .title{display:flex;flex-direction:column;gap:2px;}
+    header .title .h{font-weight:700;font-size:14px;}
+    header .title .s{color:var(--muted);font-size:12px;}
+    header .actions{display:flex;gap:8px;align-items:center;}
+    button,select{
+      background:var(--panel2);color:var(--ink);
+      border:1px solid var(--stroke);border-radius:10px;
+      padding:8px 10px;cursor:pointer;
+    }
+    button:hover{border-color:#355173;}
+    button:active{transform:translateY(1px);}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--panel2);border:1px solid var(--stroke);border-radius:999px;
+      padding:6px 10px;color:var(--muted);font-size:12px;
+    }
+
+    .main{position:relative;overflow:hidden;}
+    .stage{
+      position:absolute; inset:12px;
+      border:1px solid #182232; border-radius:14px;
+      background:radial-gradient(1200px 740px at 40% 10%, rgba(88,166,255,.10), transparent 60%),
+                 radial-gradient(900px 620px at 70% 70%, rgba(137,87,229,.10), transparent 60%),
+                 linear-gradient(180deg,#0c121a,#0b0f14);
+      overflow:hidden;
+    }
+    svg{width:100%;height:100%;display:block;}
+
+    /* Drawer */
+    .drawer{
+      position:absolute;top:12px;right:12px;bottom:12px;width:360px;
+      transform:translateX(calc(100% + 12px));
+      transition:transform 260ms ease;
+      background:var(--panel);border:1px solid #182232;border-radius:14px;
+      overflow:auto;padding:12px;box-sizing:border-box;z-index:5;
+    }
+    .drawer.open{transform:translateX(0);}
+    .drawer h2{margin:0 0 8px;font-size:13px;}
+    .drawer .hint{color:var(--muted);font-size:12px;margin:6px 0 10px;}
+    .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 12px;}
+    .card{background:var(--panel2);border:1px solid var(--stroke);border-radius:12px;padding:10px;}
+    .card .label{color:var(--muted);font-size:12px;}
+    .card .value{font-size:18px;margin-top:4px;}
+    .row{display:grid;grid-template-columns: 100px 1fr 52px;gap:8px;align-items:center;margin:6px 0;}
+    .bar{height:10px;background:#0b0f14;border:1px solid var(--stroke);border-radius:999px;overflow:hidden;}
+    .bar>div{height:100%;width:0%;transition:width 900ms ease;}
+    .log{background:#0b0f14;border:1px solid var(--stroke);border-radius:12px;padding:10px;height:170px;overflow:auto;font-size:12px;}
+    .log .t{color:#7ee787;}
+    .log .m{color:var(--muted);}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+
+    /* Phase badge - compact vertical layout, doesn't overlap with nodes */
+    .phaseBadge{
+      position:absolute;left:20px;top:18px;
+      background:rgba(14,22,33,.92);
+      border:1px solid var(--stroke);
+      padding:8px 10px;border-radius:10px;
+      display:flex;flex-direction:column;gap:2px;
+      max-width:180px;
+      z-index:2;
+      pointer-events:none;
+    }
+    .phaseBadge .big{font-size:13px;font-weight:700;}
+    .phaseBadge .small{font-size:10px;color:var(--muted);line-height:1.3;}
+
+    /* Node hover tooltip */
+    .nodeTooltip{
+      position:absolute;
+      background:rgba(14,22,33,.96);
+      border:1px solid var(--blue);
+      padding:12px 14px;border-radius:12px;
+      font-size:12px;color:var(--ink);
+      pointer-events:none;
+      z-index:10;
+      max-width:280px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+      opacity:0;
+      transform:translateY(4px);
+      transition:opacity 150ms ease, transform 150ms ease;
+    }
+    .nodeTooltip.visible{opacity:1;transform:translateY(0);}
+    .nodeTooltip .ttTitle{font-weight:700;margin-bottom:6px;color:var(--blue);}
+    .nodeTooltip .ttDesc{color:var(--muted);line-height:1.4;}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title">
+      <div class="h">Effortless Rulebook — v2.2 Two-Phase Story</div>
+      <div class="s">Phase 1: Generate (testing hidden) → Phase 2: Grade (stacked substrates + "step on stage")</div>
+    </div>
+    <div class="actions">
+      <button id="play">Play</button>
+      <button id="step">Step</button>
+      <button id="reset">Reset</button>
+      <span class="pill">
+        Speed
+        <select id="speed">
+          <option value="0.3">Slow</option>
+          <option value="1" selected>Normal</option>
+          <option value="2">Fast</option>
+          <option value="4">Turbo</option>
+        </select>
+      </span>
+      <button id="gear" title="Show details">⚙︎</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="stage">
+      <div class="phaseBadge" id="badge">
+        <div class="big" id="badgeTitle">Phase 1 — Generate</div>
+        <div class="small" id="badgeSub">Airtable → Rulebook → Platform + 10 substrates (testing infra hidden)</div>
+      </div>
+
+      <svg id="svg" viewBox="0 0 1200 740" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3.5" result="coloredBlur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="coloredBlur"></feMergeNode>
+              <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+          </filter>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L10,3 L0,6 Z" fill="#2a3a4a"></path>
+          </marker>
+        </defs>
+
+        <g id="lanes"></g>
+        <g id="edges"></g>
+        <g id="liveLines"></g>
+        <g id="nodes"></g>
+        <g id="testBox"></g>
+        <g id="tokens"></g>
+      </svg>
+    </div>
+
+    <!-- Node tooltip for hover details -->
+    <div class="nodeTooltip" id="nodeTooltip">
+      <div class="ttTitle"></div>
+      <div class="ttDesc"></div>
+    </div>
+
+    <aside class="drawer" id="drawer">
+      <h2>Run details</h2>
+      <div class="hint">Hidden by default so the canvas can tell the story.</div>
+
+      <div class="kpis">
+        <div class="card">
+          <div class="label">Phase</div>
+          <div class="value" id="kPhase">—</div>
+        </div>
+        <div class="card">
+          <div class="label">Substrates</div>
+          <div class="value" id="kSub">—</div>
+        </div>
+        <div class="card">
+          <div class="label">Passing</div>
+          <div class="value" id="kPass">—</div>
+        </div>
+        <div class="card">
+          <div class="label">Scaled Runtime</div>
+          <div class="value" id="kTime">—</div>
+        </div>
+      </div>
+
+      <h2>Timing model</h2>
+      <div class="card">
+        <div class="label">Key mapping</div>
+        <div class="value mono" id="timingMap">—</div>
+      </div>
+
+      <h2>Scores (placeholder)</h2>
+      <div id="scores"></div>
+
+      <h2>Event log</h2>
+      <div class="log" id="log"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  const gLanes = document.getElementById("lanes");
+  const gEdges = document.getElementById("edges");
+  const gLiveLines = document.getElementById("liveLines");
+  const gNodes = document.getElementById("nodes");
+  const gTestBox = document.getElementById("testBox");
+  const gTokens = document.getElementById("tokens");
+
+  const drawer = document.getElementById("drawer");
+  const logEl = document.getElementById("log");
+  const scoresEl = document.getElementById("scores");
+
+  const badgeTitle = document.getElementById("badgeTitle");
+  const badgeSub = document.getElementById("badgeSub");
+
+  const kPhase = document.getElementById("kPhase");
+  const kSub = document.getElementById("kSub");
+  const kPass = document.getElementById("kPass");
+  const kTime = document.getElementById("kTime");
+  const timingMapEl = document.getElementById("timingMap");
+
+  const speedSel = document.getElementById("speed");
+  const nodeTooltip = document.getElementById("nodeTooltip");
+  const ttTitle = nodeTooltip.querySelector(".ttTitle");
+  const ttDesc = nodeTooltip.querySelector(".ttDesc");
+
+  // Node descriptions for hover tooltips
+  const nodeDescriptions = {
+    airtable: { title: "Airtable", desc: "Single source of truth. All business rules, entities, and relationships are defined here in a human-readable format." },
+    rulebook: { title: "Effortless Rulebook", desc: "The canonical intermediate representation (IR). Generated from Airtable, it drives all downstream artifacts and substrates." },
+    postgres: { title: "PostgreSQL", desc: "The canonical compute engine. Executes the rulebook logic as SQL functions and views. Source of truth for grading." },
+    answerkeys: { title: "Answer Keys", desc: "Pre-computed correct answers for each entity, generated by PostgreSQL. Used to grade substrate predictions." },
+    blanktests: { title: "Blank Tests", desc: "Test templates with inputs but no answers. Sent to each substrate to fill in their predictions." },
+    orchestrator: { title: "Test Orchestrator", desc: "Receives filled tests from substrates, compares against answer keys, and computes conformance scores." },
+    report: { title: "Final Report", desc: "Conformance matrix showing how well each substrate matches the canonical PostgreSQL implementation." },
+    stageSpot: { title: "Center Stage", desc: "Where substrates step up to take their test. One at a time, they receive a blank test and fill it out." },
+    schemas: { title: "Schemas", desc: "YAML/TypeScript type definitions generated from the rulebook." },
+    codegen: { title: "Codegen", desc: "Generated code stubs and libraries for various languages." },
+    docs: { title: "Documentation", desc: "API contracts and documentation generated from the rulebook." },
+    python: { title: "Python Substrate", desc: "Fast execution (~100ms). Implements rulebook logic in Python. Score: 100%" },
+    golang: { title: "Golang Substrate", desc: "Fast execution (~100ms). Implements rulebook logic in Go. Score: 100%" },
+    xlsx: { title: "XLSX Substrate", desc: "Fast execution (~120ms). Implements rulebook logic as Excel formulas. Score: 100%" },
+    csv: { title: "CSV Substrate", desc: "Fast execution (~90ms). Simple CSV-based implementation. Score: 100%" },
+    yaml: { title: "YAML Substrate", desc: "Fast execution (~110ms). YAML configuration-driven implementation. Score: 100%" },
+    uml: { title: "UML Substrate", desc: "Fast execution (~120ms). UML model-based implementation. Score: 100%" },
+    binary: { title: "Binary Substrate", desc: "Medium execution (~180ms). Compiled binary implementation. Score: 79.9% - some edge cases fail." },
+    explaindag: { title: "ExplainDAG Substrate", desc: "Fast execution (~130ms). DAG-based explanation engine. Score: 100%" },
+    owl: { title: "OWL Substrate", desc: "Slow execution (~10s). OWL ontology reasoning is expensive but thorough. Score: 100%" },
+    english: { title: "English Substrate", desc: "Slowest execution (~35s). Natural language processing via LLM. Score: 71.7% - LLM interpretation varies." },
+  };
+
+  // Substrates order (English last).
+  const substrateOrder = ["python","golang","xlsx","csv","yaml","uml","binary","explaindag","owl","english"];
+
+  // Placeholder scores.
+  const scores = {
+    python: 100.0, golang: 100.0, xlsx: 100.0, csv: 100.0, yaml: 100.0, uml: 100.0,
+    explaindag: 100.0, owl: 100.0, binary: 79.9, english: 71.7
+  };
+  const isPassing = id => scores[id] >= 90;
+
+  // Real ms -> scaled for grading phase
+  const realMs = {
+    python: 100, golang: 100, xlsx: 120, csv: 90, yaml: 110, uml: 120,
+    binary: 180, explaindag: 130, owl: 10000, english: 35000
+  };
+
+  // Generation phase build times (English ~5s)
+  const genMs = {
+    python: 250, golang: 260, xlsx: 320, csv: 220, yaml: 280, uml: 320,
+    binary: 450, explaindag: 340, owl: 900, english: 5000
+  };
+
+  function speedFactor(){ return parseFloat(speedSel.value); }
+
+  function scaledGradeMs(ms){
+    if (ms <= 250) return (120 + ms) / speedFactor();
+    if (ms <= 2000) return (300 + ms * 0.35) / speedFactor();
+    const t = Math.log(ms / 2000) / Math.log(35000 / 2000);
+    const out = 2200 + Math.pow(t, 0.72) * (10000 - 2200);
+    return out / speedFactor();
+  }
+  function scaledGenMs(ms){ return ms / speedFactor(); }
+
+  function timingMapString(){
+    return [
+      `GEN: English 5000ms → ~${Math.round(scaledGenMs(5000))}ms`,
+      `GRADE: OWL 10000ms → ~${Math.round(scaledGradeMs(10000))}ms`,
+      `GRADE: English 35000ms → ~${Math.round(scaledGradeMs(35000))}ms`,
+    ].join("  |  ");
+  }
+
+  // ---------------------------------------------------------------------------
+  // Layouts
+  // ---------------------------------------------------------------------------
+  const layoutGenerate = {
+    lanes: [
+      {x:20,y:20,w:1160,h:210,label:"SOURCE → RULEBOOK"},
+      {x:20,y:245,w:500,h:465,label:"PLATFORM ARTIFACTS (generated from rulebook) — schemas/docs/codegen"},
+      {x:540,y:245,w:640,h:465,label:"EXECUTION SUBSTRATES (generated from rulebook)"},
+    ],
+    nodes: [
+      { id:"airtable", label:"Airtable\nSingle Source of Truth", x:600, y:80, kind:"source" },
+      { id:"rulebook", label:"Effortless Rulebook\n(effortless-rulebook.json)", x:600, y:170, kind:"hub" },
+
+      { id:"schemas", label:"Schemas\n(YAML / types)", x:270, y:370, kind:"artifactSmall" },
+      { id:"codegen", label:"Codegen\n(stubs / libs)", x:270, y:455, kind:"artifactSmall" },
+      { id:"docs", label:"Docs\n(contracts)", x:270, y:540, kind:"artifactSmall" },
+
+      // roomy arc
+      { id:"python", label:"Python", x:1030, y:300, kind:"substrateFast" },
+      { id:"golang", label:"Golang", x:980, y:360, kind:"substrateFast" },
+      { id:"xlsx", label:"XLSX", x:900, y:410, kind:"substrateFast" },
+      { id:"csv", label:"CSV", x:820, y:450, kind:"substrateFast" },
+      { id:"yaml", label:"YAML", x:740, y:480, kind:"substrateFast" },
+      { id:"uml", label:"UML", x:660, y:500, kind:"substrateFast" },
+      { id:"binary", label:"Binary", x:580, y:510, kind:"substratePartial" },
+      { id:"explaindag", label:"ExplainDAG", x:900, y:520, kind:"substrateFast" },
+      { id:"owl", label:"OWL", x:780, y:560, kind:"substrateSlow" },
+      { id:"english", label:"English", x:660, y:590, kind:"substrateSlowest" },
+    ],
+    edges: [
+      ["airtable","rulebook"],
+      ["rulebook","schemas"],["rulebook","codegen"],["rulebook","docs"],
+      ["rulebook","python"],["rulebook","golang"],["rulebook","xlsx"],["rulebook","csv"],["rulebook","yaml"],
+      ["rulebook","uml"],["rulebook","binary"],["rulebook","explaindag"],["rulebook","owl"],["rulebook","english"],
+    ],
+    hidden: new Set(["postgres","answerkeys","blanktests","orchestrator","report","stageSpot"])
+  };
+
+  // Phase 2: Postgres + Substrates ARE the "platform artifacts".
+  // Layout: Postgres (left) → blank tests (right), answer keys (down under postgres)
+  // Orchestrator spans under both, substrates fill right column, stage is center
+  const layoutGrade = {
+    lanes: [
+      {x:20,y:20,w:1160,h:90,label:"GENERATION (collapsed)"},
+      {x:20,y:125,w:280,h:130,label:"CANONICAL COMPUTE"},
+      {x:320,y:125,w:280,h:130,label:"TEST TEMPLATES"},
+      {x:620,y:125,w:560,h:590,label:"SUBSTRATES"},
+      {x:20,y:270,w:580,h:445,label:"TEST ORCHESTRATION"},
+    ],
+    nodes: [
+      // collapsed header - positioned to not overlap with badge
+      { id:"airtable", label:"Airtable", x:750, y:60, kind:"source" },
+      { id:"rulebook", label:"Rulebook\n(effortless-rulebook.json)", x:1020, y:60, kind:"hub" },
+
+      // Postgres on left
+      { id:"postgres", label:"PostgreSQL\ncanonical compute", x:160, y:190, kind:"postgres" },
+
+      // Blank tests to the RIGHT of postgres (same row)
+      { id:"blanktests", label:"blank-tests.json\n(per entity)", x:460, y:190, kind:"artifact" },
+
+      // Answer keys DIRECTLY UNDER postgres
+      { id:"answerkeys", label:"answer-keys.json\n(per entity)", x:160, y:340, kind:"artifact" },
+
+      // Orchestrator spans under postgres and answer keys, left side
+      { id:"orchestrator", label:"Test Orchestrator\n(dispatch → grade)", x:160, y:500, kind:"process" },
+      { id:"report", label:"Final report\n(conformance matrix)", x:160, y:650, kind:"report" },
+
+      // Stage is CENTER - under blank tests, right of answer keys
+      // This is where substrates step in to take their test
+      { id:"stageSpot", label:"STAGE", x:460, y:450, kind:"stage" },
+
+      // Substrates fill the entire right column - spread vertically (55px spacing)
+      { id:"python", label:"Python", x:900, y:165, kind:"substrateFast" },
+      { id:"golang", label:"Golang", x:900, y:220, kind:"substrateFast" },
+      { id:"xlsx", label:"XLSX", x:900, y:275, kind:"substrateFast" },
+      { id:"csv", label:"CSV", x:900, y:330, kind:"substrateFast" },
+      { id:"yaml", label:"YAML", x:900, y:385, kind:"substrateFast" },
+      { id:"uml", label:"UML", x:900, y:440, kind:"substrateFast" },
+      { id:"binary", label:"Binary", x:900, y:495, kind:"substratePartial" },
+      { id:"explaindag", label:"ExplainDAG", x:900, y:550, kind:"substrateFast" },
+      { id:"owl", label:"OWL (slow)", x:900, y:605, kind:"substrateSlow" },
+      { id:"english", label:"English (slowest)", x:900, y:660, kind:"substrateSlowest" },
+    ],
+    edges: [
+      ["airtable","rulebook"],
+      ["rulebook","postgres"],
+      // Postgres emits blank tests to the RIGHT
+      ["postgres","blanktests"],
+      // Postgres emits answer keys DOWN
+      ["postgres","answerkeys"],
+      // Both flow to orchestrator
+      ["blanktests","orchestrator"],
+      ["answerkeys","orchestrator"],
+      ["orchestrator","report"],
+    ],
+    hidden: new Set(["schemas","codegen","docs"])
+  };
+
+  // ---------------------------------------------------------------------------
+  // Styling and drawing helpers
+  // ---------------------------------------------------------------------------
+  function nodeStyle(kind){
+    if (kind === "source") return {stroke:"var(--yellow)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "hub") return {stroke:"var(--blue)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "postgres") return {stroke:"#7ee787", fill:"rgba(14,22,33,.95)"};
+    if (kind === "process") return {stroke:"var(--purple)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "report") return {stroke:"var(--blue)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "artifact" || kind === "artifactSmall") return {stroke:"var(--blue)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substrateFast") return {stroke:"var(--green)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substratePartial") return {stroke:"var(--yellow)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substrateSlow") return {stroke:"var(--yellow)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substrateSlowest") return {stroke:"var(--red)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "stage") return {stroke:"rgba(0,0,0,0)", fill:"rgba(0,0,0,0)"}; // invisible anchor
+    return {stroke:"var(--stroke)", fill:"rgba(14,22,33,.95)"};
+  }
+
+  function laneRect(x,y,w,h,label){
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    r.setAttribute("x",x); r.setAttribute("y",y);
+    r.setAttribute("width",w); r.setAttribute("height",h);
+    r.setAttribute("rx","16"); r.setAttribute("ry","16");
+    r.setAttribute("fill","rgba(14,22,33,.20)");
+    r.setAttribute("stroke","#182232");
+    r.setAttribute("stroke-dasharray","4 6");
+    const t = document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x", x+14);
+    t.setAttribute("y", y+22);
+    t.setAttribute("fill","#9aa7b2");
+    t.setAttribute("font-size","12");
+    t.textContent = label;
+    g.appendChild(r); g.appendChild(t);
+    return g;
+  }
+
+  function drawLanes(layout){
+    gLanes.innerHTML = "";
+    layout.lanes.forEach(L => gLanes.appendChild(laneRect(L.x,L.y,L.w,L.h,L.label)));
+  }
+
+  // state
+  let currentLayout = null;
+  let nodeById = {};
+  let tokens = [];
+  let raf = null;
+  let playing = false;
+  let stageIndex = 0;
+  let phase = 1;
+  let scaledRuntimeAccum = 0;
+
+  function now(){ return performance.now(); }
+  function ease(t){ return t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+  function bezier(a,b,c,d,t){
+    const mt=1-t;
+    return mt*mt*mt*a + 3*mt*mt*t*b + 3*mt*t*t*c + t*t*t*d;
+  }
+
+  function addLog(title, msg){
+    const div = document.createElement("div");
+    div.innerHTML = `<span class="t">${title}</span> <span class="m">${msg}</span>`;
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // Edges that should be dashed (test-related flow)
+  const dashedEdges = new Set([
+    "postgres→blanktests",
+    "postgres→answerkeys",
+    "blanktests→orchestrator",
+    "answerkeys→orchestrator",
+    "orchestrator→report"
+  ]);
+
+  function drawEdges(layout){
+    gEdges.innerHTML = "";
+    layout.edges.forEach(([a,b]) => {
+      if (!nodeById[a] || !nodeById[b]) return;
+      const A = nodeById[a], B = nodeById[b];
+      const p = document.createElementNS("http://www.w3.org/2000/svg","path");
+      const dx = B.x - A.x, dy = B.y - A.y;
+      const cx1 = A.x + dx * 0.15;
+      const cy1 = A.y + dy * 0.55;
+      const cx2 = A.x + dx * 0.85;
+      const cy2 = A.y + dy * 0.55;
+      const d = `M ${A.x} ${A.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${B.x} ${B.y}`;
+      p.setAttribute("d", d);
+      p.setAttribute("fill","none");
+      p.setAttribute("stroke","#2a3a4a");
+      p.setAttribute("stroke-width","2");
+      // Use dashed lines for test-related edges
+      const edgeKey = `${a}→${b}`;
+      if (dashedEdges.has(edgeKey)) {
+        p.setAttribute("stroke-dasharray","6 6");
+        p.setAttribute("stroke","#4a6a8a");
+      }
+      p.setAttribute("marker-end","url(#arrow)");
+      gEdges.appendChild(p);
+    });
+  }
+
+  function drawNodes(layout){
+    gNodes.innerHTML = "";
+    nodeById = Object.fromEntries(layout.nodes.map(n => [n.id, {...n}]));
+    layout.nodes.forEach(n => {
+      if (layout.hidden && layout.hidden.has(n.id)) return;
+
+      // stageSpot is invisible anchor but we still want it in nodeById
+      const isStageSpot = (n.id === "stageSpot");
+
+      const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+      g.setAttribute("data-id", n.id);
+      g.setAttribute("transform", `translate(${n.x},${n.y})`);
+      if (isStageSpot) {
+        // keep an invisible marker (no rect/text)
+        gNodes.appendChild(g);
+        return;
+      }
+
+      const w = (n.kind === "postgres") ? 250 :
+                (n.kind === "process" ? 280 :
+                (n.kind === "report" ? 260 :
+                (n.kind === "artifact" ? 230 :
+                (n.kind === "artifactSmall" ? 210 :
+                (n.kind === "hub" ? 280 : 190)))));
+      const h = (n.kind === "artifactSmall") ? 54 : 62;
+
+      const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      rect.setAttribute("x", -w/2);
+      rect.setAttribute("y", -h/2);
+      rect.setAttribute("rx","14");
+      rect.setAttribute("ry","14");
+      rect.setAttribute("width", w);
+      rect.setAttribute("height", h);
+
+      const style = nodeStyle(n.kind);
+      rect.setAttribute("fill", style.fill);
+      rect.setAttribute("stroke", style.stroke);
+      rect.setAttribute("stroke-width","2");
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+      text.setAttribute("text-anchor","middle");
+      text.setAttribute("fill", "#e6edf3");
+      text.setAttribute("font-size","13");
+
+      const lines = n.label.split("\n");
+      lines.forEach((line, i) => {
+        const tspan = document.createElementNS("http://www.w3.org/2000/svg","tspan");
+        tspan.setAttribute("x","0");
+        tspan.setAttribute("dy", i===0 ? "-2" : "16");
+        tspan.textContent = line;
+        text.appendChild(tspan);
+      });
+
+      g.appendChild(rect);
+      g.appendChild(text);
+      gNodes.appendChild(g);
+
+      // Hover handlers for expansion and tooltip
+      g.style.cursor = "pointer";
+      g.style.transition = "transform 150ms ease";
+
+      g.addEventListener("mouseenter", (e) => {
+        // Expand node
+        const currentTransform = g.getAttribute("transform");
+        g.setAttribute("data-original-transform", currentTransform);
+        g.style.transform = "scale(1.15)";
+        rect.style.transition = "stroke-width 150ms ease";
+        rect.style.strokeWidth = "3";
+
+        // Show tooltip
+        const info = nodeDescriptions[n.id];
+        if (info) {
+          ttTitle.textContent = info.title;
+          ttDesc.textContent = info.desc;
+
+          // Position tooltip near the node
+          const svgRect = document.getElementById("svg").getBoundingClientRect();
+          const stageRect = document.querySelector(".stage").getBoundingClientRect();
+          const scaleX = svgRect.width / 1200;
+          const scaleY = svgRect.height / 740;
+
+          const tooltipX = stageRect.left + n.x * scaleX + 80;
+          const tooltipY = stageRect.top + n.y * scaleY - 30;
+
+          nodeTooltip.style.left = tooltipX + "px";
+          nodeTooltip.style.top = tooltipY + "px";
+          nodeTooltip.classList.add("visible");
+        }
+      });
+
+      g.addEventListener("mouseleave", () => {
+        // Restore node
+        g.style.transform = "";
+        rect.style.strokeWidth = "2";
+
+        // Hide tooltip
+        nodeTooltip.classList.remove("visible");
+      });
+    });
+  }
+
+  // Tokens
+  function spawnToken(fromId, toId, color, label, dur){
+    if (!nodeById[fromId] || !nodeById[toId]) return;
+    const A = nodeById[fromId], B = nodeById[toId];
+    const token = {fromId,toId,color,label,start:now(),dur,done:false,el:null};
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("r","10");
+    c.setAttribute("fill", color);
+    c.setAttribute("filter","url(#glow)");
+
+    const tx = document.createElementNS("http://www.w3.org/2000/svg","text");
+    tx.setAttribute("text-anchor","middle");
+    tx.setAttribute("y","4");
+    tx.setAttribute("fill","#0b0f14");
+    tx.setAttribute("font-size","10");
+    tx.setAttribute("font-weight","700");
+    tx.textContent = label;
+
+    g.appendChild(c); g.appendChild(tx);
+    gTokens.appendChild(g);
+    token.el = g;
+
+    token.update = () => {
+      const pRaw = (now() - token.start) / token.dur;
+      const p = Math.max(0, Math.min(1, pRaw));
+      const e = ease(p);
+
+      const dx = B.x - A.x, dy = B.y - A.y;
+      const P0 = {x:A.x,y:A.y};
+      const P1 = {x:A.x + dx*0.20, y:A.y + dy*0.55};
+      const P2 = {x:A.x + dx*0.80, y:A.y + dy*0.55};
+      const P3 = {x:B.x,y:B.y};
+
+      const x = bezier(P0.x,P1.x,P2.x,P3.x,e);
+      const y = bezier(P0.y,P1.y,P2.y,P3.y,e);
+
+      token.el.setAttribute("transform", `translate(${x},${y})`);
+
+      if (pRaw >= 1 && !token.done){
+        token.done = true;
+        c.setAttribute("r","12");
+        setTimeout(() => { if (g.parentNode) g.parentNode.removeChild(g); }, 160);
+      }
+    };
+
+    tokens.push(token);
+  }
+
+  function tick(){
+    tokens.forEach(t => t.update && t.update());
+    tokens = tokens.filter(t => !t.done);
+    if (playing) raf = requestAnimationFrame(tick);
+  }
+
+  // Test-taking box animation (2x2 inch ~ 192px at 96dpi, scaled for SVG)
+  const TEST_BOX_SIZE = 140; // SVG units
+  let activeTestBox = null;
+
+  function showTestBox(x, y, substrateId, color) {
+    // Create the test-taking animation box - positioned to the left of center stage
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute("transform", `translate(${x - TEST_BOX_SIZE - 20}, ${y - TEST_BOX_SIZE/2})`);
+
+    // Outer box (the "test paper")
+    const box = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    box.setAttribute("width", TEST_BOX_SIZE);
+    box.setAttribute("height", TEST_BOX_SIZE);
+    box.setAttribute("rx", "8");
+    box.setAttribute("fill", "rgba(14,22,33,.95)");
+    box.setAttribute("stroke", color);
+    box.setAttribute("stroke-width", "2");
+
+    // Title area
+    const title = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    title.setAttribute("x", TEST_BOX_SIZE/2);
+    title.setAttribute("y", "20");
+    title.setAttribute("text-anchor", "middle");
+    title.setAttribute("fill", color);
+    title.setAttribute("font-size", "11");
+    title.setAttribute("font-weight", "bold");
+    title.textContent = `${substrateId.toUpperCase()} TEST`;
+
+    // Animated "writing" lines
+    const linesGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    linesGroup.setAttribute("class", "test-lines");
+
+    for (let i = 0; i < 5; i++) {
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      line.setAttribute("x", "15");
+      line.setAttribute("y", 35 + i * 20);
+      line.setAttribute("width", "0");
+      line.setAttribute("height", "8");
+      line.setAttribute("rx", "2");
+      line.setAttribute("fill", color);
+      line.setAttribute("opacity", "0.6");
+      line.dataset.targetWidth = (TEST_BOX_SIZE - 30) * (0.5 + Math.random() * 0.5);
+      line.dataset.index = i;
+      linesGroup.appendChild(line);
+    }
+
+    // Progress indicator
+    const progressBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    progressBg.setAttribute("x", "15");
+    progressBg.setAttribute("y", TEST_BOX_SIZE - 20);
+    progressBg.setAttribute("width", TEST_BOX_SIZE - 30);
+    progressBg.setAttribute("height", "6");
+    progressBg.setAttribute("rx", "3");
+    progressBg.setAttribute("fill", "#0b0f14");
+
+    const progressFill = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    progressFill.setAttribute("x", "15");
+    progressFill.setAttribute("y", TEST_BOX_SIZE - 20);
+    progressFill.setAttribute("width", "0");
+    progressFill.setAttribute("height", "6");
+    progressFill.setAttribute("rx", "3");
+    progressFill.setAttribute("fill", color);
+    progressFill.setAttribute("class", "progress-fill");
+
+    g.appendChild(box);
+    g.appendChild(title);
+    g.appendChild(linesGroup);
+    g.appendChild(progressBg);
+    g.appendChild(progressFill);
+    gTestBox.appendChild(g);
+
+    activeTestBox = { el: g, lines: linesGroup.children, progressFill, color };
+    return activeTestBox;
+  }
+
+  function updateTestBox(progress) {
+    if (!activeTestBox) return;
+
+    // Animate lines filling in
+    const lines = activeTestBox.lines;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const targetWidth = parseFloat(line.dataset.targetWidth);
+      const lineProgress = Math.max(0, Math.min(1, (progress - i * 0.15) / 0.7));
+      line.setAttribute("width", targetWidth * lineProgress);
+    }
+
+    // Update progress bar
+    const maxWidth = TEST_BOX_SIZE - 30;
+    activeTestBox.progressFill.setAttribute("width", maxWidth * progress);
+  }
+
+  function hideTestBox() {
+    if (activeTestBox && activeTestBox.el.parentNode) {
+      activeTestBox.el.style.transition = "opacity 200ms ease";
+      activeTestBox.el.style.opacity = "0";
+      setTimeout(() => {
+        if (activeTestBox && activeTestBox.el.parentNode) {
+          activeTestBox.el.parentNode.removeChild(activeTestBox.el);
+        }
+        activeTestBox = null;
+      }, 200);
+    }
+  }
+
+  // Live dashed lines (animated during test taking)
+  function makeLiveLine(id, color) {
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("id", id);
+    p.setAttribute("fill", "none");
+    p.setAttribute("stroke", color);
+    p.setAttribute("stroke-width", "3");
+    p.setAttribute("stroke-linecap", "round");
+    p.setAttribute("stroke-dasharray", "8 6");
+    p.setAttribute("opacity", "0.9");
+    gLiveLines.appendChild(p);
+    return p;
+  }
+
+  function setLiveLinePath(p, A, B) {
+    const dx = B.x - A.x, dy = B.y - A.y;
+    const cx1 = A.x + dx * 0.15;
+    const cy1 = A.y + dy * 0.55;
+    const cx2 = A.x + dx * 0.85;
+    const cy2 = A.y + dy * 0.55;
+    p.setAttribute("d", `M ${A.x} ${A.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${B.x} ${B.y}`);
+  }
+
+  function removeLiveLine(p) {
+    if (!p) return;
+    p.style.transition = "opacity 180ms ease";
+    p.setAttribute("opacity", "0");
+    setTimeout(() => { if (p.parentNode) p.parentNode.removeChild(p); }, 200);
+  }
+
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  // Node tweening (for "step onto stage")
+  function getNodeEl(id){
+    return [...gNodes.querySelectorAll("g")].find(el => el.getAttribute("data-id") === id);
+  }
+  function setNodePos(id, x, y){
+    if (!nodeById[id]) return;
+    nodeById[id].x = x; nodeById[id].y = y;
+    const el = getNodeEl(id);
+    if (el) el.setAttribute("transform", `translate(${x},${y})`);
+  }
+  function tweenNode(id, toX, toY, dur){
+    return new Promise(resolve => {
+      if (!nodeById[id]) return resolve();
+      const fromX = nodeById[id].x, fromY = nodeById[id].y;
+      const start = now();
+      const step = () => {
+        const p = Math.min(1, (now()-start)/dur);
+        const e = ease(p);
+        setNodePos(id, fromX + (toX-fromX)*e, fromY + (toY-fromY)*e);
+        if (p < 1) requestAnimationFrame(step);
+        else resolve();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  async function transitionTo(layoutNext){
+    const prev = currentLayout;
+    const next = layoutNext;
+
+    // Lanes first
+    drawLanes(next);
+
+    // build id sets
+    const prevIds = new Set(prev.nodes.map(n=>n.id));
+    const nextIds = new Set(next.nodes.map(n=>n.id));
+    const willHide = new Set(next.hidden ? [...next.hidden] : []);
+
+    // remove edges during movement
+    gEdges.innerHTML = "";
+
+    // tween shared
+    const shared = [...nextIds].filter(id => prevIds.has(id));
+    const sharedTweens = shared.map(id => {
+      const target = next.nodes.find(n=>n.id===id);
+      return tweenNode(id, target.x, target.y, 650/speedFactor());
+    });
+
+    // remove nodes that disappear or become hidden
+    const toRemove = [...prevIds].filter(id => !nextIds.has(id) || willHide.has(id));
+    toRemove.forEach(id => {
+      const el = getNodeEl(id);
+      if (el){
+        el.style.transition = "opacity 260ms ease";
+        el.style.opacity = "0";
+        setTimeout(()=> { if (el.parentNode) el.parentNode.removeChild(el); }, 280);
+      }
+      delete nodeById[id];
+    });
+
+    // add new nodes
+    const toAdd = next.nodes.filter(n => !prevIds.has(n.id) && !(next.hidden && next.hidden.has(n.id)));
+    toAdd.forEach(n => {
+      nodeById[n.id] = {...n};
+      const isStageSpot = (n.id === "stageSpot");
+      const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+      g.setAttribute("data-id", n.id);
+      g.setAttribute("transform", `translate(${n.x},${n.y-18})`);
+      g.style.opacity = "0";
+
+      if (isStageSpot){
+        // invisible anchor
+        gNodes.appendChild(g);
+        requestAnimationFrame(() => {
+          g.style.transition = "opacity 250ms ease, transform 650ms cubic-bezier(.2,.9,.2,1)";
+          g.style.opacity = "1";
+          g.setAttribute("transform", `translate(${n.x},${n.y})`);
+        });
+        return;
+      }
+
+      const w = (n.kind === "postgres") ? 250 :
+                (n.kind === "process" ? 280 :
+                (n.kind === "report" ? 260 :
+                (n.kind === "artifact" ? 230 :
+                (n.kind === "artifactSmall" ? 210 :
+                (n.kind === "hub" ? 280 : 190)))));
+      const h = (n.kind === "artifactSmall") ? 54 : 62;
+
+      const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      rect.setAttribute("x", -w/2);
+      rect.setAttribute("y", -h/2);
+      rect.setAttribute("rx","14");
+      rect.setAttribute("ry","14");
+      rect.setAttribute("width", w);
+      rect.setAttribute("height", h);
+
+      const style = nodeStyle(n.kind);
+      rect.setAttribute("fill", style.fill);
+      rect.setAttribute("stroke", style.stroke);
+      rect.setAttribute("stroke-width","2");
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+      text.setAttribute("text-anchor","middle");
+      text.setAttribute("fill", "#e6edf3");
+      text.setAttribute("font-size","13");
+
+      const lines = n.label.split("\n");
+      lines.forEach((line, i) => {
+        const tspan = document.createElementNS("http://www.w3.org/2000/svg","tspan");
+        tspan.setAttribute("x","0");
+        tspan.setAttribute("dy", i===0 ? "-2" : "16");
+        tspan.textContent = line;
+        text.appendChild(tspan);
+      });
+
+      g.appendChild(rect);
+      g.appendChild(text);
+      gNodes.appendChild(g);
+
+      // Hover handlers for expansion and tooltip (for dynamically added nodes)
+      g.style.cursor = "pointer";
+
+      g.addEventListener("mouseenter", () => {
+        g.style.transform = "scale(1.15)";
+        rect.style.transition = "stroke-width 150ms ease";
+        rect.style.strokeWidth = "3";
+
+        const info = nodeDescriptions[n.id];
+        if (info) {
+          ttTitle.textContent = info.title;
+          ttDesc.textContent = info.desc;
+
+          const svgRect = document.getElementById("svg").getBoundingClientRect();
+          const stageRect = document.querySelector(".stage").getBoundingClientRect();
+          const scaleX = svgRect.width / 1200;
+          const scaleY = svgRect.height / 740;
+
+          const tooltipX = stageRect.left + n.x * scaleX + 80;
+          const tooltipY = stageRect.top + n.y * scaleY - 30;
+
+          nodeTooltip.style.left = tooltipX + "px";
+          nodeTooltip.style.top = tooltipY + "px";
+          nodeTooltip.classList.add("visible");
+        }
+      });
+
+      g.addEventListener("mouseleave", () => {
+        g.style.transform = "";
+        rect.style.strokeWidth = "2";
+        nodeTooltip.classList.remove("visible");
+      });
+
+      requestAnimationFrame(() => {
+        g.style.transition = "opacity 300ms ease, transform 650ms cubic-bezier(.2,.9,.2,1)";
+        g.style.opacity = "1";
+        g.setAttribute("transform", `translate(${n.x},${n.y})`);
+      });
+    });
+
+    await Promise.all(sharedTweens);
+
+    // apply next positions
+    next.nodes.forEach(n => {
+      if (nodeById[n.id]) nodeById[n.id] = {...nodeById[n.id], ...n};
+    });
+
+    drawEdges(next);
+    currentLayout = next;
+  }
+
+  // KPIs / drawer
+  function setKpis(){
+    const subCount = substrateOrder.length;
+    const passCount = substrateOrder.filter(isPassing).length;
+    kPhase.textContent = (phase === 1) ? "Generate" : "Grade";
+    kSub.textContent = `${subCount}`;
+    kPass.textContent = `${passCount} / ${subCount}`;
+    kTime.textContent = `${(scaledRuntimeAccum/1000).toFixed(1)}s`;
+    timingMapEl.textContent = timingMapString();
+  }
+
+  function renderScoreBars(){
+    scoresEl.innerHTML = "";
+    substrateOrder.forEach(id => {
+      const row = document.createElement("div");
+      row.className = "row";
+      const left = document.createElement("div");
+      left.textContent = id;
+      left.style.color = "#c9d1d9";
+
+      const bar = document.createElement("div");
+      bar.className = "bar";
+      const fill = document.createElement("div");
+      fill.style.width = "0%";
+      fill.style.background = (id === "english") ? "var(--red)" : (id === "owl" || id === "binary") ? "var(--yellow)" : "var(--green)";
+      fill.dataset.target = scores[id];
+      bar.appendChild(fill);
+
+      const right = document.createElement("div");
+      right.textContent = `${scores[id].toFixed(1)}%`;
+      right.style.textAlign = "right";
+      right.style.color = (id === "english") ? "var(--red)" : (id === "owl" || id === "binary") ? "var(--yellow)" : "#7ee787";
+
+      row.appendChild(left); row.appendChild(bar); row.appendChild(right);
+      scoresEl.appendChild(row);
+    });
+  }
+  function animateScoreBars(){
+    [...scoresEl.querySelectorAll(".bar > div")].forEach((fill, i) => {
+      const target = parseFloat(fill.dataset.target);
+      setTimeout(() => fill.style.width = `${target}%`, 100 + i*45);
+    });
+  }
+
+  function updateBadge(){
+    if (phase === 1){
+      badgeTitle.textContent = "Phase 1";
+      badgeSub.textContent = "Generate artifacts + substrates";
+    } else {
+      badgeTitle.textContent = "Phase 2";
+      badgeSub.textContent = "Test & grade each substrate";
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Storyboard
+  // ---------------------------------------------------------------------------
+  const BASE = () => 900 / speedFactor();
+
+  async function phase1Generate(){
+    phase = 1;
+    updateBadge();
+    setKpis();
+
+    addLog("1.", "Airtable flows into the rulebook (canonical IR).");
+    spawnToken("airtable","rulebook","var(--blue)","IR", BASE()*0.9);
+    await wait(BASE()*1.0);
+
+    addLog("2.", "Rulebook generates artifacts (schemas/docs/codegen) + all substrates.");
+    ["schemas","codegen","docs"].forEach((id,i)=>{
+      setTimeout(()=> spawnToken("rulebook", id, "var(--purple)", "gen", BASE()*0.75), i*80);
+    });
+    substrateOrder.forEach((id,i)=>{
+      setTimeout(()=> spawnToken("rulebook", id, "var(--blue)", "→", BASE()*0.85), 300 + i*55);
+    });
+    await wait(BASE()*1.2);
+
+    // Per-substrate generation time (English ~5s)
+    for (const id of substrateOrder){
+      const ms = genMs[id];
+      const scaled = scaledGenMs(ms);
+      addLog("•", `Generate ${id} (scaled ~${Math.round(scaled)}ms).`);
+      const pulses = Math.max(2, Math.min(10, Math.round(scaled/500)));
+      for (let p=0; p<pulses; p++){
+        spawnToken("rulebook", id,
+          (id==="english") ? "var(--red)" : (id==="owl") ? "var(--yellow)" : "var(--green)",
+          "…", 320/speedFactor()
+        );
+        await wait(scaled / pulses);
+      }
+    }
+
+    addLog("✓", "Generation complete. Transitioning to grading story…");
+    await wait(BASE()*0.8);
+  }
+
+  // Phase 2: postgres → orchestrator (down), orchestrator → blanktests (right once), then per-taker dashed lines
+  async function phase2Grade(){
+    phase = 2;
+    updateBadge();
+    setKpis();
+
+    addLog("3.", "We collapse generation and reveal platform artifacts + grading pipeline.");
+    await transitionTo(layoutGrade);
+    await wait(BASE()*0.5);
+
+    addLog("4.", "Rulebook materializes canonical compute (Postgres).");
+    spawnToken("rulebook","postgres","var(--green)","SQL", BASE()*0.95);
+    await wait(BASE()*0.85);
+
+    addLog("5.", "Postgres emits blank tests RIGHT and answer keys DOWN-RIGHT.");
+    spawnToken("postgres","blanktests","var(--blue)","∅", BASE()*0.75);
+    spawnToken("postgres","answerkeys","var(--green)","OK", BASE()*0.85);
+    await wait(BASE()*0.85);
+
+    addLog("6.", "Blank tests and answer keys flow to Test Orchestrator.");
+    spawnToken("blanktests","orchestrator","var(--blue)","∅", BASE()*0.75);
+    spawnToken("answerkeys","orchestrator","var(--green)","OK", BASE()*0.75);
+    await wait(BASE()*0.7);
+
+    // Remember lineup positions so we can return substrates to the vertical stack
+    const lineupPos = {};
+    substrateOrder.forEach(id => {
+      lineupPos[id] = {x: nodeById[id].x, y: nodeById[id].y};
+    });
+
+    const stageSpot = nodeById["stageSpot"]; // invisible anchor
+
+    addLog("7.", "For each test taker: test flows DOWN to taker, then answers return to orchestrator.");
+    addLog("→", "Pipelining: next test taker starts as previous one returns.");
+
+    // Pipelined execution: next substrate starts moving when previous one begins returning
+    let currentPromise = null;
+    let canStartNext = true;
+
+    for (let i = 0; i < substrateOrder.length; i++) {
+      const id = substrateOrder[i];
+      const isLast = (i === substrateOrder.length - 1);
+
+      // Wait for signal that we can start (from previous substrate's return)
+      while (!canStartNext) {
+        await wait(50);
+      }
+      canStartNext = false;
+
+      // Start this substrate's test with dashed line animation
+      const testPromise = runOneTestOnStage(id, lineupPos[id], stageSpot, () => {
+        // This callback fires when the substrate starts returning
+        canStartNext = true;
+      });
+
+      // For the last substrate, wait for completion
+      if (isLast) {
+        await testPromise;
+      } else {
+        // Store promise but don't await - allow pipelining
+        currentPromise = testPromise;
+      }
+    }
+
+    // Wait for all substrates to return to their positions
+    if (currentPromise) await currentPromise;
+    await wait(BASE()*0.3);
+
+    addLog("8.", "Final report is assembled.");
+    spawnToken("orchestrator","report","var(--blue)","R", BASE()*0.9);
+    await wait(BASE()*0.9);
+    animateScoreBars();
+    await wait(BASE()*0.8);
+    addLog("Done.", "Two-phase story complete.");
+  }
+
+  // Returns a promise that resolves when the substrate is done taking the test
+  // and starts returning (allowing the next one to begin moving to stage)
+  async function runOneTestOnStage(id, home, stageSpot, onStartReturn){
+    const real = realMs[id];
+    const scaled = scaledGradeMs(real);
+    const color = (id==="english") ? "var(--red)" : (id==="owl" || id==="binary") ? "var(--yellow)" : "var(--green)";
+
+    addLog("•", `${id} takes test (real ~${real}ms, scaled ~${Math.round(scaled)}ms).`);
+
+    // Step onto stage (center)
+    await tweenNode(id, stageSpot.x, stageSpot.y, 520/speedFactor());
+
+    // Create dashed line from orchestrator to the test taker (orchestrator dispatches tests)
+    const testLine = makeLiveLine(`testLine-${id}`, "rgba(88,166,255,.95)");
+
+    // Update line geometry continuously during test
+    let lineActive = true;
+    const updateLine = () => {
+      if (!lineActive) return;
+      const A = nodeById["orchestrator"];
+      const B = nodeById[id];
+      if (A && B) setLiveLinePath(testLine, A, B);
+      requestAnimationFrame(updateLine);
+    };
+    requestAnimationFrame(updateLine);
+
+    // Blank test token arrives from orchestrator to the test taker
+    spawnToken("orchestrator", id, "var(--blue)", "∅", BASE()*0.55);
+    await wait(BASE()*0.3);
+
+    // Show the test-taking box
+    showTestBox(stageSpot.x, stageSpot.y, id, color);
+
+    // Fill it out with animated progress
+    const start = now();
+    while (now() - start < scaled){
+      const progress = (now() - start) / scaled;
+      updateTestBox(progress);
+      await wait(50); // Update every 50ms for smooth animation
+    }
+    updateTestBox(1); // Ensure we reach 100%
+
+    // Hide the test box
+    hideTestBox();
+
+    // Remove the test line, create answer line back to orchestrator
+    removeLiveLine(testLine);
+    lineActive = false;
+
+    const answerLine = makeLiveLine(`answerLine-${id}`, (id==="english") ? "rgba(255,123,114,.95)" : "rgba(126,231,135,.95)");
+
+    // Update answer line geometry
+    let answerLineActive = true;
+    const updateAnswerLine = () => {
+      if (!answerLineActive) return;
+      const A = nodeById[id];
+      const B = nodeById["orchestrator"];
+      if (A && B) setLiveLinePath(answerLine, A, B);
+      requestAnimationFrame(updateAnswerLine);
+    };
+    requestAnimationFrame(updateAnswerLine);
+
+    // Hand completed test (filled answers) to orchestrator for grading
+    spawnToken(id, "orchestrator", "var(--blue)", "A", BASE()*0.55);
+    await wait(BASE()*0.5);
+
+    // Orchestrator grades
+    const pass = isPassing(id);
+    spawnToken("orchestrator", id, pass ? "var(--green)" : "var(--yellow)", pass ? "✓" : "△", BASE()*0.55);
+
+    // Remove answer line
+    removeLiveLine(answerLine);
+    answerLineActive = false;
+
+    scaledRuntimeAccum += scaled;
+    setKpis();
+
+    if (id === "owl") addLog("!", "OWL is slower — the wall-clock cost is visible, but it's still validation.");
+    if (id === "english") addLog("!!!", "English is slowest and last — this is the usual approach, and it's expensive.");
+
+    // Signal that next test taker can start moving (pipelining)
+    if (onStartReturn) onStartReturn();
+
+    // Back into line (right-side vertical stack)
+    await tweenNode(id, home.x, home.y, 520/speedFactor());
+  }
+
+  // ---------------------------------------------------------------------------
+  // Controls
+  // ---------------------------------------------------------------------------
+  document.getElementById("gear").addEventListener("click", ()=> drawer.classList.toggle("open"));
+
+  function resetAll(){
+    playing = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+    tokens = [];
+    stageIndex = 0;
+    scaledRuntimeAccum = 0;
+    logEl.innerHTML = "";
+    gTokens.innerHTML = "";
+    gTestBox.innerHTML = "";
+    gLiveLines.innerHTML = "";
+    activeTestBox = null;
+    nodeTooltip.classList.remove("visible");
+
+    currentLayout = layoutGenerate;
+    drawLanes(currentLayout);
+    drawNodes(currentLayout);
+    drawEdges(currentLayout);
+
+    phase = 1;
+    updateBadge();
+    renderScoreBars();
+    setKpis();
+
+    addLog("Reset.", "Ready.");
+  }
+
+  async function stepOnce(){
+    if (playing) return;
+    if (!raf) raf = requestAnimationFrame(tick);
+
+    if (stageIndex === 0){
+      stageIndex++;
+      await phase1Generate();
+      return;
+    }
+    if (stageIndex === 1){
+      stageIndex++;
+      await phase2Grade();
+      return;
+    }
+    addLog("Done.", "Storyboard complete. Reset to replay.");
+  }
+
+  async function playAll(){
+    if (playing) return;
+    playing = true;
+    if (!raf) raf = requestAnimationFrame(tick);
+
+    if (stageIndex === 0){
+      stageIndex = 1;
+      await phase1Generate();
+    }
+    if (stageIndex === 1){
+      stageIndex = 2;
+      await phase2Grade();
+    }
+
+    playing = false;
+  }
+
+  document.getElementById("reset").addEventListener("click", resetAll);
+  document.getElementById("step").addEventListener("click", stepOnce);
+  document.getElementById("play").addEventListener("click", playAll);
+  speedSel.addEventListener("change", ()=>{
+    timingMapEl.textContent = timingMapString();
+    addLog("Speed.", `Set to ${speedSel.options[speedSel.selectedIndex].text}.`);
+  });
+
+  // Init
+  renderScoreBars();
+  resetAll();
+})();
+</script>
+</body>
+</html>

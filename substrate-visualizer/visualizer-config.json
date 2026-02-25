@@ -1,0 +1,469 @@
+{
+  "$schema": "./visualizer-config.schema.json",
+  "meta": {
+    "title": "Effortless Rulebook Architecture",
+    "subtitle": "Single Source of Truth → Declarative Hub → Execution Substrates",
+    "version": "3.0.0",
+    "lastUpdated": "2026-02-25"
+  },
+
+  "hub": {
+    "id": "effortless-rulebook",
+    "label": "Effortless Rulebook",
+    "sublabel": "effortless-rulebook.json",
+    "description": "Declarative Hub",
+    "color": "#4F46E5",
+    "gradientEnd": "#3730A3"
+  },
+
+  "layers": {
+    "ssot": {
+      "label": "Single Source of Truth",
+      "position": "top",
+      "active": "airtable",
+      "options": [
+        { "id": "airtable", "label": "Airtable", "implemented": true, "color": "#FCBF49", "gradientEnd": "#F77F00" },
+        { "id": "notion", "label": "Notion", "implemented": false, "color": "#000000", "gradientEnd": "#333333" },
+        { "id": "google-sheets", "label": "Google Sheets", "implemented": false, "color": "#34A853", "gradientEnd": "#1E7E34" },
+        { "id": "baserow", "label": "Baserow", "implemented": false, "color": "#5190EF", "gradientEnd": "#3B6FCF" },
+        { "id": "coda", "label": "Coda", "implemented": false, "color": "#F46A54", "gradientEnd": "#D44A34" },
+        { "id": "smartsheet", "label": "Smartsheet", "implemented": false, "color": "#0073EA", "gradientEnd": "#0052A3" },
+        { "id": "excel-online", "label": "Excel Online", "implemented": false, "color": "#217346", "gradientEnd": "#165232" }
+      ]
+    },
+
+    "foundation": {
+      "label": "Canonical Computation Engine",
+      "position": "bottom",
+      "active": "postgresql",
+      "sublabel": "Tables + calc_*() + Views",
+      "answerKeyBadge": "answer-key.json",
+      "options": [
+        { "id": "postgresql", "label": "PostgreSQL", "implemented": true, "color": "#336791", "gradientEnd": "#264d73" },
+        { "id": "sqlserver", "label": "SQL Server", "implemented": false, "color": "#CC2927", "gradientEnd": "#9A1F1D" },
+        { "id": "duckdb", "label": "DuckDB", "implemented": false, "color": "#FFC107", "gradientEnd": "#E0A800" },
+        { "id": "sqlite", "label": "SQLite", "implemented": false, "color": "#003B57", "gradientEnd": "#002537" },
+        { "id": "cockroachdb", "label": "CockroachDB", "implemented": false, "color": "#6933FF", "gradientEnd": "#4A1FCC" },
+        { "id": "mysql", "label": "MySQL", "implemented": false, "color": "#4479A1", "gradientEnd": "#336180" }
+      ]
+    }
+  },
+
+  "categories": [
+    {
+      "id": "backend",
+      "name": "Backend",
+      "icon": "⚙️",
+      "color": "#3B82F6",
+      "description": "Server-side languages & frameworks"
+    },
+    {
+      "id": "frontend",
+      "name": "Frontend",
+      "icon": "🖥️",
+      "color": "#8B5CF6",
+      "description": "Client-side frameworks & libraries"
+    },
+    {
+      "id": "mobile",
+      "name": "Mobile",
+      "icon": "📱",
+      "color": "#06B6D4",
+      "description": "Mobile app frameworks"
+    },
+    {
+      "id": "data",
+      "name": "Data Formats",
+      "icon": "📊",
+      "color": "#10B981",
+      "description": "Data interchange & serialization"
+    },
+    {
+      "id": "api",
+      "name": "APIs",
+      "icon": "🔌",
+      "color": "#EC4899",
+      "description": "API specifications & protocols"
+    },
+    {
+      "id": "semantic",
+      "name": "Semantic",
+      "icon": "🧠",
+      "color": "#F59E0B",
+      "description": "Knowledge graphs & ontologies"
+    },
+    {
+      "id": "docs",
+      "name": "Documentation",
+      "icon": "📚",
+      "color": "#84CC16",
+      "description": "Documentation & diagrams"
+    },
+    {
+      "id": "infra",
+      "name": "Infrastructure",
+      "icon": "🏗️",
+      "color": "#7C3AED",
+      "description": "DevOps & infrastructure as code"
+    },
+    {
+      "id": "testing",
+      "name": "Testing",
+      "icon": "🧪",
+      "color": "#EF4444",
+      "description": "Testing frameworks & tools"
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "icon": "🔒",
+      "color": "#64748B",
+      "description": "Auth, encryption & security"
+    },
+    {
+      "id": "messaging",
+      "name": "Messaging",
+      "icon": "📬",
+      "color": "#F97316",
+      "description": "Message queues & event streaming"
+    },
+    {
+      "id": "storage",
+      "name": "Storage",
+      "icon": "💾",
+      "color": "#0EA5E9",
+      "description": "Databases & caching"
+    }
+  ],
+
+  "substrates": [
+    { "id": "python", "label": "Python", "category": "backend", "implemented": true, "icon": "🐍" },
+    { "id": "golang", "label": "Go", "category": "backend", "implemented": true, "icon": "🔷" },
+    { "id": "rust", "label": "Rust", "category": "backend", "implemented": false, "icon": "🦀" },
+    { "id": "java", "label": "Java", "category": "backend", "implemented": false, "icon": "☕" },
+    { "id": "csharp", "label": "C#", "category": "backend", "implemented": false, "icon": "🟣" },
+    { "id": "ruby", "label": "Ruby", "category": "backend", "implemented": false, "icon": "💎" },
+    { "id": "php", "label": "PHP", "category": "backend", "implemented": false, "icon": "🐘" },
+    { "id": "elixir", "label": "Elixir", "category": "backend", "implemented": false, "icon": "💧" },
+    { "id": "scala", "label": "Scala", "category": "backend", "implemented": false, "icon": "🔴" },
+    { "id": "nodejs", "label": "Node.js", "category": "backend", "implemented": false, "icon": "💚" },
+    { "id": "deno", "label": "Deno", "category": "backend", "implemented": false, "icon": "🦕" },
+    { "id": "bun", "label": "Bun", "category": "backend", "implemented": false, "icon": "🥟" },
+    { "id": "django", "label": "Django", "category": "backend", "implemented": false, "icon": "🎸" },
+    { "id": "flask", "label": "Flask", "category": "backend", "implemented": false, "icon": "🧪" },
+    { "id": "fastapi", "label": "FastAPI", "category": "backend", "implemented": false, "icon": "⚡" },
+    { "id": "spring", "label": "Spring", "category": "backend", "implemented": false, "icon": "🌿" },
+    { "id": "rails", "label": "Rails", "category": "backend", "implemented": false, "icon": "🛤️" },
+    { "id": "laravel", "label": "Laravel", "category": "backend", "implemented": false, "icon": "🔶" },
+    { "id": "express", "label": "Express", "category": "backend", "implemented": false, "icon": "🚂" },
+    { "id": "nestjs", "label": "NestJS", "category": "backend", "implemented": false, "icon": "🐱" },
+
+    { "id": "react", "label": "React", "category": "frontend", "implemented": false, "icon": "⚛️" },
+    { "id": "vue", "label": "Vue", "category": "frontend", "implemented": false, "icon": "💚" },
+    { "id": "angular", "label": "Angular", "category": "frontend", "implemented": false, "icon": "🅰️" },
+    { "id": "svelte", "label": "Svelte", "category": "frontend", "implemented": false, "icon": "🔥" },
+    { "id": "nextjs", "label": "Next.js", "category": "frontend", "implemented": false, "icon": "▲" },
+    { "id": "nuxt", "label": "Nuxt", "category": "frontend", "implemented": false, "icon": "💚" },
+    { "id": "remix", "label": "Remix", "category": "frontend", "implemented": false, "icon": "💿" },
+    { "id": "astro", "label": "Astro", "category": "frontend", "implemented": false, "icon": "🚀" },
+    { "id": "solid", "label": "SolidJS", "category": "frontend", "implemented": false, "icon": "🔷" },
+    { "id": "htmx", "label": "HTMX", "category": "frontend", "implemented": false, "icon": "🔄" },
+    { "id": "typescript", "label": "TypeScript", "category": "frontend", "implemented": false, "icon": "🔷" },
+    { "id": "tailwind", "label": "Tailwind", "category": "frontend", "implemented": false, "icon": "🎨" },
+    { "id": "sass", "label": "Sass", "category": "frontend", "implemented": false, "icon": "💅" },
+    { "id": "webcomponents", "label": "WebComp", "category": "frontend", "implemented": false, "icon": "🧩" },
+
+    { "id": "swift", "label": "Swift", "category": "mobile", "implemented": false, "icon": "🍎" },
+    { "id": "kotlin", "label": "Kotlin", "category": "mobile", "implemented": false, "icon": "🟣" },
+    { "id": "flutter", "label": "Flutter", "category": "mobile", "implemented": false, "icon": "🦋" },
+    { "id": "reactnative", "label": "RN", "category": "mobile", "implemented": false, "icon": "📱" },
+    { "id": "ionic", "label": "Ionic", "category": "mobile", "implemented": false, "icon": "⚡" },
+    { "id": "capacitor", "label": "Capacitor", "category": "mobile", "implemented": false, "icon": "🔋" },
+    { "id": "expo", "label": "Expo", "category": "mobile", "implemented": false, "icon": "📲" },
+    { "id": "maui", "label": ".NET MAUI", "category": "mobile", "implemented": false, "icon": "🟣" },
+
+    { "id": "json", "label": "JSON", "category": "data", "implemented": false, "icon": "{}" },
+    { "id": "yaml", "label": "YAML", "category": "data", "implemented": true, "icon": "📋" },
+    { "id": "xml", "label": "XML", "category": "data", "implemented": false, "icon": "📰" },
+    { "id": "csv", "label": "CSV", "category": "data", "implemented": true, "icon": "📄" },
+    { "id": "xlsx", "label": "XLSX", "category": "data", "implemented": true, "icon": "📗" },
+    { "id": "toml", "label": "TOML", "category": "data", "implemented": false, "icon": "⚙️" },
+    { "id": "parquet", "label": "Parquet", "category": "data", "implemented": false, "icon": "🗃️" },
+    { "id": "avro", "label": "Avro", "category": "data", "implemented": false, "icon": "🗄️" },
+    { "id": "arrow", "label": "Arrow", "category": "data", "implemented": false, "icon": "➡️" },
+    { "id": "msgpack", "label": "MsgPack", "category": "data", "implemented": false, "icon": "📦" },
+    { "id": "binary", "label": "Binary", "category": "data", "implemented": true, "icon": "💾" },
+    { "id": "sqlite-file", "label": "SQLite", "category": "data", "implemented": false, "icon": "🗃️" },
+
+    { "id": "graphql", "label": "GraphQL", "category": "api", "implemented": true, "icon": "◈" },
+    { "id": "rest", "label": "REST", "category": "api", "implemented": false, "icon": "🌐" },
+    { "id": "openapi", "label": "OpenAPI", "category": "api", "implemented": false, "icon": "📜" },
+    { "id": "grpc", "label": "gRPC", "category": "api", "implemented": false, "icon": "🔌" },
+    { "id": "protobuf", "label": "Protobuf", "category": "api", "implemented": false, "icon": "📦" },
+    { "id": "asyncapi", "label": "AsyncAPI", "category": "api", "implemented": false, "icon": "📡" },
+    { "id": "trpc", "label": "tRPC", "category": "api", "implemented": false, "icon": "🔗" },
+    { "id": "jsonapi", "label": "JSON:API", "category": "api", "implemented": false, "icon": "📋" },
+    { "id": "odata", "label": "OData", "category": "api", "implemented": false, "icon": "🔷" },
+    { "id": "soap", "label": "SOAP", "category": "api", "implemented": false, "icon": "🧼" },
+    { "id": "webhooks", "label": "Webhooks", "category": "api", "implemented": false, "icon": "🪝" },
+    { "id": "websocket", "label": "WebSocket", "category": "api", "implemented": false, "icon": "🔌" },
+
+    { "id": "owl", "label": "OWL", "category": "semantic", "implemented": true, "icon": "🦉" },
+    { "id": "rdf", "label": "RDF", "category": "semantic", "implemented": true, "icon": "🔗" },
+    { "id": "turtle", "label": "Turtle", "category": "semantic", "implemented": false, "icon": "🐢" },
+    { "id": "sparql", "label": "SPARQL", "category": "semantic", "implemented": false, "icon": "🔍" },
+    { "id": "jsonld", "label": "JSON-LD", "category": "semantic", "implemented": false, "icon": "🏷️" },
+    { "id": "shacl", "label": "SHACL", "category": "semantic", "implemented": false, "icon": "✅" },
+    { "id": "skos", "label": "SKOS", "category": "semantic", "implemented": false, "icon": "📚" },
+    { "id": "shex", "label": "ShEx", "category": "semantic", "implemented": false, "icon": "🔷" },
+
+    { "id": "markdown", "label": "Markdown", "category": "docs", "implemented": false, "icon": "📝" },
+    { "id": "asciidoc", "label": "AsciiDoc", "category": "docs", "implemented": false, "icon": "📑" },
+    { "id": "english", "label": "English", "category": "docs", "implemented": true, "icon": "📖" },
+    { "id": "uml", "label": "UML", "category": "docs", "implemented": true, "icon": "📊" },
+    { "id": "mermaid", "label": "Mermaid", "category": "docs", "implemented": false, "icon": "🧜" },
+    { "id": "plantuml", "label": "PlantUML", "category": "docs", "implemented": false, "icon": "🌱" },
+    { "id": "explain-dag", "label": "DAG", "category": "docs", "implemented": true, "icon": "🌳" },
+    { "id": "readme", "label": "README", "category": "docs", "implemented": false, "icon": "📃" },
+    { "id": "latex", "label": "LaTeX", "category": "docs", "implemented": false, "icon": "📐" },
+    { "id": "docusaurus", "label": "Docusaurus", "category": "docs", "implemented": false, "icon": "🦖" },
+    { "id": "storybook", "label": "Storybook", "category": "docs", "implemented": false, "icon": "📕" },
+    { "id": "swagger", "label": "Swagger", "category": "docs", "implemented": false, "icon": "📗" },
+
+    { "id": "terraform", "label": "Terraform", "category": "infra", "implemented": false, "icon": "🏗️" },
+    { "id": "kubernetes", "label": "K8s", "category": "infra", "implemented": false, "icon": "☸️" },
+    { "id": "docker", "label": "Docker", "category": "infra", "implemented": false, "icon": "🐳" },
+    { "id": "helm", "label": "Helm", "category": "infra", "implemented": false, "icon": "⎈" },
+    { "id": "pulumi", "label": "Pulumi", "category": "infra", "implemented": false, "icon": "🔷" },
+    { "id": "ansible", "label": "Ansible", "category": "infra", "implemented": false, "icon": "🅰️" },
+    { "id": "cloudformation", "label": "CFN", "category": "infra", "implemented": false, "icon": "☁️" },
+    { "id": "github-actions", "label": "GH Actions", "category": "infra", "implemented": false, "icon": "🐙" },
+    { "id": "gitlab-ci", "label": "GitLab CI", "category": "infra", "implemented": false, "icon": "🦊" },
+    { "id": "argocd", "label": "ArgoCD", "category": "infra", "implemented": false, "icon": "🐙" },
+    { "id": "jenkins", "label": "Jenkins", "category": "infra", "implemented": false, "icon": "🎩" },
+    { "id": "nginx", "label": "Nginx", "category": "infra", "implemented": false, "icon": "🟢" },
+
+    { "id": "jest", "label": "Jest", "category": "testing", "implemented": false, "icon": "🃏" },
+    { "id": "pytest", "label": "pytest", "category": "testing", "implemented": false, "icon": "🐍" },
+    { "id": "cypress", "label": "Cypress", "category": "testing", "implemented": false, "icon": "🌲" },
+    { "id": "playwright", "label": "Playwright", "category": "testing", "implemented": false, "icon": "🎭" },
+    { "id": "selenium", "label": "Selenium", "category": "testing", "implemented": false, "icon": "🔬" },
+    { "id": "junit", "label": "JUnit", "category": "testing", "implemented": false, "icon": "☕" },
+    { "id": "vitest", "label": "Vitest", "category": "testing", "implemented": false, "icon": "⚡" },
+    { "id": "mocha", "label": "Mocha", "category": "testing", "implemented": false, "icon": "☕" },
+    { "id": "postman", "label": "Postman", "category": "testing", "implemented": false, "icon": "📮" },
+    { "id": "k6", "label": "k6", "category": "testing", "implemented": false, "icon": "📈" },
+
+    { "id": "oauth", "label": "OAuth", "category": "security", "implemented": false, "icon": "🔐" },
+    { "id": "jwt", "label": "JWT", "category": "security", "implemented": false, "icon": "🎫" },
+    { "id": "oidc", "label": "OIDC", "category": "security", "implemented": false, "icon": "🆔" },
+    { "id": "saml", "label": "SAML", "category": "security", "implemented": false, "icon": "🔏" },
+    { "id": "rbac", "label": "RBAC", "category": "security", "implemented": false, "icon": "👥" },
+    { "id": "vault", "label": "Vault", "category": "security", "implemented": false, "icon": "🔒" },
+    { "id": "keycloak", "label": "Keycloak", "category": "security", "implemented": false, "icon": "🔑" },
+    { "id": "auth0", "label": "Auth0", "category": "security", "implemented": false, "icon": "🛡️" },
+    { "id": "ssl", "label": "SSL/TLS", "category": "security", "implemented": false, "icon": "🔐" },
+
+    { "id": "kafka", "label": "Kafka", "category": "messaging", "implemented": false, "icon": "📬" },
+    { "id": "rabbitmq", "label": "RabbitMQ", "category": "messaging", "implemented": false, "icon": "🐰" },
+    { "id": "redis-pubsub", "label": "Redis PubSub", "category": "messaging", "implemented": false, "icon": "🔴" },
+    { "id": "sqs", "label": "SQS", "category": "messaging", "implemented": false, "icon": "📨" },
+    { "id": "nats", "label": "NATS", "category": "messaging", "implemented": false, "icon": "🔷" },
+    { "id": "pulsar", "label": "Pulsar", "category": "messaging", "implemented": false, "icon": "⭐" },
+    { "id": "eventbridge", "label": "EventBridge", "category": "messaging", "implemented": false, "icon": "🌉" },
+    { "id": "sns", "label": "SNS", "category": "messaging", "implemented": false, "icon": "📢" },
+
+    { "id": "redis", "label": "Redis", "category": "storage", "implemented": false, "icon": "🔴" },
+    { "id": "mongodb", "label": "MongoDB", "category": "storage", "implemented": false, "icon": "🍃" },
+    { "id": "elastic", "label": "Elastic", "category": "storage", "implemented": false, "icon": "🔎" },
+    { "id": "s3", "label": "S3", "category": "storage", "implemented": false, "icon": "🪣" },
+    { "id": "dynamodb", "label": "DynamoDB", "category": "storage", "implemented": false, "icon": "⚡" },
+    { "id": "cassandra", "label": "Cassandra", "category": "storage", "implemented": false, "icon": "👁️" },
+    { "id": "neo4j", "label": "Neo4j", "category": "storage", "implemented": false, "icon": "🔵" },
+    { "id": "memcached", "label": "Memcached", "category": "storage", "implemented": false, "icon": "🧠" },
+    { "id": "clickhouse", "label": "ClickHouse", "category": "storage", "implemented": false, "icon": "🏠" },
+    { "id": "timescale", "label": "TimescaleDB", "category": "storage", "implemented": false, "icon": "⏱️" }
+  ],
+
+  "arrangements": [
+    {
+      "id": "current-production",
+      "name": "Production Stack",
+      "description": "Current fully implemented stack",
+      "color": "#10B981",
+      "implemented": true,
+      "substrates": ["python", "golang", "csv", "xlsx", "yaml", "uml", "owl", "rdf", "graphql", "explain-dag", "english", "binary"]
+    },
+    {
+      "id": "python-data-science",
+      "name": "Python Data Science",
+      "description": "Data analysis & ML pipeline",
+      "color": "#3B82F6",
+      "implemented": true,
+      "substrates": ["python", "csv", "xlsx", "yaml", "json", "parquet", "jupyter", "pandas", "pytest"]
+    },
+    {
+      "id": "golang-microservices",
+      "name": "Go Microservices",
+      "description": "High-performance backend",
+      "color": "#00ADD8",
+      "implemented": true,
+      "substrates": ["golang", "graphql", "grpc", "protobuf", "docker", "kubernetes", "redis", "kafka"]
+    },
+    {
+      "id": "semantic-knowledge",
+      "name": "Knowledge Graph",
+      "description": "Semantic web & ontologies",
+      "color": "#F59E0B",
+      "implemented": true,
+      "substrates": ["owl", "rdf", "turtle", "sparql", "jsonld", "shacl", "english", "uml"]
+    },
+    {
+      "id": "react-fullstack",
+      "name": "React Full Stack",
+      "description": "Modern web application",
+      "color": "#8B5CF6",
+      "implemented": false,
+      "substrates": ["typescript", "react", "nextjs", "graphql", "tailwind", "jest", "cypress", "docker"]
+    },
+    {
+      "id": "vue-enterprise",
+      "name": "Vue Enterprise",
+      "description": "Enterprise Vue.js stack",
+      "color": "#42B883",
+      "implemented": false,
+      "substrates": ["typescript", "vue", "nuxt", "rest", "tailwind", "vitest", "playwright"]
+    },
+    {
+      "id": "rust-performance",
+      "name": "Rust Performance",
+      "description": "Systems programming",
+      "color": "#DEA584",
+      "implemented": false,
+      "substrates": ["rust", "grpc", "protobuf", "binary", "arrow", "parquet", "docker"]
+    },
+    {
+      "id": "java-enterprise",
+      "name": "Java Enterprise",
+      "description": "Enterprise Java stack",
+      "color": "#ED8B00",
+      "implemented": false,
+      "substrates": ["java", "spring", "rest", "openapi", "xml", "junit", "jenkins", "kubernetes"]
+    },
+    {
+      "id": "dotnet-enterprise",
+      "name": ".NET Enterprise",
+      "description": "Microsoft .NET stack",
+      "color": "#512BD4",
+      "implemented": false,
+      "substrates": ["csharp", "rest", "openapi", "azure", "docker", "jwt", "swagger"]
+    },
+    {
+      "id": "flutter-mobile",
+      "name": "Flutter Mobile",
+      "description": "Cross-platform mobile",
+      "color": "#02569B",
+      "implemented": false,
+      "substrates": ["flutter", "rest", "json", "graphql", "firebase", "oauth"]
+    },
+    {
+      "id": "react-native-mobile",
+      "name": "React Native Mobile",
+      "description": "React Native apps",
+      "color": "#61DAFB",
+      "implemented": false,
+      "substrates": ["reactnative", "expo", "typescript", "rest", "graphql", "jest"]
+    },
+    {
+      "id": "serverless-aws",
+      "name": "AWS Serverless",
+      "description": "AWS Lambda & services",
+      "color": "#FF9900",
+      "implemented": false,
+      "substrates": ["nodejs", "typescript", "dynamodb", "sqs", "sns", "s3", "cloudformation", "github-actions"]
+    },
+    {
+      "id": "kubernetes-native",
+      "name": "K8s Native",
+      "description": "Kubernetes-native apps",
+      "color": "#326CE5",
+      "implemented": false,
+      "substrates": ["golang", "kubernetes", "helm", "argocd", "docker", "grpc", "prometheus"]
+    },
+    {
+      "id": "documentation-suite",
+      "name": "Documentation",
+      "description": "Docs & diagrams",
+      "color": "#84CC16",
+      "implemented": true,
+      "substrates": ["english", "markdown", "mermaid", "plantuml", "uml", "explain-dag", "docusaurus", "swagger"]
+    },
+    {
+      "id": "api-first",
+      "name": "API First",
+      "description": "API-first development",
+      "color": "#EC4899",
+      "implemented": true,
+      "substrates": ["graphql", "openapi", "rest", "grpc", "protobuf", "asyncapi", "postman", "swagger"]
+    },
+    {
+      "id": "event-driven",
+      "name": "Event Driven",
+      "description": "Event-driven architecture",
+      "color": "#F97316",
+      "implemented": false,
+      "substrates": ["kafka", "rabbitmq", "asyncapi", "json", "avro", "kubernetes", "docker"]
+    },
+    {
+      "id": "data-pipeline",
+      "name": "Data Pipeline",
+      "description": "ETL & data processing",
+      "color": "#0EA5E9",
+      "implemented": false,
+      "substrates": ["python", "parquet", "arrow", "csv", "json", "kafka", "s3", "clickhouse"]
+    },
+    {
+      "id": "security-stack",
+      "name": "Security Stack",
+      "description": "Auth & security",
+      "color": "#64748B",
+      "implemented": false,
+      "substrates": ["oauth", "jwt", "oidc", "vault", "keycloak", "rbac", "ssl"]
+    },
+    {
+      "id": "testing-suite",
+      "name": "Testing Suite",
+      "description": "Comprehensive testing",
+      "color": "#EF4444",
+      "implemented": false,
+      "substrates": ["jest", "pytest", "cypress", "playwright", "postman", "k6", "vitest"]
+    },
+    {
+      "id": "elixir-realtime",
+      "name": "Elixir Realtime",
+      "description": "Real-time with Phoenix",
+      "color": "#6E4A7E",
+      "implemented": false,
+      "substrates": ["elixir", "websocket", "rest", "json", "docker", "kubernetes"]
+    }
+  ],
+
+  "llmContextWindow": {
+    "enabled": true,
+    "width": 180,
+    "height": 140,
+    "initialPosition": { "x": 150, "y": 300 },
+    "dimOpacity": 0.75,
+    "borderColor": "#EF4444",
+    "borderWidth": 3,
+    "label": "LLM Context Window"
+  },
+
+  "theme": {
+    "background": "#F8FAFC",
+    "cardBackground": "#FFFFFF",
+    "cardBorder": "#E2E8F0",
+    "textPrimary": "#1E293B",
+    "textSecondary": "#64748B"
+  }
+}

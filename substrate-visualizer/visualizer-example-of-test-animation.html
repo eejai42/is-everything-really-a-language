@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ERB v2.3 — Generate → Grade (Stage + Live Test Lines)</title>
+  <style>
+    :root{
+      --bg:#0b0f14;
+      --panel:#101a26;
+      --panel2:#0e1621;
+      --ink:#e6edf3;
+      --muted:#9aa7b2;
+      --line:#2a3a4a;
+      --blue:#58a6ff;
+      --green:#2b8a3e;
+      --yellow:#f2cc60;
+      --purple:#8957e5;
+      --red:#ff7b72;
+      --stroke:#223247;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    .app{height:100%;display:grid;grid-template-rows:56px 1fr;}
+    header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 12px;border-bottom:1px solid #182232;
+      background:linear-gradient(180deg,#0c121a,#0b0f14);
+    }
+    header .title{display:flex;flex-direction:column;gap:2px;}
+    header .title .h{font-weight:700;font-size:14px;}
+    header .title .s{color:var(--muted);font-size:12px;}
+    header .actions{display:flex;gap:8px;align-items:center;}
+    button,select{
+      background:var(--panel2);color:var(--ink);
+      border:1px solid var(--stroke);border-radius:10px;
+      padding:8px 10px;cursor:pointer;
+    }
+    button:hover{border-color:#355173;}
+    button:active{transform:translateY(1px);}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      background:var(--panel2);border:1px solid var(--stroke);border-radius:999px;
+      padding:6px 10px;color:var(--muted);font-size:12px;
+    }
+
+    .main{position:relative;overflow:hidden;}
+    .stage{
+      position:absolute; inset:12px;
+      border:1px solid #182232; border-radius:14px;
+      background:radial-gradient(1200px 740px at 40% 10%, rgba(88,166,255,.10), transparent 60%),
+                 radial-gradient(900px 620px at 70% 70%, rgba(137,87,229,.10), transparent 60%),
+                 linear-gradient(180deg,#0c121a,#0b0f14);
+      overflow:hidden;
+    }
+    svg{width:100%;height:100%;display:block;}
+
+    .drawer{
+      position:absolute;top:12px;right:12px;bottom:12px;width:360px;
+      transform:translateX(calc(100% + 12px));
+      transition:transform 260ms ease;
+      background:var(--panel);border:1px solid #182232;border-radius:14px;
+      overflow:auto;padding:12px;box-sizing:border-box;z-index:5;
+    }
+    .drawer.open{transform:translateX(0);}
+    .drawer h2{margin:0 0 8px;font-size:13px;}
+    .drawer .hint{color:var(--muted);font-size:12px;margin:6px 0 10px;}
+    .log{background:#0b0f14;border:1px solid var(--stroke);border-radius:12px;padding:10px;height:170px;overflow:auto;font-size:12px;}
+    .log .t{color:#7ee787;}
+    .log .m{color:var(--muted);}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+
+    .phaseBadge{
+      position:absolute;left:20px;top:18px;
+      background:rgba(14,22,33,.92);
+      border:1px solid var(--stroke);
+      padding:10px 12px;border-radius:12px;
+      display:flex;flex-direction:column;gap:2px;
+      max-width:620px;
+      z-index:4;
+    }
+    .phaseBadge .big{font-size:16px;font-weight:700;}
+    .phaseBadge .small{font-size:12px;color:var(--muted);}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title">
+      <div class="h">Effortless Rulebook — v2.3 Two-Phase Story</div>
+      <div class="s">Phase 2: stacked lineup → step on stage → live blank-test line → submit → grade → pipeline next</div>
+    </div>
+    <div class="actions">
+      <button id="play">Play</button>
+      <button id="step">Step</button>
+      <button id="reset">Reset</button>
+      <span class="pill">
+        Speed
+        <select id="speed">
+          <option value="0.75">Slow</option>
+          <option value="1" selected>Normal</option>
+          <option value="1.4">Fast</option>
+          <option value="2">Turbo</option>
+        </select>
+      </span>
+      <button id="gear" title="Show details">⚙︎</button>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="stage">
+      <div class="phaseBadge" id="badge">
+        <div class="big" id="badgeTitle">Phase 1 — Generate</div>
+        <div class="small" id="badgeSub">Airtable → Rulebook → artifacts + substrates (testing hidden). English generation visibly slower.</div>
+      </div>
+
+      <svg id="svg" viewBox="0 0 1200 740" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3.5" result="coloredBlur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="coloredBlur"></feMergeNode>
+              <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+          </filter>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L10,3 L0,6 Z" fill="#2a3a4a"></path>
+          </marker>
+        </defs>
+
+        <g id="lanes"></g>
+        <g id="edges"></g>
+
+        <!-- LIVE, temporary lines during testing -->
+        <g id="liveLines"></g>
+
+        <g id="nodes"></g>
+
+        <!-- Stage worksheet (appears only while taking test) -->
+        <g id="worksheet"></g>
+
+        <g id="tokens"></g>
+
+        <!-- Hover detail card -->
+        <g id="hoverCard" style="display:none;"></g>
+      </svg>
+    </div>
+
+    <aside class="drawer" id="drawer">
+      <h2>Event log</h2>
+      <div class="hint">This panel stays hidden unless you want instrumentation.</div>
+      <div class="log" id="log"></div>
+      <div class="hint mono" id="timingMap" style="margin-top:10px;"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  const gLanes = document.getElementById("lanes");
+  const gEdges = document.getElementById("edges");
+  const gNodes = document.getElementById("nodes");
+  const gTokens = document.getElementById("tokens");
+  const gLive = document.getElementById("liveLines");
+  const gWorksheet = document.getElementById("worksheet");
+  const gHover = document.getElementById("hoverCard");
+
+  const drawer = document.getElementById("drawer");
+  const logEl = document.getElementById("log");
+
+  const badgeTitle = document.getElementById("badgeTitle");
+  const badgeSub = document.getElementById("badgeSub");
+  const timingMapEl = document.getElementById("timingMap");
+
+  const speedSel = document.getElementById("speed");
+
+  const substrateOrder = ["python","golang","xlsx","csv","yaml","uml","binary","explaindag","owl","english"];
+  const scores = { python:100,golang:100,xlsx:100,csv:100,yaml:100,uml:100,explaindag:100,owl:100,binary:79.9,english:71.7 };
+  const isPassing = id => scores[id] >= 90;
+
+  const realMs = { python:100,golang:100,xlsx:120,csv:90,yaml:110,uml:120,binary:180,explaindag:130,owl:10000,english:35000 };
+  const genMs  = { python:250,golang:260,xlsx:320,csv:220,yaml:280,uml:320,binary:450,explaindag:340,owl:900,english:5000 };
+
+  function speedFactor(){ return parseFloat(speedSel.value); }
+  function scaledGenMs(ms){ return ms / speedFactor(); }
+
+  function scaledGradeMs(ms){
+    // used for both "taking test" duration AND the live token movement speed.
+    if (ms <= 250) return (180 + ms) / speedFactor();
+    if (ms <= 2000) return (420 + ms*0.40) / speedFactor();
+    const t = Math.log(ms/2000) / Math.log(35000/2000);
+    const out = 2600 + Math.pow(t, 0.78) * (12000 - 2600);
+    return out / speedFactor();
+  }
+
+  function timingMapString(){
+    return [
+      `GEN English 5000ms → ${Math.round(scaledGenMs(5000))}ms`,
+      `GRADE OWL 10000ms → ${Math.round(scaledGradeMs(10000))}ms`,
+      `GRADE English 35000ms → ${Math.round(scaledGradeMs(35000))}ms`,
+    ].join("  |  ");
+  }
+
+  // Node hover details
+  const nodeDetails = {
+    airtable:   {title:"Airtable", body:"Human-authored source of truth.\nRecords define the rulebook inputs."},
+    rulebook:   {title:"Rulebook (IR)", body:"Canonical declarative model.\nGenerates artifacts & validates semantics."},
+    postgres:   {title:"PostgreSQL", body:"Canonical compute engine.\nExports answer keys + blank tests per entity."},
+    answerkeys: {title:"answer-keys.json", body:"Expected computed fields.\nGround truth for grading."},
+    blanktests: {title:"blank-tests.json", body:"Same inputs; computed fields blank.\nUsed for each test run."},
+    orchestrator:{title:"Test Orchestrator", body:"Owns test session.\nHands out blank tests, receives answers,\ncompares to answer keys, issues grades."},
+    report:     {title:"Final report", body:"Conformance matrix + health view.\nScores per substrate."},
+    stageSpot:  {title:"Stage", body:"Where the active substrate takes the test."},
+    python:     {title:"Python substrate", body:"Fast deterministic implementation.\n~100ms typical."},
+    golang:     {title:"Golang substrate", body:"Fast deterministic implementation.\n~100ms typical."},
+    xlsx:       {title:"XLSX substrate", body:"Spreadsheet formulas.\nFast-ish deterministic."},
+    csv:        {title:"CSV substrate", body:"Tabular representation.\nMostly fast."},
+    yaml:       {title:"YAML substrate", body:"Schema/config representation.\nFast."},
+    uml:        {title:"UML substrate", body:"Model constraints.\nFast-ish."},
+    binary:     {title:"Binary substrate", body:"Partial coverage.\nLower score."},
+    explaindag: {title:"ExplainDAG substrate", body:"Witnessed derivation graph.\nDeterministic and explainable."},
+    owl:        {title:"OWL substrate", body:"Reasoner-based.\nSlow (~10s) but valuable validation."},
+    english:    {title:"English substrate", body:"LLM-graded / natural language.\nSlowest (30–45s+)."},
+  };
+
+  // Layouts
+  const layoutGenerate = {
+    lanes: [
+      {x:20,y:20,w:1160,h:210,label:"SOURCE → RULEBOOK"},
+      {x:20,y:245,w:500,h:465,label:"ARTIFACTS (schemas/docs/codegen)"},
+      {x:540,y:245,w:640,h:465,label:"EXECUTION SUBSTRATES (generated from rulebook)"},
+    ],
+    nodes: [
+      { id:"airtable", label:"Airtable\nSingle Source of Truth", x:600, y:80, kind:"source" },
+      { id:"rulebook", label:"Effortless Rulebook\n(effortless-rulebook.json)", x:600, y:170, kind:"hub" },
+
+      { id:"schemas", label:"Schemas\n(YAML / types)", x:270, y:370, kind:"artifactSmall" },
+      { id:"codegen", label:"Codegen\n(stubs / libs)", x:270, y:455, kind:"artifactSmall" },
+      { id:"docs", label:"Docs\n(contracts)", x:270, y:540, kind:"artifactSmall" },
+
+      { id:"python", label:"Python", x:1030, y:300, kind:"substrateFast" },
+      { id:"golang", label:"Golang", x:980, y:360, kind:"substrateFast" },
+      { id:"xlsx", label:"XLSX", x:900, y:410, kind:"substrateFast" },
+      { id:"csv", label:"CSV", x:820, y:450, kind:"substrateFast" },
+      { id:"yaml", label:"YAML", x:740, y:480, kind:"substrateFast" },
+      { id:"uml", label:"UML", x:660, y:500, kind:"substrateFast" },
+      { id:"binary", label:"Binary", x:580, y:510, kind:"substratePartial" },
+      { id:"explaindag", label:"ExplainDAG", x:900, y:520, kind:"substrateFast" },
+      { id:"owl", label:"OWL", x:780, y:560, kind:"substrateSlow" },
+      { id:"english", label:"English", x:660, y:590, kind:"substrateSlowest" },
+    ],
+    edges: [
+      ["airtable","rulebook"],
+      ["rulebook","schemas"],["rulebook","codegen"],["rulebook","docs"],
+      ...["python","golang","xlsx","csv","yaml","uml","binary","explaindag","owl","english"].map(id => ["rulebook", id])
+    ],
+    hidden: new Set(["postgres","answerkeys","blanktests","orchestrator","report","stageSpot"])
+  };
+
+  const layoutGrade = {
+    lanes: [
+      {x:20,y:20,w:1160,h:150,label:"GENERATION (collapsed)"},
+      {x:20,y:185,w:560,h:260,label:"PLATFORM ARTIFACTS (generated from rulebook) — Postgres + substrates"},
+      {x:600,y:185,w:580,h:260,label:"TEST ARTIFACTS (from Postgres)"},
+      {x:20,y:455,w:1160,h:265,label:"TEST ORCHESTRATION (center stage)"},
+    ],
+    nodes: [
+      { id:"airtable", label:"Airtable", x:220, y:65, kind:"source" },
+      { id:"rulebook", label:"Rulebook\n(effortless-rulebook.json)", x:500, y:65, kind:"hub" },
+
+      { id:"postgres", label:"PostgreSQL\ncanonical compute engine", x:300, y:285, kind:"postgres" },
+
+      { id:"answerkeys", label:"answer-keys.json\n(per entity)", x:890, y:260, kind:"artifact" },
+      { id:"blanktests", label:"blank-tests.json\n(per entity)", x:890, y:330, kind:"artifact" },
+
+      { id:"orchestrator", label:"Test Orchestrator\n(predict → grade)", x:220, y:560, kind:"process" },
+      { id:"report", label:"Final report\n(conformance matrix)", x:220, y:670, kind:"report" },
+
+      { id:"stageSpot", label:"", x:650, y:575, kind:"stage" },
+
+      // stacked lineup (right)
+      { id:"python", label:"Python", x:1075, y:485, kind:"substrateFast" },
+      { id:"golang", label:"Golang", x:1075, y:525, kind:"substrateFast" },
+      { id:"xlsx", label:"XLSX", x:1075, y:565, kind:"substrateFast" },
+      { id:"csv", label:"CSV", x:1075, y:605, kind:"substrateFast" },
+      { id:"yaml", label:"YAML", x:1075, y:645, kind:"substrateFast" },
+      { id:"uml", label:"UML", x:1075, y:685, kind:"substrateFast" },
+
+      { id:"binary", label:"Binary", x:930, y:485, kind:"substratePartial" },
+      { id:"explaindag", label:"ExplainDAG", x:930, y:525, kind:"substrateFast" },
+      { id:"owl", label:"OWL (slow)", x:930, y:565, kind:"substrateSlow" },
+      { id:"english", label:"English (slowest)", x:930, y:605, kind:"substrateSlowest" },
+    ],
+    edges: [
+      ["airtable","rulebook"],
+      ["rulebook","postgres"],
+      ["postgres","answerkeys"],
+      ["postgres","blanktests"],
+      // both artifacts go to orchestrator (session ownership)
+      ["answerkeys","orchestrator"],
+      ["blanktests","orchestrator"],
+      ["orchestrator","report"],
+    ],
+    hidden: new Set(["schemas","codegen","docs"])
+  };
+
+  // Drawing helpers
+  function nodeStyle(kind){
+    if (kind === "source") return {stroke:"var(--yellow)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "hub") return {stroke:"var(--blue)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "postgres") return {stroke:"#7ee787", fill:"rgba(14,22,33,.95)"};
+    if (kind === "process") return {stroke:"var(--purple)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "report") return {stroke:"var(--blue)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "artifact" || kind === "artifactSmall") return {stroke:"var(--blue)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substrateFast") return {stroke:"var(--green)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substratePartial") return {stroke:"var(--yellow)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substrateSlow") return {stroke:"var(--yellow)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "substrateSlowest") return {stroke:"var(--red)", fill:"rgba(14,22,33,.95)"};
+    if (kind === "stage") return {stroke:"rgba(0,0,0,0)", fill:"rgba(0,0,0,0)"};
+    return {stroke:"var(--stroke)", fill:"rgba(14,22,33,.95)"};
+  }
+
+  function laneRect(x,y,w,h,label){
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    r.setAttribute("x",x); r.setAttribute("y",y);
+    r.setAttribute("width",w); r.setAttribute("height",h);
+    r.setAttribute("rx","16"); r.setAttribute("ry","16");
+    r.setAttribute("fill","rgba(14,22,33,.20)");
+    r.setAttribute("stroke","#182232");
+    r.setAttribute("stroke-dasharray","4 6");
+    const t = document.createElementNS("http://www.w3.org/2000/svg","text");
+    t.setAttribute("x", x+14);
+    t.setAttribute("y", y+22);
+    t.setAttribute("fill","#9aa7b2");
+    t.setAttribute("font-size","12");
+    t.textContent = label;
+    g.appendChild(r); g.appendChild(t);
+    return g;
+  }
+
+  // State
+  let currentLayout = null;
+  let nodeById = {};
+  let tokens = [];
+  let raf = null;
+  let playing = false;
+  let stageIndex = 0;
+  let phase = 1;
+  let scaledRuntimeAccum = 0;
+
+  function now(){ return performance.now(); }
+  function ease(t){ return t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+  function bezier(a,b,c,d,t){
+    const mt=1-t;
+    return mt*mt*mt*a + 3*mt*mt*t*b + 3*mt*t*t*c + t*t*t*d;
+  }
+
+  function addLog(title, msg){
+    const div = document.createElement("div");
+    div.innerHTML = `<span class="t">${title}</span> <span class="m">${msg}</span>`;
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function drawLanes(layout){
+    gLanes.innerHTML = "";
+    layout.lanes.forEach(L => gLanes.appendChild(laneRect(L.x,L.y,L.w,L.h,L.label)));
+  }
+
+  function drawEdges(layout){
+    gEdges.innerHTML = "";
+    layout.edges.forEach(([a,b]) => {
+      if (!nodeById[a] || !nodeById[b]) return;
+      const A = nodeById[a], B = nodeById[b];
+      const p = document.createElementNS("http://www.w3.org/2000/svg","path");
+      const dx = B.x - A.x, dy = B.y - A.y;
+      const cx1 = A.x + dx * 0.15;
+      const cy1 = A.y + dy * 0.55;
+      const cx2 = A.x + dx * 0.85;
+      const cy2 = A.y + dy * 0.55;
+      const d = `M ${A.x} ${A.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${B.x} ${B.y}`;
+      p.setAttribute("d", d);
+      p.setAttribute("fill","none");
+      p.setAttribute("stroke","#2a3a4a");
+      p.setAttribute("stroke-width","2");
+      p.setAttribute("marker-end","url(#arrow)");
+      gEdges.appendChild(p);
+    });
+  }
+
+  function drawNodes(layout){
+    gNodes.innerHTML = "";
+    nodeById = Object.fromEntries(layout.nodes.map(n => [n.id, {...n}]));
+
+    layout.nodes.forEach(n => {
+      if (layout.hidden && layout.hidden.has(n.id)) return;
+
+      const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+      g.setAttribute("data-id", n.id);
+      g.setAttribute("transform", `translate(${n.x},${n.y})`);
+      g.style.cursor = "default";
+
+      if (n.id === "stageSpot"){
+        // invisible anchor for stage
+        gNodes.appendChild(g);
+        return;
+      }
+
+      const w = (n.kind === "postgres") ? 320 :
+                (n.kind === "process" ? 320 :
+                (n.kind === "report" ? 300 :
+                (n.kind === "artifact" ? 270 :
+                (n.kind === "artifactSmall" ? 240 :
+                (n.kind === "hub" ? 300 : 210)))));
+      const h = (n.kind === "artifactSmall") ? 54 : 62;
+
+      const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      rect.setAttribute("x", -w/2);
+      rect.setAttribute("y", -h/2);
+      rect.setAttribute("rx","14");
+      rect.setAttribute("ry","14");
+      rect.setAttribute("width", w);
+      rect.setAttribute("height", h);
+
+      const style = nodeStyle(n.kind);
+      rect.setAttribute("fill", style.fill);
+      rect.setAttribute("stroke", style.stroke);
+      rect.setAttribute("stroke-width","2");
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+      text.setAttribute("text-anchor","middle");
+      text.setAttribute("fill", "#e6edf3");
+      text.setAttribute("font-size","13");
+
+      const lines = n.label.split("\n");
+      lines.forEach((line, i) => {
+        const tspan = document.createElementNS("http://www.w3.org/2000/svg","tspan");
+        tspan.setAttribute("x","0");
+        tspan.setAttribute("dy", i===0 ? "-2" : "16");
+        tspan.textContent = line;
+        text.appendChild(tspan);
+      });
+
+      g.appendChild(rect);
+      g.appendChild(text);
+      gNodes.appendChild(g);
+
+      // Hover expand + detail card
+      g.addEventListener("mouseenter", (ev) => {
+        g.setAttribute("data-hover","1");
+        g.style.transition = "transform 140ms ease";
+        g.setAttribute("transform", `translate(${n.x},${n.y}) scale(1.12)`);
+        showHoverCard(n.id, n.x, n.y);
+      });
+      g.addEventListener("mouseleave", () => {
+        g.setAttribute("data-hover","0");
+        g.setAttribute("transform", `translate(${n.x},${n.y})`);
+        hideHoverCard();
+      });
+      g.addEventListener("mousemove", () => {
+        // keep card anchored to node, not cursor, for stability
+        if (g.getAttribute("data-hover")==="1") showHoverCard(n.id, n.x, n.y);
+      });
+    });
+  }
+
+  function showHoverCard(id, x, y){
+    const d = nodeDetails[id];
+    if (!d) return;
+    gHover.style.display = "block";
+    gHover.innerHTML = "";
+
+    const w = 320, h = 110;
+    const pad = 12;
+    const cx = Math.min(1160 - w/2 - 10, Math.max(40 + w/2, x + 210));
+    const cy = Math.min(720 - h/2 - 10, Math.max(40 + h/2, y));
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("transform", `translate(${cx - w/2},${cy - h/2})`);
+
+    const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    r.setAttribute("x","0"); r.setAttribute("y","0");
+    r.setAttribute("width", w); r.setAttribute("height", h);
+    r.setAttribute("rx","14"); r.setAttribute("ry","14");
+    r.setAttribute("fill","rgba(14,22,33,.96)");
+    r.setAttribute("stroke","var(--stroke)");
+    r.setAttribute("stroke-width","1.5");
+
+    const title = document.createElementNS("http://www.w3.org/2000/svg","text");
+    title.setAttribute("x", pad);
+    title.setAttribute("y", pad+14);
+    title.setAttribute("fill","#e6edf3");
+    title.setAttribute("font-size","13");
+    title.setAttribute("font-weight","700");
+    title.textContent = d.title;
+
+    const body = document.createElementNS("http://www.w3.org/2000/svg","text");
+    body.setAttribute("x", pad);
+    body.setAttribute("y", pad+34);
+    body.setAttribute("fill","#9aa7b2");
+    body.setAttribute("font-size","12");
+    const lines = d.body.split("\n");
+    lines.forEach((ln,i)=>{
+      const t = document.createElementNS("http://www.w3.org/2000/svg","tspan");
+      t.setAttribute("x", pad);
+      t.setAttribute("dy", i===0 ? "0" : "16");
+      t.textContent = ln;
+      body.appendChild(t);
+    });
+
+    g.appendChild(r);
+    g.appendChild(title);
+    g.appendChild(body);
+    gHover.appendChild(g);
+  }
+  function hideHoverCard(){
+    gHover.style.display = "none";
+    gHover.innerHTML = "";
+  }
+
+  // Tokens: slow == longer duration, so movement is slower.
+  function spawnToken(fromId, toId, color, label, dur){
+    if (!nodeById[fromId] || !nodeById[toId]) return;
+    const A = nodeById[fromId], B = nodeById[toId];
+    const token = {fromId,toId,color,label,start:now(),dur,done:false,el:null};
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+    const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("r","10");
+    c.setAttribute("fill", color);
+    c.setAttribute("filter","url(#glow)");
+
+    const tx = document.createElementNS("http://www.w3.org/2000/svg","text");
+    tx.setAttribute("text-anchor","middle");
+    tx.setAttribute("y","4");
+    tx.setAttribute("fill","#0b0f14");
+    tx.setAttribute("font-size","10");
+    tx.setAttribute("font-weight","700");
+    tx.textContent = label;
+
+    g.appendChild(c); g.appendChild(tx);
+    gTokens.appendChild(g);
+    token.el = g;
+
+    token.update = () => {
+      const pRaw = (now() - token.start) / token.dur;
+      const p = Math.max(0, Math.min(1, pRaw));
+      const e = ease(p);
+
+      const dx = B.x - A.x, dy = B.y - A.y;
+      const P0 = {x:A.x,y:A.y};
+      const P1 = {x:A.x + dx*0.20, y:A.y + dy*0.55};
+      const P2 = {x:A.x + dx*0.80, y:A.y + dy*0.55};
+      const P3 = {x:B.x,y:B.y};
+
+      const x = bezier(P0.x,P1.x,P2.x,P3.x,e);
+      const y = bezier(P0.y,P1.y,P2.y,P3.y,e);
+
+      token.el.setAttribute("transform", `translate(${x},${y})`);
+
+      if (pRaw >= 1 && !token.done){
+        token.done = true;
+        c.setAttribute("r","12");
+        setTimeout(() => { if (g.parentNode) g.parentNode.removeChild(g); }, 160);
+      }
+    };
+
+    tokens.push(token);
+  }
+
+  function tick(){
+    tokens.forEach(t => t.update && t.update());
+    tokens = tokens.filter(t => !t.done);
+    if (playing) raf = requestAnimationFrame(tick);
+  }
+
+  function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+  // Tween node positions for “step onto stage”
+  function getNodeEl(id){
+    return [...gNodes.querySelectorAll("g")].find(el => el.getAttribute("data-id") === id);
+  }
+  function setNodePos(id, x, y){
+    if (!nodeById[id]) return;
+    nodeById[id].x = x; nodeById[id].y = y;
+    const el = getNodeEl(id);
+    if (el) el.setAttribute("transform", `translate(${x},${y})`);
+  }
+  function tweenNode(id, toX, toY, dur){
+    return new Promise(resolve => {
+      if (!nodeById[id]) return resolve();
+      const fromX = nodeById[id].x, fromY = nodeById[id].y;
+      const start = now();
+      const step = () => {
+        const p = Math.min(1, (now()-start)/dur);
+        const e = ease(p);
+        setNodePos(id, fromX + (toX-fromX)*e, fromY + (toY-fromY)*e);
+        if (p < 1) requestAnimationFrame(step);
+        else resolve();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  async function transitionTo(layoutNext){
+    const prev = currentLayout;
+    const next = layoutNext;
+
+    drawLanes(next);
+    gEdges.innerHTML = "";
+
+    const prevIds = new Set(prev.nodes.map(n=>n.id));
+    const nextIds = new Set(next.nodes.map(n=>n.id));
+    const willHide = new Set(next.hidden ? [...next.hidden] : []);
+
+    // tween shared
+    const shared = [...nextIds].filter(id => prevIds.has(id));
+    const sharedTweens = shared.map(id => {
+      const target = next.nodes.find(n=>n.id===id);
+      return tweenNode(id, target.x, target.y, 650/speedFactor());
+    });
+
+    // remove nodes that disappear
+    const toRemove = [...prevIds].filter(id => !nextIds.has(id) || willHide.has(id));
+    toRemove.forEach(id => {
+      const el = getNodeEl(id);
+      if (el){
+        el.style.transition = "opacity 260ms ease";
+        el.style.opacity = "0";
+        setTimeout(()=> { if (el.parentNode) el.parentNode.removeChild(el); }, 280);
+      }
+      delete nodeById[id];
+    });
+
+    // add new nodes
+    const toAdd = next.nodes.filter(n => !prevIds.has(n.id) && !(next.hidden && next.hidden.has(n.id)));
+    toAdd.forEach(n => {
+      nodeById[n.id] = {...n};
+      const g = document.createElementNS("http://www.w3.org/2000/svg","g");
+      g.setAttribute("data-id", n.id);
+      g.setAttribute("transform", `translate(${n.x},${n.y-18})`);
+      g.style.opacity = "0";
+
+      if (n.id === "stageSpot"){
+        gNodes.appendChild(g);
+        requestAnimationFrame(() => {
+          g.style.transition = "opacity 250ms ease, transform 650ms cubic-bezier(.2,.9,.2,1)";
+          g.style.opacity = "1";
+          g.setAttribute("transform", `translate(${n.x},${n.y})`);
+        });
+        return;
+      }
+
+      const w = (n.kind === "postgres") ? 320 :
+                (n.kind === "process" ? 320 :
+                (n.kind === "report" ? 300 :
+                (n.kind === "artifact" ? 270 :
+                (n.kind === "artifactSmall" ? 240 :
+                (n.kind === "hub" ? 300 : 210)))));
+      const h = (n.kind === "artifactSmall") ? 54 : 62;
+
+      const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      rect.setAttribute("x", -w/2);
+      rect.setAttribute("y", -h/2);
+      rect.setAttribute("rx","14");
+      rect.setAttribute("ry","14");
+      rect.setAttribute("width", w);
+      rect.setAttribute("height", h);
+
+      const style = nodeStyle(n.kind);
+      rect.setAttribute("fill", style.fill);
+      rect.setAttribute("stroke", style.stroke);
+      rect.setAttribute("stroke-width","2");
+
+      const text = document.createElementNS("http://www.w3.org/2000/svg","text");
+      text.setAttribute("text-anchor","middle");
+      text.setAttribute("fill", "#e6edf3");
+      text.setAttribute("font-size","13");
+
+      const lines = n.label.split("\n");
+      lines.forEach((line, i) => {
+        const tspan = document.createElementNS("http://www.w3.org/2000/svg","tspan");
+        tspan.setAttribute("x","0");
+        tspan.setAttribute("dy", i===0 ? "-2" : "16");
+        tspan.textContent = line;
+        text.appendChild(tspan);
+      });
+
+      g.appendChild(rect);
+      g.appendChild(text);
+      gNodes.appendChild(g);
+
+      requestAnimationFrame(() => {
+        g.style.transition = "opacity 300ms ease, transform 650ms cubic-bezier(.2,.9,.2,1)";
+        g.style.opacity = "1";
+        g.setAttribute("transform", `translate(${n.x},${n.y})`);
+      });
+    });
+
+    await Promise.all(sharedTweens);
+
+    // refresh positions
+    next.nodes.forEach(n => {
+      if (nodeById[n.id]) nodeById[n.id] = {...nodeById[n.id], ...n};
+    });
+
+    drawEdges(next);
+    currentLayout = next;
+  }
+
+  // Live lines between nodes (updated continuously while visible)
+  function makeLiveLine(id, color){
+    const p = document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("id", id);
+    p.setAttribute("fill","none");
+    p.setAttribute("stroke", color);
+    p.setAttribute("stroke-width","3");
+    p.setAttribute("stroke-linecap","round");
+    p.setAttribute("stroke-dasharray","6 6");
+    p.setAttribute("opacity","0.9");
+    gLive.appendChild(p);
+    return p;
+  }
+  function setLiveLinePath(p, A, B){
+    const dx = B.x - A.x, dy = B.y - A.y;
+    const cx1 = A.x + dx*0.15;
+    const cy1 = A.y + dy*0.55;
+    const cx2 = A.x + dx*0.85;
+    const cy2 = A.y + dy*0.55;
+    p.setAttribute("d", `M ${A.x} ${A.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${B.x} ${B.y}`);
+  }
+  function removeLiveLine(p){
+    if (!p) return;
+    p.style.transition = "opacity 180ms ease";
+    p.setAttribute("opacity","0");
+    setTimeout(()=>{ if (p.parentNode) p.parentNode.removeChild(p); }, 200);
+  }
+
+  // Stage worksheet (2x2-ish box) with progress fill
+  function showWorksheet(activeId, progress01){
+    gWorksheet.innerHTML = "";
+    if (!nodeById["stageSpot"] || !nodeById[activeId]) return;
+
+    const stage = nodeById["stageSpot"];
+    const w = 170, h = 170; // ~2x2 visual "inches" relative
+    const x = stage.x - w/2 - 10;
+    const y = stage.y - h/2 - 90;
+
+    const outer = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    outer.setAttribute("x", x);
+    outer.setAttribute("y", y);
+    outer.setAttribute("width", w);
+    outer.setAttribute("height", h);
+    outer.setAttribute("rx","16"); outer.setAttribute("ry","16");
+    outer.setAttribute("fill","rgba(14,22,33,.92)");
+    outer.setAttribute("stroke","var(--stroke)");
+    outer.setAttribute("stroke-width","2");
+
+    const title = document.createElementNS("http://www.w3.org/2000/svg","text");
+    title.setAttribute("x", x+12);
+    title.setAttribute("y", y+22);
+    title.setAttribute("fill","#e6edf3");
+    title.setAttribute("font-size","12");
+    title.setAttribute("font-weight","700");
+    title.textContent = `Taking test: ${activeId}`;
+
+    const sub = document.createElementNS("http://www.w3.org/2000/svg","text");
+    sub.setAttribute("x", x+12);
+    sub.setAttribute("y", y+40);
+    sub.setAttribute("fill","#9aa7b2");
+    sub.setAttribute("font-size","11");
+    sub.textContent = "Filling computed fields…";
+
+    // progress bar
+    const barBg = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    barBg.setAttribute("x", x+12);
+    barBg.setAttribute("y", y+54);
+    barBg.setAttribute("width", w-24);
+    barBg.setAttribute("height", 12);
+    barBg.setAttribute("rx","6"); barBg.setAttribute("ry","6");
+    barBg.setAttribute("fill","rgba(11,15,20,.9)");
+    barBg.setAttribute("stroke","var(--stroke)");
+
+    const bar = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    bar.setAttribute("x", x+12);
+    bar.setAttribute("y", y+54);
+    bar.setAttribute("width", Math.max(2, (w-24)*progress01));
+    bar.setAttribute("height", 12);
+    bar.setAttribute("rx","6"); bar.setAttribute("ry","6");
+    const col = (activeId==="english") ? "var(--red)" : (activeId==="owl") ? "var(--yellow)" : "var(--green)";
+    bar.setAttribute("fill", col);
+
+    // scribble lines
+    const scribbleCount = 6;
+    for (let i=0;i<scribbleCount;i++){
+      const ln = document.createElementNS("http://www.w3.org/2000/svg","line");
+      ln.setAttribute("x1", x+14);
+      ln.setAttribute("x2", x + 14 + (w-28) * (0.35 + 0.65*progress01));
+      ln.setAttribute("y1", y+78 + i*14);
+      ln.setAttribute("y2", y+78 + i*14);
+      ln.setAttribute("stroke", "rgba(230,237,243,.55)");
+      ln.setAttribute("stroke-width", "2");
+      ln.setAttribute("stroke-linecap","round");
+      gWorksheet.appendChild(ln);
+    }
+
+    gWorksheet.appendChild(outer);
+    gWorksheet.appendChild(title);
+    gWorksheet.appendChild(sub);
+    gWorksheet.appendChild(barBg);
+    gWorksheet.appendChild(bar);
+  }
+  function hideWorksheet(){ gWorksheet.innerHTML = ""; }
+
+  // Badge
+  function updateBadge(){
+    if (phase === 1){
+      badgeTitle.textContent = "Phase 1 — Generate";
+      badgeSub.textContent = "Airtable → Rulebook → artifacts + substrates (testing hidden). English generation visibly slower.";
+    } else {
+      badgeTitle.textContent = "Phase 2 — Grade";
+      badgeSub.textContent = "Orchestrator owns blank tests. During a test, the blank extends to the taker; completed answers return for grading.";
+    }
+  }
+
+  // Tokens engine
+  function startRafIfNeeded(){
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Story
+  // ---------------------------------------------------------------------------
+  const BASE = () => 900 / speedFactor();
+
+  async function phase1Generate(){
+    phase = 1; updateBadge();
+    timingMapEl.textContent = timingMapString();
+
+    addLog("1.", "Airtable → Rulebook (canonical IR).");
+    spawnToken("airtable","rulebook","var(--blue)","IR", BASE()*0.9);
+    await wait(BASE()*1.0);
+
+    addLog("2.", "Rulebook generates artifacts + substrates (English is slow here).");
+    ["schemas","codegen","docs"].forEach((id,i)=>{
+      setTimeout(()=> spawnToken("rulebook", id, "var(--purple)", "gen", BASE()*0.75), i*80);
+    });
+    substrateOrder.forEach((id,i)=>{
+      setTimeout(()=> spawnToken("rulebook", id, "var(--blue)", "→", BASE()*0.85), 280 + i*55);
+    });
+    await wait(BASE()*1.2);
+
+    for (const id of substrateOrder){
+      const dur = scaledGenMs(genMs[id]);
+      addLog("•", `Generate ${id} (~${Math.round(dur)}ms).`);
+      // slow generation = slow moving token (not pulses)
+      spawnToken("rulebook", id,
+        (id==="english") ? "var(--red)" : (id==="owl") ? "var(--yellow)" : "var(--green)",
+        "…", Math.max(350, dur)
+      );
+      await wait(Math.min(650, dur*0.20)); // overlap generation visuals slightly
+    }
+
+    addLog("✓", "Generation complete. Transition to grading story…");
+    await wait(BASE()*0.8);
+  }
+
+  async function phase2Grade(){
+    phase = 2; updateBadge();
+    timingMapEl.textContent = timingMapString();
+
+    addLog("3.", "Reveal grading pipeline; substrates stack on the right.");
+    await transitionTo(layoutGrade);
+    await wait(BASE()*0.5);
+
+    addLog("4.", "Rulebook → Postgres (canonical compute).");
+    spawnToken("rulebook","postgres","var(--green)","SQL", BASE()*0.95);
+    await wait(BASE()*0.85);
+
+    addLog("5.", "Postgres emits answer-keys and blank-tests; both go to the orchestrator (session ownership).");
+    // show flow to artifacts, then to orchestrator
+    spawnToken("postgres","answerkeys","var(--blue)","OK", BASE()*0.8);
+    spawnToken("postgres","blanktests","var(--blue)","∅", BASE()*0.8);
+    await wait(BASE()*0.8);
+    spawnToken("answerkeys","orchestrator","var(--blue)","OK", BASE()*0.7);
+    spawnToken("blanktests","orchestrator","var(--blue)","∅", BASE()*0.7);
+    await wait(BASE()*1.0);
+
+    const lineupPos = {};
+    substrateOrder.forEach(id => lineupPos[id] = {x: nodeById[id].x, y: nodeById[id].y});
+    const stageSpot = nodeById["stageSpot"];
+
+    addLog("6.", "Pipeline: as one returns, the next steps onto the stage.");
+    const pendingReturns = [];
+
+    for (let i=0; i<substrateOrder.length; i++){
+      const id = substrateOrder[i];
+
+      // Approach: if previous is returning, we overlap here.
+      await tweenNode(id, stageSpot.x, stageSpot.y, 520/speedFactor());
+
+      // Take test + grade
+      const returnPromise = runTestAndReturn(id, lineupPos[id], stageSpot);
+      pendingReturns.push(returnPromise);
+
+      // IMPORTANT: do NOT wait for return before starting next approach.
+      // We wait only until grading has started the return (runTestAndReturn handles that).
+      // Small beat so motion doesn't feel instant-cut.
+      await wait(120/speedFactor());
+    }
+
+    await Promise.all(pendingReturns);
+
+    addLog("7.", "Final report assembled.");
+    spawnToken("orchestrator","report","var(--blue)","R", BASE()*0.9);
+    await wait(BASE()*0.9);
+    addLog("Done.", "v2.3 complete.");
+  }
+
+  async function runTestAndReturn(id, home, stageSpot){
+    const durTake = scaledGradeMs(realMs[id]); // slow means slow motion & slow worksheet
+
+    // Live line: orchestrator extends blank test to taker DURING taking.
+    const blankLine = makeLiveLine(`blankLine-${id}`, "rgba(88,166,255,.95)");
+    const answerLine = makeLiveLine(`answerLine-${id}`, (id==="english") ? "rgba(255,123,114,.95)" : "rgba(126,231,135,.95)");
+    answerLine.setAttribute("opacity","0"); // hidden until submit
+
+    // Update live line geometry during the test
+    let live = true;
+    const liveLoop = () => {
+      if (!live) return;
+      // blank line from blanktests node to taker (current position)
+      const A = nodeById["blanktests"];
+      const B = nodeById[id];
+      setLiveLinePath(blankLine, A, B);
+      // answer line from taker to orchestrator once visible
+      if (answerLine.getAttribute("opacity") !== "0"){
+        const C = nodeById["orchestrator"];
+        setLiveLinePath(answerLine, B, C);
+      }
+      requestAnimationFrame(liveLoop);
+    };
+    requestAnimationFrame(liveLoop);
+
+    addLog("•", `${id} taking test (slow = slow motion): ~${Math.round(durTake)}ms`);
+    // Also move a “blank” token slowly from blanktests to taker (motion duration == a chunk of runtime)
+    spawnToken("blanktests", id, "var(--blue)", "∅", Math.max(350, durTake*0.35));
+
+    // Worksheet progress animation
+    const start = now();
+    while (now() - start < durTake){
+      const p = Math.min(1, (now()-start)/durTake);
+      showWorksheet(id, p);
+      await wait(60); // UI tick
+    }
+    hideWorksheet();
+
+    // Submit answers: show answer line and move the completed test slowly to orchestrator
+    answerLine.setAttribute("opacity","0.9");
+    spawnToken(id, "orchestrator", "var(--blue)", "A", Math.max(350, durTake*0.25));
+
+    // Orchestrator grades against answer-key (short)
+    spawnToken("answerkeys", "orchestrator", "var(--blue)", "OK", 420/speedFactor());
+    await wait(520/speedFactor());
+
+    const pass = isPassing(id);
+    spawnToken("orchestrator", id, pass ? "var(--green)" : "var(--yellow)", pass ? "✓" : "△", 420/speedFactor());
+
+    if (id === "owl") addLog("!", "OWL: slower but deterministic validation.");
+    if (id === "english") addLog("!!!", "English: slowest and last — this is the usual approach cost made visible.");
+
+    // Stop live lines
+    live = false;
+    removeLiveLine(blankLine);
+    removeLiveLine(answerLine);
+
+    // Return to line (this runs concurrently with the next taker approaching)
+    await tweenNode(id, home.x, home.y, 520/speedFactor());
+  }
+
+  // ---------------------------------------------------------------------------
+  // Controls
+  // ---------------------------------------------------------------------------
+  document.getElementById("gear").addEventListener("click", ()=> drawer.classList.toggle("open"));
+
+  function resetAll(){
+    playing = false;
+    if (raf) cancelAnimationFrame(raf);
+    raf = null;
+    tokens = [];
+    stageIndex = 0;
+    scaledRuntimeAccum = 0;
+    logEl.innerHTML = "";
+    gTokens.innerHTML = "";
+    gLive.innerHTML = "";
+    gWorksheet.innerHTML = "";
+    hideHoverCard();
+
+    currentLayout = layoutGenerate;
+    drawLanes(currentLayout);
+    drawNodes(currentLayout);
+    drawEdges(currentLayout);
+
+    phase = 1;
+    updateBadge();
+    timingMapEl.textContent = timingMapString();
+
+    addLog("Reset.", "Ready.");
+  }
+
+  async function stepOnce(){
+    if (playing) return;
+    startRafIfNeeded();
+
+    if (stageIndex === 0){
+      stageIndex++;
+      await phase1Generate();
+      return;
+    }
+    if (stageIndex === 1){
+      stageIndex++;
+      await phase2Grade();
+      return;
+    }
+    addLog("Done.", "Storyboard complete. Reset to replay.");
+  }
+
+  async function playAll(){
+    if (playing) return;
+    playing = true;
+    startRafIfNeeded();
+
+    if (stageIndex === 0){
+      stageIndex = 1;
+      await phase1Generate();
+    }
+    if (stageIndex === 1){
+      stageIndex = 2;
+      await phase2Grade();
+    }
+
+    playing = false;
+  }
+
+  document.getElementById("reset").addEventListener("click", resetAll);
+  document.getElementById("step").addEventListener("click", stepOnce);
+  document.getElementById("play").addEventListener("click", playAll);
+  speedSel.addEventListener("change", ()=>{
+    timingMapEl.textContent = timingMapString();
+    addLog("Speed.", `Set to ${speedSel.options[speedSel.selectedIndex].text}.`);
+  });
+
+  // Initial render
+  function init(){
+    resetAll();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

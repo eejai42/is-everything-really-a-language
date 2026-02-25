@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effortless Rulebook Architecture</title>
+    <style>
+:root {
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --bg-tertiary: #334155;
+    --bg-card: #1E293B;
+    --text-primary: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --border-color: #334155;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    --radius: 8px;
+    --radius-sm: 4px;
+    --hub-gradient: linear-gradient(135deg, #4F46E5, #7C3AED);
+    --ssot-gradient: linear-gradient(135deg, #FCBF49, #F77F00);
+    --foundation-gradient: linear-gradient(135deg, #336791, #264d73);
+    --glow-hub: 0 0 30px rgba(79, 70, 229, 0.4);
+    --glow-ssot: 0 0 20px rgba(252, 191, 73, 0.3);
+    --glow-foundation: 0 0 25px rgba(51, 103, 145, 0.5);
+}
+
+[data-theme="light"] {
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #E2E8F0;
+    --bg-card: #FFFFFF;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --text-muted: #94A3B8;
+    --border-color: #E2E8F0;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+}
+
+header {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.25rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    height: 32px;
+}
+
+.header-title h1 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #4F46E5, #7C3AED, #EC4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.header-controls { display: flex; gap: 0.4rem; align-items: center; }
+
+.toggle-btn {
+    padding: 0.1rem 0.35rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 0.55rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.toggle-btn.active { background: linear-gradient(135deg, #4F46E5, #7C3AED); color: white; border-color: transparent; }
+
+#theme-toggle {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    cursor: pointer;
+    font-size: 0.7rem;
+    display: flex; align-items: center; justify-content: center;
+}
+
+main {
+    padding: 0.3rem 0.5rem;
+    padding-top: 36px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    overflow: hidden;
+}
+
+.ssot-row { display: flex; justify-content: center; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+
+.ssot-box {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius);
+    background: var(--ssot-gradient);
+    color: #000;
+    box-shadow: var(--glow-ssot);
+}
+
+.ssot-box h2 { font-size: 0.7rem; font-weight: 700; }
+.ssot-box .sublabel { font-size: 0.45rem; opacity: 0.7; }
+
+.carousel-btn {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.2);
+    color: inherit;
+    cursor: pointer;
+    font-size: 0.55rem;
+    display: flex; align-items: center; justify-content: center;
+}
+.carousel-btn:hover { background: rgba(255,255,255,0.4); }
+
+.flow-arrow { color: var(--text-muted); font-size: 0.8rem; text-align: center; }
+
+.hub-row { display: flex; justify-content: center; flex-shrink: 0; }
+
+.hub-box {
+    padding: 0.35rem 1rem;
+    border-radius: var(--radius);
+    background: var(--hub-gradient);
+    color: white;
+    text-align: center;
+    box-shadow: var(--glow-hub);
+}
+
+.hub-box h2 { font-size: 0.75rem; font-weight: 700; }
+.hub-box .sublabel { font-size: 0.5rem; opacity: 0.8; font-family: monospace; }
+
+.categories-container {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    overflow-y: auto;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+    border: 1px solid var(--border-color);
+}
+
+.category-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.4rem 0.5rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    min-width: 12Mke5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.category-group:hover {
+    background: var(--bg-secondary);
+    transform: scale(1.02);
+}
+
+.category-group .cat-label {
+    font-size: 0.5rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.category-group .substrate-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+}
+
+.category-group .sub-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.category-group .sub-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    margin-top: 0.15rem;
+}
+
+.category-group.implemented {
+    border-color: #10B981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.2);
+}
+
+.category-group.implemented .cat-label {
+    color: #10B981;
+}
+
+.foundation-row { display: flex; justify-content: center; flex-shrink: 0; padding-top: 0.15rem; }
+
+.foundation-box {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 1.2rem;
+    border-radius: var(--radius);
+    background: var(--foundation-gradient);
+    color: white;
+    box-shadow: var(--glow-foundation);
+    border-top: 3px solid rgba(255,255,255,0.2);
+}
+
+.foundation-box h2 { font-size: 0.8rem; font-weight: 700; }
+.foundation-box .sublabel { font-size: 0.5rem; opacity: 0.8; font-family: monospace; }
+.foundation-box .carousel-btn { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); }
+
+.stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.15rem 0.4rem;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.stat-item { display: flex; align-items: center; gap: 0.2rem; }
+.stat-value { font-size: 0.6rem; font-weight: 700; }
+.stat-label { font-size: 0.4rem; color: var(--text-muted); text-transform: uppercase; }
+
+.stat-value.implemented { color: #10B981; }
+.stat-value.potential { color: var(--text-secondary); }
+.stat-value.selected { color: #8B5CF6; }
+.stat-value.ready { color: #F59E0B; }
+
+.llm-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    pointer-events: none;
+    z-index: 100;
+    transition: clip-path 0.05s ease-out;
+}
+
+.llm-window {
+    position: fixed;
+    border: 2px solid #EF4444;
+    border-radius: var(--radius-sm);
+    cursor: move;
+    z-index: 101;
+    background: transparent;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.llm-window-header {
+    position: absolute;
+    top: -16px; left: 0;
+    background: #EF4444;
+    color: white;
+    padding: 1px 5px;
+    border-radius: 2px 2px 0 0;
+    font-size: 0.45rem;
+    font-weight: 600;
+}
+
+.llm-window-counter {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #EF4444;
+    color: white;
+    padding: 1px 5px;
+    border-radius: 0 0 2px 2px;
+    font-size: 0.45rem;
+    font-weight: 600;
+}
+
+.llm-overlay.hidden, .llm-window.hidden { display: none; }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-title">
+            <h1>Effortless Rulebook Architecture</h1>
+        </div>
+        <div class="header-controls">
+            <button class="toggle-btn" id="implemented-toggle">Implemented</button>
+            <button class="toggle-btn" id="llm-toggle">LLM Window</button>
+            <button id="theme-toggle">
+                <span class="sun" style="display:none;">☀</span>
+                <span class="moon">☾</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="ssot-row">
+            <div class="ssot-box" id="ssot-box">
+                <button class="carousel-btn" id="ssot-prev">‹</button>
+                <div>
+                    <h2 id="ssot-label">Airtable</h2>
+                    <div class="sublabel">Single Source of Truth</div>
+                </div>
+                <button class="carousel-btn" id="ssot-next">›</button>
+            </div>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+
+        <div class="hub-row">
+            <div class="hub-box" id="hub-box">
+                <h2 id="hub-label">Effortless Rulebook</h2>
+                <div class="sublabel" id="hub-sublabel">effortless-rulebook.json</div>
+            </div>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+
+        <div class="categories-container" id="categories-container"></div>
+
+        <div class="flow-arrow">↓</div>
+
+        <div class="foundation-row">
+            <div class="foundation-box" id="foundation-box">
+                <button class="carousel-btn" id="foundation-prev">‹</button>
+                <div>
+                    <h2 id="foundation-label">PostgreSQL</h2>
+                    <div class="sublabel">Tables + calc_*() Functions + Views</div>
+                </div>
+                <button class="carousel-btn" id="foundation-next">›</button>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value implemented" id="stat-implemented">0</div>
+                <div class="stat-label">Implemented</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value potential" id="stat-potential">0</div>
+                <div class="stat-label">Potential</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value selected" id="stat-in-arrangement">0</div>
+                <div class="stat-label">Substrates</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value ready" id="stat-arrangement-implemented">0</div>
+                <div class="stat-label">Categories</div>
+            </div>
+        </div>
+    </main>
+
+    <div class="llm-overlay hidden" id="llm-overlay"></div>
+    <div class="llm-window hidden" id="llm-window">
+        <div class="llm-window-header">LLM Context</div>
+        <div class="llm-window-counter" id="llm-counter">0/0</div>
+    </div>
+
+    <script>
+// Embedded config - works without server
+var config = {
+  "hub": { "label": "Effortless Rulebook", "sublabel": "effortless-rulebook.json" },
+  "layers": {
+    "ssot": {
+      "active": "airtable",
+      "options": [
+        { "id": "airtable", "label": "Airtable", "implemented": true, "color": "#FCBF49", "gradientEnd": "#F77F00" },
+        { "id": "notion", "label": "Notion", "implemented": false, "color": "#000000", "gradientEnd": "#F3F3F3" },
+        { "id": "google-sheets", "label": "Google Sheets", "implemented": false, "color": "#34A853", "gradientEnd": "#1E7E34" },
+        { "id": "baserow", "label": "Baserow", "implemented": false, "color": "#5190EF", "gradientEnd": "#3B6FCF" },
+        { "id": "coda", "label": "Coda", "implemented": false, "color": "#F46A54", "gradientEnd": "#D44A34" }
+      ]
+    },
+    "foundation": {
+      "active": "postgresql",
+      "options": [
+        { "id": "postgresql", "label": "PostgreSQL", "implemented": true, "color": "#336791", "gradientEnd": "#264d73" },
+        { "id": "sqlserver", "label": "SQL Server", "implemented": false, "color": "#CC2927", "gradientEnd": "#9A1F1D" },
+        { "id": "duckdb", "label": "DuckDB", "implemented": false, "color": "#FFC107", "gradientEnd": "#E0A800" },
+        { "id": "sqlite", "label": "SQLite", "implemented": false, "color": "#003B57", "gradientEnd": "#002537" },
+        { "id": "mysql", "label": "MySQL", "implemented": false, "color": "#4479A1", "gradientEnd": "#336180" }
+      ]
+    }
+  },
+  "categories": [
+    { "id": "backend", "name": "Backend", "icon": "⚙️", "color": "#3B82F6" },
+    { "id": "frontend", "name": "Frontend", "icon": "🖥️", "color": "#8B5CF6" },
+    { "id": "mobile", "name": "Mobile", "icon": "📱", "color": "#06B6D4" },
+    { "id": "data", "name": "Data Formats", "icon": "📊", "color": "#10B981" },
+    { "id": "api", "name": "APIs", "icon": "🔌", "color": "#EC4899" },
+    { "id": "semantic", "name": "Semantic", "icon": "🧠", "color": "#F59E0B" },
+    { "id": "docs", "name": "Documentation", "icon": "📚", "color": "#84CC16" },
+    { "id": "infra", "name": "Infrastructure", "icon": "🏗️", "color": "#7C3AED" },
+    { "id": "testing", "name": "Testing", "icon": "🧪", "color": "#EF4444" },
+    { "id": "security", "name": "Security", "icon": "🔒", "color": "#64748B" },
+    { "id": "messaging", "name": "Messaging", "icon": "📬", "color": "#F97316" },
+    { "id": "storage", "name": "Storage", "icon": "💾", "color": "#0EA5E9" }
+  ],
+  "substrates": [
+    { "id": "python", "label": "Python", "category": "backend", "implemented": true, "icon": "🐍" },
+    { "id": "golang", "label": "Go", "category": "backend", "implemented": true, "icon": "🔷" },
+    { "id": "rust", "label": "Rust", "category": "backend", "implemented": false, "icon": "🦀" },
+    { "id": "java", "label": "Java", "category": "backend", "implemented": false, "icon": "☕" },
+    { "id": "nodejs", "label": "Node.js", "category": "backend", "implemented": false, "icon": "💚" },
+    { "id": "csharp", "label": "C#", "category": "backend", "implemented": false, "icon": "🟣" },
+    { "id": "react", "label": "React", "category": "frontend", "implemented": false, "icon": "⚛️" },
+    { "id": "vue", "label": "Vue", "category": "frontend", "implemented": false, "icon": "💚" },
+    { "id": "angular", "label": "Angular", "category": "frontend", "implemented": false, "icon": "🅰️" },
+    { "id": "svelte", "label": "Svelte", "category": "frontend", "implemented": false, "icon": "🔥" },
+    { "id": "htmx", "label": "HTMX", "category": "frontend", "implemented": false, "icon": "🔄" },
+    { "id": "swift", "label": "iOS", "category": "mobile", "implemented": false, "icon": "🍎" },
+    { "id": "kotlin", "label": "Android", "category": "mobile", "implemented": false, "icon": "🤖" },
+    { "id": "flutter", "label": "Flutter", "category": "mobile", "implemented": false, "icon": "🦋" },
+    { "id": "reactnative", "label": "RN", "category": "mobile", "implemented": false, "icon": "📱" },
+    { "id": "json", "label": "JSON", "category": "data", "implemented": false, "icon": "{}" },
+    { "id": "yaml", "label": "YAML", "category": "data", "implemented": true, "icon": "📋" },
+    { "id": "csv", "label": "CSV", "category": "data", "implemented": true, "icon": "📄" },
+    { "id": "xlsx", "label": "Excel", "category": "data", "implemented": true, "icon": "📗" },
+    { "id": "xml", "label": "XML", "category": "data", "implemented": false, "icon": "📰" },
+    { "id": "graphql", "label": "GraphQL", "category": "api", "implemented": true, "icon": "◈" },
+    { "id": "rest", "label": "REST", "category": "api", "implemented": false, "icon": "🌐" },
+    { "id": "grpc", "label": "gRPC", "category": "api", "implemented": false, "icon": "🔌" },
+    { "id": "websocket", "label": "WebSocket", "category": "api", "implemented": false, "icon": "🔗" },
+    { "id": "owl", "label": "OWL", "category": "semantic", "implemented": true, "icon": "🦉" },
+    { "id": "rdf", "label": "RDF", "category": "semantic", "implemented": true, "icon": "🔗" },
+    { "id": "jsonld", "label": "JSON-LD", "category": "semantic", "implemented": false, "icon": "🏷️" },
+    { "id": "sparql", "label": "SPARQL", "category": "semantic", "implemented": false, "icon": "🔍" },
+    { "id": "english", "label": "English", "category": "docs", "implemented": true, "icon": "📖" },
+    { "id": "uml", "label": "UML", "category": "docs", "implemented": true, "icon": "📊" },
+    { "id": "explain-dag", "label": "DAG", "category": "docs", "implemented": true, "icon": "🌳" },
+    { "id": "markdown", "label": "Markdown", "category": "docs", "implemented": false, "icon": "📝" },
+    { "id": "swagger", "label": "Swagger", "category": "docs", "implemented": false, "icon": "📗" },
+    { "id": "docker", "label": "Docker", "category": "infra", "implemented": false, "icon": "🐳" },
+    { "id": "kubernetes", "label": "K8s", "category": "infra", "implemented": false, "icon": "☸️" },
+    { "id": "terraform", "label": "Terraform", "category": "infra", "implemented": false, "icon": "🏗️" },
+    { "id": "github-actions", "label": "GH Actions", "category": "infra", "implemented": false, "icon": "🐙" },
+    { "id": "jest", "label": "Jest", "category": "testing", "implemented": false, "icon": "🃏" },
+    { "id": "pytest", "label": "pytest", "category": "testing", "implemented": false, "icon": "🐍" },
+    { "id": "cypress", "label": "Cypress", "category": "testing", "implemented": false, "icon": "🌲" },
+    { "id": "playwright", "label": "Playwright", "category": "testing", "implemented": false, "icon": "🎭" },
+    { "id": "oauth", "label": "OAuth", "category": "security", "implemented": false, "icon": "🔐" },
+    { "id": "jwt", "label": "JWT", "category": "security", "implemented": false, "icon": "🎫" },
+    { "id": "rbac", "label": "RBAC", "category": "security", "implemented": false, "icon": "👥" },
+    { "id": "kafka", "label": "Kafka", "category": "messaging", "implemented": false, "icon": "📬" },
+    { "id": "rabbitmq", "label": "RabbitMQ", "category": "messaging", "implemented": false, "icon": "🐰" },
+    { "id": "sqs", "label": "SQS", "category": "messaging", "implemented": false, "icon": "📨" },
+    { "id": "redis", "label": "Redis", "category": "storage", "implemented": false, "icon": "🔴" },
+    { "id": "mongodb", "label": "MongoDB", "category": "storage", "implemented": false, "icon": "🍃" },
+    { "id": "s3", "label": "S3", "category": "storage", "implemented": false, "icon": "🪣" },
+    { "id": "elastic", "label": "Elastic", "category": "storage", "implemented": false, "icon": "🔎" }
+  ],
+  "llmContextWindow": { "width": 150, "height": 120, "initialPosition": { "x": 150, "y": 200 } }
+};
+
+var showImplementedOnly = false;
+var llmWindowEnabled = false;
+var categoryIndices = {};
+
+function render() {
+    renderSpine();
+    renderCategories();
+    updateStats();
+}
+
+function renderSpine() {
+    var ssot = config.layers.ssot;
+    var activeSsot = ssot.options.filter(function(o) { return o.id === ssot.active; })[0] || ssot.options[0];
+    document.getElementById('ssot-label').textContent = activeSsot.label;
+    var ssotBox = document.getElementById('ssot-box');
+    ssotBox.style.background = 'linear-gradient(135deg, ' + activeSsot.color + ', ' + activeSsot.gradientEnd + ')';
+
+    document.getElementById('hub-label').textContent = config.hub.label;
+    document.getElementById('hub-sublabel').textContent = config.hub.sublabel;
+
+    var foundation = config.layers.foundation;
+    var activeFoundation = foundation.options.filter(function(o) { return o.id === foundation.active; })[0] || foundation.options[0];
+    document.getElementById('foundation-label').textContent = activeFoundation.label;
+    var foundationBox = document.getElementById('foundation-box');
+    foundationBox.style.background = 'linear-gradient(135deg, ' + activeFoundation.color + ', ' + activeFoundation.gradientEnd + ')';
+}
+
+function getSubstratesByCategory() {
+    var byCategory = {};
+    for (var i = 0; i < config.substrates.length; i++) {
+        var sub = config.substrates[i];
+        if (!byCategory[sub.category]) byCategory[sub.category] = [];
+        byCategory[sub.category].push(sub);
+    }
+    return byCategory;
+}
+
+function renderCategories() {
+    var container = document.getElementById('categories-container');
+    container.innerHTML = '';
+
+    var byCategory = getSubstratesByCategory();
+
+    for (var i = 0; i < config.categories.length; i++) {
+        var category = config.categories[i];
+        var substrates = byCategory[category.id] || [];
+        if (substrates.length === 0) continue;
+
+        if (categoryIndices[category.id] === undefined) {
+            categoryIndices[category.id] = 0;
+        }
+
+        var currentIndex = categoryIndices[category.id] % substrates.length;
+        var currentSub = substrates[currentIndex];
+
+        var group = document.createElement('div');
+        group.className = 'category-group';
+        group.id = 'cat-' + category.id;
+        if (currentSub.implemented) group.className += ' implemented';
+
+        var label = document.createElement('div');
+        label.className = 'cat-label';
+        label.textContent = category.name;
+        label.style.color = category.color;
+
+        var display = document.createElement('div');
+        display.className = 'substrate-display';
+        display.innerHTML = '<span class="sub-icon">' + currentSub.icon + '</span>' +
+                           '<span class="sub-label">' + currentSub.label + '</span>';
+
+        group.appendChild(label);
+        group.appendChild(display);
+        container.appendChild(group);
+
+        // Click to cycle through substrates
+        (function(catId) {
+            group.onclick = function() {
+                rotateCategory(catId);
+            };
+        })(category.id);
+    }
+}
+
+function rotateCategory(categoryId) {
+    var byCategory = getSubstratesByCategory();
+    var substrates = byCategory[categoryId];
+    if (!substrates || substrates.length <= 1) return;
+
+    categoryIndices[categoryId] = (categoryIndices[categoryId] + 1) % substrates.length;
+    var currentSub = substrates[categoryIndices[categoryId]];
+
+    var group = document.getElementById('cat-' + categoryId);
+    if (!group) return;
+
+    var display = group.querySelector('.substrate-display');
+    display.style.opacity = '0';
+    display.style.transform = 'scale(0.85)';
+
+    setTimeout(function() {
+        display.innerHTML = '<span class="sub-icon">' + currentSub.icon + '</span>' +
+                           '<span class="sub-label">' + currentSub.label + '</span>';
+        group.className = currentSub.implemented ? 'category-group implemented' : 'category-group';
+        display.style.opacity = '1';
+        display.style.transform = 'scale(1)';
+    }, 150);
+}
+
+function updateStats() {
+    var implemented = config.substrates.filter(function(s) { return s.implemented; });
+    var potential = config.substrates.filter(function(s) { return !s.implemented; });
+    var categories = config.categories.length;
+
+    document.getElementById('stat-implemented').textContent = implemented.length;
+    document.getElementById('stat-potential').textContent = potential.length;
+    document.getElementById('stat-in-arrangement').textContent = config.substrates.length;
+    document.getElementById('stat-arrangement-implemented').textContent = categories;
+}
+
+function rotateOption(layer, direction) {
+    var options = config.layers[layer].options;
+    var currentIndex = -1;
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].id === config.layers[layer].active) { currentIndex = i; break; }
+    }
+    var newIndex = (currentIndex + direction + options.length) % options.length;
+    config.layers[layer].active = options[newIndex].id;
+    renderSpine();
+}
+
+function toggleLLMWindow(enabled) {
+    var overlay = document.getElementById('llm-overlay');
+    var win = document.getElementById('llm-window');
+
+    if (enabled) {
+        overlay.className = 'llm-overlay';
+        win.className = 'llm-window';
+
+        var cfg = config.llmContextWindow;
+        win.style.width = cfg.width + 'px';
+        win.style.height = cfg.height + 'px';
+        win.style.left = cfg.initialPosition.x + 'px';
+        win.style.top = cfg.initialPosition.y + 'px';
+
+        updateLLMClipPath();
+        updateVisibleCount();
+    } else {
+        overlay.className = 'llm-overlay hidden';
+        win.className = 'llm-window hidden';
+    }
+}
+
+function updateLLMClipPath() {
+    var overlay = document.getElementById('llm-overlay');
+    var win = document.getElementById('llm-window');
+
+    var l = parseInt(win.style.left);
+    var t = parseInt(win.style.top);
+    var w = parseInt(win.style.width);
+    var h = parseInt(win.style.height);
+    var vw = document.documentElement.clientWidth;
+    var vh = document.documentElement.clientHeight;
+
+    overlay.style.clipPath = 'polygon(0 0, ' + vw + 'px 0, ' + vw + 'px ' + vh + 'px, 0 ' + vh + 'px, 0 0, ' +
+        l + 'px ' + t + 'px, ' + l + 'px ' + (t + h) + 'px, ' + (l + w) + 'px ' + (t + h) + 'px, ' + (l + w) + 'px ' + t + 'px, ' + l + 'px ' + t + 'px)';
+}
+
+function updateVisibleCount() {
+    var win = document.getElementById('llm-window');
+    var counter = document.getElementById('llm-counter');
+
+    var rect = {
+        left: parseInt(win.style.left),
+        top: parseInt(win.style.top),
+        right: parseInt(win.style.left) + parseInt(win.style.width),
+        bottom: parseInt(win.style.top) + parseInt(win.style.height)
+    };
+
+    var cards = document.querySelectorAll('.substrate-card');
+    var visible = 0;
+
+    for (var i = 0; i < cards.length; i++) {
+        var r = cards[i].getBoundingClientRect();
+        if (!(r.right < rect.left || r.left > rect.right || r.bottom < rect.top || r.top > rect.bottom)) {
+            visible++;
+        }
+    }
+
+    counter.textContent = visible + '/' + cards.length;
+}
+
+// Event listeners
+document.getElementById('theme-toggle').onclick = function() {
+    var isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    document.documentElement.setAttribute('data-theme', isLight ? '' : 'light');
+    document.querySelector('.sun').style.display = isLight ? 'none' : 'inline';
+    document.querySelector('.moon').style.display = isLight ? 'inline' : 'none';
+};
+
+document.getElementById('implemented-toggle').onclick = function(e) {
+    showImplementedOnly = !showImplementedOnly;
+    e.target.className = showImplementedOnly ? 'toggle-btn active' : 'toggle-btn';
+    renderCategories();
+};
+
+document.getElementById('ssot-prev').onclick = function() { rotateOption('ssot', -1); };
+document.getElementById('ssot-next').onclick = function() { rotateOption('ssot', 1); };
+document.getElementById('foundation-prev').onclick = function() { rotateOption('foundation', -1); };
+document.getElementById('foundation-next').onclick = function() { rotateOption('foundation', 1); };
+
+document.getElementById('llm-toggle').onclick = function(e) {
+    llmWindowEnabled = !llmWindowEnabled;
+    e.target.className = llmWindowEnabled ? 'toggle-btn active' : 'toggle-btn';
+    toggleLLMWindow(llmWindowEnabled);
+};
+
+// LLM window drag
+(function() {
+    var win = document.getElementById('llm-window');
+    var isDragging = false;
+    var startX, startY, startLeft, startTop;
+    var rafPending = false;
+
+    win.onmousedown = function(e) {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = parseInt(win.style.left) || 0;
+        startTop = parseInt(win.style.top) || 0;
+        win.style.cursor = 'grabbing';
+    };
+
+    document.onmousemove = function(e) {
+        if (!isDragging) return;
+        var newLeft = startLeft + e.clientX - startX;
+        var newTop = startTop + e.clientY - startY;
+        win.style.left = newLeft + 'px';
+        win.style.top = newTop + 'px';
+
+        // Throttle expensive updates with requestAnimationFrame
+        if (!rafPending) {
+            rafPending = true;
+            requestAnimationFrame(function() {
+                updateLLMClipPath();
+                rafPending = false;
+            });
+        }
+    };
+
+    document.onmouseup = function() {
+        if (isDragging) {
+            updateLLMClipPath();
+            updateVisibleCount();
+        }
+        isDragging = false;
+        win.style.cursor = 'move';
+    };
+})();
+
+// Initialize
+render();
+    </script>
+</body>
+</html>
