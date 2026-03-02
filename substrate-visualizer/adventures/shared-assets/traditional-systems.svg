@@ -1,0 +1,116 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.9; }
+        50% { opacity: 1; }
+      }
+      .system { animation: fadeIn 0.5s ease-out forwards; }
+      .rule-box { animation: fadeIn 0.6s ease-out forwards; }
+
+      #sys-frontend { animation-delay: 0.2s; opacity: 0; }
+      #sys-backend { animation-delay: 0.4s; opacity: 0; }
+      #sys-database { animation-delay: 0.6s; opacity: 0; }
+      #sys-reports { animation-delay: 0.8s; opacity: 0; }
+
+      #rule-frontend { animation-delay: 1.0s; opacity: 0; }
+      #rule-backend { animation-delay: 1.2s; opacity: 0; }
+      #rule-database { animation-delay: 1.4s; opacity: 0; }
+      #rule-reports { animation-delay: 1.6s; opacity: 0; }
+
+      #title-text { animation-delay: 0.1s; opacity: 0; }
+      #warning-text { animation-delay: 2.0s; opacity: 0; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="#0b0f14"/>
+
+  <!-- Title -->
+  <text id="title-text" class="system" x="400" y="35" text-anchor="middle" fill="#e6edf3" font-size="18" font-weight="bold" font-family="system-ui">
+    Traditional Architecture: 4 Systems, 4 Copies of the Rule
+  </text>
+
+  <!-- System boxes - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(100, 120)">
+    <g id="sys-frontend" class="system">
+      <rect x="-80" y="-40" width="160" height="80" rx="12" fill="rgba(14,22,33,0.95)" stroke="#58a6ff" stroke-width="2"/>
+      <text text-anchor="middle" y="-10" fill="#58a6ff" font-size="12" font-family="system-ui">FRONTEND</text>
+      <text text-anchor="middle" y="10" fill="#e6edf3" font-size="14" font-family="system-ui">React App</text>
+    </g>
+  </g>
+
+  <g transform="translate(300, 120)">
+    <g id="sys-backend" class="system">
+      <rect x="-80" y="-40" width="160" height="80" rx="12" fill="rgba(14,22,33,0.95)" stroke="#2b8a3e" stroke-width="2"/>
+      <text text-anchor="middle" y="-10" fill="#2b8a3e" font-size="12" font-family="system-ui">BACKEND</text>
+      <text text-anchor="middle" y="10" fill="#e6edf3" font-size="14" font-family="system-ui">Go API</text>
+    </g>
+  </g>
+
+  <g transform="translate(500, 120)">
+    <g id="sys-database" class="system">
+      <rect x="-80" y="-40" width="160" height="80" rx="12" fill="rgba(14,22,33,0.95)" stroke="#f2cc60" stroke-width="2"/>
+      <text text-anchor="middle" y="-10" fill="#f2cc60" font-size="12" font-family="system-ui">DATABASE</text>
+      <text text-anchor="middle" y="10" fill="#e6edf3" font-size="14" font-family="system-ui">PostgreSQL</text>
+    </g>
+  </g>
+
+  <g transform="translate(700, 120)">
+    <g id="sys-reports" class="system">
+      <rect x="-80" y="-40" width="160" height="80" rx="12" fill="rgba(14,22,33,0.95)" stroke="#8957e5" stroke-width="2"/>
+      <text text-anchor="middle" y="-10" fill="#8957e5" font-size="12" font-family="system-ui">REPORTS</text>
+      <text text-anchor="middle" y="10" fill="#e6edf3" font-size="14" font-family="system-ui">Excel Macros</text>
+    </g>
+  </g>
+
+  <!-- Rule boxes (duplicated in each system) - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(100, 260)">
+    <g id="rule-frontend" class="rule-box">
+      <rect x="-75" y="-50" width="150" height="100" rx="8" fill="rgba(255,123,114,0.15)" stroke="#ff7b72" stroke-width="2"/>
+      <text text-anchor="middle" y="-25" fill="#ff7b72" font-size="11" font-family="system-ui">IsVIP Rule</text>
+      <text text-anchor="middle" y="0" fill="#e6edf3" font-size="12" font-family="monospace">if (sales &gt; 100)</text>
+      <text text-anchor="middle" y="18" fill="#e6edf3" font-size="12" font-family="monospace">  return true</text>
+      <text text-anchor="middle" y="40" fill="#9aa7b2" font-size="10" font-family="system-ui">JavaScript</text>
+    </g>
+  </g>
+
+  <g transform="translate(300, 260)">
+    <g id="rule-backend" class="rule-box">
+      <rect x="-75" y="-50" width="150" height="100" rx="8" fill="rgba(255,123,114,0.15)" stroke="#ff7b72" stroke-width="2"/>
+      <text text-anchor="middle" y="-25" fill="#ff7b72" font-size="11" font-family="system-ui">IsVIP Rule</text>
+      <text text-anchor="middle" y="0" fill="#e6edf3" font-size="12" font-family="monospace">if sales &gt; 100 {</text>
+      <text text-anchor="middle" y="18" fill="#e6edf3" font-size="12" font-family="monospace">  return true</text>
+      <text text-anchor="middle" y="40" fill="#9aa7b2" font-size="10" font-family="system-ui">Go</text>
+    </g>
+  </g>
+
+  <g transform="translate(500, 260)">
+    <g id="rule-database" class="rule-box">
+      <rect x="-75" y="-50" width="150" height="100" rx="8" fill="rgba(255,123,114,0.15)" stroke="#ff7b72" stroke-width="2"/>
+      <text text-anchor="middle" y="-25" fill="#ff7b72" font-size="11" font-family="system-ui">IsVIP Rule</text>
+      <text text-anchor="middle" y="0" fill="#e6edf3" font-size="12" font-family="monospace">CASE WHEN</text>
+      <text text-anchor="middle" y="18" fill="#e6edf3" font-size="12" font-family="monospace">sales &gt; 100</text>
+      <text text-anchor="middle" y="40" fill="#9aa7b2" font-size="10" font-family="system-ui">SQL</text>
+    </g>
+  </g>
+
+  <g transform="translate(700, 260)">
+    <g id="rule-reports" class="rule-box">
+      <rect x="-75" y="-50" width="150" height="100" rx="8" fill="rgba(255,123,114,0.15)" stroke="#ff7b72" stroke-width="2"/>
+      <text text-anchor="middle" y="-25" fill="#ff7b72" font-size="11" font-family="system-ui">IsVIP Rule</text>
+      <text text-anchor="middle" y="0" fill="#e6edf3" font-size="12" font-family="monospace">=IF(B2&gt;100,</text>
+      <text text-anchor="middle" y="18" fill="#e6edf3" font-size="12" font-family="monospace">"VIP","Standard")</text>
+      <text text-anchor="middle" y="40" fill="#9aa7b2" font-size="10" font-family="system-ui">Excel</text>
+    </g>
+  </g>
+
+  <!-- Warning text -->
+  <text id="warning-text" class="rule-box" x="400" y="380" text-anchor="middle" fill="#ff7b72" font-size="14" font-family="system-ui">
+    Same rule defined 4 times = 4x maintenance burden
+  </text>
+</svg>

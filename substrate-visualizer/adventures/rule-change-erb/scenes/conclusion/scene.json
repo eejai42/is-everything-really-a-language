@@ -1,0 +1,162 @@
+{
+  "id": "conclusion",
+  "title": "The ERB Advantage",
+  "description": "Celebrating the efficiency of the ERB approach",
+  "category": "conclusion",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#bdead1"
+  },
+  "entities": {
+    "pm": {
+      "type": "stickActor",
+      "x": 200,
+      "y": 380,
+      "scale": 1,
+      "head": "😲",
+      "name": "Product Manager"
+    },
+    "dev": {
+      "type": "stickActor",
+      "x": 760,
+      "y": 380,
+      "scale": 1,
+      "head": "😎",
+      "name": "Developer"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 280,
+      "y": 30,
+      "width": 400,
+      "height": 390,
+      "initialText": "RULE CHANGE COST\n\n- Change in Airtable: 1 min\n- Regenerate: 4 min\n\nTOTAL: ~5 minutes\n\n(vs 4 hours traditional)",
+      "name": "whiteboard",
+      "scale": 1,
+      "moveDirection": 0,
+      "moveDistance": 0,
+      "moveDuration": 0.8,
+      "speechText": "",
+      "speechHold": 2
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "That was... incredibly fast!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "And guaranteed to be consistent across all systems.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "thinkingChin",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "pm",
+      "args": {
+        "emoji": "🤔"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "What if marketing wants another change next week?",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Same thing - 5 minutes! The rule lives in one place.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nBENEFITS:\n- Zero risk of missed updates\n- Guaranteed consistency\n- No language-specific bugs",
+        "speedCps": 50
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "pm",
+      "args": {
+        "emoji": "🤩"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "This changes everything!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "That's the Effortless Rulebook!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-erb/scenes/conclusion/"
+}

@@ -1,0 +1,178 @@
+{
+  "id": "intro",
+  "title": "The VIP Rule",
+  "description": "PM introduces the new VIP customer business rule",
+  "category": "planning",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#b7e4fb"
+  },
+  "entities": {
+    "pm": {
+      "type": "stickActor",
+      "x": 150,
+      "y": 350,
+      "scale": 1,
+      "head": "😊",
+      "name": "Product Manager"
+    },
+    "dev": {
+      "type": "stickActor",
+      "x": 800,
+      "y": 350,
+      "scale": 1,
+      "head": "🙂",
+      "name": "Lead Developer"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 262,
+      "y": 55,
+      "width": 420,
+      "height": 390,
+      "initialText": "",
+      "name": "whiteboard",
+      "scale": 1,
+      "moveDirection": 0,
+      "moveDistance": 0,
+      "moveDuration": 0.8,
+      "speechText": "",
+      "speechHold": 2
+    }
+  },
+  "timeline": [
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.1
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsDown",
+        "duration": 0.1
+      }
+    },
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "NEW BUSINESS RULE",
+        "speedCps": 80
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "We need to identify VIP customers!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nIsVIP = TotalSales > $100",
+        "speedCps": 40
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "thinkingChin",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Simple enough. Where does this need to work?",
+        "hold": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "Everywhere! Frontend, backend, database, and reports.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nSYSTEMS:\n- React Frontend\n- Go API Backend\n- PostgreSQL Database\n- Excel Reports",
+        "speedCps": 60
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😅"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "So I need to implement the same rule 4 times?",
+        "hold": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "shrug",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "That's how we've always done it!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😐"
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-traditional/scenes/intro/"
+}

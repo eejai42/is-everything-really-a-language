@@ -1,0 +1,146 @@
+{
+  "id": "cascade",
+  "title": "The Cascade",
+  "description": "Developer must update all 4 systems one by one",
+  "category": "development",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#b3d5ff"
+  },
+  "entities": {
+    "dev": {
+      "type": "stickActor",
+      "x": 80,
+      "y": 420,
+      "scale": 0.9,
+      "head": "😫",
+      "name": "Developer"
+    },
+    "diagram": {
+      "type": "svgCanvas",
+      "x": 120,
+      "y": 20,
+      "width": 800,
+      "height": 340,
+      "svgSrc": "../../../shared-assets/rule-change-cascade.svg"
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 150,
+      "y": 420,
+      "width": 780,
+      "height": 100
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Updating React... find all usages, change 100 to 500, test, deploy."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Now the Go backend... different codebase, different tests, different deploy."
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😰"
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "PostgreSQL migration... need to be careful not to break production."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "And finally the Excel macros... where did I put that file again?"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "shrug",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😵"
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "4 hours later... finally done. I hope I didn't miss anything.",
+        "hold": 3
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-traditional/scenes/cascade/"
+}

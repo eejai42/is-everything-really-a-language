@@ -1,0 +1,127 @@
+{
+  "id": "define-once",
+  "title": "Define Once",
+  "description": "Developer defines the rule in Airtable - the single source of truth",
+  "category": "development",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#c2d6f0"
+  },
+  "entities": {
+    "dev": {
+      "type": "stickActor",
+      "x": 100,
+      "y": 420,
+      "scale": 0.9,
+      "head": "😊",
+      "name": "Developer"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 180,
+      "y": 30,
+      "width": 600,
+      "height": 370,
+      "initialText": "AIRTABLE - Single Source of Truth\n+-------------------------------------------+\n|  Rules Table                   |\n+-------------------------------------------+\n|  Name     |  Condition         |\n+-------------------------------------------+\n|  IsVIP    |  TotalSales > $100 |\n+-------------------------------------------+",
+      "name": "whiteboard",
+      "scale": 1,
+      "moveDirection": 0,
+      "moveDistance": 0,
+      "moveDuration": 0.8,
+      "speechText": "",
+      "speechHold": 2
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 180,
+      "y": 420,
+      "width": 750,
+      "height": 100
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Step 1: Define the rule in Airtable.",
+        "hold": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Airtable is our Single Source of Truth (SSOT). All business rules live here."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "I define IsVIP once: TotalSales > $100. That's it."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "No code written yet. Just the semantic definition.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "The Effortless Rulebook will take this definition and generate all the code."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1.5
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-erb/scenes/define-once/"
+}

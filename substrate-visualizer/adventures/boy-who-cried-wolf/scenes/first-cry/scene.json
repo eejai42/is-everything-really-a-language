@@ -1,0 +1,31 @@
+{
+  "id": "first-cry",
+  "title": "The First Cry",
+  "description": "The boy cries wolf for the first time",
+  "category": "story",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#87ceeb"
+  },
+  "entities": {
+    "scene": {
+      "type": "svgCanvas",
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 540,
+      "svgSrc": "./resources/crying-wolf-1.svg"
+    }
+  },
+  "timeline": [
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    }
+  ],
+  "_basePath": "adventures/boy-who-cried-wolf/scenes/first-cry/"
+}

@@ -1,0 +1,126 @@
+{
+  "id": "erb-recap",
+  "title": "ERB Approach",
+  "description": "Quick recap of the ERB approach",
+  "category": "development",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#0b0f14"
+  },
+  "entities": {
+    "narrator": {
+      "type": "stickActor",
+      "x": 80,
+      "y": 420,
+      "scale": 0.9,
+      "head": "😊",
+      "name": "Guide"
+    },
+    "diagram": {
+      "type": "svgCanvas",
+      "x": 120,
+      "y": 10,
+      "width": 800,
+      "height": 340,
+      "svgSrc": "../../../shared-assets/erb-rule-change.svg"
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 150,
+      "y": 420,
+      "width": 780,
+      "height": 100
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "Now the ERB approach...",
+        "hold": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "The rule lives in ONE place: Airtable. All systems are generated from it."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "Change Airtable (1 min) + Regenerate all outputs (4 min) = ~5 minutes"
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "narrator",
+      "args": {
+        "emoji": "🎉"
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "And consistency is guaranteed - all systems are generated from the same source.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "No manual updates, no typos, no missed systems. Just regenerate."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    }
+  ]
+}

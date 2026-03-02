@@ -1,0 +1,47 @@
+{
+  "id": "rule-change-erb",
+  "name": "Rule Change: The ERB Way",
+  "description": "See how the Effortless Rulebook handles business rule changes with a single source of truth",
+  "version": 1,
+  "author": "ERB Team",
+  "scenes": [
+    {
+      "type": "scene",
+      "sceneRef": "intro"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "define-once"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "generate-all"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "change-request"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "one-update"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "conclusion"
+    },
+    {
+      "type": "end",
+      "title": "The ERB Advantage",
+      "summary": "5 minutes to change the rule, all systems automatically regenerated, and guaranteed consistency across every output.\n\nThis is the power of Single Source of Truth.",
+      "score": 100,
+      "lessons": [
+        "Define the rule once in Airtable",
+        "Rulebook captures the semantic meaning",
+        "All outputs are generated automatically",
+        "Rule changes propagate instantly",
+        "Consistency is guaranteed, not hoped for"
+      ]
+    }
+  ],
+  "title": "Rule Change: The ERB Way"
+}

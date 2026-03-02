@@ -1,0 +1,114 @@
+{
+  "id": "intro",
+  "title": "The Comparison",
+  "description": "Setting up the side-by-side comparison",
+  "category": "planning",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#12151a"
+  },
+  "entities": {
+    "narrator": {
+      "type": "stickActor",
+      "x": 480,
+      "y": 380,
+      "scale": 1,
+      "head": "🎓",
+      "name": "Guide"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 230,
+      "y": 30,
+      "width": 500,
+      "height": 280,
+      "initialText": "THE QUESTION\n\nHow do you change a business rule\nthat exists in multiple systems?"
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "Let's compare two approaches to the same problem.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nTHE RULE:\nIsVIP = TotalSales > $100\n  -> Change to $500",
+        "speedCps": 40
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "thinkingChin",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "The rule exists in 4 systems: Frontend, Backend, Database, Reports.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nSYSTEMS TO UPDATE:\n- React Frontend\n- Go API Backend\n- PostgreSQL\n- Excel Reports",
+        "speedCps": 50
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "Two approaches: Traditional vs ERB. Let's see the difference.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ]
+}

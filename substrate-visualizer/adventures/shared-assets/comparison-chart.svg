@@ -1,0 +1,142 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-20px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes countUp {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .header { animation: fadeIn 0.5s ease-out forwards; }
+      .trad-item { animation: slideIn 0.4s ease-out forwards; }
+      .erb-item { animation: slideInRight 0.4s ease-out forwards; }
+
+      #header { animation-delay: 0.1s; opacity: 0; }
+      #divider { animation-delay: 0.2s; opacity: 0; }
+
+      #trad-header { animation-delay: 0.3s; opacity: 0; }
+      #erb-header { animation-delay: 0.3s; opacity: 0; }
+
+      #trad-time { animation-delay: 0.6s; opacity: 0; }
+      #erb-time { animation-delay: 0.6s; opacity: 0; }
+
+      #trad-changes { animation-delay: 0.9s; opacity: 0; }
+      #erb-changes { animation-delay: 0.9s; opacity: 0; }
+
+      #trad-risk { animation-delay: 1.2s; opacity: 0; }
+      #erb-risk { animation-delay: 1.2s; opacity: 0; }
+
+      #trad-consistency { animation-delay: 1.5s; opacity: 0; }
+      #erb-consistency { animation-delay: 1.5s; opacity: 0; }
+
+      #trad-next { animation-delay: 1.8s; opacity: 0; }
+      #erb-next { animation-delay: 1.8s; opacity: 0; }
+
+      #verdict { animation-delay: 2.2s; opacity: 0; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="#0b0f14"/>
+
+  <!-- Header -->
+  <text id="header" class="header" x="400" y="35" text-anchor="middle" fill="#e6edf3" font-size="20" font-weight="bold" font-family="system-ui">
+    Rule Change: $100 -> $500 Comparison
+  </text>
+
+  <!-- Divider line -->
+  <line id="divider" class="header" x1="400" y1="55" x2="400" y2="330" stroke="#2a3a4a" stroke-width="2"/>
+
+  <!-- Traditional side header - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(200, 75)">
+    <g id="trad-header" class="trad-item">
+      <rect x="-120" y="-18" width="240" height="36" rx="8" fill="rgba(255,123,114,0.2)" stroke="#ff7b72" stroke-width="2"/>
+      <text text-anchor="middle" y="6" fill="#ff7b72" font-size="16" font-weight="bold" font-family="system-ui">TRADITIONAL</text>
+    </g>
+  </g>
+
+  <!-- ERB side header - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(600, 75)">
+    <g id="erb-header" class="erb-item">
+      <rect x="-120" y="-18" width="240" height="36" rx="8" fill="rgba(43,138,62,0.2)" stroke="#2b8a3e" stroke-width="2"/>
+      <text text-anchor="middle" y="6" fill="#7ee787" font-size="16" font-weight="bold" font-family="system-ui">ERB (SSOT)</text>
+    </g>
+  </g>
+
+  <!-- Row 1: Time - Position wrappers outside, animation wrappers inside -->
+  <g transform="translate(200, 135)">
+    <g id="trad-time" class="trad-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">TIME TO UPDATE</text>
+      <text text-anchor="middle" y="18" fill="#ff7b72" font-size="28" font-weight="bold" font-family="system-ui">~4 hours</text>
+    </g>
+  </g>
+  <g transform="translate(600, 135)">
+    <g id="erb-time" class="erb-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">TIME TO UPDATE</text>
+      <text text-anchor="middle" y="18" fill="#7ee787" font-size="28" font-weight="bold" font-family="system-ui">~5 minutes</text>
+    </g>
+  </g>
+
+  <!-- Row 2: Changes needed - Position wrappers outside, animation wrappers inside -->
+  <g transform="translate(200, 195)">
+    <g id="trad-changes" class="trad-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">CHANGES NEEDED</text>
+      <text text-anchor="middle" y="18" fill="#ff7b72" font-size="22" font-weight="bold" font-family="system-ui">4 systems</text>
+    </g>
+  </g>
+  <g transform="translate(600, 195)">
+    <g id="erb-changes" class="erb-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">CHANGES NEEDED</text>
+      <text text-anchor="middle" y="18" fill="#7ee787" font-size="22" font-weight="bold" font-family="system-ui">1 place</text>
+    </g>
+  </g>
+
+  <!-- Row 3: Risk - Position wrappers outside, animation wrappers inside -->
+  <g transform="translate(200, 250)">
+    <g id="trad-risk" class="trad-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">RISK OF ERRORS</text>
+      <text text-anchor="middle" y="18" fill="#ff7b72" font-size="18" font-weight="bold" font-family="system-ui">High (4x chances)</text>
+    </g>
+  </g>
+  <g transform="translate(600, 250)">
+    <g id="erb-risk" class="erb-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">RISK OF ERRORS</text>
+      <text text-anchor="middle" y="18" fill="#7ee787" font-size="18" font-weight="bold" font-family="system-ui">Zero (generated)</text>
+    </g>
+  </g>
+
+  <!-- Row 4: Consistency - Position wrappers outside, animation wrappers inside -->
+  <g transform="translate(200, 305)">
+    <g id="trad-consistency" class="trad-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">CONSISTENCY</text>
+      <text text-anchor="middle" y="18" fill="#ff7b72" font-size="16" font-family="system-ui">Hoped for</text>
+    </g>
+  </g>
+  <g transform="translate(600, 305)">
+    <g id="erb-consistency" class="erb-item">
+      <text text-anchor="middle" y="-8" fill="#9aa7b2" font-size="12" font-family="system-ui">CONSISTENCY</text>
+      <text text-anchor="middle" y="18" fill="#7ee787" font-size="16" font-family="system-ui">Guaranteed</text>
+    </g>
+  </g>
+
+  <!-- Verdict - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(400, 370)">
+    <g id="verdict" class="header">
+      <rect x="-250" y="-22" width="500" height="44" rx="10" fill="rgba(43,138,62,0.15)" stroke="#2b8a3e" stroke-width="2"/>
+      <text text-anchor="middle" y="8" fill="#7ee787" font-size="18" font-weight="bold" font-family="system-ui">
+        ERB: 48x faster, zero risk, guaranteed consistency
+      </text>
+    </g>
+  </g>
+</svg>

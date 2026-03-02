@@ -1,0 +1,31 @@
+{
+  "id": "lesson",
+  "title": "The Lesson Learned",
+  "description": "The moral of the story is revealed",
+  "category": "story",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#FFE4B5"
+  },
+  "entities": {
+    "scene": {
+      "type": "svgCanvas",
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 540,
+      "svgSrc": "./resources/village-lesson.svg"
+    }
+  },
+  "timeline": [
+    {
+      "do": "wait",
+      "args": {
+        "duration": 10
+      }
+    }
+  ],
+  "_basePath": "adventures/boy-who-cried-wolf/scenes/lesson/"
+}

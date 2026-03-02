@@ -1,0 +1,126 @@
+{
+  "id": "generate-all",
+  "title": "Generate All",
+  "description": "Rulebook generates all outputs automatically",
+  "category": "development",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#0b0f14"
+  },
+  "entities": {
+    "dev": {
+      "type": "stickActor",
+      "x": 80,
+      "y": 420,
+      "scale": 0.9,
+      "head": "😎",
+      "name": "Developer"
+    },
+    "diagram": {
+      "type": "svgCanvas",
+      "x": 120,
+      "y": 10,
+      "width": 800,
+      "height": 340,
+      "svgSrc": "../../../shared-assets/erb-ssot-flow.svg"
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 150,
+      "y": 420,
+      "width": 780,
+      "height": 100
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Step 2: Generate all outputs from the Rulebook.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Airtable syncs to the Effortless Rulebook - our intermediate representation."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "The Rulebook then generates: React (JS), Go API, PostgreSQL, and Excel."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "🎉"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "All 4 systems generated! Same rule, guaranteed consistent.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Total time: about 5 minutes. And it's all tested automatically."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    }
+  ]
+}

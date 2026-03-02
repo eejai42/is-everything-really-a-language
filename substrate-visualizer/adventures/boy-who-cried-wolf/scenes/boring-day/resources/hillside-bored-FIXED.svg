@@ -1,0 +1,286 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#87CEEB"/>
+      <stop offset="100%" stop-color="#E0F4FF"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7CCD7C"/>
+      <stop offset="100%" stop-color="#228B22"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDAB9"/>
+      <stop offset="100%" stop-color="#E8B896"/>
+    </linearGradient>
+
+    <style>
+      /*
+        FIX: Animation classes are now on INNER elements, not the positioned wrapper.
+        The outer <g> with transform="translate(x,y)" is just for positioning.
+        The inner element with class="animated-*" gets the CSS animation.
+
+        OLD (BROKEN):
+          <g class="sheep-1" transform="translate(150, 420)">  <-- CSS overwrites position!
+
+        NEW (FIXED):
+          <g transform="translate(150, 420)">                   <-- Position only
+            <g class="sheep-grazing">                           <-- Animation only
+      */
+
+      /* Shepherd boy animations */
+      @keyframes boyBreath {
+        0%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(1.02); }
+      }
+      @keyframes boySigh {
+        0%, 70%, 100% { transform: rotate(0deg); }
+        75% { transform: rotate(-5deg); }
+        85% { transform: rotate(3deg); }
+      }
+      @keyframes armSwing {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(-15deg); }
+      }
+      @keyframes lookAround {
+        0%, 40%, 100% { transform: rotate(0deg); }
+        20% { transform: rotate(-10deg); }
+        60% { transform: rotate(8deg); }
+        80% { transform: rotate(-5deg); }
+      }
+      @keyframes blink {
+        0%, 45%, 55%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(0.1); }
+      }
+      @keyframes yawn {
+        0%, 60%, 100% { transform: scaleY(1); }
+        70%, 90% { transform: scaleY(1.8); }
+      }
+
+      /* Sheep animations - now work relative to origin, not absolute */
+      @keyframes sheepGraze {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        30% { transform: translateY(5px) rotate(5deg); }
+        60% { transform: translateY(3px) rotate(-3deg); }
+      }
+      @keyframes sheepWalk {
+        0%, 100% { transform: translateX(0); }
+        50% { transform: translateX(15px); }
+      }
+      @keyframes legMove {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(15deg); }
+        75% { transform: rotate(-15deg); }
+      }
+
+      /* Cloud drift */
+      @keyframes drift {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(100px); }
+      }
+
+      /* Grass sway */
+      @keyframes sway {
+        0%, 100% { transform: rotate(-3deg); }
+        50% { transform: rotate(3deg); }
+      }
+
+      /* Apply animations to INNER elements */
+      .boy-body { animation: boyBreath 3s ease-in-out infinite; transform-origin: center bottom; }
+      .boy-head { animation: lookAround 8s ease-in-out infinite, boySigh 6s ease-in-out infinite; transform-origin: center bottom; }
+      .boy-eyes { animation: blink 4s ease-in-out infinite; transform-origin: center; }
+      .boy-mouth { animation: yawn 10s ease-in-out infinite; transform-origin: center; }
+      .boy-arm-left { animation: armSwing 4s ease-in-out infinite; transform-origin: top center; }
+
+      /* FIXED: Animation on inner group, position on outer */
+      .sheep-grazing { animation: sheepGraze 3s ease-in-out infinite; }
+      .sheep-grazing-delayed { animation: sheepGraze 3.5s ease-in-out infinite 0.5s; }
+      .sheep-walking { animation: sheepWalk 8s ease-in-out infinite; }
+      .sheep-grazing-slow { animation: sheepGraze 2.8s ease-in-out infinite 1s; }
+
+      .cloud { animation: drift 30s linear infinite; }
+      .grass { animation: sway 2s ease-in-out infinite; transform-origin: bottom center; }
+    </style>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="960" height="540" fill="url(#sky)"/>
+
+  <!-- Sun -->
+  <circle cx="820" cy="80" r="50" fill="#FFD700" opacity="0.9"/>
+  <circle cx="820" cy="80" r="60" fill="#FFD700" opacity="0.3"/>
+
+  <!-- Clouds -->
+  <g class="cloud" opacity="0.9">
+    <ellipse cx="150" cy="80" rx="60" ry="30" fill="white"/>
+    <ellipse cx="200" cy="70" rx="50" ry="25" fill="white"/>
+    <ellipse cx="110" cy="85" rx="40" ry="20" fill="white"/>
+  </g>
+  <g class="cloud" opacity="0.8" style="animation-delay: -10s;">
+    <ellipse cx="500" cy="100" rx="55" ry="28" fill="white"/>
+    <ellipse cx="545" cy="90" rx="45" ry="22" fill="white"/>
+  </g>
+
+  <!-- Distant hills -->
+  <ellipse cx="200" cy="350" rx="300" ry="120" fill="#6B8E6B"/>
+  <ellipse cx="700" cy="360" rx="350" ry="100" fill="#5F9F5F"/>
+
+  <!-- Main hillside -->
+  <ellipse cx="480" cy="600" rx="600" ry="280" fill="url(#hill)"/>
+
+  <!-- Grass tufts -->
+  <g class="grass" stroke="#2E8B2E" stroke-width="2" fill="none">
+    <path d="M100,380 Q102,360 100,370 M100,380 Q98,355 100,365"/>
+    <path d="M250,400 Q252,380 250,390 M250,400 Q248,375 250,385"/>
+    <path d="M750,390 Q752,370 750,380 M750,390 Q748,365 750,375"/>
+    <path d="M850,385 Q852,365 850,375 M850,385 Q848,360 850,370"/>
+  </g>
+
+  <!--
+    SHEEP - FIXED STRUCTURE
+    Outer <g> = POSITION ONLY (no class)
+    Inner <g> = ANIMATION ONLY (has class)
+  -->
+
+  <!-- Sheep 1 - grazing left -->
+  <g transform="translate(150, 420)">  <!-- POSITION wrapper - no class! -->
+    <g class="sheep-grazing">           <!-- ANIMATION wrapper -->
+      <ellipse cx="0" cy="0" rx="40" ry="28" fill="#FFFEF0"/>
+      <ellipse cx="-20" cy="-8" rx="15" ry="12" fill="#FFFEF0"/>
+      <ellipse cx="20" cy="-8" rx="15" ry="12" fill="#FFFEF0"/>
+      <ellipse cx="0" cy="-18" rx="12" ry="10" fill="#FFFEF0"/>
+      <ellipse cx="40" cy="5" rx="18" ry="14" fill="#333"/>
+      <circle cx="48" cy="0" r="3" fill="white"/>
+      <circle cx="48" cy="0" r="1.5" fill="#333"/>
+      <rect x="-25" y="18" width="8" height="25" rx="3" fill="#333"/>
+      <rect x="-10" y="18" width="8" height="25" rx="3" fill="#333"/>
+      <rect x="8" y="18" width="8" height="25" rx="3" fill="#333"/>
+      <rect x="22" y="18" width="8" height="25" rx="3" fill="#333"/>
+    </g>
+  </g>
+
+  <!-- Sheep 2 - standing center -->
+  <g transform="translate(380, 440)">
+    <g class="sheep-grazing-delayed">
+      <ellipse cx="0" cy="0" rx="35" ry="25" fill="#FFF"/>
+      <ellipse cx="-15" cy="-6" rx="12" ry="10" fill="#FFF"/>
+      <ellipse cx="15" cy="-6" rx="12" ry="10" fill="#FFF"/>
+      <ellipse cx="-35" cy="2" rx="16" ry="12" fill="#333"/>
+      <circle cx="-42" cy="-2" r="2.5" fill="white"/>
+      <circle cx="-42" cy="-2" r="1" fill="#333"/>
+      <rect x="-20" y="16" width="7" height="22" rx="2" fill="#333"/>
+      <rect x="-8" y="16" width="7" height="22" rx="2" fill="#333"/>
+      <rect x="6" y="16" width="7" height="22" rx="2" fill="#333"/>
+      <rect x="18" y="16" width="7" height="22" rx="2" fill="#333"/>
+    </g>
+  </g>
+
+  <!-- Sheep 3 - walking right -->
+  <g transform="translate(600, 410)">
+    <g class="sheep-walking">
+      <ellipse cx="0" cy="0" rx="38" ry="26" fill="#FFFEF5"/>
+      <ellipse cx="-18" cy="-7" rx="14" ry="11" fill="#FFFEF5"/>
+      <ellipse cx="18" cy="-7" rx="14" ry="11" fill="#FFFEF5"/>
+      <ellipse cx="38" cy="3" rx="17" ry="13" fill="#333"/>
+      <circle cx="46" cy="-1" r="2.5" fill="white"/>
+      <circle cx="46" cy="-1" r="1" fill="#333"/>
+      <rect x="-22" y="16" width="7" height="24" rx="2" fill="#333"/>
+      <rect x="-8" y="16" width="7" height="24" rx="2" fill="#333"/>
+      <rect x="8" y="16" width="7" height="24" rx="2" fill="#333"/>
+      <rect x="20" y="16" width="7" height="24" rx="2" fill="#333"/>
+    </g>
+  </g>
+
+  <!-- Sheep 4 - far back (scaled) -->
+  <g transform="translate(800, 380) scale(0.7)">
+    <g class="sheep-grazing-slow">
+      <ellipse cx="0" cy="0" rx="35" ry="24" fill="#F8F8F8"/>
+      <ellipse cx="-15" cy="-5" rx="12" ry="9" fill="#F8F8F8"/>
+      <ellipse cx="15" cy="-5" rx="12" ry="9" fill="#F8F8F8"/>
+      <ellipse cx="-32" cy="2" rx="14" ry="11" fill="#333"/>
+      <rect x="-18" y="15" width="6" height="20" rx="2" fill="#333"/>
+      <rect x="-6" y="15" width="6" height="20" rx="2" fill="#333"/>
+      <rect x="6" y="15" width="6" height="20" rx="2" fill="#333"/>
+      <rect x="16" y="15" width="6" height="20" rx="2" fill="#333"/>
+    </g>
+  </g>
+
+  <!-- SHEPHERD BOY - center, looking bored -->
+  <!-- Boy already had correct structure - animation classes on inner elements -->
+  <g transform="translate(480, 320)">
+    <!-- Shepherd's crook -->
+    <path d="M60,0 L60,120" stroke="#8B4513" stroke-width="6" stroke-linecap="round"/>
+    <path d="M60,0 Q60,-30 40,-30 Q20,-30 20,-10" stroke="#8B4513" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+    <!-- Body -->
+    <g class="boy-body">
+      <!-- Legs -->
+      <rect x="-15" y="70" width="14" height="50" rx="5" fill="#4A4A8A"/>
+      <rect x="1" y="70" width="14" height="50" rx="5" fill="#4A4A8A"/>
+      <!-- Feet -->
+      <ellipse cx="-8" cy="122" rx="10" ry="6" fill="#5D4037"/>
+      <ellipse cx="8" cy="122" rx="10" ry="6" fill="#5D4037"/>
+
+      <!-- Torso -->
+      <rect x="-22" y="20" width="44" height="55" rx="8" fill="#E67E22"/>
+
+      <!-- Arms -->
+      <g class="boy-arm-left">
+        <rect x="-35" y="25" width="15" height="40" rx="5" fill="url(#skin)"/>
+      </g>
+      <rect x="20" y="25" width="15" height="40" rx="5" fill="url(#skin)"/>
+
+      <!-- Hands -->
+      <circle cx="-27" cy="68" r="8" fill="url(#skin)"/>
+      <circle cx="55" cy="60" r="8" fill="url(#skin)"/> <!-- Hand on crook -->
+    </g>
+
+    <!-- Head -->
+    <g class="boy-head">
+      <!-- Neck -->
+      <rect x="-8" y="5" width="16" height="18" fill="url(#skin)"/>
+
+      <!-- Head shape -->
+      <ellipse cx="0" cy="-15" rx="28" ry="32" fill="url(#skin)"/>
+
+      <!-- Hair -->
+      <ellipse cx="0" cy="-35" rx="26" ry="18" fill="#5D4037"/>
+      <ellipse cx="-20" cy="-25" rx="10" ry="15" fill="#5D4037"/>
+      <ellipse cx="20" cy="-25" rx="10" ry="15" fill="#5D4037"/>
+
+      <!-- Eyes -->
+      <g class="boy-eyes">
+        <ellipse cx="-10" cy="-18" rx="6" ry="5" fill="white"/>
+        <ellipse cx="10" cy="-18" rx="6" ry="5" fill="white"/>
+        <circle cx="-10" cy="-17" r="3" fill="#4A4A4A"/>
+        <circle cx="10" cy="-17" r="3" fill="#4A4A4A"/>
+        <!-- Droopy eyelids for bored look -->
+        <path d="M-17,-20 Q-10,-24 -3,-20" stroke="url(#skin)" stroke-width="4" fill="none"/>
+        <path d="M3,-20 Q10,-24 17,-20" stroke="url(#skin)" stroke-width="4" fill="none"/>
+      </g>
+
+      <!-- Eyebrows - raised skeptically -->
+      <path d="M-16,-26 Q-10,-29 -4,-26" stroke="#5D4037" stroke-width="2" fill="none"/>
+      <path d="M4,-26 Q10,-29 16,-26" stroke="#5D4037" stroke-width="2" fill="none"/>
+
+      <!-- Nose -->
+      <ellipse cx="0" cy="-8" rx="4" ry="5" fill="#E8A878"/>
+
+      <!-- Mouth - bored/frowning -->
+      <g class="boy-mouth">
+        <path d="M-8,2 Q0,-2 8,2" stroke="#8B4513" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Cheeks -->
+      <circle cx="-18" cy="-5" r="6" fill="#FFB6A3" opacity="0.5"/>
+      <circle cx="18" cy="-5" r="6" fill="#FFB6A3" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- Thought bubble showing boredom -->
+  <g transform="translate(380, 200)" opacity="0.9">
+    <circle cx="70" cy="50" r="5" fill="white"/>
+    <circle cx="55" cy="35" r="8" fill="white"/>
+    <ellipse cx="20" cy="0" rx="50" ry="30" fill="white" stroke="#DDD" stroke-width="2"/>
+    <text x="20" y="5" text-anchor="middle" font-family="Comic Sans MS, cursive" font-size="14" fill="#666">So boring...</text>
+  </g>
+</svg>

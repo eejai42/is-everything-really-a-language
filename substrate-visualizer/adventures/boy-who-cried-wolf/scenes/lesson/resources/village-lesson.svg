@@ -1,0 +1,196 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sunsetSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF7F50"/>
+      <stop offset="50%" stop-color="#FFB347"/>
+      <stop offset="100%" stop-color="#FFE4B5"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDAB9"/>
+      <stop offset="100%" stop-color="#E8B896"/>
+    </linearGradient>
+
+    <filter id="smokeBlur">
+      <feGaussianBlur stdDeviation="4"/>
+    </filter>
+
+    <style>
+      @keyframes smokeRise {
+        0% { transform: translateY(0) scale(1); opacity: 0.5; }
+        100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
+      }
+      @keyframes windowGlow {
+        0%, 100% { fill: #FFD700; }
+        50% { fill: #FFA500; }
+      }
+      @keyframes boySad {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(2px); }
+      }
+      @keyframes headDroop {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(5deg); }
+      }
+      @keyframes tearFall {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(30px); opacity: 0; }
+      }
+
+      .smoke { animation: smokeRise 3s ease-out infinite; }
+      .window-glow { animation: windowGlow 2s ease-in-out infinite; }
+      .boy-sad { animation: boySad 3s ease-in-out infinite; }
+      /* Head rotates around neck base at origin */
+      .boy-head-sad { animation: headDroop 4s ease-in-out infinite; transform-origin: 0 0; }
+      .tear { animation: tearFall 2s ease-in infinite; }
+    </style>
+  </defs>
+
+  <!-- Sunset sky -->
+  <rect width="960" height="540" fill="url(#sunsetSky)"/>
+
+  <!-- Setting sun -->
+  <circle cx="800" cy="150" r="60" fill="#FF6347" opacity="0.7"/>
+  <circle cx="800" cy="150" r="80" fill="#FF6347" opacity="0.3"/>
+
+  <!-- Ground -->
+  <rect x="0" y="380" width="960" height="160" fill="#C4A574"/>
+
+  <!-- Cobblestone path -->
+  <g fill="#A08060" opacity="0.6">
+    <ellipse cx="400" cy="420" rx="20" ry="10"/>
+    <ellipse cx="450" cy="430" rx="18" ry="9"/>
+    <ellipse cx="360" cy="435" rx="16" ry="8"/>
+    <ellipse cx="500" cy="415" rx="17" ry="8"/>
+    <ellipse cx="320" cy="425" rx="15" ry="7"/>
+    <ellipse cx="540" cy="428" rx="19" ry="9"/>
+  </g>
+
+  <!-- House 1 (left) -->
+  <g transform="translate(100, 200)">
+    <rect x="0" y="60" width="140" height="120" fill="#DEB887" stroke="#8B7355" stroke-width="2"/>
+    <polygon points="-15,60 70,-10 155,60" fill="#8B4513" stroke="#5D3A1A" stroke-width="2"/>
+    <rect x="50" y="110" width="40" height="70" fill="#5D3A1A" stroke="#3D2A0A" stroke-width="2"/>
+    <circle cx="82" cy="145" r="4" fill="#B8860B"/>
+    <rect x="15" y="85" width="30" height="30" fill="#2F4F4F" stroke="#5D3A1A" stroke-width="2"/>
+    <rect class="window-glow" x="17" y="87" width="26" height="26" opacity="0.6"/>
+    <rect x="95" y="85" width="30" height="30" fill="#2F4F4F" stroke="#5D3A1A" stroke-width="2"/>
+    <rect class="window-glow" x="97" y="87" width="26" height="26" opacity="0.6" style="animation-delay: 0.5s;"/>
+    <rect x="100" y="15" width="25" height="45" fill="#8B4513"/>
+    <circle class="smoke" cx="112" cy="10" r="10" fill="#888" filter="url(#smokeBlur)"/>
+    <circle class="smoke" cx="112" cy="10" r="8" fill="#999" filter="url(#smokeBlur)" style="animation-delay: 1s;"/>
+  </g>
+
+  <!-- House 2 (center, larger) -->
+  <g transform="translate(350, 170)">
+    <rect x="0" y="70" width="180" height="140" fill="#DEB887" stroke="#8B7355" stroke-width="2"/>
+    <polygon points="-20,70 90,-15 200,70" fill="#8B4513" stroke="#5D3A1A" stroke-width="2"/>
+    <rect x="65" y="140" width="50" height="70" fill="#5D3A1A" stroke="#3D2A0A" stroke-width="2"/>
+    <circle cx="105" cy="175" r="5" fill="#B8860B"/>
+    <rect x="15" y="100" width="40" height="35" fill="#2F4F4F" stroke="#5D3A1A" stroke-width="2"/>
+    <rect class="window-glow" x="17" y="102" width="36" height="31" opacity="0.5"/>
+    <rect x="125" y="100" width="40" height="35" fill="#2F4F4F" stroke="#5D3A1A" stroke-width="2"/>
+    <rect class="window-glow" x="127" y="102" width="36" height="31" opacity="0.5" style="animation-delay: 0.3s;"/>
+    <rect x="130" y="20" width="28" height="50" fill="#8B4513"/>
+    <circle class="smoke" cx="144" cy="15" r="12" fill="#888" filter="url(#smokeBlur)"/>
+  </g>
+
+  <!-- House 3 (right) -->
+  <g transform="translate(650, 220)">
+    <rect x="0" y="50" width="120" height="110" fill="#DEB887" stroke="#8B7355" stroke-width="2"/>
+    <polygon points="-12,50 60,-8 132,50" fill="#8B4513" stroke="#5D3A1A" stroke-width="2"/>
+    <rect x="40" y="100" width="40" height="60" fill="#5D3A1A" stroke="#3D2A0A" stroke-width="2"/>
+    <circle cx="72" cy="130" r="4" fill="#B8860B"/>
+    <rect x="12" y="70" width="25" height="28" fill="#2F4F4F" stroke="#5D3A1A" stroke-width="2"/>
+    <rect class="window-glow" x="14" y="72" width="21" height="24" opacity="0.6" style="animation-delay: 0.7s;"/>
+  </g>
+
+  <!-- Fence -->
+  <g fill="#8B4513">
+    <rect x="30" y="400" width="8" height="50"/>
+    <rect x="80" y="398" width="8" height="52"/>
+    <rect x="820" y="402" width="8" height="48"/>
+    <rect x="870" y="400" width="8" height="50"/>
+    <rect x="920" y="398" width="8" height="52"/>
+  </g>
+  <g fill="none" stroke="#A0522D" stroke-width="6">
+    <path d="M30,415 Q55,412 80,413"/>
+    <path d="M30,435 Q55,432 80,433"/>
+    <path d="M820,417 Q845,414 870,415 Q895,416 920,417"/>
+    <path d="M820,437 Q845,434 870,435 Q895,436 920,437"/>
+  </g>
+
+  <!-- SHEPHERD BOY - walking sadly into village -->
+  <!-- FIX: Position wrapper (outer) + Animation wrapper (inner) -->
+  <g transform="translate(480, 340)">
+    <g class="boy-sad">
+    <!-- Legs - slow walking -->
+    <rect x="-18" y="55" width="14" height="55" rx="5" fill="#4A4A8A"/>
+    <rect x="4" y="55" width="14" height="55" rx="5" fill="#4A4A8A"/>
+    <ellipse cx="-10" cy="112" rx="12" ry="7" fill="#5D4037"/>
+    <ellipse cx="12" cy="112" rx="12" ry="7" fill="#5D4037"/>
+
+    <!-- Torso - hunched -->
+    <rect x="-25" y="5" width="50" height="55" rx="8" fill="#E67E22" transform="rotate(8)"/>
+
+    <!-- Arms hanging down -->
+    <rect x="-42" y="15" width="14" height="48" rx="5" fill="url(#skin)"/>
+    <rect x="28" y="15" width="14" height="48" rx="5" fill="url(#skin)"/>
+    <circle cx="-35" cy="65" r="8" fill="url(#skin)"/>
+    <circle cx="35" cy="65" r="8" fill="url(#skin)"/>
+
+    <!-- Head drooping - position wrapper at neck base (y=8), head pivots from there -->
+    <g transform="translate(0, 8)">
+      <g class="boy-head-sad">
+        <!-- Neck: was y=-12 to 8, now y=-20 to 0 (bottom at origin) -->
+        <rect x="-8" y="-20" width="16" height="20" fill="url(#skin)"/>
+        <!-- Head: shifted by -8 -->
+        <ellipse cx="0" cy="-43" rx="32" ry="36" fill="url(#skin)"/>
+
+        <!-- Messy hair: shifted by -8 -->
+        <ellipse cx="0" cy="-66" rx="28" ry="20" fill="#5D4037"/>
+        <ellipse cx="-22" cy="-56" rx="12" ry="16" fill="#5D4037"/>
+        <ellipse cx="22" cy="-56" rx="12" ry="16" fill="#5D4037"/>
+
+        <!-- Sad downcast eyes: shifted by -8 -->
+        <ellipse cx="-12" cy="-46" rx="7" ry="5" fill="white"/>
+        <ellipse cx="12" cy="-46" rx="7" ry="5" fill="white"/>
+        <circle cx="-12" cy="-44" r="3" fill="#333"/>
+        <circle cx="12" cy="-44" r="3" fill="#333"/>
+        <!-- Heavy eyelids -->
+        <path d="M-20,-48 Q-12,-52 -4,-48" stroke="url(#skin)" stroke-width="4" fill="none"/>
+        <path d="M4,-48 Q12,-52 20,-48" stroke="url(#skin)" stroke-width="4" fill="none"/>
+
+        <!-- Sad eyebrows: shifted by -8 -->
+        <path d="M-19,-56 Q-12,-60 -5,-58" stroke="#5D4037" stroke-width="2.5" fill="none"/>
+        <path d="M5,-58 Q12,-60 19,-56" stroke="#5D4037" stroke-width="2.5" fill="none"/>
+
+        <!-- Nose: shifted by -8 -->
+        <ellipse cx="0" cy="-36" rx="4" ry="5" fill="#E8A878"/>
+
+        <!-- Sad mouth - frowning: shifted by -8 -->
+        <path d="M-10,-23 Q0,-30 10,-23" stroke="#8B4513" stroke-width="3" fill="none"/>
+
+        <!-- Tears: shifted by -8 -->
+        <ellipse class="tear" cx="-18" cy="-40" rx="3" ry="5" fill="#87CEEB"/>
+        <ellipse class="tear" cx="18" cy="-40" rx="3" ry="5" fill="#87CEEB" style="animation-delay: 1s;"/>
+
+        <!-- Red eyes from crying: shifted by -8 -->
+        <circle cx="-17" cy="-46" r="4" fill="#FFAAAA" opacity="0.4"/>
+        <circle cx="17" cy="-46" r="4" fill="#FFAAAA" opacity="0.4"/>
+      </g>
+    </g>
+    </g>
+  </g>
+
+  <!-- Thought bubble with moral -->
+  <g transform="translate(480, 80)">
+    <circle cx="-50" cy="100" r="8" fill="white" opacity="0.9"/>
+    <circle cx="-30" cy="80" r="12" fill="white" opacity="0.9"/>
+    <ellipse cx="50" cy="30" rx="180" ry="55" fill="white" stroke="#AAA" stroke-width="2"/>
+    <text x="50" y="20" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#555" font-style="italic">"A liar will not be believed,</text>
+    <text x="50" y="45" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#555" font-style="italic">even when telling the truth."</text>
+  </g>
+
+  <!-- "THE END" subtle text -->
+  <text x="480" y="520" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#8B4513" font-weight="bold">THE END</text>
+</svg>

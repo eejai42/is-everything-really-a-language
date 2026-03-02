@@ -1,0 +1,138 @@
+{
+  "id": "implementation",
+  "title": "The Implementation",
+  "description": "Developer implements the rule in 4 different systems",
+  "category": "development",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#c1d4ec"
+  },
+  "entities": {
+    "dev": {
+      "type": "stickActor",
+      "x": 80,
+      "y": 420,
+      "scale": 0.9,
+      "head": "😤",
+      "name": "Developer"
+    },
+    "diagram": {
+      "type": "svgCanvas",
+      "x": 120,
+      "y": 20,
+      "width": 800,
+      "height": 340,
+      "svgSrc": "../../../shared-assets/traditional-systems.svg"
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 150,
+      "y": 420,
+      "width": 780,
+      "height": 100
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "First, let me implement IsVIP in the React frontend..."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Now the Go backend... same logic, different syntax."
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😓"
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "PostgreSQL needs a CASE WHEN statement... and Excel needs a formula."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "shrug",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😩"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "4 systems done. Same rule, 4 different implementations.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-traditional/scenes/implementation/"
+}

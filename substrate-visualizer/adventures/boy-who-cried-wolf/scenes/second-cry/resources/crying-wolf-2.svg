@@ -1,0 +1,249 @@
+<svg viewBox="0 0 960 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#87CEEB"/>
+      <stop offset="100%" stop-color="#E0F4FF"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7CCD7C"/>
+      <stop offset="100%" stop-color="#228B22"/>
+    </linearGradient>
+    <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDAB9"/>
+      <stop offset="100%" stop-color="#E8B896"/>
+    </linearGradient>
+
+    <style>
+      @keyframes boyLaugh {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-5px) rotate(-2deg); }
+        75% { transform: translateY(-5px) rotate(2deg); }
+      }
+      @keyframes pointMock {
+        0%, 100% { transform: rotate(-10deg); }
+        50% { transform: rotate(10deg); }
+      }
+
+      @keyframes villagerAngry {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+      }
+      @keyframes fistShake {
+        0%, 100% { transform: rotate(-15deg); }
+        50% { transform: rotate(15deg); }
+      }
+      @keyframes stomp {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(-5deg); }
+      }
+
+      @keyframes angerVein {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.2); }
+      }
+
+      .boy-laughing { animation: boyLaugh 0.4s ease-in-out infinite; }
+      /* Arms/limbs rotate around origin (0,0) which is the joint */
+      .boy-point { animation: pointMock 0.6s ease-in-out infinite; transform-origin: 0 0; }
+
+      .villager-angry { animation: villagerAngry 0.3s ease-in-out infinite; }
+      .villager-fist { animation: fistShake 0.25s ease-in-out infinite; transform-origin: 0 0; }
+      .villager-stomp { animation: stomp 0.4s ease-in-out infinite; transform-origin: 0 0; }
+
+      .anger-vein { animation: angerVein 0.5s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="960" height="540" fill="url(#sky)"/>
+  <circle cx="820" cy="80" r="50" fill="#FFD700" opacity="0.9"/>
+
+  <!-- Hills -->
+  <ellipse cx="200" cy="350" rx="300" ry="120" fill="#6B8E6B"/>
+  <ellipse cx="700" cy="360" rx="350" ry="100" fill="#5F9F5F"/>
+  <ellipse cx="480" cy="600" rx="600" ry="280" fill="url(#hill)"/>
+
+  <!-- Sheep in background, calm -->
+  <g transform="translate(700, 400)">
+    <ellipse cx="0" cy="0" rx="32" ry="22" fill="#FFF"/>
+    <ellipse cx="30" cy="2" rx="14" ry="10" fill="#333"/>
+    <rect x="-16" y="14" width="6" height="18" rx="2" fill="#333"/>
+    <rect x="-4" y="14" width="6" height="18" rx="2" fill="#333"/>
+    <rect x="8" y="14" width="6" height="18" rx="2" fill="#333"/>
+    <rect x="18" y="14" width="6" height="18" rx="2" fill="#333"/>
+  </g>
+
+  <!-- ANGRY VILLAGER 1 - Farmer, very mad -->
+  <!-- FIX: Position wrapper (no class) + Animation wrapper (class inside) -->
+  <g transform="translate(200, 350)">
+    <g class="villager-angry">
+    <!-- Body -->
+    <rect x="-18" y="10" width="36" height="48" rx="6" fill="#8B4513"/>
+
+    <!-- Legs stomping - hip joint positioned, leg drawn from origin -->
+    <!-- Left leg: hip at (-9, 55) -->
+    <g transform="translate(-9, 55)">
+      <g class="villager-stomp">
+        <rect x="-6" y="0" width="12" height="42" rx="4" fill="#4A4A6A"/>
+      </g>
+    </g>
+    <!-- Right leg (static) -->
+    <rect x="3" y="55" width="12" height="42" rx="4" fill="#4A4A6A"/>
+
+    <!-- Arms - fist raised - shoulder joint positioned, arm drawn from origin -->
+    <!-- Left arm (static, hanging down) -->
+    <rect x="-30" y="15" width="14" height="35" rx="5" fill="url(#skin)"/>
+    <!-- Right arm with fist: THREE wrappers - position, base rotation, animation -->
+    <g transform="translate(18, 10)">
+      <!-- Base position: arm raised with fist (-70 degrees) -->
+      <g transform="rotate(-70)">
+        <!-- Animation wrapper: fist shake oscillation -->
+        <g class="villager-fist">
+          <rect x="-7" y="0" width="14" height="40" rx="5" fill="url(#skin)"/>
+          <ellipse cx="0" cy="45" rx="10" ry="8" fill="url(#skin)"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="-12" rx="24" ry="28" fill="url(#skin)"/>
+    <!-- Straw hat askew -->
+    <ellipse cx="5" cy="-35" rx="28" ry="8" fill="#DAA520" transform="rotate(10)"/>
+
+    <!-- ANGRY face -->
+    <ellipse cx="-9" cy="-14" rx="5" ry="4" fill="white"/>
+    <ellipse cx="9" cy="-14" rx="5" ry="4" fill="white"/>
+    <circle cx="-9" cy="-13" r="2.5" fill="#333"/>
+    <circle cx="9" cy="-13" r="2.5" fill="#333"/>
+    <!-- Angry eyebrows -->
+    <path d="M-16,-22 L-2,-18" stroke="#5D4037" stroke-width="3" fill="none"/>
+    <path d="M2,-18 L16,-22" stroke="#5D4037" stroke-width="3" fill="none"/>
+    <!-- Angry mouth -->
+    <path d="M-10,2 Q0,8 10,2" stroke="#333" stroke-width="3" fill="none"/>
+
+    <!-- Anger veins -->
+    <g class="anger-vein">
+      <path d="M20,-25 L25,-30 L22,-25 L28,-28" stroke="#D32F2F" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- Red face -->
+    <circle cx="-16" cy="-5" r="8" fill="#FF6B6B" opacity="0.7"/>
+    <circle cx="16" cy="-5" r="8" fill="#FF6B6B" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- ANGRY VILLAGER 2 - Baker, arms crossed -->
+  <g transform="translate(750, 360)">
+    <g class="villager-angry" style="animation-delay: 0.15s;">
+    <!-- Body -->
+    <rect x="-16" y="8" width="32" height="45" rx="5" fill="white"/>
+    <rect x="-20" y="5" width="40" height="18" rx="4" fill="#4169E1"/>
+
+    <!-- Legs -->
+    <rect x="-14" y="50" width="11" height="40" rx="4" fill="#333"/>
+    <rect x="3" y="50" width="11" height="40" rx="4" fill="#333"/>
+
+    <!-- Arms crossed -->
+    <rect x="-28" y="18" width="56" height="12" rx="4" fill="url(#skin)"/>
+    <ellipse cx="-28" cy="24" rx="8" ry="6" fill="url(#skin)"/>
+    <ellipse cx="28" cy="24" rx="8" ry="6" fill="url(#skin)"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="-10" rx="22" ry="25" fill="url(#skin)"/>
+    <!-- Chef hat tilted angrily -->
+    <rect x="-12" y="-38" width="28" height="22" rx="3" fill="white" transform="rotate(-8)"/>
+
+    <!-- Skeptical/angry face -->
+    <ellipse cx="-8" cy="-12" rx="4" ry="3.5" fill="white"/>
+    <ellipse cx="8" cy="-12" rx="4" ry="3.5" fill="white"/>
+    <circle cx="-8" cy="-11" r="2" fill="#333"/>
+    <circle cx="8" cy="-11" r="2" fill="#333"/>
+    <!-- Angry V eyebrows -->
+    <path d="M-14,-20 L-2,-16" stroke="#5D4037" stroke-width="2.5" fill="none"/>
+    <path d="M2,-16 L14,-20" stroke="#5D4037" stroke-width="2.5" fill="none"/>
+    <!-- Frown -->
+    <path d="M-7,4 Q0,-2 7,4" stroke="#333" stroke-width="2.5" fill="none"/>
+
+    <!-- Anger vein -->
+    <g class="anger-vein" style="animation-delay: 0.2s;">
+      <path d="M-20,-20 L-25,-25 L-22,-20 L-28,-22" stroke="#D32F2F" stroke-width="2" fill="none"/>
+    </g>
+    </g>
+  </g>
+
+  <!-- SHEPHERD BOY - laughing, pointing -->
+  <g transform="translate(480, 300)">
+    <g class="boy-laughing">
+    <!-- Legs -->
+    <rect x="-15" y="70" width="14" height="50" rx="5" fill="#4A4A8A"/>
+    <rect x="1" y="70" width="14" height="50" rx="5" fill="#4A4A8A"/>
+    <ellipse cx="-8" cy="122" rx="10" ry="6" fill="#5D4037"/>
+    <ellipse cx="8" cy="122" rx="10" ry="6" fill="#5D4037"/>
+
+    <!-- Torso bent forward laughing -->
+    <rect x="-22" y="20" width="44" height="55" rx="8" fill="#E67E22" transform="rotate(5)"/>
+
+    <!-- Arms - one pointing, one holding belly -->
+    <!-- Left arm pointing: THREE wrappers - position, base rotation, animation -->
+    <g transform="translate(-22, 30)">
+      <!-- Base position: arm pointing outward (-70 degrees) -->
+      <g transform="rotate(-70)">
+        <!-- Animation wrapper: pointing motion oscillation -->
+        <g class="boy-point">
+          <rect x="-7" y="0" width="14" height="40" rx="5" fill="url(#skin)"/>
+          <circle cx="0" cy="45" r="8" fill="url(#skin)"/>
+        </g>
+      </g>
+    </g>
+    <!-- Right arm holding belly (static) -->
+    <rect x="18" y="40" width="14" height="30" rx="5" fill="url(#skin)"/>
+    <circle cx="25" cy="72" r="8" fill="url(#skin)"/>
+
+    <!-- Head tilted back laughing -->
+    <rect x="-8" y="5" width="16" height="18" fill="url(#skin)"/>
+    <ellipse cx="0" cy="-15" rx="28" ry="32" fill="url(#skin)"/>
+
+    <!-- Hair -->
+    <ellipse cx="0" cy="-35" rx="26" ry="18" fill="#5D4037"/>
+    <ellipse cx="-20" cy="-25" rx="10" ry="15" fill="#5D4037"/>
+    <ellipse cx="20" cy="-25" rx="10" ry="15" fill="#5D4037"/>
+
+    <!-- Laughing eyes - closed crescents -->
+    <path d="M-15,-18 Q-10,-12 -5,-18" stroke="#333" stroke-width="3" fill="none"/>
+    <path d="M5,-18 Q10,-12 15,-18" stroke="#333" stroke-width="3" fill="none"/>
+
+    <!-- Nose -->
+    <ellipse cx="0" cy="-8" rx="4" ry="5" fill="#E8A878"/>
+
+    <!-- Big laughing mouth -->
+    <ellipse cx="0" cy="5" rx="15" ry="12" fill="#8B0000"/>
+    <ellipse cx="0" cy="0" rx="12" ry="5" fill="white"/>
+    <path d="M-12,8 Q0,15 12,8" fill="#CC6666"/>
+
+    <!-- Tears of laughter -->
+    <path d="M-22,-15 Q-25,-10 -22,-5" stroke="#87CEEB" stroke-width="2" fill="none"/>
+    <path d="M22,-15 Q25,-10 22,-5" stroke="#87CEEB" stroke-width="2" fill="none"/>
+
+    <!-- Rosy cheeks -->
+    <circle cx="-20" cy="-2" r="8" fill="#FF9999" opacity="0.7"/>
+    <circle cx="20" cy="-2" r="8" fill="#FF9999" opacity="0.7"/>
+    </g>
+  </g>
+
+  <!-- Speech bubble - "Ha ha! Fooled you again!" -->
+  <g transform="translate(480, 130)">
+    <ellipse cx="0" cy="0" rx="140" ry="45" fill="white" stroke="#333" stroke-width="3"/>
+    <polygon points="10,42 -10,80 30,48" fill="white" stroke="#333" stroke-width="3"/>
+    <polygon points="10,42 -8,75 28,46" fill="white"/>
+    <text x="0" y="8" text-anchor="middle" font-family="Comic Sans MS, cursive" font-size="22" fill="#333">Ha ha! Fooled you</text>
+    <text x="0" y="32" text-anchor="middle" font-family="Comic Sans MS, cursive" font-size="22" fill="#333">AGAIN!</text>
+  </g>
+
+  <!-- Angry speech bubble from villager -->
+  <g transform="translate(200, 230)">
+    <ellipse cx="0" cy="0" rx="100" ry="35" fill="white" stroke="#D32F2F" stroke-width="3"/>
+    <polygon points="0,32 10,60 -15,38" fill="white" stroke="#D32F2F" stroke-width="3"/>
+    <polygon points="0,32 8,55 -13,36" fill="white"/>
+    <text x="0" y="8" text-anchor="middle" font-family="Comic Sans MS, cursive" font-size="18" fill="#D32F2F">Never again!</text>
+  </g>
+</svg>

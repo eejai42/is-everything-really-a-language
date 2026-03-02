@@ -1,0 +1,126 @@
+{
+  "id": "traditional-recap",
+  "title": "Traditional Approach",
+  "description": "Quick recap of the traditional painful process",
+  "category": "development",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#0b0f14"
+  },
+  "entities": {
+    "narrator": {
+      "type": "stickActor",
+      "x": 80,
+      "y": 420,
+      "scale": 0.9,
+      "head": "😬",
+      "name": "Guide"
+    },
+    "diagram": {
+      "type": "svgCanvas",
+      "x": 120,
+      "y": 10,
+      "width": 800,
+      "height": 340,
+      "svgSrc": "../../../shared-assets/rule-change-cascade.svg"
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 150,
+      "y": 420,
+      "width": 780,
+      "height": 100
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "First, the traditional approach...",
+        "hold": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "Each system has its own copy of the rule. Each must be updated separately."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "React (45 min) + Go (1 hr) + PostgreSQL (1.5 hr) + Excel (30 min) = ~4 hours"
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "narrator",
+      "args": {
+        "emoji": "😫"
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "shrug",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "Plus the risk that one system gets missed or has a typo.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "Different languages, different testing, different deployments. Different bugs."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    }
+  ]
+}

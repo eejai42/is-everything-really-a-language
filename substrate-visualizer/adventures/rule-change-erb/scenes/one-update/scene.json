@@ -1,0 +1,133 @@
+{
+  "id": "one-update",
+  "title": "One Update",
+  "description": "Change the rule once, regenerate everything",
+  "category": "development",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#c7e0ff"
+  },
+  "entities": {
+    "dev": {
+      "type": "stickActor",
+      "x": 80,
+      "y": 420,
+      "scale": 0.9,
+      "head": "😎",
+      "name": "Developer"
+    },
+    "diagram": {
+      "type": "svgCanvas",
+      "x": 120,
+      "y": 10,
+      "width": 800,
+      "height": 340,
+      "svgSrc": "../../../shared-assets/erb-rule-change.svg"
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 150,
+      "y": 420,
+      "width": 780,
+      "height": 100
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Step 1: Change the value in Airtable from $100 to $500."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Step 2: Run 'erb generate' - the Rulebook regenerates all outputs."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "🎉"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Done! All 4 systems updated and tested.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "React, Go, PostgreSQL, Excel - all regenerated with the new $500 threshold."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Developer",
+        "text": "Total time: about 5 minutes. Compare to 4 hours the traditional way!"
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-erb/scenes/one-update/"
+}

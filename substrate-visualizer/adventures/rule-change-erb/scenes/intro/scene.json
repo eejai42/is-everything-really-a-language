@@ -1,0 +1,178 @@
+{
+  "id": "intro",
+  "title": "The VIP Rule (ERB Way)",
+  "description": "PM introduces the same VIP rule, but this time using ERB",
+  "category": "planning",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#b3e5ca"
+  },
+  "entities": {
+    "pm": {
+      "type": "stickActor",
+      "x": 150,
+      "y": 350,
+      "scale": 1,
+      "head": "😊",
+      "name": "Product Manager"
+    },
+    "dev": {
+      "type": "stickActor",
+      "x": 800,
+      "y": 350,
+      "scale": 1,
+      "head": "🙂",
+      "name": "Lead Developer"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 280,
+      "y": 40,
+      "width": 400,
+      "height": 390,
+      "initialText": "",
+      "name": "whiteboard",
+      "scale": 1,
+      "moveDirection": 0,
+      "moveDistance": 0,
+      "moveDuration": 0.8,
+      "speechText": "",
+      "speechHold": 2
+    }
+  },
+  "timeline": [
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.1
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsDown",
+        "duration": 0.1
+      }
+    },
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "NEW BUSINESS RULE",
+        "speedCps": 80
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "We need to identify VIP customers!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nIsVIP = TotalSales > $100",
+        "speedCps": 40
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Got it. Where does this need to work?",
+        "hold": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "Everywhere! Frontend, backend, database, and reports.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😎"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Perfect! We use ERB for exactly this.",
+        "hold": 2
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nERB APPROACH:\n1. Define rule ONCE\n2. Generate all outputs",
+        "speedCps": 50
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "pm",
+      "args": {
+        "emoji": "🤔"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "Define it once? That sounds too easy...",
+        "hold": 2
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Let me show you!",
+        "hold": 1.5
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-erb/scenes/intro/"
+}

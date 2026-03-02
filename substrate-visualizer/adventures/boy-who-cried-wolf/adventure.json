@@ -1,0 +1,53 @@
+{
+  "id": "boy-who-cried-wolf",
+  "name": "The Boy Who Cried Wolf",
+  "title": "The Boy Who Cried Wolf",
+  "description": "An animated retelling of the classic Aesop's fable about the importance of honesty and the consequences of lying",
+  "version": 1,
+  "author": "ERB Team",
+  "scenes": [
+    {
+      "type": "scene",
+      "sceneRef": "boring-day"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "first-cry"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "second-cry"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "boring-day"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "first-cry"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "second-cry"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "real-wolf"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "lesson"
+    },
+    {
+      "type": "end",
+      "title": "The End",
+      "summary": "Thank you for watching \"The Boy Who Cried Wolf\"",
+      "lessons": [
+        "A liar will not be believed, even when telling the truth",
+        "Trust, once broken, is hard to rebuild",
+        "Honesty is the foundation of all relationships",
+        "Think before you act - your actions have consequences"
+      ]
+    }
+  ]
+}

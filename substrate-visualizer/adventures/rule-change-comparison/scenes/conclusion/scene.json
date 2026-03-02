@@ -1,0 +1,140 @@
+{
+  "id": "conclusion",
+  "title": "The Verdict",
+  "description": "Final thoughts on the comparison",
+  "category": "conclusion",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#0f1a14"
+  },
+  "entities": {
+    "narrator": {
+      "type": "stickActor",
+      "x": 480,
+      "y": 400,
+      "scale": 1,
+      "head": "🎓",
+      "name": "Guide"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 230,
+      "y": 25,
+      "width": 500,
+      "height": 300,
+      "initialText": "THE TAKEAWAY\n\nTraditional:\n- N systems = N times the work\n- N chances for errors\n- Consistency is hoped for"
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "Let's summarize what we've learned.",
+        "hold": 2
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nERB (Single Source of Truth):\n- 1 definition generates N outputs\n- 0 chances for inconsistency\n- Consistency is guaranteed",
+        "speedCps": 50
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "narrator",
+      "args": {
+        "emoji": "🎯"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "The question isn't IF rules will change - it's HOW you handle change.",
+        "hold": 3
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "narrator",
+      "args": {
+        "emoji": "🚀"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "With ERB, rule changes go from emergencies to routine tasks.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nBOTTOM LINE:\n48x faster + zero risk\n= The Effortless Rulebook",
+        "speedCps": 40
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "second-cry",
+  "title": "Ha Ha - I fooled you",
+  "description": "The boy tricks the villagers again",
+  "category": "story",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#87ceeb"
+  },
+  "entities": {
+    "scene": {
+      "type": "svgCanvas",
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 540,
+      "svgSrc": "./resources/crying-wolf-2.svg"
+    }
+  },
+  "timeline": [
+    {
+      "do": "wait",
+      "args": {
+        "duration": 3
+      }
+    }
+  ],
+  "_basePath": "adventures/boy-who-cried-wolf/scenes/second-cry/"
+}

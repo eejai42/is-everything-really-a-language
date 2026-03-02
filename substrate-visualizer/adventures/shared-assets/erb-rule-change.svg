@@ -1,0 +1,185 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes pulseGreen {
+        0%, 100% { stroke: #2b8a3e; }
+        50% { stroke: #7ee787; }
+      }
+      @keyframes checkmark {
+        from { stroke-dashoffset: 20; }
+        to { stroke-dashoffset: 0; }
+      }
+
+      .node { animation: fadeIn 0.4s ease-out forwards; }
+      .regenerated { animation: pulseGreen 1s ease-in-out 2; }
+      .check { stroke-dasharray: 20; animation: checkmark 0.4s ease-out forwards; }
+
+      #title { animation-delay: 0s; opacity: 0; }
+      #source-box { animation-delay: 0.2s; opacity: 0; }
+      #old-rule { animation-delay: 0.4s; opacity: 0; }
+      #new-rule { animation-delay: 1.0s; opacity: 0; }
+      #rulebook { animation-delay: 0.6s; opacity: 0; }
+
+      #out-1 { animation-delay: 1.5s; opacity: 0; }
+      #out-2 { animation-delay: 1.7s; opacity: 0; }
+      #out-3 { animation-delay: 1.9s; opacity: 0; }
+      #out-4 { animation-delay: 2.1s; opacity: 0; }
+
+      #check-1 { animation-delay: 2.0s; }
+      #check-2 { animation-delay: 2.2s; }
+      #check-3 { animation-delay: 2.4s; }
+      #check-4 { animation-delay: 2.6s; }
+
+      #total-time { animation-delay: 3.0s; opacity: 0; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="#0b0f14"/>
+
+  <!-- Title -->
+  <text id="title" class="node" x="400" y="30" text-anchor="middle" fill="#7ee787" font-size="18" font-weight="bold" font-family="system-ui">
+    ERB Rule Change: $100 -> $500 (Automatic Regeneration)
+  </text>
+
+  <!-- Source box - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(130, 140)">
+    <g id="source-box" class="node">
+      <rect x="-110" y="-80" width="220" height="160" rx="12" fill="rgba(14,22,33,0.95)" stroke="#f2cc60" stroke-width="2"/>
+      <text text-anchor="middle" y="-55" fill="#f2cc60" font-size="12" font-family="system-ui">SINGLE SOURCE OF TRUTH</text>
+      <text text-anchor="middle" y="-35" fill="#e6edf3" font-size="14" font-family="system-ui">Airtable</text>
+
+      <!-- Old rule (crossed out) - nested position wrapper -->
+      <g transform="translate(0, -5)">
+        <g id="old-rule" class="node">
+          <rect x="-90" y="-18" width="180" height="36" rx="6" fill="rgba(255,123,114,0.1)" stroke="#ff7b72" stroke-width="1"/>
+          <text text-anchor="middle" y="5" fill="#9aa7b2" font-size="12" font-family="monospace">TotalSales &gt; $100</text>
+          <line x1="-80" y1="5" x2="80" y2="5" stroke="#ff7b72" stroke-width="2"/>
+        </g>
+      </g>
+
+      <!-- New rule - nested position wrapper -->
+      <g transform="translate(0, 50)">
+        <g id="new-rule" class="node">
+          <rect x="-90" y="-18" width="180" height="36" rx="6" fill="rgba(43,138,62,0.2)" stroke="#2b8a3e" stroke-width="2"/>
+          <text text-anchor="middle" y="5" fill="#7ee787" font-size="12" font-family="monospace">TotalSales &gt; $500</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- Rulebook - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(400, 140)">
+    <g id="rulebook" class="node">
+      <rect x="-100" y="-35" width="200" height="70" rx="12" fill="rgba(14,22,33,0.95)" stroke="#58a6ff" stroke-width="2"/>
+      <text text-anchor="middle" y="-8" fill="#58a6ff" font-size="11" font-family="system-ui">REGENERATE</text>
+      <text text-anchor="middle" y="12" fill="#e6edf3" font-size="14" font-family="system-ui">Effortless Rulebook</text>
+    </g>
+  </g>
+
+  <!-- Arrow from source to rulebook -->
+  <path d="M240,140 L300,140" fill="none" stroke="#58a6ff" stroke-width="2" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#58a6ff"/>
+    </marker>
+  </defs>
+
+  <!-- Generated outputs - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(600, 80)">
+    <g id="out-1" class="node regenerated">
+      <rect x="-70" y="-25" width="140" height="50" rx="10" fill="rgba(14,22,33,0.95)" stroke="#2b8a3e" stroke-width="2"/>
+      <text text-anchor="middle" y="5" fill="#e6edf3" font-size="12" font-family="system-ui">React (JS)</text>
+      <path id="check-1" class="check" d="M55,-15 L65,-5 L80,-25" fill="none" stroke="#7ee787" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g transform="translate(750, 80)">
+    <g id="out-2" class="node regenerated">
+      <rect x="-70" y="-25" width="140" height="50" rx="10" fill="rgba(14,22,33,0.95)" stroke="#2b8a3e" stroke-width="2"/>
+      <text text-anchor="middle" y="5" fill="#e6edf3" font-size="12" font-family="system-ui">Go API</text>
+      <path id="check-2" class="check" d="M55,-15 L65,-5 L80,-25" fill="none" stroke="#7ee787" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g transform="translate(600, 160)">
+    <g id="out-3" class="node regenerated">
+      <rect x="-70" y="-25" width="140" height="50" rx="10" fill="rgba(14,22,33,0.95)" stroke="#2b8a3e" stroke-width="2"/>
+      <text text-anchor="middle" y="5" fill="#e6edf3" font-size="12" font-family="system-ui">PostgreSQL</text>
+      <path id="check-3" class="check" d="M55,-15 L65,-5 L80,-25" fill="none" stroke="#7ee787" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <g transform="translate(750, 160)">
+    <g id="out-4" class="node regenerated">
+      <rect x="-70" y="-25" width="140" height="50" rx="10" fill="rgba(14,22,33,0.95)" stroke="#2b8a3e" stroke-width="2"/>
+      <text text-anchor="middle" y="5" fill="#e6edf3" font-size="12" font-family="system-ui">Excel</text>
+      <path id="check-4" class="check" d="M55,-15 L65,-5 L80,-25" fill="none" stroke="#7ee787" stroke-width="3" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Arrows from rulebook to outputs -->
+  <path d="M500,120 L530,95" fill="none" stroke="#2a3a4a" stroke-width="2"/>
+  <path d="M500,120 L600,95" fill="none" stroke="#2a3a4a" stroke-width="2"/>
+  <path d="M500,160 L530,160" fill="none" stroke="#2a3a4a" stroke-width="2"/>
+  <path d="M500,160 L600,160" fill="none" stroke="#2a3a4a" stroke-width="2"/>
+
+  <!-- Animated tokens showing regeneration -->
+  <g filter="url(#glow)">
+    <circle r="6" fill="#7ee787">
+      <animateMotion dur="0.8s" repeatCount="indefinite" begin="1.5s" path="M400,140 Q500,110 600,80"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="0.8s" repeatCount="indefinite" begin="1.5s"/>
+    </circle>
+    <circle r="6" fill="#7ee787">
+      <animateMotion dur="0.9s" repeatCount="indefinite" begin="1.7s" path="M400,140 Q575,110 750,80"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="0.9s" repeatCount="indefinite" begin="1.7s"/>
+    </circle>
+    <circle r="6" fill="#7ee787">
+      <animateMotion dur="0.7s" repeatCount="indefinite" begin="1.9s" path="M400,140 Q500,150 600,160"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="0.7s" repeatCount="indefinite" begin="1.9s"/>
+    </circle>
+    <circle r="6" fill="#7ee787">
+      <animateMotion dur="0.85s" repeatCount="indefinite" begin="2.1s" path="M400,140 Q575,150 750,160"/>
+      <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="0.85s" repeatCount="indefinite" begin="2.1s"/>
+    </circle>
+  </g>
+
+  <!-- Comparison box - Position wrapper outside, animation wrapper inside -->
+  <g transform="translate(400, 300)">
+    <g id="total-time" class="node">
+      <rect x="-350" y="-70" width="700" height="140" rx="12" fill="rgba(14,22,33,0.95)" stroke="#2a3a4a" stroke-width="1"/>
+
+      <!-- Traditional side -->
+      <g transform="translate(-175, 0)">
+        <text text-anchor="middle" y="-40" fill="#ff7b72" font-size="12" font-family="system-ui">TRADITIONAL</text>
+        <text text-anchor="middle" y="-15" fill="#9aa7b2" font-size="24" font-weight="bold" font-family="system-ui">~4 hours</text>
+        <text text-anchor="middle" y="10" fill="#9aa7b2" font-size="11" font-family="system-ui">4 systems to update</text>
+        <text text-anchor="middle" y="28" fill="#9aa7b2" font-size="11" font-family="system-ui">4 code reviews</text>
+        <text text-anchor="middle" y="46" fill="#ff7b72" font-size="11" font-family="system-ui">Risk of missed updates</text>
+      </g>
+
+      <!-- Divider -->
+      <line x1="0" y1="-55" x2="0" y2="55" stroke="#2a3a4a" stroke-width="1"/>
+
+      <!-- ERB side -->
+      <g transform="translate(175, 0)">
+        <text text-anchor="middle" y="-40" fill="#7ee787" font-size="12" font-family="system-ui">ERB</text>
+        <text text-anchor="middle" y="-15" fill="#7ee787" font-size="24" font-weight="bold" font-family="system-ui">~5 minutes</text>
+        <text text-anchor="middle" y="10" fill="#e6edf3" font-size="11" font-family="system-ui">1 change in Airtable</text>
+        <text text-anchor="middle" y="28" fill="#e6edf3" font-size="11" font-family="system-ui">1 regenerate command</text>
+        <text text-anchor="middle" y="46" fill="#7ee787" font-size="11" font-family="system-ui">Guaranteed consistency</text>
+      </g>
+    </g>
+  </g>
+</svg>

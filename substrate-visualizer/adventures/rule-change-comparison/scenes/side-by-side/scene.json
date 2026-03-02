@@ -1,0 +1,145 @@
+{
+  "id": "side-by-side",
+  "title": "Side by Side",
+  "description": "Direct comparison of both approaches",
+  "category": "comparison",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#0b0f14"
+  },
+  "entities": {
+    "narrator": {
+      "type": "stickActor",
+      "x": 80,
+      "y": 430,
+      "scale": 0.85,
+      "head": "🎓",
+      "name": "Guide"
+    },
+    "diagram": {
+      "type": "svgCanvas",
+      "x": 80,
+      "y": 10,
+      "width": 800,
+      "height": 360,
+      "svgSrc": "../../../shared-assets/comparison-chart.svg"
+    },
+    "chat": {
+      "type": "chatPanel",
+      "x": 150,
+      "y": 430,
+      "width": 780,
+      "height": 90
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "Time: 4 hours vs 5 minutes. That's a 48x improvement."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "Risk: 4 chances to make mistakes vs zero (everything is generated)."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "narrator",
+      "args": {
+        "emoji": "🤔"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "thinkingChin",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "chatSay",
+      "target": "chat",
+      "args": {
+        "speaker": "Guide",
+        "text": "Consistency: 'hoping' all 4 devs got it right vs guaranteed by generation."
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 2.5
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "narrator",
+      "args": {
+        "emoji": "😊"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "narrator",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "narrator",
+      "args": {
+        "text": "The numbers speak for themselves.",
+        "hold": 2
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ]
+}

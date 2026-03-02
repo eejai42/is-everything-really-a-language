@@ -1,0 +1,183 @@
+{
+  "id": "change-request",
+  "title": "The Change Request",
+  "description": "Business comes back with a rule change - same scenario as traditional",
+  "category": "planning",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#95d0b0"
+  },
+  "entities": {
+    "pm": {
+      "type": "stickActor",
+      "x": 150,
+      "y": 340,
+      "scale": 1,
+      "head": "😬",
+      "name": "Product Manager"
+    },
+    "dev": {
+      "type": "stickActor",
+      "x": 800,
+      "y": 340,
+      "scale": 1,
+      "head": "😎",
+      "name": "Developer"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 280,
+      "y": 40,
+      "width": 400,
+      "height": 390,
+      "initialText": "CURRENT STATUS\n\nIsVIP = TotalSales > $100\n\nDEPLOYED TO:\n- Frontend (generated)\n- Backend (generated)\n- Database (generated)\n- Reports (generated)",
+      "name": "whiteboard",
+      "scale": 1,
+      "moveDirection": 0,
+      "moveDistance": 0,
+      "moveDuration": 0.8,
+      "speechText": "",
+      "speechHold": 2
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "VIP feature is live in all systems!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "pointRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "pm",
+      "args": {
+        "emoji": "😅"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "Great work! But... there's been a change.",
+        "hold": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsDown",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "What kind of change?",
+        "hold": 1.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "shrug",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "Marketing wants the threshold changed to $500.",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😊"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "pointUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "No problem! Give me 5 minutes.",
+        "hold": 2
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "pm",
+      "args": {
+        "emoji": "😲"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "Wait... 5 minutes? For all 4 systems?",
+        "hold": 2
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "That's the power of Single Source of Truth!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-erb/scenes/change-request/"
+}

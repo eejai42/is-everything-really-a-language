@@ -1,0 +1,234 @@
+<!--
+  SHEPHERD BOY - Reusable Character Component
+
+  Usage: Import as symbol and position with <use>
+  The character is drawn at origin (0,0) - position via transform on container
+
+  Available CSS classes for mood/state:
+    - .boy--bored: Looking bored, occasional yawning
+    - .boy--shouting: Arms up, mouth open
+    - .boy--laughing: Bent forward laughing
+    - .boy--scared: Shaking, arms up in defense
+    - .boy--sad: Hunched, drooping, tears
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -60 160 200">
+  <defs>
+    <linearGradient id="boy-skin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDAB9"/>
+      <stop offset="100%" stop-color="#E8B896"/>
+    </linearGradient>
+
+    <style>
+      /* Base breathing animation - always on */
+      @keyframes boy-breath {
+        0%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(1.02); }
+      }
+
+      /* Bored state animations */
+      @keyframes boy-look-around {
+        0%, 40%, 100% { transform: rotate(0deg); }
+        20% { transform: rotate(-10deg); }
+        60% { transform: rotate(8deg); }
+        80% { transform: rotate(-5deg); }
+      }
+      @keyframes boy-blink {
+        0%, 45%, 55%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(0.1); }
+      }
+      @keyframes boy-yawn {
+        0%, 60%, 100% { transform: scaleY(1); }
+        70%, 90% { transform: scaleY(1.8); }
+      }
+      @keyframes boy-arm-swing {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(-15deg); }
+      }
+
+      /* Shouting state animations */
+      @keyframes boy-jump {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+      }
+      @keyframes boy-arm-wave {
+        0%, 100% { transform: rotate(-20deg); }
+        50% { transform: rotate(20deg); }
+      }
+      @keyframes boy-mouth-shout {
+        0%, 100% { transform: scaleY(1); }
+        25%, 75% { transform: scaleY(1.5); }
+      }
+
+      /* Scared state animations */
+      @keyframes boy-shake {
+        0%, 100% { transform: translateX(0) rotate(0deg); }
+        25% { transform: translateX(-5px) rotate(-2deg); }
+        75% { transform: translateX(5px) rotate(2deg); }
+      }
+      @keyframes boy-arms-up {
+        0%, 100% { transform: rotate(-5deg); }
+        50% { transform: rotate(5deg); }
+      }
+
+      /* Laughing state animations */
+      @keyframes boy-laugh {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-5px) rotate(-2deg); }
+        75% { transform: translateY(-5px) rotate(2deg); }
+      }
+
+      /* Sad state animations */
+      @keyframes boy-droop {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(2px); }
+      }
+      @keyframes boy-head-droop {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(5deg); }
+      }
+      @keyframes boy-tear-fall {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(30px); opacity: 0; }
+      }
+
+      /* Apply animations based on state class on root */
+      .boy-torso {
+        animation: boy-breath 3s ease-in-out infinite;
+        transform-origin: center bottom;
+      }
+
+      /* BORED STATE */
+      .boy--bored .boy-head {
+        animation: boy-look-around 8s ease-in-out infinite;
+        transform-origin: center bottom;
+      }
+      .boy--bored .boy-eyes {
+        animation: boy-blink 4s ease-in-out infinite;
+        transform-origin: center;
+      }
+      .boy--bored .boy-mouth {
+        animation: boy-yawn 10s ease-in-out infinite;
+        transform-origin: center;
+      }
+      .boy--bored .boy-arm-left {
+        animation: boy-arm-swing 4s ease-in-out infinite;
+        transform-origin: top center;
+      }
+
+      /* SHOUTING STATE */
+      .boy--shouting .boy-container {
+        animation: boy-jump 0.5s ease-in-out infinite;
+      }
+      .boy--shouting .boy-arm-left,
+      .boy--shouting .boy-arm-right {
+        animation: boy-arm-wave 0.4s ease-in-out infinite;
+        transform-origin: top center;
+      }
+      .boy--shouting .boy-arm-right {
+        animation-delay: 0.2s;
+      }
+      .boy--shouting .boy-mouth {
+        animation: boy-mouth-shout 0.3s ease-in-out infinite;
+        transform-origin: center;
+      }
+
+      /* SCARED STATE */
+      .boy--scared .boy-container {
+        animation: boy-shake 0.2s ease-in-out infinite;
+      }
+      .boy--scared .boy-arm-left,
+      .boy--scared .boy-arm-right {
+        animation: boy-arms-up 0.3s ease-in-out infinite;
+        transform-origin: bottom center;
+      }
+
+      /* LAUGHING STATE */
+      .boy--laughing .boy-container {
+        animation: boy-laugh 0.4s ease-in-out infinite;
+      }
+
+      /* SAD STATE */
+      .boy--sad .boy-container {
+        animation: boy-droop 3s ease-in-out infinite;
+      }
+      .boy--sad .boy-head {
+        animation: boy-head-droop 4s ease-in-out infinite;
+        transform-origin: bottom center;
+      }
+      .boy--sad .boy-tear {
+        animation: boy-tear-fall 2s ease-in infinite;
+      }
+    </style>
+  </defs>
+
+  <!-- The entire character is in a container group for state-based transforms -->
+  <g class="boy-container">
+    <!-- Legs - always visible -->
+    <g class="boy-legs">
+      <rect x="-15" y="70" width="14" height="50" rx="5" fill="#4A4A8A"/>
+      <rect x="1" y="70" width="14" height="50" rx="5" fill="#4A4A8A"/>
+      <!-- Feet -->
+      <ellipse cx="-8" cy="122" rx="10" ry="6" fill="#5D4037"/>
+      <ellipse cx="8" cy="122" rx="10" ry="6" fill="#5D4037"/>
+    </g>
+
+    <!-- Torso -->
+    <g class="boy-torso">
+      <rect x="-22" y="20" width="44" height="55" rx="8" fill="#E67E22"/>
+    </g>
+
+    <!-- Arms - separate for different animations -->
+    <g class="boy-arm-left">
+      <rect x="-35" y="25" width="15" height="40" rx="5" fill="url(#boy-skin)"/>
+      <circle cx="-27" cy="68" r="8" fill="url(#boy-skin)"/>
+    </g>
+    <g class="boy-arm-right">
+      <rect x="20" y="25" width="15" height="40" rx="5" fill="url(#boy-skin)"/>
+      <circle cx="27" cy="68" r="8" fill="url(#boy-skin)"/>
+    </g>
+
+    <!-- Head group - contains all facial features -->
+    <g class="boy-head">
+      <!-- Neck -->
+      <rect x="-8" y="5" width="16" height="18" fill="url(#boy-skin)"/>
+
+      <!-- Head shape -->
+      <ellipse cx="0" cy="-15" rx="28" ry="32" fill="url(#boy-skin)"/>
+
+      <!-- Hair -->
+      <ellipse cx="0" cy="-35" rx="26" ry="18" fill="#5D4037"/>
+      <ellipse cx="-20" cy="-25" rx="10" ry="15" fill="#5D4037"/>
+      <ellipse cx="20" cy="-25" rx="10" ry="15" fill="#5D4037"/>
+
+      <!-- Eyes -->
+      <g class="boy-eyes">
+        <ellipse cx="-10" cy="-18" rx="6" ry="5" fill="white"/>
+        <ellipse cx="10" cy="-18" rx="6" ry="5" fill="white"/>
+        <circle cx="-10" cy="-17" r="3" fill="#4A4A4A"/>
+        <circle cx="10" cy="-17" r="3" fill="#4A4A4A"/>
+      </g>
+
+      <!-- Eyebrows -->
+      <path class="boy-eyebrows" d="M-16,-26 Q-10,-29 -4,-26" stroke="#5D4037" stroke-width="2" fill="none"/>
+      <path class="boy-eyebrows" d="M4,-26 Q10,-29 16,-26" stroke="#5D4037" stroke-width="2" fill="none"/>
+
+      <!-- Nose -->
+      <ellipse cx="0" cy="-8" rx="4" ry="5" fill="#E8A878"/>
+
+      <!-- Mouth - changes based on state -->
+      <g class="boy-mouth">
+        <path d="M-8,2 Q0,-2 8,2" stroke="#8B4513" stroke-width="2" fill="none"/>
+      </g>
+
+      <!-- Cheeks -->
+      <circle cx="-18" cy="-5" r="6" fill="#FFB6A3" opacity="0.5"/>
+      <circle cx="18" cy="-5" r="6" fill="#FFB6A3" opacity="0.5"/>
+
+      <!-- Tears (hidden by default, shown in sad state) -->
+      <g class="boy-tears" style="display: none;">
+        <ellipse class="boy-tear" cx="-18" cy="-12" rx="3" ry="5" fill="#87CEEB"/>
+        <ellipse class="boy-tear" cx="18" cy="-12" rx="3" ry="5" fill="#87CEEB" style="animation-delay: 1s;"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,43 @@
+{
+  "id": "rule-change-traditional",
+  "name": "Rule Change: The Traditional Way",
+  "description": "Experience the pain of changing a business rule across multiple traditional systems",
+  "version": 1,
+  "author": "ERB Team",
+  "scenes": [
+    {
+      "type": "scene",
+      "sceneRef": "intro"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "implementation"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "change-request"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "cascade"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "conclusion"
+    },
+    {
+      "type": "end",
+      "title": "The Traditional Pain",
+      "summary": "4 hours of developer time, 4 systems manually updated, and a constant risk that one system got missed or has a subtle bug.\n\nEvery time the business rule changes, this entire painful process repeats.\n\nWhat if there was a better way?",
+      "score": 0,
+      "lessons": [
+        "Same rule defined 4 times = 4x maintenance",
+        "Every rule change requires updating ALL implementations",
+        "Different languages mean different bugs",
+        "Risk of inconsistency grows with each copy",
+        "Time cost multiplies with each system"
+      ]
+    }
+  ],
+  "title": "Rule Change: The Traditional Way"
+}

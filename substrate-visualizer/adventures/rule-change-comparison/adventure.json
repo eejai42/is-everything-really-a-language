@@ -1,0 +1,43 @@
+{
+  "id": "rule-change-comparison",
+  "name": "Rule Change: Side-by-Side Comparison",
+  "description": "A direct comparison of traditional vs ERB approaches to business rule changes",
+  "version": 1,
+  "author": "ERB Team",
+  "scenes": [
+    {
+      "type": "scene",
+      "sceneRef": "intro"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "traditional-recap"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "erb-recap"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "side-by-side"
+    },
+    {
+      "type": "scene",
+      "sceneRef": "conclusion"
+    },
+    {
+      "type": "end",
+      "title": "The Clear Winner",
+      "summary": "When business rules live in one place, change is effortless.\n\nTraditional: 4 hours, 4 systems, risk of inconsistency\nERB: 5 minutes, 1 change, guaranteed consistency\n\nThat's a 48x improvement in time alone.",
+      "score": 100,
+      "lessons": [
+        "Traditional = N systems means N times the work",
+        "ERB = 1 definition generates N outputs",
+        "Consistency is guaranteed, not hoped for",
+        "Rule changes become routine, not emergencies",
+        "Developer time is better spent on new features"
+      ]
+    }
+  ],
+  "title": "Rule Change: Side-by-Side Comparison"
+}

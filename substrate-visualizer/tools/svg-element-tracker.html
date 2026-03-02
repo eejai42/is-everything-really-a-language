@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SVG Element Position Tracker</title>
+  <style>
+    body { font-family: monospace; margin: 20px; background: #1a1a2e; color: #eee; }
+    .container { display: flex; gap: 20px; }
+    .svg-panel { flex: 2; background: #16213e; padding: 10px; border-radius: 8px; }
+    .log-panel { flex: 1; background: #0f3460; padding: 10px; border-radius: 8px; max-height: 600px; overflow-y: auto; }
+    .svg-container { border: 2px solid #e94560; background: white; }
+    .svg-container svg { display: block; width: 100%; height: auto; }
+    .log-entry { padding: 4px 8px; margin: 2px 0; border-radius: 4px; font-size: 11px; }
+    .log-entry.warning { background: #ff6b6b33; border-left: 3px solid #ff6b6b; }
+    .log-entry.info { background: #4ecdc433; border-left: 3px solid #4ecdc4; }
+    .log-entry.error { background: #e9456033; border-left: 3px solid #e94560; }
+    h2 { color: #e94560; margin-top: 0; }
+    select, button { padding: 8px 12px; margin: 5px; border-radius: 4px; border: none; }
+    button { background: #e94560; color: white; cursor: pointer; }
+    button:hover { background: #ff6b6b; }
+    .element-list { margin-top: 10px; }
+    .element-item { padding: 6px; background: #1a1a2e; margin: 4px 0; border-radius: 4px; }
+    .element-item.problem { border-left: 3px solid #ff6b6b; }
+    .position { color: #4ecdc4; }
+    .transform-info { color: #feca57; font-size: 10px; }
+  </style>
+</head>
+<body>
+  <h1>SVG Element Position Tracker</h1>
+
+  <div>
+    <label>Load SVG: </label>
+    <select id="svgSelect">
+      <option value="../adventures/boy-who-cried-wolf/scenes/boring-day/resources/hillside-bored.svg">boring-day/hillside-bored.svg</option>
+      <option value="../adventures/boy-who-cried-wolf/scenes/first-cry/resources/crying-wolf-1.svg">first-cry/crying-wolf-1.svg</option>
+      <option value="../adventures/boy-who-cried-wolf/scenes/second-cry/resources/crying-wolf-2.svg">second-cry/crying-wolf-2.svg</option>
+      <option value="../adventures/boy-who-cried-wolf/scenes/real-wolf/resources/wolf-attack.svg">real-wolf/wolf-attack.svg</option>
+      <option value="../adventures/boy-who-cried-wolf/scenes/lesson/resources/village-lesson.svg">lesson/village-lesson.svg</option>
+    </select>
+    <button onclick="loadSvg()">Load</button>
+    <button onclick="trackPositions()">Track Positions Now</button>
+    <button onclick="startContinuousTracking()">Start Continuous Tracking</button>
+    <button onclick="stopTracking()">Stop Tracking</button>
+  </div>
+
+  <div class="container">
+    <div class="svg-panel">
+      <h2>SVG Preview</h2>
+      <div id="svgContainer" class="svg-container"></div>
+      <div class="element-list">
+        <h3>Tracked Elements</h3>
+        <div id="elementList"></div>
+      </div>
+    </div>
+    <div class="log-panel">
+      <h2>Position Log</h2>
+      <button onclick="clearLog()">Clear Log</button>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <script>
+    let svgElement = null;
+    let trackingInterval = null;
+    let frameCount = 0;
+
+    // Elements to track - look for these patterns
+    const TRACK_PATTERNS = [
+      { pattern: /sheep/i, name: 'Sheep' },
+      { pattern: /boy/i, name: 'Boy' },
+      { pattern: /wolf/i, name: 'Wolf' },
+      { pattern: /villager/i, name: 'Villager' },
+    ];
+
+    function log(message, type = 'info') {
+      const logEl = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      logEl.insertBefore(entry, logEl.firstChild);
+    }
+
+    function clearLog() {
+      document.getElementById('log').innerHTML = '';
+    }
+
+    async function loadSvg() {
+      const url = document.getElementById('svgSelect').value;
+      log(`Loading SVG: ${url}`);
+
+      try {
+        const resp = await fetch(url);
+        const svgText = await resp.text();
+
+        const container = document.getElementById('svgContainer');
+        container.innerHTML = svgText;
+        svgElement = container.querySelector('svg');
+
+        log(`SVG loaded successfully`, 'info');
+        analyzeStructure();
+        trackPositions();
+      } catch (e) {
+        log(`Failed to load SVG: ${e.message}`, 'error');
+      }
+    }
+
+    function analyzeStructure() {
+      if (!svgElement) return;
+
+      const listEl = document.getElementById('elementList');
+      listEl.innerHTML = '';
+
+      // Find all groups with class or id
+      const groups = svgElement.querySelectorAll('g[class], g[id]');
+
+      groups.forEach(g => {
+        const className = g.getAttribute('class') || '';
+        const id = g.getAttribute('id') || '';
+        const transform = g.getAttribute('transform') || 'none';
+
+        // Check if this element has both a positioning transform AND an animation class
+        const hasPositionTransform = /translate\s*\([^)]+\)/.test(transform);
+        const hasAnimationClass = className && getComputedStyle(g).animationName !== 'none';
+
+        const hasProblem = hasPositionTransform && hasAnimationClass;
+
+        const item = document.createElement('div');
+        item.className = `element-item ${hasProblem ? 'problem' : ''}`;
+
+        const identifier = className || id || 'unnamed';
+
+        item.innerHTML = `
+          <strong>${identifier}</strong>
+          <div class="transform-info">SVG transform: ${transform}</div>
+          <div class="transform-info">CSS animation: ${getComputedStyle(g).animationName}</div>
+          ${hasProblem ? '<div style="color:#ff6b6b;">BUG: CSS animation will overwrite position!</div>' : ''}
+          <div class="position" data-selector=".${className || `#${id}`}">Position: calculating...</div>
+        `;
+
+        listEl.appendChild(item);
+
+        if (hasProblem) {
+          log(`PROBLEM: "${identifier}" has position transform AND CSS animation - will jump to origin!`, 'warning');
+        }
+      });
+    }
+
+    function trackPositions() {
+      if (!svgElement) {
+        log('No SVG loaded', 'error');
+        return;
+      }
+
+      frameCount++;
+      const groups = svgElement.querySelectorAll('g[class], g[id]');
+
+      groups.forEach(g => {
+        const className = g.getAttribute('class') || '';
+        const id = g.getAttribute('id') || '';
+        const identifier = className || id;
+
+        // Skip if doesn't match our patterns
+        const matchesPattern = TRACK_PATTERNS.some(p => p.pattern.test(identifier));
+        if (!matchesPattern && !identifier.includes('boy')) return;
+
+        // Get actual rendered position using getBoundingClientRect
+        const rect = g.getBoundingClientRect();
+        const svgRect = svgElement.getBoundingClientRect();
+
+        // Position relative to SVG
+        const relX = rect.left - svgRect.left;
+        const relY = rect.top - svgRect.top;
+
+        // Get computed transform
+        const computedStyle = getComputedStyle(g);
+        const computedTransform = computedStyle.transform;
+
+        // Check for origin position (potential bug)
+        if (relX < 50 && relY < 50 && identifier.includes('sheep')) {
+          log(`SHEEP AT ORIGIN! "${identifier}" at (${relX.toFixed(0)}, ${relY.toFixed(0)}) - CSS transform: ${computedTransform}`, 'error');
+        }
+
+        // Update position display
+        const posEl = document.querySelector(`[data-selector=".${className || `#${id}`}"]`);
+        if (posEl) {
+          posEl.textContent = `Position: (${relX.toFixed(0)}, ${relY.toFixed(0)}) | Computed: ${computedTransform}`;
+        }
+      });
+    }
+
+    function startContinuousTracking() {
+      if (trackingInterval) {
+        log('Already tracking', 'warning');
+        return;
+      }
+
+      log('Started continuous tracking (every 100ms)', 'info');
+      trackingInterval = setInterval(trackPositions, 100);
+    }
+
+    function stopTracking() {
+      if (trackingInterval) {
+        clearInterval(trackingInterval);
+        trackingInterval = null;
+        log('Stopped tracking', 'info');
+      }
+    }
+
+    // Load first SVG on page load
+    window.onload = () => loadSvg();
+  </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+{
+  "id": "conclusion",
+  "title": "The Aftermath",
+  "description": "Reflecting on the painful process",
+  "category": "conclusion",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#ccb3ea"
+  },
+  "entities": {
+    "pm": {
+      "type": "stickActor",
+      "x": 200,
+      "y": 380,
+      "scale": 1,
+      "head": "😊",
+      "name": "Product Manager"
+    },
+    "dev": {
+      "type": "stickActor",
+      "x": 760,
+      "y": 380,
+      "scale": 1,
+      "head": "😵",
+      "name": "Developer"
+    },
+    "whiteboard": {
+      "type": "whiteboard",
+      "x": 280,
+      "y": 30,
+      "width": 420,
+      "height": 390,
+      "initialText": "RULE CHANGE COST\n\n- React: 45 min + review\n- Go API: 1 hour + review\n- PostgreSQL: 1.5 hours + migration\n- Excel: 30 min\n\nTOTAL: ~4 hours",
+      "name": "whiteboard",
+      "scale": 1,
+      "moveDirection": 0,
+      "moveDistance": 0,
+      "moveDuration": 0.8,
+      "speechText": "",
+      "speechHold": 2
+    }
+  },
+  "timeline": [
+    {
+      "do": "fadeIn",
+      "args": {
+        "duration": 0.5
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsDown",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "presentRight",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "Great! The rule is updated everywhere!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Yeah... 4 hours for a one-number change.",
+        "hold": 2
+      }
+    },
+    {
+      "do": "pose",
+      "target": "pm",
+      "args": {
+        "name": "thinkingChin",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "pm",
+      "args": {
+        "emoji": "🤔"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "pm",
+      "args": {
+        "text": "What if marketing wants to change it again next week?",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😱"
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "handsUp",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "Then I do it all over again!",
+        "hold": 2
+      }
+    },
+    {
+      "do": "writeBoard",
+      "target": "whiteboard",
+      "args": {
+        "text": "\n\nRISKS:\n- Systems out of sync\n- Different bugs in each\n- Missed updates",
+        "speedCps": 50
+      }
+    },
+    {
+      "do": "pose",
+      "target": "dev",
+      "args": {
+        "name": "shrug",
+        "duration": 0.3
+      }
+    },
+    {
+      "do": "setHead",
+      "target": "dev",
+      "args": {
+        "emoji": "😔"
+      }
+    },
+    {
+      "do": "bubbleSay",
+      "target": "dev",
+      "args": {
+        "text": "There has to be a better way...",
+        "hold": 2.5
+      }
+    },
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1
+      }
+    }
+  ],
+  "_basePath": "adventures/rule-change-traditional/scenes/conclusion/"
+}

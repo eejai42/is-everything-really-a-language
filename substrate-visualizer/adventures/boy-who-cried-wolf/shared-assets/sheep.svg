@@ -1,0 +1,119 @@
+<!--
+  SHEEP - Reusable Character Component
+
+  Usage: Import and position with transform on OUTER wrapper
+  The sheep is drawn at origin (0,0) centered on body
+
+  Available CSS classes for state:
+    - .sheep--grazing: Head bobbing down to graze
+    - .sheep--walking: Moving legs, slight body bob
+    - .sheep--scared: Shaking, looking around frantically
+    - .sheep--idle: Standing still, occasional ear twitch
+
+  Facing direction:
+    - Default faces RIGHT (head on right side)
+    - Add transform="scale(-1,1)" to face LEFT
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -40 120 100">
+  <defs>
+    <style>
+      /* Grazing animation */
+      @keyframes sheep-graze {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        30% { transform: translateY(5px) rotate(5deg); }
+        60% { transform: translateY(3px) rotate(-3deg); }
+      }
+
+      /* Walking animation */
+      @keyframes sheep-walk-body {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+      }
+      @keyframes sheep-leg-front {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(15deg); }
+        75% { transform: rotate(-15deg); }
+      }
+      @keyframes sheep-leg-back {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-15deg); }
+        75% { transform: rotate(15deg); }
+      }
+
+      /* Scared animation */
+      @keyframes sheep-scared {
+        0%, 100% { transform: translateX(0) rotate(0deg); }
+        25% { transform: translateX(-3px) rotate(-3deg); }
+        75% { transform: translateX(3px) rotate(3deg); }
+      }
+
+      /* Ear twitch */
+      @keyframes sheep-ear-twitch {
+        0%, 90%, 100% { transform: rotate(0deg); }
+        95% { transform: rotate(10deg); }
+      }
+
+      /* GRAZING STATE */
+      .sheep--grazing .sheep-head {
+        animation: sheep-graze 3s ease-in-out infinite;
+        transform-origin: left center;
+      }
+
+      /* WALKING STATE */
+      .sheep--walking .sheep-body {
+        animation: sheep-walk-body 0.5s ease-in-out infinite;
+      }
+      .sheep--walking .sheep-leg-fl,
+      .sheep--walking .sheep-leg-br {
+        animation: sheep-leg-front 0.5s ease-in-out infinite;
+        transform-origin: top center;
+      }
+      .sheep--walking .sheep-leg-fr,
+      .sheep--walking .sheep-leg-bl {
+        animation: sheep-leg-back 0.5s ease-in-out infinite;
+        transform-origin: top center;
+      }
+
+      /* SCARED STATE */
+      .sheep--scared .sheep-container {
+        animation: sheep-scared 0.3s ease-in-out infinite;
+      }
+
+      /* IDLE STATE */
+      .sheep--idle .sheep-ear {
+        animation: sheep-ear-twitch 4s ease-in-out infinite;
+        transform-origin: bottom center;
+      }
+    </style>
+  </defs>
+
+  <g class="sheep-container">
+    <!-- Body (woolly) -->
+    <g class="sheep-body">
+      <!-- Main wool body -->
+      <ellipse cx="0" cy="0" rx="40" ry="28" fill="#FFFEF0"/>
+      <!-- Wool tufts -->
+      <ellipse cx="-20" cy="-8" rx="15" ry="12" fill="#FFFEF0"/>
+      <ellipse cx="20" cy="-8" rx="15" ry="12" fill="#FFFEF0"/>
+      <ellipse cx="0" cy="-18" rx="12" ry="10" fill="#FFFEF0"/>
+    </g>
+
+    <!-- Head (dark) - facing right by default -->
+    <g class="sheep-head">
+      <ellipse cx="40" cy="5" rx="18" ry="14" fill="#333"/>
+      <!-- Eye -->
+      <circle cx="48" cy="0" r="3" fill="white"/>
+      <circle cx="48" cy="0" r="1.5" fill="#333"/>
+      <!-- Ear -->
+      <ellipse class="sheep-ear" cx="35" cy="-8" rx="6" ry="10" fill="#333"/>
+    </g>
+
+    <!-- Legs -->
+    <g class="sheep-legs">
+      <rect class="sheep-leg-bl" x="-25" y="18" width="8" height="25" rx="3" fill="#333"/>
+      <rect class="sheep-leg-fl" x="-10" y="18" width="8" height="25" rx="3" fill="#333"/>
+      <rect class="sheep-leg-br" x="8" y="18" width="8" height="25" rx="3" fill="#333"/>
+      <rect class="sheep-leg-fr" x="22" y="18" width="8" height="25" rx="3" fill="#333"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,31 @@
+{
+  "id": "boring-day",
+  "title": "A Boring Day on the Hill",
+  "description": "The shepherd boy watches his sheep on a quiet hillside",
+  "category": "story",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#87ceeb"
+  },
+  "entities": {
+    "scene": {
+      "type": "svgCanvas",
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 540,
+      "svgSrc": "./resources/hillside-bored.svg"
+    }
+  },
+  "timeline": [
+    {
+      "do": "wait",
+      "args": {
+        "duration": 1.8
+      }
+    }
+  ],
+  "_basePath": "adventures/boy-who-cried-wolf/scenes/boring-day/"
+}

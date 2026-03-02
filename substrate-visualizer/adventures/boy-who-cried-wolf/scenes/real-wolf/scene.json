@@ -1,0 +1,31 @@
+{
+  "id": "real-wolf",
+  "title": "The Real Wolf",
+  "description": "A real wolf appears, but no one believes the boy",
+  "category": "story",
+  "version": 1,
+  "stage": {
+    "width": 960,
+    "height": 540,
+    "background": "#4A3F55"
+  },
+  "entities": {
+    "scene": {
+      "type": "svgCanvas",
+      "x": 0,
+      "y": 0,
+      "width": 960,
+      "height": 540,
+      "svgSrc": "./resources/wolf-attack.svg"
+    }
+  },
+  "timeline": [
+    {
+      "do": "wait",
+      "args": {
+        "duration": 10
+      }
+    }
+  ],
+  "_basePath": "adventures/boy-who-cried-wolf/scenes/real-wolf/"
+}
