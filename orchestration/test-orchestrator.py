@@ -195,8 +195,12 @@ def update_run_metadata(substrate_name: str, grades: dict, success: bool, error_
 # =============================================================================
 
 def to_snake_case(name: str) -> str:
-    """Convert PascalCase to snake_case: FamilyFuedQuestion -> family_fued_question"""
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    """Convert PascalCase to snake_case: FamilyFuedQuestion -> family_fued_question
+
+    Also handles fields with existing underscores: Bio_HockettScore -> bio_hockett_score
+    """
+    # Use [^_] to avoid doubling underscores when input already has them
+    s1 = re.sub('([^_])([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 

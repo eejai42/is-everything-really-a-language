@@ -48,7 +48,41 @@ AS $function$
 BEGIN
   RETURN ('Is ' || (SELECT NULLIF(name, '''') FROM language_candidates WHERE language_candidate_id = p_language_candidate_id) || ' a language?')::text;
 END;
-$function$
+$function$;
+
+CREATE OR REPLACE FUNCTION public.calc_language_candidates_bio_hockett_score(p_language_candidate_id text)
+ RETURNS integer
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+AS $function$
+DECLARE
+    candidate_record RECORD;
+BEGIN
+    -- Select the required attributes for the given language candidate ID
+    SELECT bio_has_semanticity, bio_has_arbitrariness, bio_has_discreteness, 
+           bio_has_duality_of_patterning, bio_has_productivity, 
+           bio_has_displacement, bio_has_cultural_transmission, 
+           bio_has_interchangeability, bio_has_feedback, 
+           bio_has_broadcast_transmission, bio_has_rapid_fading
+    INTO candidate_record
+    FROM language_candidates
+    WHERE language_candidate_id = p_language_candidate_id;
+
+    -- Calculate and return the Hockett score by summing up the boolean attributes
+    RETURN 
+        COALESCE(candidate_record.bio_has_semanticity, FALSE)::int +
+        COALESCE(candidate_record.bio_has_arbitrariness, FALSE)::int +
+        COALESCE(candidate_record.bio_has_discreteness, FALSE)::int +
+        COALESCE(candidate_record.bio_has_duality_of_patterning, FALSE)::int +
+        COALESCE(candidate_record.bio_has_productivity, FALSE)::int +
+        COALESCE(candidate_record.bio_has_displacement, FALSE)::int +
+        COALESCE(candidate_record.bio_has_cultural_transmission, FALSE)::int +
+        COALESCE(candidate_record.bio_has_interchangeability, FALSE)::int +
+        COALESCE(candidate_record.bio_has_feedback, FALSE)::int +
+        COALESCE(candidate_record.bio_has_broadcast_transmission, FALSE)::int +
+        COALESCE(candidate_record.bio_has_rapid_fading, FALSE)::int;
+END;
+$function$;
 """ ;
     erb:sQLTarget "Postgres" ;
     erb:customizationType "Functions" .
@@ -349,7 +383,20 @@ erb:LanguageCandidates_0 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 1 .
+    erb:sortOrder 1 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness true ;
+    erb:bio_HasDiscreteness true ;
+    erb:bio_HasDualityOfPatterning true ;
+    erb:bio_HasProductivity true ;
+    erb:bio_HasDisplacement true ;
+    erb:bio_HasCulturalTransmission true ;
+    erb:bio_HasInterchangeability true ;
+    erb:bio_HasFeedback true ;
+    erb:bio_HasBroadcastTransmission true ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VocalAuditory" .
 
 erb:LanguageCandidates_1 a erb:LanguageCandidates ;
     erb:languageCandidateId "a-coffee-mug" ;
@@ -369,7 +416,20 @@ erb:LanguageCandidates_1 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
-    erb:sortOrder 2 .
+    erb:sortOrder 2 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_2 a erb:LanguageCandidates ;
     erb:languageCandidateId "spoken-words" ;
@@ -389,7 +449,20 @@ erb:LanguageCandidates_2 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 3 .
+    erb:sortOrder 3 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness true ;
+    erb:bio_HasDiscreteness true ;
+    erb:bio_HasDualityOfPatterning true ;
+    erb:bio_HasProductivity true ;
+    erb:bio_HasDisplacement true ;
+    erb:bio_HasCulturalTransmission true ;
+    erb:bio_HasInterchangeability true ;
+    erb:bio_HasFeedback true ;
+    erb:bio_HasBroadcastTransmission true ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VocalAuditory" .
 
 erb:LanguageCandidates_3 a erb:LanguageCandidates ;
     erb:languageCandidateId "a-game-of-fortnite" ;
@@ -409,7 +482,20 @@ erb:LanguageCandidates_3 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
-    erb:sortOrder 4 .
+    erb:sortOrder 4 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_4 a erb:LanguageCandidates ;
     erb:languageCandidateId "sign-language" ;
@@ -429,7 +515,20 @@ erb:LanguageCandidates_4 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 5 .
+    erb:sortOrder 5 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness true ;
+    erb:bio_HasDiscreteness true ;
+    erb:bio_HasDualityOfPatterning true ;
+    erb:bio_HasProductivity true ;
+    erb:bio_HasDisplacement true ;
+    erb:bio_HasCulturalTransmission true ;
+    erb:bio_HasInterchangeability true ;
+    erb:bio_HasFeedback true ;
+    erb:bio_HasBroadcastTransmission true ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VisualGestural" .
 
 erb:LanguageCandidates_5 a erb:LanguageCandidates ;
     erb:languageCandidateId "editing-airtable-base" ;
@@ -449,7 +548,20 @@ erb:LanguageCandidates_5 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
-    erb:sortOrder 6 .
+    erb:sortOrder 6 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_6 a erb:LanguageCandidates ;
     erb:languageCandidateId "math" ;
@@ -469,7 +581,20 @@ erb:LanguageCandidates_6 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 7 .
+    erb:sortOrder 7 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_7 a erb:LanguageCandidates ;
     erb:languageCandidateId "falsifier-a" ;
@@ -489,7 +614,20 @@ erb:LanguageCandidates_7 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
-    erb:sortOrder 8 .
+    erb:sortOrder 8 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_8 a erb:LanguageCandidates ;
     erb:languageCandidateId "falsifier-b" ;
@@ -509,7 +647,20 @@ erb:LanguageCandidates_8 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 9 .
+    erb:sortOrder 9 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_9 a erb:LanguageCandidates ;
     erb:languageCandidateId "a-smartphone" ;
@@ -529,7 +680,20 @@ erb:LanguageCandidates_9 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
-    erb:sortOrder 10 .
+    erb:sortOrder 10 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_10 a erb:LanguageCandidates ;
     erb:languageCandidateId "python" ;
@@ -549,7 +713,20 @@ erb:LanguageCandidates_10 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 11 .
+    erb:sortOrder 11 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_11 a erb:LanguageCandidates ;
     erb:languageCandidateId "a-running-app" ;
@@ -569,7 +746,20 @@ erb:LanguageCandidates_11 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
-    erb:sortOrder 12 .
+    erb:sortOrder 12 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_12 a erb:LanguageCandidates ;
     erb:languageCandidateId "an-xlsx-doc" ;
@@ -589,7 +779,20 @@ erb:LanguageCandidates_12 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
-    erb:sortOrder 13 .
+    erb:sortOrder 13 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_13 a erb:LanguageCandidates ;
     erb:languageCandidateId "xlsx-editing" ;
@@ -609,7 +812,20 @@ erb:LanguageCandidates_13 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
-    erb:sortOrder 14 .
+    erb:sortOrder 14 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_14 a erb:LanguageCandidates ;
     erb:languageCandidateId "an-docx-doc" ;
@@ -629,7 +845,20 @@ erb:LanguageCandidates_14 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
-    erb:sortOrder 15 .
+    erb:sortOrder 15 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_15 a erb:LanguageCandidates ;
     erb:languageCandidateId "docx-editing" ;
@@ -649,7 +878,20 @@ erb:LanguageCandidates_15 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M4" ;
-    erb:sortOrder 16 .
+    erb:sortOrder 16 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_16 a erb:LanguageCandidates ;
     erb:languageCandidateId "owl-rdf-graphql-generally" ;
@@ -669,7 +911,20 @@ erb:LanguageCandidates_16 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
-    erb:sortOrder 17 .
+    erb:sortOrder 17 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_17 a erb:LanguageCandidates ;
     erb:languageCandidateId "a-thunderstorm" ;
@@ -689,7 +944,20 @@ erb:LanguageCandidates_17 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
-    erb:sortOrder 18 .
+    erb:sortOrder 18 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_18 a erb:LanguageCandidates ;
     erb:languageCandidateId "a-uml-file" ;
@@ -709,7 +977,20 @@ erb:LanguageCandidates_18 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
-    erb:sortOrder 23 .
+    erb:sortOrder 23 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_19 a erb:LanguageCandidates ;
     erb:languageCandidateId "the-mona-lisa" ;
@@ -729,7 +1010,20 @@ erb:LanguageCandidates_19 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "N/A" ;
     erb:modelObjectFacilityLayer "NA" ;
-    erb:sortOrder 20 .
+    erb:sortOrder 20 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_20 a erb:LanguageCandidates ;
     erb:languageCandidateId "binary-code" ;
@@ -749,7 +1043,20 @@ erb:LanguageCandidates_20 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M2" ;
-    erb:sortOrder 21 .
+    erb:sortOrder 21 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_21 a erb:LanguageCandidates ;
     erb:languageCandidateId "running-calculator-app" ;
@@ -769,7 +1076,20 @@ erb:LanguageCandidates_21 a erb:LanguageCandidates ;
     erb:distanceFromConcept 1 ;
     erb:dimensionalityWhileEditing "MultiDimensionalNonSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 22 .
+    erb:sortOrder 22 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
 
 erb:LanguageCandidates_22 a erb:LanguageCandidates ;
     erb:languageCandidateId "owa-cwa-falsifier" ;
@@ -789,4 +1109,347 @@ erb:LanguageCandidates_22 a erb:LanguageCandidates ;
     erb:distanceFromConcept 2 ;
     erb:dimensionalityWhileEditing "OneDimensionalSymbolic" ;
     erb:modelObjectFacilityLayer "M1" ;
-    erb:sortOrder 23 .
+    erb:sortOrder 23 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
+
+erb:LanguageCandidates_23 a erb:LanguageCandidates ;
+    erb:languageCandidateId "honeybee-waggle-dance" ;
+    erb:name "Honeybee Waggle Dance" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure false ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "Other" .
+
+erb:LanguageCandidates_24 a erb:LanguageCandidates ;
+    erb:languageCandidateId "vervet-monkey-alarm-calls" ;
+    erb:name "Vervet Monkey Alarm Calls" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure false ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VocalAuditory" .
+
+erb:LanguageCandidates_25 a erb:LanguageCandidates ;
+    erb:languageCandidateId "songbird-song-learned-dialects" ;
+    erb:name "Songbird Song (learned dialects)" ;
+    erb:isLanguage true ;
+    erb:hasSyntax true ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure false ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness true ;
+    erb:bio_HasDiscreteness true ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission true ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VocalAuditory" .
+
+erb:LanguageCandidates_26 a erb:LanguageCandidates ;
+    erb:languageCandidateId "killer-whale-pod-dialects" ;
+    erb:name "Killer Whale Pod Dialects" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure false ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness true ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement true ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission true ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
+
+erb:LanguageCandidates_27 a erb:LanguageCandidates ;
+    erb:languageCandidateId "dolphin-signature-whistles" ;
+    erb:name "Dolphin Signature Whistles" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure false ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback true ;
+    erb:bio_HasBroadcastTransmission true ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VocalAuditory" .
+
+erb:LanguageCandidates_28 a erb:LanguageCandidates ;
+    erb:languageCandidateId "ant-pheromone-trail-system" ;
+    erb:name "Ant Pheromone Trail System" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure false ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity false ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission true ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "Tactile" .
+
+erb:LanguageCandidates_29 a erb:LanguageCandidates ;
+    erb:languageCandidateId "cuttlefish-chromatophore-displays" ;
+    erb:name "Cuttlefish Chromatophore Displays" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure false ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity false ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VisualGestural" .
+
+erb:LanguageCandidates_30 a erb:LanguageCandidates ;
+    erb:languageCandidateId "nicaraguan-sign-language-early-cohort" ;
+    erb:name "Nicaraguan Sign Language (early cohort)" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure true ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness true ;
+    erb:bio_HasDiscreteness true ;
+    erb:bio_HasDualityOfPatterning true ;
+    erb:bio_HasProductivity true ;
+    erb:bio_HasDisplacement true ;
+    erb:bio_HasCulturalTransmission true ;
+    erb:bio_HasInterchangeability true ;
+    erb:bio_HasFeedback true ;
+    erb:bio_HasBroadcastTransmission true ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem true ;
+    erb:bio_PrimaryModality "VisualGestural" .
+
+erb:LanguageCandidates_31 a erb:LanguageCandidates ;
+    erb:languageCandidateId "homesign-single-child" ;
+    erb:name "Homesign (single child)" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure true ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness false ;
+    erb:bio_HasDiscreteness true ;
+    erb:bio_HasDualityOfPatterning false ;
+    erb:bio_HasProductivity true ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading true ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .
+
+erb:LanguageCandidates_32 a erb:LanguageCandidates ;
+    erb:languageCandidateId "bonobo-lexigram-keyboard-communication" ;
+    erb:name "Bonobo/Lexigram Keyboard Communication" ;
+    erb:isLanguage true ;
+    erb:hasSyntax false ;
+    erb:canBeHeld false ;
+    erb:category "Natural Language" ;
+    erb:hasIdentity false ;
+    erb:isParsed false ;
+    erb:resolvesToAnAST false ;
+    erb:hasLinearDecodingPressure true ;
+    erb:isStableOntologyReference false ;
+    erb:isLiveOntologyEditor false ;
+    erb:isOpenWorld false ;
+    erb:isClosedWorld false ;
+    erb:distanceFromConcept 0 ;
+    erb:dimensionalityWhileEditing "" ;
+    erb:modelObjectFacilityLayer "" ;
+    erb:sortOrder 0 ;
+    erb:bio_HasSemanticity true ;
+    erb:bio_HasArbitrariness true ;
+    erb:bio_HasDiscreteness false ;
+    erb:bio_HasDualityOfPatterning true ;
+    erb:bio_HasProductivity true ;
+    erb:bio_HasDisplacement false ;
+    erb:bio_HasCulturalTransmission false ;
+    erb:bio_HasInterchangeability false ;
+    erb:bio_HasFeedback false ;
+    erb:bio_HasBroadcastTransmission false ;
+    erb:bio_HasRapidFading false ;
+    erb:bio_IsEvolvedCommunicationSystem false ;
+    erb:bio_PrimaryModality "" .

@@ -192,6 +192,16 @@ def evaluate_formula(formula, row_data):
                     return False
             return True
 
+        # Handle OR(...)
+        if expr.upper().startswith('OR('):
+            inner = extract_parens(expr[2:])
+            args = split_args(inner)
+            for arg in args:
+                val = eval_expr(arg)
+                if val:
+                    return True
+            return False
+
         # Handle NOT(...)
         if expr.upper().startswith('NOT('):
             inner = extract_parens(expr[3:])
@@ -208,6 +218,37 @@ def evaluate_formula(formula, row_data):
             true_val = eval_expr(args[1]) if len(args) > 1 else None
             false_val = eval_expr(args[2]) if len(args) > 2 else None
             return true_val if condition else false_val
+
+        # Handle SUM(...)
+        if expr.upper().startswith('SUM('):
+            inner = extract_parens(expr[3:])
+            args = split_args(inner)
+            total = 0
+            for arg in args:
+                val = eval_expr(arg)
+                if val is not None:
+                    try:
+                        total += float(val) if isinstance(val, (int, float)) else float(val)
+                    except (ValueError, TypeError):
+                        pass
+            return int(total) if total == int(total) else total
+
+        # Handle comparison operators (check multi-char operators first)
+        for op, op_fn in [(' >= ', lambda a, b: a >= b),
+                          (' <= ', lambda a, b: a <= b),
+                          (' > ', lambda a, b: a > b),
+                          (' < ', lambda a, b: a < b),
+                          ('>=', lambda a, b: a >= b),
+                          ('<=', lambda a, b: a <= b),
+                          ('>', lambda a, b: a > b),
+                          ('<', lambda a, b: a < b)]:
+            if op in expr:
+                parts = expr.split(op, 1)
+                if len(parts) == 2:
+                    left = eval_expr(parts[0])
+                    right = eval_expr(parts[1])
+                    if left is not None and right is not None:
+                        return op_fn(left, right)
 
         # Handle equality: {{Field}} = value or value = value
         if ' = ' in expr or '=' in expr:

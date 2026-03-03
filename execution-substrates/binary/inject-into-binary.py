@@ -178,6 +178,11 @@ class IRConcat(IRNode):
     parts: List[IRNode]
 
 
+@dataclass
+class IRSum(IRNode):
+    operands: List[IRNode]
+
+
 # =============================================================================
 # PHASE 1: LEXER
 # =============================================================================
@@ -572,6 +577,10 @@ class IRLowerer:
                 operand = self.lower(ast.args[0])
                 return IRNot(result_type=DataType.BOOL, operand=operand)
 
+            if ast.name == 'SUM':
+                operands = [self.lower(arg) for arg in ast.args]
+                return IRSum(result_type=DataType.INT, operands=operands)
+
             raise ValueError(f"Unknown function: {ast.name}")
 
         if isinstance(ast, Concat):
@@ -845,13 +854,14 @@ class AsmGenerator:
             lines.append(f"    cbz w0, {else_label}")
 
             # Then branch
+            # Use x22/x23 for IF results to avoid clobbering x20/x21 used by IRSum/IRCompare
             _, then_code = self.gen_ir(ir.then_branch)
             lines.extend(then_code)
             if ir.result_type == DataType.STRING:
-                lines.append("    mov x20, x0")  # Save string ptr
-                lines.append("    mov x21, x1")  # Save string len
+                lines.append("    mov x22, x0")  # Save string ptr
+                lines.append("    mov x23, x1")  # Save string len
             else:
-                lines.append("    mov x20, x0")
+                lines.append("    mov x22, x0")
             lines.append(f"    b {end_label}")
 
             # Else branch
@@ -859,22 +869,36 @@ class AsmGenerator:
             _, else_code = self.gen_ir(ir.else_branch)
             lines.extend(else_code)
             if ir.result_type == DataType.STRING:
-                lines.append("    mov x20, x0")
-                lines.append("    mov x21, x1")
+                lines.append("    mov x22, x0")
+                lines.append("    mov x23, x1")
             else:
-                lines.append("    mov x20, x0")
+                lines.append("    mov x22, x0")
 
             # End - move result to x0
             lines.append(f"{end_label}:")
             if ir.result_type == DataType.STRING:
-                lines.append("    mov x0, x20")
-                lines.append("    mov x1, x21")
+                lines.append("    mov x0, x22")
+                lines.append("    mov x1, x23")
             elif ir.result_type == DataType.BOOL:
-                lines.append("    mov w0, w20")
+                lines.append("    mov w0, w22")
             else:
-                lines.append("    mov x0, x20")
+                lines.append("    mov x0, x22")
 
             return ("x0" if ir.result_type != DataType.BOOL else "w0", lines)
+
+        if isinstance(ir, IRSum):
+            # Sum all operands into x20 (accumulator)
+            lines.append("    mov x20, #0")  # Initialize accumulator to 0
+
+            for operand in ir.operands:
+                _, op_code = self.gen_ir(operand)
+                lines.extend(op_code)
+                # Add result to accumulator (x0 holds operand result)
+                lines.append("    add x20, x20, x0")
+
+            # Move result to x0
+            lines.append("    mov x0, x20")
+            return ("x0", lines)
 
         if isinstance(ir, IRConcat):
             # String concatenation - build result in a static buffer

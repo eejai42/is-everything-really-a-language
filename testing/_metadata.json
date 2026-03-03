@@ -5,12 +5,15 @@
       "has_grammar",
       "question",
       "predicted_answer",
+      "predicted_biological_language_core",
+      "predicted_biological_language_strict",
+      "bio_hockett_score",
       "prediction_predicates",
       "prediction_fail",
       "is_description_of",
       "is_open_closed_world_conflicted",
       "relationship_to_concept"
     ],
-    "record_count": 23
+    "record_count": 33
   }
 }

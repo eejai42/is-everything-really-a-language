@@ -245,6 +245,17 @@ class ExplainEvaluator:
                     result_value = else_val
                 result_type = self._infer_type(result_value)
 
+        elif name == "SUM":
+            total = 0
+            for v in arg_values:
+                if v is not None:
+                    try:
+                        total += float(v) if isinstance(v, (int, float)) else float(v)
+                    except (ValueError, TypeError):
+                        pass
+            result_value = int(total) if total == int(total) else total
+            result_type = "number"
+
         elif name == "LOWER":
             if len(arg_values) >= 1 and arg_values[0] is not None:
                 result_value = str(arg_values[0]).lower()

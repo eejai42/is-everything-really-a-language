@@ -438,28 +438,246 @@ _eval_language_candidates_predicted_answer:
     sub sp, sp, #256
     mov x19, x0
     ldrb w0, [x19, #34]
-    cbz w0, and_false_1
-    ldrb w0, [x19, #113]
-    cbz w0, and_false_1
-    ldrb w0, [x19, #120]
-    cbz w0, and_false_1
-    ldrb w0, [x19, #115]
-    cbz w0, and_false_1
-    ldrb w0, [x19, #114]
-    cbz w0, and_false_1
-    ldrb w0, [x19, #116]
-    cbz w0, and_false_1
+    cbz w0, and_false_3
+    ldrb w0, [x19, #121]
+    cbz w0, and_false_3
+    ldrb w0, [x19, #128]
+    cbz w0, and_false_3
+    ldrb w0, [x19, #123]
+    cbz w0, and_false_3
+    ldrb w0, [x19, #122]
+    cbz w0, and_false_3
+    ldrb w0, [x19, #124]
+    cbz w0, and_false_3
     ldrb w0, [x19, #35]
     eor w0, w0, #1
-    cbz w0, and_false_1
-    ldrb w0, [x19, #112]
+    cbz w0, and_false_3
+    ldrb w0, [x19, #120]
     eor w0, w0, #1
-    cbz w0, and_false_1
+    cbz w0, and_false_3
     mov w0, #1
-    b and_end_2
-and_false_1:
+    b and_end_4
+and_false_3:
     mov w0, #0
-and_end_2:
+and_end_4:
+    cbnz w0, or_true_1
+    ldr x0, [x19, #64]
+    mov x20, x0
+    mov x0, #0
+    cmp x20, x0
+    cset w0, gt
+    cbnz w0, or_true_1
+    mov w0, #0
+    b or_end_2
+or_true_1:
+    mov w0, #1
+or_end_2:
+    add sp, sp, #256
+    ldp x23, x24, [sp], #16
+    ldp x21, x22, [sp], #16
+    ldp x19, x20, [sp], #16
+    ldp x29, x30, [sp], #16
+    ret
+
+    .globl _eval_language_candidates_predicted_biological_language_core
+    .p2align 2
+_eval_language_candidates_predicted_biological_language_core:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    stp x19, x20, [sp, #-16]!
+    stp x21, x22, [sp, #-16]!
+    stp x23, x24, [sp, #-16]!
+    sub sp, sp, #256
+    mov x19, x0
+    ldrb w0, [x19, #219]
+    cbz w0, and_false_5
+    ldrb w0, [x19, #208]
+    cbz w0, and_false_5
+    ldrb w0, [x19, #209]
+    cbz w0, and_false_5
+    ldrb w0, [x19, #210]
+    cbz w0, and_false_5
+    ldrb w0, [x19, #211]
+    cbz w0, and_false_5
+    ldrb w0, [x19, #212]
+    cbz w0, and_false_5
+    ldrb w0, [x19, #213]
+    cbz w0, and_false_5
+    ldrb w0, [x19, #214]
+    cbz w0, and_false_5
+    mov w0, #1
+    b and_end_6
+and_false_5:
+    mov w0, #0
+and_end_6:
+    add sp, sp, #256
+    ldp x23, x24, [sp], #16
+    ldp x21, x22, [sp], #16
+    ldp x19, x20, [sp], #16
+    ldp x29, x30, [sp], #16
+    ret
+
+    .globl _eval_language_candidates_predicted_biological_language_strict
+    .p2align 2
+_eval_language_candidates_predicted_biological_language_strict:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    stp x19, x20, [sp, #-16]!
+    stp x21, x22, [sp, #-16]!
+    stp x23, x24, [sp, #-16]!
+    sub sp, sp, #256
+    mov x19, x0
+    ldrb w0, [x19, #57]
+    cbz w0, and_false_7
+    ldrb w0, [x19, #215]
+    cbz w0, and_false_7
+    ldrb w0, [x19, #216]
+    cbz w0, and_false_7
+    mov w0, #1
+    b and_end_8
+and_false_7:
+    mov w0, #0
+and_end_8:
+    add sp, sp, #256
+    ldp x23, x24, [sp], #16
+    ldp x21, x22, [sp], #16
+    ldp x19, x20, [sp], #16
+    ldp x29, x30, [sp], #16
+    ret
+
+    .globl _eval_language_candidates_bio_hockett_score
+    .p2align 2
+_eval_language_candidates_bio_hockett_score:
+    stp x29, x30, [sp, #-16]!
+    mov x29, sp
+    stp x19, x20, [sp, #-16]!
+    stp x21, x22, [sp, #-16]!
+    stp x23, x24, [sp, #-16]!
+    sub sp, sp, #256
+    mov x19, x0
+    mov x20, #0
+    ldrb w0, [x19, #208]
+    cbz w0, if_else_9
+    mov x0, #1
+    mov x22, x0
+    b if_end_10
+if_else_9:
+    mov x0, #0
+    mov x22, x0
+if_end_10:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #209]
+    cbz w0, if_else_11
+    mov x0, #1
+    mov x22, x0
+    b if_end_12
+if_else_11:
+    mov x0, #0
+    mov x22, x0
+if_end_12:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #210]
+    cbz w0, if_else_13
+    mov x0, #1
+    mov x22, x0
+    b if_end_14
+if_else_13:
+    mov x0, #0
+    mov x22, x0
+if_end_14:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #211]
+    cbz w0, if_else_15
+    mov x0, #1
+    mov x22, x0
+    b if_end_16
+if_else_15:
+    mov x0, #0
+    mov x22, x0
+if_end_16:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #212]
+    cbz w0, if_else_17
+    mov x0, #1
+    mov x22, x0
+    b if_end_18
+if_else_17:
+    mov x0, #0
+    mov x22, x0
+if_end_18:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #213]
+    cbz w0, if_else_19
+    mov x0, #1
+    mov x22, x0
+    b if_end_20
+if_else_19:
+    mov x0, #0
+    mov x22, x0
+if_end_20:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #214]
+    cbz w0, if_else_21
+    mov x0, #1
+    mov x22, x0
+    b if_end_22
+if_else_21:
+    mov x0, #0
+    mov x22, x0
+if_end_22:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #215]
+    cbz w0, if_else_23
+    mov x0, #1
+    mov x22, x0
+    b if_end_24
+if_else_23:
+    mov x0, #0
+    mov x22, x0
+if_end_24:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #216]
+    cbz w0, if_else_25
+    mov x0, #1
+    mov x22, x0
+    b if_end_26
+if_else_25:
+    mov x0, #0
+    mov x22, x0
+if_end_26:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #217]
+    cbz w0, if_else_27
+    mov x0, #1
+    mov x22, x0
+    b if_end_28
+if_else_27:
+    mov x0, #0
+    mov x22, x0
+if_end_28:
+    mov x0, x22
+    add x20, x20, x0
+    ldrb w0, [x19, #218]
+    cbz w0, if_else_29
+    mov x0, #1
+    mov x22, x0
+    b if_end_30
+if_else_29:
+    mov x0, #0
+    mov x22, x0
+if_end_30:
+    mov x0, x22
+    add x20, x20, x0
+    mov x0, x20
     add sp, sp, #256
     ldp x23, x24, [sp], #16
     ldp x21, x22, [sp], #16
@@ -478,22 +696,22 @@ _eval_language_candidates_prediction_predicates:
     sub sp, sp, #256
     mov x19, x0
     ldrb w0, [x19, #34]
-    cbz w0, if_else_3
+    cbz w0, if_else_31
     adrp x0, str_2@PAGE
     add x0, x0, str_2@PAGEOFF
     mov x1, #10
-    mov x20, x0
-    mov x21, x1
-    b if_end_4
-if_else_3:
+    mov x22, x0
+    mov x23, x1
+    b if_end_32
+if_else_31:
     adrp x0, str_3@PAGE
     add x0, x0, str_3@PAGEOFF
     mov x1, #9
-    mov x20, x0
-    mov x21, x1
-if_end_4:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_32:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #16]
     str x1, [sp, #24]
     adrp x0, str_4@PAGE
@@ -501,23 +719,23 @@ if_end_4:
     mov x1, #3
     str x0, [sp, #32]
     str x1, [sp, #40]
-    ldrb w0, [x19, #113]
-    cbz w0, if_else_5
+    ldrb w0, [x19, #121]
+    cbz w0, if_else_33
     adrp x0, str_5@PAGE
     add x0, x0, str_5@PAGEOFF
     mov x1, #16
-    mov x20, x0
-    mov x21, x1
-    b if_end_6
-if_else_5:
+    mov x22, x0
+    mov x23, x1
+    b if_end_34
+if_else_33:
     adrp x0, str_6@PAGE
     add x0, x0, str_6@PAGEOFF
     mov x1, #16
-    mov x20, x0
-    mov x21, x1
-if_end_6:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_34:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #48]
     str x1, [sp, #56]
     adrp x0, str_4@PAGE
@@ -525,23 +743,23 @@ if_end_6:
     mov x1, #3
     str x0, [sp, #64]
     str x1, [sp, #72]
-    ldrb w0, [x19, #120]
-    cbz w0, if_else_7
+    ldrb w0, [x19, #128]
+    cbz w0, if_else_35
     adrp x0, str_7@PAGE
     add x0, x0, str_7@PAGEOFF
     mov x1, #19
-    mov x20, x0
-    mov x21, x1
-    b if_end_8
-if_else_7:
+    mov x22, x0
+    mov x23, x1
+    b if_end_36
+if_else_35:
     adrp x0, str_8@PAGE
     add x0, x0, str_8@PAGEOFF
     mov x1, #12
-    mov x20, x0
-    mov x21, x1
-if_end_8:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_36:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #80]
     str x1, [sp, #88]
     adrp x0, str_4@PAGE
@@ -549,23 +767,23 @@ if_end_8:
     mov x1, #3
     str x0, [sp, #96]
     str x1, [sp, #104]
-    ldrb w0, [x19, #115]
-    cbz w0, if_else_9
+    ldrb w0, [x19, #123]
+    cbz w0, if_else_37
     adrp x0, str_9@PAGE
     add x0, x0, str_9@PAGEOFF
     mov x1, #28
-    mov x20, x0
-    mov x21, x1
-    b if_end_10
-if_else_9:
+    mov x22, x0
+    mov x23, x1
+    b if_end_38
+if_else_37:
     adrp x0, str_10@PAGE
     add x0, x0, str_10@PAGEOFF
     mov x1, #20
-    mov x20, x0
-    mov x21, x1
-if_end_10:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_38:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #112]
     str x1, [sp, #120]
     adrp x0, str_4@PAGE
@@ -573,23 +791,23 @@ if_end_10:
     mov x1, #3
     str x0, [sp, #128]
     str x1, [sp, #136]
-    ldrb w0, [x19, #114]
-    cbz w0, if_else_11
+    ldrb w0, [x19, #122]
+    cbz w0, if_else_39
     adrp x0, str_11@PAGE
     add x0, x0, str_11@PAGEOFF
     mov x1, #15
-    mov x20, x0
-    mov x21, x1
-    b if_end_12
-if_else_11:
+    mov x22, x0
+    mov x23, x1
+    b if_end_40
+if_else_39:
     adrp x0, str_12@PAGE
     add x0, x0, str_12@PAGEOFF
     mov x1, #6
-    mov x20, x0
-    mov x21, x1
-if_end_12:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_40:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #144]
     str x1, [sp, #152]
     adrp x0, str_13@PAGE
@@ -597,23 +815,23 @@ if_end_12:
     mov x1, #2
     str x0, [sp, #160]
     str x1, [sp, #168]
-    ldrb w0, [x19, #116]
-    cbz w0, if_else_13
+    ldrb w0, [x19, #124]
+    cbz w0, if_else_41
     adrp x0, str_14@PAGE
     add x0, x0, str_14@PAGEOFF
     mov x1, #18
-    mov x20, x0
-    mov x21, x1
-    b if_end_14
-if_else_13:
+    mov x22, x0
+    mov x23, x1
+    b if_end_42
+if_else_41:
     adrp x0, str_15@PAGE
     add x0, x0, str_15@PAGEOFF
     mov x1, #14
-    mov x20, x0
-    mov x21, x1
-if_end_14:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_42:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #176]
     str x1, [sp, #184]
     adrp x0, str_16@PAGE
@@ -622,22 +840,22 @@ if_end_14:
     str x0, [sp, #192]
     str x1, [sp, #200]
     ldrb w0, [x19, #35]
-    cbz w0, if_else_15
+    cbz w0, if_else_43
     adrp x0, str_17@PAGE
     add x0, x0, str_17@PAGEOFF
     mov x1, #11
-    mov x20, x0
-    mov x21, x1
-    b if_end_16
-if_else_15:
+    mov x22, x0
+    mov x23, x1
+    b if_end_44
+if_else_43:
     adrp x0, str_18@PAGE
     add x0, x0, str_18@PAGEOFF
     mov x1, #13
-    mov x20, x0
-    mov x21, x1
-if_end_16:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_44:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #208]
     str x1, [sp, #216]
     adrp x0, str_13@PAGE
@@ -645,23 +863,23 @@ if_end_16:
     mov x1, #2
     str x0, [sp, #224]
     str x1, [sp, #232]
-    ldrb w0, [x19, #112]
-    cbz w0, if_else_17
+    ldrb w0, [x19, #120]
+    cbz w0, if_else_45
     adrp x0, str_19@PAGE
     add x0, x0, str_19@PAGEOFF
     mov x1, #12
-    mov x20, x0
-    mov x21, x1
-    b if_end_18
-if_else_17:
+    mov x22, x0
+    mov x23, x1
+    b if_end_46
+if_else_45:
     adrp x0, str_20@PAGE
     add x0, x0, str_20@PAGEOFF
     mov x1, #15
-    mov x20, x0
-    mov x21, x1
-if_end_18:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_46:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #240]
     str x1, [sp, #248]
     ldr x0, [sp, #16]
@@ -775,7 +993,7 @@ _eval_language_candidates_prediction_fail:
     cmp w20, w0
     cset w0, eq
     eor w0, w0, #1
-    cbz w0, if_else_19
+    cbz w0, if_else_47
     ldr x0, [x19, #16]
     ldr x1, [x19, #24]
     str x0, [sp, #16]
@@ -786,22 +1004,22 @@ _eval_language_candidates_prediction_fail:
     str x0, [sp, #32]
     str x1, [sp, #40]
     ldrb w0, [x19, #56]
-    cbz w0, if_else_21
+    cbz w0, if_else_49
     adrp x0, str_22@PAGE
     add x0, x0, str_22@PAGEOFF
     mov x1, #2
-    mov x20, x0
-    mov x21, x1
-    b if_end_22
-if_else_21:
+    mov x22, x0
+    mov x23, x1
+    b if_end_50
+if_else_49:
     adrp x0, str_23@PAGE
     add x0, x0, str_23@PAGEOFF
     mov x1, #5
-    mov x20, x0
-    mov x21, x1
-if_end_22:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_50:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #48]
     str x1, [sp, #56]
     adrp x0, str_24@PAGE
@@ -810,22 +1028,22 @@ if_end_22:
     str x0, [sp, #64]
     str x1, [sp, #72]
     ldrb w0, [x19, #32]
-    cbz w0, if_else_23
+    cbz w0, if_else_51
     adrp x0, str_22@PAGE
     add x0, x0, str_22@PAGEOFF
     mov x1, #2
-    mov x20, x0
-    mov x21, x1
-    b if_end_24
-if_else_23:
+    mov x22, x0
+    mov x23, x1
+    b if_end_52
+if_else_51:
     adrp x0, str_25@PAGE
     add x0, x0, str_25@PAGEOFF
     mov x1, #6
-    mov x20, x0
-    mov x21, x1
-if_end_24:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_52:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #80]
     str x1, [sp, #88]
     adrp x0, str_26@PAGE
@@ -867,37 +1085,37 @@ if_end_24:
     mov x1, x0
     mov x0, x22
     bl _string_concat
-    mov x20, x0
-    mov x21, x1
-    b if_end_20
-if_else_19:
+    mov x22, x0
+    mov x23, x1
+    b if_end_48
+if_else_47:
     adrp x0, str_27@PAGE
     add x0, x0, str_27@PAGEOFF
     mov x1, #0
-    mov x20, x0
-    mov x21, x1
-if_end_20:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_48:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #16]
     str x1, [sp, #24]
-    ldrb w0, [x19, #136]
-    cbz w0, if_else_25
+    ldrb w0, [x19, #144]
+    cbz w0, if_else_53
     adrp x0, str_28@PAGE
     add x0, x0, str_28@PAGEOFF
     mov x1, #40
-    mov x20, x0
-    mov x21, x1
-    b if_end_26
-if_else_25:
+    mov x22, x0
+    mov x23, x1
+    b if_end_54
+if_else_53:
     adrp x0, str_27@PAGE
     add x0, x0, str_27@PAGEOFF
     mov x1, #0
-    mov x20, x0
-    mov x21, x1
-if_end_26:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_54:
+    mov x0, x22
+    mov x1, x23
     str x0, [sp, #32]
     str x1, [sp, #40]
     ldr x0, [sp, #16]
@@ -927,7 +1145,7 @@ _eval_language_candidates_is_description_of:
     stp x23, x24, [sp, #-16]!
     sub sp, sp, #256
     mov x19, x0
-    ldr x0, [x19, #128]
+    ldr x0, [x19, #136]
     mov x20, x0
     mov x0, #1
     cmp x20, x0
@@ -949,15 +1167,15 @@ _eval_language_candidates_is_open_closed_world_conflicted:
     stp x23, x24, [sp, #-16]!
     sub sp, sp, #256
     mov x19, x0
-    ldrb w0, [x19, #118]
-    cbz w0, and_false_27
-    ldrb w0, [x19, #119]
-    cbz w0, and_false_27
+    ldrb w0, [x19, #126]
+    cbz w0, and_false_55
+    ldrb w0, [x19, #127]
+    cbz w0, and_false_55
     mov w0, #1
-    b and_end_28
-and_false_27:
+    b and_end_56
+and_false_55:
     mov w0, #0
-and_end_28:
+and_end_56:
     add sp, sp, #256
     ldp x23, x24, [sp], #16
     ldp x21, x22, [sp], #16
@@ -975,27 +1193,27 @@ _eval_language_candidates_relationship_to_concept:
     stp x23, x24, [sp, #-16]!
     sub sp, sp, #256
     mov x19, x0
-    ldr x0, [x19, #128]
+    ldr x0, [x19, #136]
     mov x20, x0
     mov x0, #1
     cmp x20, x0
     cset w0, eq
-    cbz w0, if_else_29
+    cbz w0, if_else_57
     adrp x0, str_29@PAGE
     add x0, x0, str_29@PAGEOFF
     mov x1, #10
-    mov x20, x0
-    mov x21, x1
-    b if_end_30
-if_else_29:
+    mov x22, x0
+    mov x23, x1
+    b if_end_58
+if_else_57:
     adrp x0, str_30@PAGE
     add x0, x0, str_30@PAGEOFF
     mov x1, #15
-    mov x20, x0
-    mov x21, x1
-if_end_30:
-    mov x0, x20
-    mov x1, x21
+    mov x22, x0
+    mov x23, x1
+if_end_58:
+    mov x0, x22
+    mov x1, x23
     add sp, sp, #256
     ldp x23, x24, [sp], #16
     ldp x21, x22, [sp], #16

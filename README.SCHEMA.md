@@ -318,6 +318,16 @@ The following entities have been evaluated against the operational definition of
 | Binary Code | Formal Language | No | ✓ | ✗ | ✓ | ✗ | - |
 | Running Calculator App | Running Software | No | ✗ | ✗ | ✗ | ✗ | - |
 | OWA & CWA Falsifier | MISSING: Have you seen this Language? | No | ✓ | ✗ | ✓ | ✗ | - |
+| Honeybee Waggle Dance | Natural Language | No | ✗ | ✗ | ✗ | ✗ | - |
+| Vervet Monkey Alarm Calls | Natural Language | No | ✗ | ✗ | ✗ | ✗ | - |
+| Songbird Song (learned dialects) | Natural Language | No | ✓ | ✗ | ✗ | ✗ | - |
+| Killer Whale Pod Dialects | Natural Language | No | ✗ | ✗ | ✗ | ✗ | - |
+| Dolphin Signature Whistles | Natural Language | No | ✗ | ✗ | ✗ | ✗ | - |
+| Ant Pheromone Trail System | Natural Language | No | ✗ | ✗ | ✗ | ✗ | - |
+| Cuttlefish Chromatophore Displays | Natural Language | No | ✗ | ✗ | ✗ | ✗ | - |
+| Nicaraguan Sign Language (early cohort) | Natural Language | No | ✗ | ✗ | ✓ | ✗ | - |
+| Homesign (single child) | Natural Language | No | ✗ | ✗ | ✓ | ✗ | - |
+| Bonobo/Lexigram Keyboard Communication | Natural Language | No | ✗ | ✗ | ✓ | ✗ | - |
 
 ### Predicate Legend
 
@@ -348,6 +358,9 @@ The following entities have been evaluated against the operational definition of
 | `CanBeHeld` | raw | boolean | Yes | Is this candidate physical/material.  I.e. could it at least theoretically "be held"? |
 | `Question` | calculated | string | Yes | Question that 100 random people could be asked, family feud style. |
 | `PredictedAnswer` | calculated | boolean | Yes | The predicted answer as the top most popular answer among those in the family feud polling pool. |
+| `PredictedBiologicalLanguage_Core` | calculated | boolean | Yes | - |
+| `PredictedBiologicalLanguage_Strict` | calculated | boolean | Yes | - |
+| `Bio_HockettScore` | calculated | integer | Yes | - |
 | `PredictionPredicates` | calculated | string | Yes | - |
 | `PredictionFail` | calculated | string | Yes | If the family feud answer does not match the chosen language candidates status then this explains what did not match. t also flags (in english) mismatch where a candidate is marked as BOTH open AND closed world which does not make sense. |
 | `Category` | raw | string | Yes | The general high level category of the candidate. |
@@ -366,6 +379,19 @@ The following entities have been evaluated against the operational definition of
 | `RelationshipToConcept` | calculated | string | Yes | - |
 | `ModelObjectFacilityLayer` | raw | string | Yes | - |
 | `SortOrder` | raw | integer | Yes | - |
+| `Bio_HasSemanticity` | raw | boolean | Yes | - |
+| `Bio_HasArbitrariness` | raw | boolean | Yes | - |
+| `Bio_HasDiscreteness` | raw | boolean | Yes | - |
+| `Bio_HasDualityOfPatterning` | raw | boolean | Yes | - |
+| `Bio_HasProductivity` | raw | boolean | Yes | - |
+| `Bio_HasDisplacement` | raw | boolean | Yes | - |
+| `Bio_HasCulturalTransmission` | raw | boolean | Yes | - |
+| `Bio_HasInterchangeability` | raw | boolean | Yes | - |
+| `Bio_HasFeedback` | raw | boolean | Yes | - |
+| `Bio_HasBroadcastTransmission` | raw | boolean | Yes | - |
+| `Bio_HasRapidFading` | raw | boolean | Yes | - |
+| `Bio_IsEvolvedCommunicationSystem` | raw | boolean | Yes | - |
+| `Bio_PrimaryModality` | raw | string | Yes | - |
 
 **Formula for `HasGrammar`:**
 ```
@@ -379,16 +405,57 @@ The following entities have been evaluated against the operational definition of
 
 **Formula for `PredictedAnswer`:**
 ```
-=AND(
-  {{HasSyntax}},
-  {{IsParsed}},
-  {{IsDescriptionOf}},
-  {{HasLinearDecodingPressure}},
-  {{ResolvesToAnAST}},
-  {{IsStableOntologyReference}},
-  NOT({{CanBeHeld}}),
-  NOT({{HasIdentity}})
+=OR(
+  AND(
+    {{HasSyntax}},
+    {{IsParsed}},
+    {{IsDescriptionOf}},
+    {{HasLinearDecodingPressure}},
+    {{ResolvesToAnAST}},
+    {{IsStableOntologyReference}},
+    NOT({{CanBeHeld}}),
+    NOT({{HasIdentity}})
+  ),
+  {{Bio_HockettScore}} > 0
 )
+```
+
+**Formula for `PredictedBiologicalLanguage_Core`:**
+```
+=AND(
+  {{Bio_IsEvolvedCommunicationSystem}},
+  {{Bio_HasSemanticity}},
+  {{Bio_HasArbitrariness}},
+  {{Bio_HasDiscreteness}},
+  {{Bio_HasDualityOfPatterning}},
+  {{Bio_HasProductivity}},
+  {{Bio_HasDisplacement}},
+  {{Bio_HasCulturalTransmission}}
+)
+```
+
+**Formula for `PredictedBiologicalLanguage_Strict`:**
+```
+=AND(
+  {{PredictedBiologicalLanguage_Core}},
+  {{Bio_HasInterchangeability}},
+  {{Bio_HasFeedback}}
+)
+```
+
+**Formula for `Bio_HockettScore`:**
+```
+=SUM(IF({{Bio_HasSemanticity}},1,0),
+IF({{Bio_HasArbitrariness}},1,0),
+IF({{Bio_HasDiscreteness}},1,0),
+IF({{Bio_HasDualityOfPatterning}},1,0),
+IF({{Bio_HasProductivity}},1,0),
+IF({{Bio_HasDisplacement}},1,0),
+IF({{Bio_HasCulturalTransmission}},1,0),
+IF({{Bio_HasInterchangeability}},1,0),
+IF({{Bio_HasFeedback}},1,0),
+IF({{Bio_HasBroadcastTransmission}},1,0),
+IF({{Bio_HasRapidFading}},1,0))
 ```
 
 **Formula for `PredictionPredicates`:**
@@ -419,7 +486,7 @@ The following entities have been evaluated against the operational definition of
 ```
 
 
-#### Sample Data (23 records)
+#### Sample Data (33 records)
 
 | Field | Value |
 |-------|-------|
@@ -443,6 +510,22 @@ The following entities have been evaluated against the operational definition of
 | `ResolvesToAnAST` | true |
 | `ModelObjectFacilityLayer` | M1 |
 | `PredictionPredicates` | Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity |
+| `Bio_HasSemanticity` | true |
+| `Bio_HasArbitrariness` | true |
+| `Bio_HasDiscreteness` | true |
+| `Bio_HasDualityOfPatterning` | true |
+| `Bio_HasProductivity` | true |
+| `Bio_HasDisplacement` | true |
+| `Bio_HasCulturalTransmission` | true |
+| `Bio_HasInterchangeability` | true |
+| `Bio_HasFeedback` | true |
+| `Bio_HasBroadcastTransmission` | true |
+| `Bio_HasRapidFading` | true |
+| `Bio_IsEvolvedCommunicationSystem` | true |
+| `Bio_PrimaryModality` | VocalAuditory |
+| `PredictedBiologicalLanguage_Core` | true |
+| `PredictedBiologicalLanguage_Strict` | true |
+| `Bio_HockettScore` | 11 |
 | `CanBeHeld` | false |
 | `PredictionFail` |  |
 | `HasIdentity` | false |

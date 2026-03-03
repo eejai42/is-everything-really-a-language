@@ -252,6 +252,16 @@ def call_bool_function(lib: ctypes.CDLL, func_name: str, struct_ptr: int) -> boo
     return bool(result)
 
 
+def call_int_function(lib: ctypes.CDLL, func_name: str, struct_ptr: int) -> int:
+    """Call an int-returning function."""
+    func = getattr(lib, func_name)
+    func.argtypes = [ctypes.c_void_p]
+    func.restype = ctypes.c_int64
+
+    result = func(struct_ptr)
+    return int(result)
+
+
 # =============================================================================
 # CALCULATED FIELD DISCOVERY
 # =============================================================================
@@ -294,36 +304,55 @@ def discover_calculated_fields(rulebook: dict, entity_name: str) -> dict:
 
 def process_records(data: List[dict], lib: ctypes.CDLL, schema: Dict[str, FieldInfo],
                     struct_size: int, available_funcs: dict) -> List[dict]:
-    """Process a list of records and compute calculated fields."""
+    """Process a list of records and compute calculated fields.
+
+    Uses multiple passes to handle dependencies between computed fields.
+    Each pass re-packs the struct with latest computed values.
+    """
     # Keep all string tables alive for the duration
     all_string_tables = []
 
     for i, record in enumerate(data):
         try:
-            # Create string table for this record (keep reference alive)
-            string_table = StringTable()
-            all_string_tables.append(string_table)
+            # Multiple passes to resolve dependencies between computed fields
+            max_passes = 5
+            for pass_num in range(max_passes):
+                # Create string table for this pass (keep reference alive)
+                string_table = StringTable()
+                all_string_tables.append(string_table)
 
-            # Pack record to struct bytes
-            struct_bytes = pack_test_answer(record, schema, struct_size, string_table)
+                # Pack record to struct bytes (includes previously computed values)
+                struct_bytes = pack_test_answer(record, schema, struct_size, string_table)
 
-            # Create ctypes buffer from bytes
-            struct_buf = ctypes.create_string_buffer(struct_bytes, struct_size)
-            struct_ptr = ctypes.addressof(struct_buf)
+                # Create ctypes buffer from bytes
+                struct_buf = ctypes.create_string_buffer(struct_bytes, struct_size)
+                struct_ptr = ctypes.addressof(struct_buf)
 
-            # Call each available function
-            for field_name, (func_name, ret_type) in available_funcs.items():
-                try:
-                    if ret_type == 'bool':
-                        result = call_bool_function(lib, func_name, struct_ptr)
-                    else:  # string
-                        result = call_string_function(lib, func_name, struct_ptr)
+                # Track if any values changed this pass
+                changes = False
 
-                    record[field_name] = result
-                except Exception as e:
-                    print(f"  Warning: Error calling {func_name} for record {i}: {e}")
-                    import traceback
-                    traceback.print_exc()
+                # Call each available function
+                for field_name, (func_name, ret_type) in available_funcs.items():
+                    try:
+                        if ret_type == 'bool':
+                            result = call_bool_function(lib, func_name, struct_ptr)
+                        elif ret_type == 'int':
+                            result = call_int_function(lib, func_name, struct_ptr)
+                        else:  # string
+                            result = call_string_function(lib, func_name, struct_ptr)
+
+                        # Check if value changed
+                        if record.get(field_name) != result:
+                            changes = True
+                            record[field_name] = result
+                    except Exception as e:
+                        print(f"  Warning: Error calling {func_name} for record {i}: {e}")
+                        import traceback
+                        traceback.print_exc()
+
+                # If no changes, we've reached a fixed point
+                if not changes:
+                    break
 
         except Exception as e:
             print(f"ERROR processing record {i}: {e}")

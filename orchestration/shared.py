@@ -159,8 +159,12 @@ import re
 
 
 def to_snake_case(name: str) -> str:
-    """Convert PascalCase to snake_case: UserAccounts -> user_accounts"""
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    """Convert PascalCase to snake_case: UserAccounts -> user_accounts
+
+    Also handles fields with existing underscores: Bio_HockettScore -> bio_hockett_score
+    """
+    # Use [^_] to avoid doubling underscores when input already has them
+    s1 = re.sub('([^_])([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 

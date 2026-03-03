@@ -1,140 +1,158 @@
 # Specification Document for Rulebook: PUBLISHED - ERB_semiotics-is-everything-a-language
 
 ## Overview
-This rulebook provides a structured framework for evaluating various language candidates based on specific criteria. It includes a set of calculated fields that derive insights about whether a candidate qualifies as a language, based on attributes such as syntax, parsing, and identity. The rulebook is generated from an Airtable base and includes detailed descriptions of each field, along with the necessary formulas for calculating derived values.
+This rulebook provides a structured framework for evaluating various candidates to determine if they can be classified as a language. It includes a set of calculated fields that derive insights based on raw input data about each language candidate. The rulebook is designed to facilitate the classification process by offering clear criteria and formulas for evaluation.
 
-## Entity: LanguageCandidates
+## Entities and Calculated Fields
 
-### Input Fields (Type: Raw)
+### Entity: LanguageCandidates
+
+#### Input Fields (Type: raw)
 1. **LanguageCandidateId**
-   - **Type:** String
+   - **Type:** string
    - **Description:** Unique identifier for the language candidate.
 
 2. **Name**
-   - **Type:** String
+   - **Type:** string
    - **Description:** Name of the language candidate being classified.
 
 3. **IsLanguage**
-   - **Type:** Boolean
-   - **Description:** Indicates if the candidate is considered a language.
+   - **Type:** boolean
+   - **Description:** Indicates if the candidate is classified as a language.
 
 4. **HasSyntax**
-   - **Type:** Boolean
+   - **Type:** boolean
    - **Description:** Indicates if the language candidate has syntax and/or grammar.
 
 5. **CanBeHeld**
-   - **Type:** Boolean
-   - **Description:** Indicates if the candidate is physical/material and could theoretically be held.
+   - **Type:** boolean
+   - **Description:** Indicates if the candidate is physical/material.
 
-6. **DistanceFromConcept**
-   - **Type:** Integer
-   - **Description:** A numerical representation of how closely the candidate relates to a specific concept.
+6. **IsParsed**
+   - **Type:** boolean
+   - **Description:** Indicates if the information requires parsing before meaning can be extracted.
 
-7. **HasIdentity**
-   - **Type:** Boolean
-   - **Description:** Indicates if the candidate can be assigned a unique identifier.
+7. **ResolvesToAnAST**
+   - **Type:** boolean
+   - **Description:** Indicates if the information resolves to an Abstract Syntax Tree (AST).
 
-8. **IsParsed**
-   - **Type:** Boolean
-   - **Description:** Indicates if the knowledge/information requires parsing before meaning can be extracted.
+8. **HasLinearDecodingPressure**
+   - **Type:** boolean
+   - **Description:** Indicates if there is linear decoding pressure in the candidate.
 
-9. **ResolvesToAnAST**
-   - **Type:** Boolean
-   - **Description:** Indicates if the knowledge/information can be represented as an Abstract Syntax Tree (AST).
+9. **IsStableOntologyReference**
+   - **Type:** boolean
+   - **Description:** Indicates if the candidate is a stable ontology reference.
 
-10. **HasLinearDecodingPressure**
-    - **Type:** Boolean
-    - **Description:** Indicates if the candidate has linear decoding pressure.
+10. **HasIdentity**
+    - **Type:** boolean
+    - **Description:** Indicates if the candidate can be assigned a unique identifier.
 
-11. **IsStableOntologyReference**
-    - **Type:** Boolean
-    - **Description:** Indicates if the candidate is a stable ontology reference.
+11. **DistanceFromConcept**
+    - **Type:** integer
+    - **Description:** Distance from the core concept being evaluated.
 
 12. **IsOpenWorld**
-    - **Type:** Boolean
-    - **Description:** Indicates if the candidate is considered to be in an open world context.
+    - **Type:** boolean
+    - **Description:** Indicates if the candidate is considered an open world.
 
 13. **IsClosedWorld**
-    - **Type:** Boolean
-    - **Description:** Indicates if the candidate is considered to be in a closed world context.
+    - **Type:** boolean
+    - **Description:** Indicates if the candidate is considered a closed world.
 
-14. **IsDescriptionOf**
-    - **Type:** Boolean
-    - **Description:** Indicates if the candidate describes a concept rather than being the concept itself.
-
-### Calculated Fields (Type: Calculated)
+#### Calculated Fields (Type: calculated)
 
 1. **HasGrammar**
    - **Description:** Determines if the candidate has grammar based on the presence of syntax.
-   - **Calculation:** If `HasSyntax` is true, then `HasGrammar` is true.
+   - **How to Compute:** If `HasSyntax` is true, then `HasGrammar` is true; otherwise, it is false.
    - **Formula:** `={{HasSyntax}} = TRUE()`
-   - **Example:** If `HasSyntax` for "English" is true, then `HasGrammar` will also be true.
+   - **Example:** If `HasSyntax` is true, then `HasGrammar` is true.
 
 2. **Question**
-   - **Description:** Constructs a question that could be posed to a group of people, family feud style.
-   - **Calculation:** The question is formed by concatenating "Is ", the candidate's name, and " a language?".
+   - **Description:** Constructs a question that could be asked in a Family Feud style.
+   - **How to Compute:** Combine the phrase "Is " with the `Name` of the candidate and append " a language?".
    - **Formula:** `="Is " & {{Name}} & " a language?"`
-   - **Example:** For "English", the question will be "Is English a language?".
+   - **Example:** For `Name` = "English", the output would be "Is English a language?".
 
 3. **PredictedAnswer**
-   - **Description:** Predicts the most popular answer based on various criteria.
-   - **Calculation:** The answer is true if all of the following conditions are met:
-     - Has syntax
-     - Is parsed
-     - Is a description of a concept
-     - Has linear decoding pressure
-     - Resolves to an AST
-     - Is a stable ontology reference
-     - Cannot be held
-     - Has no identity
+   - **Description:** Predicts if the candidate is likely to be considered a language based on various criteria.
+   - **How to Compute:** The answer is true if all of the following conditions are met:
+     - `HasSyntax` is true
+     - `IsParsed` is true
+     - `IsDescriptionOf` is true
+     - `HasLinearDecodingPressure` is true
+     - `ResolvesToAnAST` is true
+     - `IsStableOntologyReference` is true
+     - `CanBeHeld` is false
+     - `HasIdentity` is false
    - **Formula:** `=AND({{HasSyntax}}, {{IsParsed}}, {{IsDescriptionOf}}, {{HasLinearDecodingPressure}}, {{ResolvesToAnAST}}, {{IsStableOntologyReference}}, NOT({{CanBeHeld}}), NOT({{HasIdentity}}))`
-   - **Example:** For "English", if all conditions are met, `PredictedAnswer` will be true.
+   - **Example:** If all conditions are met for "English", `PredictedAnswer` would be true.
 
-4. **PredictionPredicates**
-   - **Description:** Summarizes the predicates that led to the prediction.
-   - **Calculation:** Concatenates the results of various predicates into a descriptive string.
-   - **Formula:** 
-     ```
-     =IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & 
-     IF({{IsParsed}}, "Requires Parsing", "No Parsing Needed") & " & " & 
-     IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & 
-     IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & 
-     IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & 
-     IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & " AND " & 
-     IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & 
-     IF({{HasIdentity}}, "Has Identity", "Has no Identity")
-     ```
-   - **Example:** For "English", the predicates will yield a string summarizing its characteristics.
+4. **PredictedBiologicalLanguage_Core**
+   - **Description:** Determines if the candidate meets the core biological language criteria.
+   - **How to Compute:** The answer is true if all of the following conditions are met:
+     - `Bio_IsEvolvedCommunicationSystem` is true
+     - `Bio_HasSemanticity` is true
+     - `Bio_HasArbitrariness` is true
+     - `Bio_HasDiscreteness` is true
+     - `Bio_HasDualityOfPatterning` is true
+     - `Bio_HasProductivity` is true
+     - `Bio_HasDisplacement` is true
+     - `Bio_HasCulturalTransmission` is true
+   - **Formula:** `=AND({{Bio_IsEvolvedCommunicationSystem}}, {{Bio_HasSemanticity}}, {{Bio_HasArbitrariness}}, {{Bio_HasDiscreteness}}, {{Bio_HasDualityOfPatterning}}, {{Bio_HasProductivity}}, {{Bio_HasDisplacement}}, {{Bio_HasCulturalTransmission}})`
+   - **Example:** If all biological criteria are met for "English", `PredictedBiologicalLanguage_Core` would be true.
 
-5. **PredictionFail**
-   - **Description:** Provides a message explaining any mismatch between the predicted answer and the actual classification.
-   - **Calculation:** If the predicted answer does not match `IsLanguage`, it constructs an explanation message.
-   - **Formula:** 
-     ```
-     =IF(NOT({{PredictedAnswer}} = {{IsLanguage}}),
-       {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & 
-       IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'", "") & 
-       IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.", "")
-     ```
-   - **Example:** If "A Coffee Mug" is predicted to be a language but is marked as not being one, the output will indicate the mismatch.
+5. **PredictedBiologicalLanguage_Strict**
+   - **Description:** Determines if the candidate meets the strict biological language criteria.
+   - **How to Compute:** The answer is true if `PredictedBiologicalLanguage_Core` is true and both `Bio_HasInterchangeability` and `Bio_HasFeedback` are true.
+   - **Formula:** `=AND({{PredictedBiologicalLanguage_Core}}, {{Bio_HasInterchangeability}}, {{Bio_HasFeedback}})`
+   - **Example:** If "English" meets the strict criteria, `PredictedBiologicalLanguage_Strict` would be true.
 
-6. **IsDescriptionOf**
-   - **Description:** Determines if the candidate describes a concept based on its distance from the concept.
-   - **Calculation:** If `DistanceFromConcept` is greater than 1, then it is a description.
-   - **Formula:** `={{DistanceFromConcept}} > 1`
-   - **Example:** If "English" has a `DistanceFromConcept` of 2, then `IsDescriptionOf` will be true.
+6. **Bio_HockettScore**
+   - **Description:** Computes a score based on various biological language attributes.
+   - **How to Compute:** Sum the boolean values of the following attributes:
+     - `Bio_HasSemanticity`
+     - `Bio_HasArbitrariness`
+     - `Bio_HasDiscreteness`
+     - `Bio_HasDualityOfPatterning`
+     - `Bio_HasProductivity`
+     - `Bio_HasDisplacement`
+     - `Bio_HasCulturalTransmission`
+     - `Bio_HasInterchangeability`
+     - `Bio_HasFeedback`
+     - `Bio_HasBroadcastTransmission`
+     - `Bio_HasRapidFading`
+   - **Formula:** `=SUM(IF({{Bio_HasSemanticity}},1,0), IF({{Bio_HasArbitrariness}},1,0), IF({{Bio_HasDiscreteness}},1,0), IF({{Bio_HasDualityOfPatterning}},1,0), IF({{Bio_HasProductivity}},1,0), IF({{Bio_HasDisplacement}},1,0), IF({{Bio_HasCulturalTransmission}},1,0), IF({{Bio_HasInterchangeability}},1,0), IF({{Bio_HasFeedback}},1,0), IF({{Bio_HasBroadcastTransmission}},1,0), IF({{Bio_HasRapidFading}},1,0))`
+   - **Example:** If all biological attributes for "English" are true, the `Bio_HockettScore` would be 11.
 
-7. **IsOpenClosedWorldConflicted**
-   - **Description:** Checks for conflicts between open and closed world designations.
-   - **Calculation:** True if both `IsOpenWorld` and `IsClosedWorld` are true.
+7. **PredictionPredicates**
+   - **Description:** Constructs a string that summarizes the predicates affecting the prediction.
+   - **How to Compute:** Combine the results of various boolean fields into a descriptive string.
+   - **Formula:** `=IF({{HasSyntax}}, "Has Syntax", "No Syntax") & " & " & IF({{IsParsed}}, "Requires Parsing", "No Parsing Needed") & " & " & IF({{IsDescriptionOf}}, "Describes the thing", "Is the Thing") & " & " & IF({{HasLinearDecodingPressure}}, "Has Linear Decoding Pressure", "No Decoding Pressure") & " & " & IF({{ResolvesToAnAST}}, "Resolves to AST", "No AST") & ", " & IF({{IsStableOntologyReference}}, "Is Stable Ontology", "Not 'Ontology'") & " AND " & IF({{CanBeHeld}}, "Can Be Held", "Can't Be Held") & ", " & IF({{HasIdentity}}, "Has Identity", "Has no Identity")`
+   - **Example:** For "English", the output might be "Has Syntax & Requires Parsing & Describes the thing & Has Linear Decoding Pressure & Resolves to AST, Is Stable Ontology AND Can't Be Held, Has no Identity".
+
+8. **PredictionFail**
+   - **Description:** Provides an explanation if the predicted answer does not match the actual classification.
+   - **How to Compute:** If `PredictedAnswer` does not equal `IsLanguage`, construct a message explaining the mismatch.
+   - **Formula:** `=IF(NOT({{PredictedAnswer}} = {{IsLanguage}}), {{Name}} & " " & IF({{PredictedAnswer}}, "Is", "Isn't") & " a Family Feud Language, but " & IF({{IsLanguage}}, "Is", "Is Not") & " marked as a 'Language Candidate.'", "") & IF({{IsOpenClosedWorldConflicted}}, " - Open World vs. Closed World Conflict.", "")`
+   - **Example:** If `PredictedAnswer` for "A Coffee Mug" is false and `IsLanguage` is true, the output would be "A Coffee Mug Isn't a Family Feud Language, but Is marked as a 'Language Candidate.'".
+
+9. **IsOpenClosedWorldConflicted**
+   - **Description:** Indicates if there is a conflict between being classified as both open and closed world.
+   - **How to Compute:** The answer is true if both `IsOpenWorld` and `IsClosedWorld` are true.
    - **Formula:** `=AND({{IsOpenWorld}}, {{IsClosedWorld}})`
-   - **Example:** If both flags are true for "Falsifier A", then this field will indicate a conflict.
+   - **Example:** If both are true for "A Game of Fortnite", `IsOpenClosedWorldConflicted` would be true.
 
-8. **RelationshipToConcept**
-   - **Description:** Defines the relationship of the candidate to a concept based on its distance.
-   - **Calculation:** If `DistanceFromConcept` equals 1, it is a mirror; otherwise, it describes the concept.
-   - **Formula:** `=IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")`
-   - **Example:** For "A UML File" with a `DistanceFromConcept` of 2, the output will be "IsDescriptionOf".
+10. **IsDescriptionOf**
+    - **Description:** Indicates if the candidate is a description of the concept based on its distance.
+    - **How to Compute:** The answer is true if `DistanceFromConcept` is greater than 1.
+    - **Formula:** `={{DistanceFromConcept}} > 1`
+    - **Example:** If `DistanceFromConcept` for "English" is 2, `IsDescriptionOf` would be true.
 
-## Conclusion
-This specification outlines how to compute the calculated fields for the `LanguageCandidates` entity within the rulebook. By following the provided formulas and examples, users can derive the necessary values for each candidate without needing to reference the original formulas directly.
+11. **RelationshipToConcept**
+    - **Description:** Determines the relationship of the candidate to the core concept based on distance.
+    - **How to Compute:** If `DistanceFromConcept` equals 1, the output is "IsMirrorOf"; otherwise, it is "IsDescriptionOf".
+    - **Formula:** `=IF({{DistanceFromConcept}} = 1, "IsMirrorOf", "IsDescriptionOf")`
+    - **Example:** For "A Coffee Mug" with `DistanceFromConcept` of 1, the output would be "IsMirrorOf".
+
+This specification provides a comprehensive guide to understanding how to compute the calculated fields for each language candidate based on the raw input data in the rulebook. Each calculation is defined clearly, ensuring that the values can be derived accurately without needing to reference the original formulas directly.

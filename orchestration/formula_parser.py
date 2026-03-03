@@ -341,9 +341,11 @@ def to_snake_case(name: str) -> str:
     Examples:
         HasLinearDecodingPressure -> has_linear_decoding_pressure
         StableOntologyReference -> stable_ontology_reference
+        Bio_HockettScore -> bio_hockett_score
         Name -> name
     """
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    # Use [^_] to avoid doubling underscores when input already has them
+    s1 = re.sub('([^_])([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
@@ -501,6 +503,14 @@ def compile_to_python(ast: ASTNode) -> str:
                 return f'(str({arg}) if {arg} else "")'
             raise ValueError("CAST requires at least 1 argument")
 
+        if ast.name == 'SUM':
+            # SUM(a, b, c) -> (a + b + c)
+            # Typically used as SUM(IF(cond,1,0), IF(cond,1,0), ...)
+            if not ast.args:
+                return '0'
+            parts = [compile_to_python(arg) for arg in ast.args]
+            return '(' + ' + '.join(parts) + ')'
+
         raise ValueError(f"Unknown function: {ast.name}")
 
     if isinstance(ast, Concat):
@@ -598,6 +608,13 @@ def compile_to_javascript(ast: ASTNode, obj_name: str = 'candidate') -> str:
                 return f'({arg} ? String({arg}) : "")'
             raise ValueError("CAST requires at least 1 argument")
 
+        if ast.name == 'SUM':
+            # SUM(a, b, c) -> (a + b + c)
+            if not ast.args:
+                return '0'
+            parts = [compile_to_javascript(arg, obj_name) for arg in ast.args]
+            return '(' + ' + '.join(parts) + ')'
+
         raise ValueError(f"Unknown function: {ast.name}")
 
     if isinstance(ast, Concat):
@@ -617,6 +634,31 @@ def compile_to_javascript(ast: ASTNode, obj_name: str = 'candidate') -> str:
 # =============================================================================
 # GO CODE GENERATOR
 # =============================================================================
+
+def _compile_to_go_int(ast: ASTNode, struct_name: str, field_types: dict) -> str:
+    """Compile an AST node to a Go expression that returns an int.
+
+    This is used for SUM arguments where IF(cond, 1, 0) should return int, not string.
+    """
+    if isinstance(ast, LiteralInt):
+        return str(ast.value)
+
+    if isinstance(ast, FuncCall) and ast.name == 'IF':
+        # IF(cond, then, else) -> func() int { if cond { return then }; return else }()
+        if len(ast.args) < 2:
+            raise ValueError("IF requires at least 2 arguments")
+        cond = compile_to_go(ast.args[0], struct_name, field_types)
+        then_val = _compile_to_go_int(ast.args[1], struct_name, field_types)
+        else_val = _compile_to_go_int(ast.args[2], struct_name, field_types) if len(ast.args) > 2 else '0'
+        # Wrap condition in boolVal if it's a field ref
+        if isinstance(ast.args[0], FieldRef):
+            cond = f'boolVal({cond})'
+        return f'func() int {{ if {cond} {{ return {then_val} }}; return {else_val} }}()'
+
+    # For other expressions, fall back to the regular compiler
+    # (shouldn't happen in practice for SUM(IF(...), IF(...)))
+    return compile_to_go(ast, struct_name, field_types)
+
 
 def compile_to_go(ast: ASTNode, struct_name: str = 'lc', field_types: dict = None) -> str:
     """Compile an AST to a Go expression.
@@ -776,6 +818,17 @@ def compile_to_go(ast: ASTNode, struct_name: str = 'lc', field_types: dict = Non
                         return f'stringVal({arg})'
                 return f'fmt.Sprintf("%v", {arg})'
             raise ValueError("CAST requires at least 1 argument")
+
+        if ast.name == 'SUM':
+            # SUM(a, b, c) -> (a + b + c)
+            # Typically used as SUM(IF(cond,1,0), IF(cond,1,0), ...)
+            # For Go, we need IF to return int, not string
+            if not ast.args:
+                return '0'
+            parts = []
+            for arg in ast.args:
+                parts.append(_compile_to_go_int(arg, struct_name, field_types))
+            return '(' + ' + '.join(parts) + ')'
 
         raise ValueError(f"Unknown function: {ast.name}")
 

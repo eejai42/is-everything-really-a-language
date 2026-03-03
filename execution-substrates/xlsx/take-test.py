@@ -25,8 +25,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 
 def to_snake_case(name):
-    """Convert PascalCase or camelCase to snake_case."""
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    """Convert PascalCase or camelCase to snake_case.
+
+    Also handles fields with existing underscores: Bio_HockettScore -> bio_hockett_score
+    """
+    # Use [^_] to avoid doubling underscores when input already has them
+    s1 = re.sub('([^_])([A-Z][a-z]+)', r'\1_\2', name)
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 
@@ -125,6 +129,16 @@ def evaluate_excel_formula_recursive(formula, cell_data, col_to_header, get_cell
                     return False
             return True
 
+        # Handle OR(...)
+        if expr.upper().startswith('OR('):
+            inner = extract_parens(expr[2:])
+            args = split_args(inner)
+            for arg in args:
+                val = eval_expr(arg)
+                if val:
+                    return True
+            return False
+
         # Handle NOT(...)
         if expr.upper().startswith('NOT('):
             inner = extract_parens(expr[3:])
@@ -143,6 +157,20 @@ def evaluate_excel_formula_recursive(formula, cell_data, col_to_header, get_cell
             # This matches Excel behavior for string concatenation
             false_val = eval_expr(args[2]) if len(args) > 2 else ""
             return true_val if condition else false_val
+
+        # Handle SUM(...)
+        if expr.upper().startswith('SUM('):
+            inner = extract_parens(expr[3:])
+            args = split_args(inner)
+            total = 0
+            for arg in args:
+                val = eval_expr(arg)
+                if val is not None:
+                    try:
+                        total += float(val) if isinstance(val, (int, float)) else float(val)
+                    except (ValueError, TypeError):
+                        pass
+            return int(total) if total == int(total) else total
 
         # Handle comparison operators (>, <, >=, <=) - check these before equality
         for op, fn in [(' >= ', lambda a, b: a >= b),
@@ -325,6 +353,16 @@ def evaluate_excel_formula(formula, row_data, headers, col_to_header):
                     return False
             return True
 
+        # Handle OR(...)
+        if expr.upper().startswith('OR('):
+            inner = extract_parens(expr[2:])
+            args = split_args(inner)
+            for arg in args:
+                val = eval_expr(arg)
+                if val:
+                    return True
+            return False
+
         # Handle NOT(...)
         if expr.upper().startswith('NOT('):
             inner = extract_parens(expr[3:])
@@ -341,6 +379,20 @@ def evaluate_excel_formula(formula, row_data, headers, col_to_header):
             true_val = eval_expr(args[1]) if len(args) > 1 else None
             false_val = eval_expr(args[2]) if len(args) > 2 else None
             return true_val if condition else false_val
+
+        # Handle SUM(...)
+        if expr.upper().startswith('SUM('):
+            inner = extract_parens(expr[3:])
+            args = split_args(inner)
+            total = 0
+            for arg in args:
+                val = eval_expr(arg)
+                if val is not None:
+                    try:
+                        total += float(val) if isinstance(val, (int, float)) else float(val)
+                    except (ValueError, TypeError):
+                        pass
+            return int(total) if total == int(total) else total
 
         # Handle equality
         if ' = ' in expr or '=' in expr:

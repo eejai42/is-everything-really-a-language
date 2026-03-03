@@ -419,6 +419,11 @@ def compile_to_ocl(ast: ASTNode) -> str:
             haystack = compile_to_ocl(ast.args[1])
             return f'{haystack}.indexOf({needle})'
 
+        if ast.name == 'SUM':
+            # SUM of values - use arithmetic addition
+            parts = [compile_to_ocl(arg) for arg in ast.args]
+            return '(' + ' + '.join(parts) + ')'
+
         raise ValueError(f"Unknown function: {ast.name}")
 
     if isinstance(ast, Concat):

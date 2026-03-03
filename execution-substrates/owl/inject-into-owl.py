@@ -439,6 +439,11 @@ def compile_to_sparql(ast: ASTNode, field_bindings: Dict[str, str] = None) -> st
             haystack = compile_to_sparql(ast.args[1], field_bindings)
             return f'CONTAINS({haystack}, {needle})'
 
+        if ast.name == 'SUM':
+            # SUM of values - use arithmetic addition
+            parts = [compile_to_sparql(arg, field_bindings) for arg in ast.args]
+            return '(' + ' + '.join(parts) + ')'
+
         raise ValueError(f"Unknown function: {ast.name}")
 
     if isinstance(ast, Concat):

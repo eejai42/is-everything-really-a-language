@@ -97,7 +97,7 @@ def call_llm(prompt: str, skip_confirmation: bool = False) -> str:
         model=model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
-        max_tokens=8096,
+        max_tokens=16384,  # Increased from 8096 to handle larger outputs
     )
 
     response_text = response.choices[0].message.content
@@ -309,7 +309,13 @@ Return ONLY valid JSON - no markdown code blocks, no explanations, just the JSON
 
 
 def extract_json_from_response(response_text: str) -> list:
-    """Extract JSON array from LLM response."""
+    """Extract JSON array from LLM response.
+
+    Handles various LLM response formats:
+    - Raw JSON array
+    - Markdown code blocks (```json ... ```)
+    - Truncated responses (attempts partial recovery)
+    """
     # Try to parse directly first
     try:
         return json.loads(response_text)
@@ -319,11 +325,15 @@ def extract_json_from_response(response_text: str) -> list:
     # Try to find JSON array in the response
     text = response_text.strip()
 
-    # Remove markdown code blocks if present
+    # Remove markdown code blocks if present (strip first to handle trailing newlines)
     if text.startswith("```json"):
         text = text[7:]
     elif text.startswith("```"):
         text = text[3:]
+
+    # Strip again before checking end (handles newlines between JSON and closing ```)
+    text = text.strip()
+
     if text.endswith("```"):
         text = text[:-3]
 
@@ -340,6 +350,20 @@ def extract_json_from_response(response_text: str) -> list:
             print(f"JSON parse error: {e}")
             print(f"Attempted to parse: {text[start:start+200]}...")
 
+            # Try to recover partial data from truncated response
+            # Find the last complete object by looking for },
+            truncated_json = text[start:end+1]
+            last_complete = truncated_json.rfind('},')
+            if last_complete > 0:
+                # Try parsing up to the last complete object
+                partial = truncated_json[:last_complete+1] + ']'
+                try:
+                    records = json.loads(partial)
+                    print(f"RECOVERED {len(records)} complete records from truncated response")
+                    return records
+                except json.JSONDecodeError:
+                    pass
+
     return None
 
 
@@ -354,6 +378,8 @@ def process_entity(input_path: str, output_path: str, entity_name: str,
 
     If glossary and specification are provided (the English documents),
     uses those for the prompt. Otherwise falls back to raw schema.
+
+    Uses batching for large datasets to avoid token limits.
 
     Returns: (record_count, filled_field_count)
     """
@@ -376,32 +402,59 @@ def process_entity(input_path: str, output_path: str, entity_name: str,
             json.dump(test_data, f, indent=2)
         return (len(test_data), 0)
 
-    # Build prompt - prefer English documents if available
-    if specification:
-        doc_desc = "specification" + (" + glossary" if glossary else "")
-        print(f"    Using English prose documents ({doc_desc})")
-        prompt = build_prompt_with_english_docs(glossary, specification, entity_name,
-                                                 test_data, computed_columns)
-    else:
-        print(f"    WARNING: English documents not available, using raw schema fallback")
-        prompt = build_prompt(schema, entity_name, test_data)
+    # Use batching for large datasets to avoid token limits
+    BATCH_SIZE = 10  # Process 10 records at a time
+    all_filled_answers = []
 
-    response = call_llm(prompt)
+    if len(test_data) > BATCH_SIZE:
+        print(f"    Processing {len(test_data)} records in batches of {BATCH_SIZE}...")
 
-    # Parse response
-    filled_answers = extract_json_from_response(response)
+    for batch_start in range(0, len(test_data), BATCH_SIZE):
+        batch_end = min(batch_start + BATCH_SIZE, len(test_data))
+        batch_data = test_data[batch_start:batch_end]
 
-    if filled_answers is None:
-        print(f"Error: Could not parse LLM response as JSON for {entity_name}")
-        print("Response was:")
-        print(response[:1000])
-        # Write empty result
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(test_data, f, indent=2)
-        return (len(test_data), 0)
+        if len(test_data) > BATCH_SIZE:
+            print(f"    Batch {batch_start//BATCH_SIZE + 1}/{(len(test_data) + BATCH_SIZE - 1)//BATCH_SIZE}: records {batch_start+1}-{batch_end}")
+
+        # Build prompt - prefer English documents if available
+        if specification:
+            doc_desc = "specification" + (" + glossary" if glossary else "")
+            if batch_start == 0:  # Only print on first batch
+                print(f"    Using English prose documents ({doc_desc})")
+            prompt = build_prompt_with_english_docs(glossary, specification, entity_name,
+                                                     batch_data, computed_columns)
+        else:
+            if batch_start == 0:  # Only print on first batch
+                print(f"    WARNING: English documents not available, using raw schema fallback")
+            prompt = build_prompt(schema, entity_name, batch_data)
+
+        response = call_llm(prompt, skip_confirmation=batch_start > 0)
+
+        # Parse response
+        batch_answers = extract_json_from_response(response)
+
+        if batch_answers is None:
+            print(f"Error: Could not parse LLM response as JSON for {entity_name} (batch {batch_start//BATCH_SIZE + 1})")
+            print("Response was:")
+            print(response[:1000])
+            # Use original data for this batch (null values remain)
+            all_filled_answers.extend(batch_data)
+            continue
+
+        if len(batch_answers) != len(batch_data):
+            print(f"Warning: LLM returned {len(batch_answers)} records, expected {len(batch_data)}")
+            # Pad or truncate as needed
+            if len(batch_answers) < len(batch_data):
+                batch_answers.extend(batch_data[len(batch_answers):])
+            else:
+                batch_answers = batch_answers[:len(batch_data)]
+
+        all_filled_answers.extend(batch_answers)
+
+    filled_answers = all_filled_answers
 
     if len(filled_answers) != len(test_data):
-        print(f"Warning: LLM returned {len(filled_answers)} records, expected {len(test_data)}")
+        print(f"Warning: Total results {len(filled_answers)} records, expected {len(test_data)}")
 
     # Count filled fields
     filled_count = 0

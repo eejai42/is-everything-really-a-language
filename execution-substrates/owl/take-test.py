@@ -68,7 +68,9 @@ def field_to_property_uri(field_name: str) -> str:
 def camel_to_snake(name: str) -> str:
     """Convert CamelCase to snake_case for output compatibility."""
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    s2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    # Normalize consecutive underscores to single underscore
+    return re.sub('_+', '_', s2)
 
 
 def rdf_value_to_python(value):

@@ -473,7 +473,13 @@ class OCLInterpreter:
             return node.value
 
         if isinstance(node, OCLSelfAttr):
-            return self.attr_lookup.get(node.attr.lower())
+            # Try exact match (lowered), then normalized (no underscores)
+            attr_lower = node.attr.lower()
+            if attr_lower in self.attr_lookup:
+                return self.attr_lookup[attr_lower]
+            # Try without underscores for cross-format matching
+            attr_normalized = attr_lower.replace('_', '')
+            return self.attr_lookup.get(attr_normalized)
 
         if isinstance(node, OCLUnaryExpr):
             if node.op == 'not':
@@ -599,7 +605,9 @@ class OCLInterpreter:
 def camel_to_snake(name: str) -> str:
     """Convert CamelCase to snake_case for output compatibility."""
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    s2 = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    # Normalize consecutive underscores to single underscore
+    return re.sub('_+', '_', s2)
 
 
 def snake_to_pascal(name: str) -> str:
